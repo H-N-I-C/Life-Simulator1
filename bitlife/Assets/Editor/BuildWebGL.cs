@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 
@@ -21,6 +22,8 @@ public static class BuildWebGL
         PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Brotli;
         PlayerSettings.WebGL.template = "APPLICATION:Default";
         PlayerSettings.WebGL.decompressionFallback = true;
+        // Keep every reconstructed type while recovery is still in progress.
+        PlayerSettings.SetManagedStrippingLevel(NamedBuildTarget.WebGL, ManagedStrippingLevel.Disabled);
 
         var options = new BuildPlayerOptions
         {
