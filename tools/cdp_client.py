@@ -194,11 +194,16 @@ class _Caller:
         last = None
         while time.time() < deadline:
             last = self.js(expression)
-            # DOM elements serialize to {} (falsy) — accept any result
-            # except None/False, but flow expressions should still return
-            # real booleans where possible.
-            if last is not None and last is not False:
-                return last
+            # Strict booleans: a numeric 0, "" or {} must NOT pass. Flow
+            # expressions must return real booleans (wrap DOM lookups in !!).
+            if isinstance(last, bool):
+                if last:
+                    return last
+            elif last is not None:
+                raise TypeError(
+                    "wait_js expression returned non-boolean %r "
+                    "(%s); return an explicit boolean" %
+                    (last, desc or expression[:60]))
             time.sleep(0.1)
         raise TimeoutError("wait_js: %s (last=%r)" %
                            (desc or expression[:80], last))

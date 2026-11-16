@@ -1,0 +1,370 @@
+{
+  "schema_version": 2,
+  "_comment": "Original flavor events, elder years (ages 60+).",
+  "events": [
+    {
+      "id": "flavor_grandkid_question",
+      "title": "The Hard Question",
+      "text": "A grandkid looks up and asks {name} where the sky ends. The whole room goes quiet, waiting.",
+      "category": "elder",
+      "weight": 1,
+      "conditions": {
+        "min_age": 60,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "poetry",
+          "label": "Answer with poetry",
+          "known_effects": [
+            "+happiness (3-6)",
+            "+karma (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  6
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I said the sky ends wherever you stop looking. The kid nodded very seriously."
+        },
+        {
+          "id": "science",
+          "label": "Answer with science",
+          "known_effects": [
+            "+smarts (1-3)",
+            "+happiness (2-4)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  2,
+                  4
+                ]
+              }
+            }
+          },
+          "outcome_text": "I explained the atmosphere in layers. The kid fell asleep at layer two, happy."
+        }
+      ]
+    },
+    {
+      "id": "flavor_reunion_invite",
+      "title": "The Fiftieth Reunion",
+      "text": "An invitation to the school reunion arrives. {name} could see old friends, old rivals, and whoever kept the nicknames alive.",
+      "category": "elder",
+      "weight": 1,
+      "conditions": {
+        "min_age": 65,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "go",
+          "label": "Go to the reunion",
+          "known_effects": [
+            "-$50",
+            "+happiness (4-8)"
+          ],
+          "cost": {
+            "money": 50
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  4,
+                  8
+                ]
+              }
+            },
+            "money": -50
+          },
+          "outcome_text": "I went. Nobody remembered the nickname. Everybody remembered the good parts."
+        },
+        {
+          "id": "skip",
+          "label": "Skip it peacefully",
+          "known_effects": [
+            "+happiness (1-3)",
+            "+smarts (0-1)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "smarts": {
+                "randint": [
+                  0,
+                  1
+                ]
+              }
+            }
+          },
+          "outcome_text": "I stayed home, and the nicknames stayed retired."
+        }
+      ]
+    },
+    {
+      "id": "flavor_recipe_book",
+      "title": "The Recipe Ledger",
+      "text": "The family keeps asking for {name}'s recipes, the ones written nowhere and measured in handfuls.",
+      "category": "elder",
+      "weight": 1,
+      "conditions": {
+        "min_age": 60,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "write",
+          "label": "Write the whole cookbook",
+          "known_effects": [
+            "+smarts (2-4)",
+            "+happiness (3-6)",
+            "+karma (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  2,
+                  4
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  3,
+                  6
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I translated 'a handful' into actual cups. It took a month. It was worth it."
+        },
+        {
+          "id": "mystery",
+          "label": "Keep them oral tradition",
+          "known_effects": [
+            "+happiness (1-3)",
+            "-karma (0-1)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "karma": {
+                "randint": [
+                  0,
+                  1
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I smiled and said the secret is love. And butter. Mostly butter."
+        }
+      ]
+    },
+    {
+      "id": "flavor_park_bench",
+      "title": "The Bench Dynasty",
+      "text": "Another regular claims {name}'s usual park bench. Words have been exchanged. The pigeons are taking sides.",
+      "category": "elder",
+      "weight": 1,
+      "conditions": {
+        "min_age": 60,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "negotiate",
+          "label": "Negotiate a bench-sharing treaty",
+          "known_effects": [
+            "+happiness (2-5)",
+            "+karma (2-4)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "karma": {
+                "randint": [
+                  2,
+                  4
+                ]
+              }
+            },
+            "relationship": {
+              "role": "random_relation",
+              "delta": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "The two of us the usurper split the bench by morning and afternoon. The pigeons approved."
+        },
+        {
+          "id": "concede",
+          "label": "Find a better bench",
+          "known_effects": [
+            "+happiness (1-3)",
+            "+health (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "health": {
+                "randint": [
+                  0,
+                  2
+                ]
+              }
+            }
+          },
+          "outcome_text": "The new bench had better sun. Victory, eventually."
+        }
+      ]
+    },
+    {
+      "id": "flavor_doctor_floss_lecture",
+      "title": "The Lectures",
+      "text": "{name}'s doctor and dentist have formed an alliance: more walking, more flossing. They say it like it's easy.",
+      "category": "elder",
+      "weight": 1,
+      "conditions": {
+        "min_age": 60,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "reform",
+          "label": "Take the lecture to heart",
+          "known_effects": [
+            "+health (3-6)",
+            "-happiness (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "health": {
+                "randint": [
+                  3,
+                  6
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I walks daily and flosses like a professional. The alliance is satisfied."
+        },
+        {
+          "id": "rebel",
+          "label": "Nod politely, change nothing",
+          "known_effects": [
+            "+happiness (2-4)",
+            "-health (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  4
+                ]
+              },
+              "health": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I nodded with great sincerity. The floss sat untouched, also with great sincerity."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "schema_version": 2,
+  "events": [
+    {
+      "id": "partner_kidnapping",
+      "title": "Kidnapping",
+      "text": "Your {person:partner} has been kidnapped and is being held for ransom!",
+      "category": "family",
+      "weight": 1,
+      "chance_n": 250,
+      "conditions": {
+        "once_per_lifetime": false,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "partner"
+          },
+          {
+            "kind": "min_money",
+            "value": 1000000
+          },
+          {
+            "kind": "karma_gate",
+            "value": 130
+          }
+        ]
+      },
+      "sampled_at_offer": {
+        "ransom": {
+          "money_pct": [
+            0.2,
+            0.8
+          ]
+        }
+      },
+      "effects": {
+        "stats": {
+          "happiness": {
+            "randint": [
+              30,
+              40
+            ],
+            "sign": -1
+          }
+        }
+      },
+      "choices": [
+        {
+          "id": "pay",
+          "label": "Pay the ransom",
+          "known_effects": [
+            "-ransom (20-80% of your money)",
+            "usually a safe return"
+          ],
+          "cost": {
+            "money_sampled": "ransom"
+          },
+          "effects": {
+            "money": {
+              "sampled": "ransom",
+              "sign": -1
+            }
+          },
+          "outcomes": [
+            {
+              "weight": 5,
+              "effects": {
+                "stats": {
+                  "happiness": {
+                    "randint": [
+                      6,
+                      12
+                    ]
+                  }
+                },
+                "relationship": {
+                  "role": "partner",
+                  "delta": {
+                    "randint": [
+                      30,
+                      50
+                    ]
+                  }
+                }
+              },
+              "outcome_text": "I paid the ransom for their release."
+            },
+            {
+              "weight": 1,
+              "effects": {
+                "partner_death": "presumed dead"
+              },
+              "outcome_text": "I paid, but they never returned."
+            }
+          ]
+        },
+        {
+          "id": "police",
+          "label": "Involve the police",
+          "known_effects": [
+            "usually a rescue"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "outcomes": [
+            {
+              "weight": 2,
+              "effects": {
+                "stats": {
+                  "happiness": {
+                    "randint": [
+                      6,
+                      12
+                    ]
+                  }
+                },
+                "relationship": {
+                  "role": "partner",
+                  "delta": {
+                    "randint": [
+                      30,
+                      50
+                    ]
+                  }
+                }
+              },
+              "outcome_text": "The police secured their release."
+            },
+            {
+              "weight": 1,
+              "effects": {
+                "partner_death": "presumed dead"
+              },
+              "outcome_text": "The police could not secure their release."
+            }
+          ]
+        },
+        {
+          "id": "nothing",
+          "label": "Do nothing",
+          "known_effects": [
+            "-karma (8-16)",
+            "partner presumed dead"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "karma": {
+                "randint": [
+                  8,
+                  16
+                ],
+                "sign": -1
+              }
+            },
+            "partner_death": "presumed dead"
+          },
+          "outcome_text": "I did absolutely nothing."
+        }
+      ],
+      "_comment": "Legacy gate (player.py random_events): requires partner + money>=1M AND NOT x_in_y(karma,130) \u2014 i.e. karma must be BELOW 130 and the draw must pass. Scenarios exercising this event must set karma < 130 (e.g. 50); karma >= 130 blocks it entirely. chance_n 250 on top."
+    }
+  ]
+}

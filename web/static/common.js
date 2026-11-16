@@ -11,12 +11,31 @@ export async function loadCatalog() {
   return CATALOG;
 }
 
-/* Sequenced avatar rendering: concurrent calls cannot let an older
-   response overwrite a newer one, and failures keep the previous image.
-   Returns true on success, false on failure. */
+/* M0b avatar rendering: the server resolves a Fluent 3D emoji PNG;
+   the client draws it in a circle on the appearance's background colour
+   with badge overlays in the corner. Sequenced so an older response can
+   never overwrite a newer one; failures keep the previous image. */
+const backgroundCache = {};
+
+async function backgroundHex(backgroundId) {
+  if (backgroundId in backgroundCache) {
+    return backgroundCache[backgroundId];
+  }
+  try {
+    const data = await loadCatalog();
+    const entries = (data.catalog.background) || [];
+    const hit = entries.find((e) => e.id === backgroundId);
+    backgroundCache[backgroundId] = (hit && hit.hex) || "#eeeae4";
+  } catch (e) {
+    backgroundCache[backgroundId] = "#eeeae4";
+  }
+  return backgroundCache[backgroundId];
+}
+
 export async function renderAvatar(container, appearance, age, size) {
   const seq = (container._renderSeq || 0) + 1;
   container._renderSeq = seq;
+  appearance = appearance || {};
   try {
     const res = await fetch("/api/render", {
       method: "POST",
@@ -34,10 +53,35 @@ export async function renderAvatar(container, appearance, age, size) {
       console.warn(msg);
       return false;
     }
-    const text = await res.text();
+    const blob = await res.blob();
     if (container._renderSeq !== seq) return true;  // superseded
-    container.innerHTML = text;
+    const url = URL.createObjectURL(blob);
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = "";
+    img.width = size;
+    img.height = size;
+    container.innerHTML = "";
+    container.appendChild(img);
     container.title = "";
+    backgroundHex(appearance.background).then((hex) => {
+      if (container._renderSeq === seq) container.style.background = hex;
+    });
+    // badge overlays (babies/children carry none per the guardrail)
+    const badges = Array.isArray(appearance.badges)
+      ? appearance.badges : [];
+    if (badges.length && age > 12) { // guardrail: children render no badges
+      const corner = document.createElement("span");
+      corner.className = "badge-corner";
+      for (const b of badges.slice(0, 2)) { // contract cap: up to 2
+        const bi = document.createElement("img");
+        bi.src = "/static/avatars/badge_" + encodeURIComponent(b) + ".png";
+        bi.alt = "";
+        bi.className = "badge-icon";
+        corner.appendChild(bi);
+      }
+      container.appendChild(corner);
+    }
     return true;
   } catch (err) {
     if (container._renderSeq === seq) {

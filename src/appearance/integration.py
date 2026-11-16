@@ -25,6 +25,12 @@ def ensure_person_id(person):
     return pid
 
 
+def _is_v1_data(value):
+    """True for raw v1 appearance dicts (need base refinement from gender)."""
+    return isinstance(value, dict) and \
+        value.get("schema_version", SCHEMA_VERSION) < SCHEMA_VERSION
+
+
 def _as_appearance(value):
     """Tolerant coercion: Appearance, dict, or None.
 
@@ -63,7 +69,13 @@ def ensure_appearance(person, mother=None, father=None):
     not flagged adopted), the appearance is inherited; otherwise it is
     generated independently and made age-appropriate.
     """
-    existing = _as_appearance(getattr(person, "appearance", None))
+    raw = getattr(person, "appearance", None)
+    existing = _as_appearance(raw)
+    if existing is not None and _is_v1_data(raw):
+        # base refinement applies ONLY to freshly migrated v1 data; an
+        # established v2 'person' base (e.g. mixed-parent child) is data
+        # and must survive load unchanged.
+        existing.refine_base_from_gender(getattr(person, "gender", None))
     adopted = getattr(person, "adopted", False)
     if not adopted and (mother is not None or father is not None):
         mapp = _as_appearance(getattr(mother, "appearance", None)) if mother else None
@@ -129,6 +141,9 @@ def migrate_appearances(player):
         if app is None:
             missing.append(person)
         else:
+            raw = getattr(person, "appearance", None)
+            if _is_v1_data(raw):
+                app.refine_base_from_gender(getattr(person, "gender", None))
             person.appearance = app
 
     deferred_children = []

@@ -1,6 +1,6 @@
 import { renderAvatar, miniPersonChip } from "./common.js";
 import { normalizeState, financeRows, journalPeople,
-         ACTION_CATEGORIES } from "./adapter.js";
+         ACTION_CATEGORIES, GENERAL_CATEGORIES } from "./adapter.js";
 
 const $ = (id) => document.getElementById(id);
 const resumeView = $("resumeView");
@@ -157,18 +157,17 @@ function render() {
       The record remains.</p>` : ""}`;
   renderAvatar($("playerAvatar"), player.appearance || {}, player.age, 168);
 
-  // --- turn progress (visible multi-phase annual flow) ---
+  // --- turn progress (frozen cursor shape) ---
   const tc = $("turnCard");
-  if (s.turn && !s.pending) {
+  if (s.turn && (s.turn.pending || s.pending)) {
     tc.hidden = false;
-    const phases = s.turn.phases || [];
-    const done = phases.filter((p) => p.done).length;
-    tc.innerHTML = `<h2>This year</h2>
-      <p>${esc(s.turn.label || "Resolving the year…")} — phase ${done} of
-         ${phases.length || "?"}</p>
-      <div class="row">${phases.map((p) =>
-        `<span class="phase ${p.done ? "done" : ""}">${esc(p.label || p.id)}</span>`
-      ).join("")}</div>`;
+    const cursor = s.turn.cursor || {};
+    tc.innerHTML = `<h2>This year <span class="muted">(${esc(
+        s.turn.turn_id || "")})</span></h2>
+      <p>${s.pending
+        ? "A choice is needed before the year can continue."
+        : "Resolving the year…"} Current phase:
+        <b>${esc(cursor.phase_id || "year_start")}</b></p>`;
   } else {
     tc.hidden = true;
   }
@@ -193,22 +192,118 @@ function render() {
   if (op) showPendingPill(op);
 }
 
+function firstPerson(text) {
+  const player = state.player;
+  if (!player) return text;
+  const names = [player.name, player.name.split(" ")[0]].filter(Boolean)
+    .sort((a, b) => b.length - a.length);
+  for (const n of names) {
+    if (text.startsWith(n + " ")) return "I " + text.slice(n.length + 1);
+    if (text === n) return "I";
+  }
+  if (text.startsWith("You are ")) return "I am " + text.slice(8);
+  if (text.startsWith("You have ")) return "I have " + text.slice(9);
+  if (text.startsWith("Your ")) return "My " + text.slice(5);
+  if (text.startsWith("You ")) return "I " + text.slice(4);
+  return text;
+}
+
+const TURNED_RE = /^I turned \d+\.?$/;
+
+// never expose schema tokens to the player (engine resolves person
+// roles; this is a last-line strip in case one leaks)
+function stripTokens(text) {
+  return String(text).replace(/\{[a-z_]+:[^}]*\}/gi, "someone")
+    .replace(/\s{2,}/g, " ").trim();
+}
+
+// illness names read naturally lower-case inside sentences ("I recovered
+// from the common cold"); keep a fallback list plus the live illness set
+const KNOWN_CONDITIONS = ["Common Cold", "Flu", "Cancer", "Cold", "Food " +
+  "Poisoning", "Migraine", "Pneumonia", "Chicken Pox", "Measles"];
+
+function sentenceCaseConditions(text) {
+  const names = new Set(KNOWN_CONDITIONS);
+  const health = state.sections.health;
+  for (const i of (health && health.illnesses) || []) {
+    names.add(typeof i === "string" ? i : (i && i.name) || "");
+  }
+  for (const name of names) {
+    if (!name || name === name.toLowerCase()) continue;
+    const lower = name.toLowerCase();
+    let idx = text.indexOf(name);
+    while (idx !== -1) {
+      if (idx > 0) {  // not sentence-initial
+        text = text.slice(0, idx) + lower + text.slice(idx + name.length);
+        idx = text.indexOf(name, idx + lower.length);
+      } else {
+        idx = text.indexOf(name, idx + name.length);
+      }
+    }
+  }
+  return text;
+}
+
 function renderTimeline() {
+  // group entries per age into cards; drop "I turned N" filler (the card
+  // header already gives the age); collapse runs of quiet years; first
+  // person; chips only for OTHER people involved
   const j = $("journalList");
   j.innerHTML = "";
+  const groups = [];
   for (const e of state.journal) {
-    const li = document.createElement("li");
-    li.innerHTML = `<span class="jage">${e.age}</span> <span class="jtext">` +
-      `${esc(e.text)}</span>`;
-    const who = journalPeople(e, state.peopleById);
-    if (who.length) {
-      const chips = document.createElement("span");
-      chips.className = "jchips";
-      for (const person of who) chips.appendChild(miniPersonChip(person, 22));
-      li.appendChild(chips);
-    }
-    j.appendChild(li);
+    const text = sentenceCaseConditions(firstPerson(e.text));
+    if (TURNED_RE.test(text)) continue;  // age header covers this
+    const last = groups[groups.length - 1];
+    if (last && last.age === e.age) last.entries.push({ e, text });
+    else groups.push({ age: e.age, entries: [{ e, text }] });
   }
+  const frag = document.createDocumentFragment();
+  let quietFrom = null, quietTo = null;
+  const flushQuiet = () => {
+    if (quietFrom === null) return;
+    const li = document.createElement("li");
+    li.className = "jquiet";
+    li.textContent = quietFrom === quietTo
+      ? "Age " + quietFrom + ": a quiet year"
+      : "Ages " + quietFrom + "-" + quietTo + ": quiet years";
+    frag.appendChild(li);
+    quietFrom = quietTo = null;
+  };
+  let prevAge = null;
+  for (const g of groups) {
+    if (prevAge !== null && g.age > prevAge + 1) {
+      quietFrom = prevAge + 1;
+      quietTo = g.age - 1;
+    }
+    flushQuiet();
+    const card = document.createElement("li");
+    card.className = "jcard";
+    const head = document.createElement("div");
+    head.className = "jcard-head";
+    head.textContent = "Age " + g.age;
+    card.appendChild(head);
+    for (const { e, text } of g.entries) {
+      const line = document.createElement("div");
+      line.className = "jline";
+      line.textContent = stripTokens(text);
+      const others = journalPeople(e, state.peopleById)
+        .filter((p) => p.id !== state.playerId);
+      if (others.length) {
+        const chips = document.createElement("span");
+        chips.className = "jchips";
+        for (const person of others) {
+          chips.appendChild(miniPersonChip(person, 22));
+        }
+        line.appendChild(chips);
+      }
+      card.appendChild(line);
+    }
+    frag.appendChild(card);
+    prevAge = g.age;
+  }
+  flushQuiet();
+  j.appendChild(frag);
 }
 
 function kv(rows) {
@@ -226,10 +321,15 @@ function renderSectionCards() {
   if (sec.education) {
     const e = sec.education;
     ed.innerHTML = `<h2>Education</h2><div class="kvlist">${kv([
-      ["Stage", e.stage], ["Enrolled", e.enrolled ? "Yes" : "No"],
+      ["Stage", e.stage],
+      ["Enrolled", e.enrolled ? "Yes" : "No"],
       ["Grades", e.grades != null ? e.grades : null],
-      ["University years", e.university_years],
-      ["Student loan", e.loan_status],
+      ["Dropped out", e.dropped_out ? "Yes" : null],
+      ["High school done", e.graduated_high_school ? "Yes" : null],
+      ["University years left", e.university_years_remaining],
+      ...(e.loan && e.loan.has_loan
+          ? [["Loan remaining", "$" + e.loan.remaining.toLocaleString()]]
+          : []),
     ])}</div>`;
   } else {
     ed.innerHTML = `<h2>Education</h2><p class="muted">No education data yet.</p>`;
@@ -240,14 +340,20 @@ function renderSectionCards() {
   if (sec.work) {
     const w = sec.work;
     wk.innerHTML = `<h2>Work</h2><div class="kvlist">${kv([
-      ["Status", w.state || (w.employed ? "Employed" : "Not employed")],
-      ["Job", w.job_label], ["Hours", w.hours],
-      ["Salary", w.salary != null ? "$" + w.salary.toLocaleString() : null],
+      ["Status", w.retired ? "Retired"
+        : w.employed ? "Employed" : "Not employed"],
+      ["Job", w.employed ? w.job_label : null],
+      ["Hours", w.employed ? w.hours : null],
+      ["Salary", w.employed && w.salary != null
+        ? "$" + w.salary.toLocaleString() + "/yr" : null],
       ["Annual gross", w.effective_annual_gross != null
         ? "$" + w.effective_annual_gross.toLocaleString() : null],
-      ["Pension", w.pension != null ? "$" + w.pension.toLocaleString()
-                                   : null],
-      ["Performance", w.performance], ["Stress", w.stress],
+      ["Pension", w.pension != null && w.pension > 0
+        ? "$" + w.pension.toLocaleString() : null],
+      ["Performance", w.employed ? w.performance : null],
+      ["Stress", w.employed ? w.stress : null],
+      ["Years worked", w.years_worked != null ? w.years_worked : null],
+      ["Can retire", w.can_retire ? "Yes" : null],
     ])}</div>`;
   } else {
     wk.innerHTML = `<h2>Work</h2><p class="muted">No work data yet.</p>`;
@@ -259,18 +365,17 @@ function renderSectionCards() {
     const h = sec.health;
     const illnesses = (h.illnesses || []).map((i) =>
       `<li>${esc(i.name || i)} — ${esc(i.status || "")}</li>`).join("");
+    const treatments = (h.treatments_available || []).map((t) => esc(t));
     hc.innerHTML = `<h2>Health</h2>` +
       (illnesses ? `<ul>${illnesses}</ul>`
-                 : `<p class="muted">No active illnesses.</p>`);
+                 : `<p class="muted">No active illnesses.</p>`) +
+      (treatments.length
+        ? `<p class="muted">Treatments available: ${treatments.join(", ")}</p>`
+        : "");
   } else {
     hc.innerHTML = `<p class="muted">No health data yet.</p>`;
   }
 
-  // Activities placeholder copy
-  const ac = $("activitiesCard");
-  ac.innerHTML = `<h2>Activities</h2>` +
-    (sec.activities ? "" : `<p class="muted">Activities appear as they
-     become available.</p>`);
 
   // Finances
   const fin = financeRows(state);
@@ -286,8 +391,8 @@ function renderSectionCards() {
     <div class="kvlist">${kv([
       ["Balance", "$" + (fin.balance ?? state.money).toLocaleString()],
       ...(fin.debts || []).map((d) =>
-        [esc(d.label || d.category || "Debt") + " owed",
-         "$" + (d.amount ?? d.balance).toLocaleString()]),
+        [esc(d.label || d.kind || d.category || "Debt") + " owed",
+         "$" + (d.remaining ?? d.amount ?? d.balance ?? 0).toLocaleString()]),
     ])}</div>
     ${fin.estimate ? `<h2>Annual estimate <span class="muted">(forecast, not
       posted)</span></h2><div class="kvlist">${kv([
@@ -309,7 +414,40 @@ function renderSectionCards() {
       <th>Balance</th></tr></thead><tbody>${ledgerRows}</tbody></table>` : ""}`;
 }
 
+function renderFamilySection() {
+  const box = $("familySectionCard");
+  if (!box) return;
+  const f = state.sections.family;
+  if (!f) { box.innerHTML = ""; box.hidden = true; return; }
+  box.hidden = false;
+  const group = (title, ids) => {
+    const people = (ids || []).map((id) => state.peopleById[id])
+      .filter(Boolean);
+    if (!people.length) return "";
+    return `<h3>${esc(title)}</h3><div class="row">` +
+      people.map((p) => `<span class="chip mini"
+        data-person="${esc(p.id)}">${esc(p.name)}${p.alive ? "" : " †"}
+        · ${p.age}</span>`).join("") + `</div>`;
+  };
+  box.innerHTML = group("Parents", f.parents) +
+    group("Partner", f.partner ? [f.partner] : []) +
+    group("Children", f.children) +
+    group("Siblings", f.siblings);
+  // portraits for the chips (avatars render asynchronously)
+  box.querySelectorAll(".chip.mini[data-person]").forEach((chip) => {
+    const person = state.peopleById[chip.dataset.person];
+    if (!person) return;
+    const av = document.createElement("span");
+    av.className = "avatar mini";
+    av.style.width = "26px";
+    av.style.height = "26px";
+    chip.insertBefore(av, chip.firstChild);
+    renderAvatar(av, person.appearance || {}, person.age, 52);
+  });
+}
+
 function renderFamily() {
+  renderFamilySection();
   const fam = $("familyList");
   fam.innerHTML = "";
   for (const p of state.people.filter((p) => p.id !== state.playerId)) {
@@ -358,15 +496,18 @@ function renderActions() {
       box.innerHTML = `<p class="muted">Nothing available right now.</p>`;
     }
   }
-  // general (age_up etc.)
+  // general (life/orphan categories, e.g. age_up)
   const acts = $("actionList");
   acts.innerHTML = "";
-  for (const a of state.actionsByCategory.other) {
+  const general = state.actions.filter(
+    (a) => GENERAL_CATEGORIES.includes(a.category) ||
+          !ACTION_CATEGORIES.includes(a.category));
+  for (const a of general) {
     const b = actionButton(a);
     if (a.id === "age_up") b.classList.add("primary");
     acts.appendChild(b);
   }
-  if (!state.actionsByCategory.other.length) {
+  if (!general.length) {
     acts.innerHTML = "<p class=\"muted\">No actions available.</p>";
   }
 }
@@ -374,8 +515,18 @@ function renderActions() {
 function actionButton(a) {
   const b = document.createElement("button");
   const cost = costLabel(a);
-  b.innerHTML = esc(a.label) + (cost ? `<span class="cost">${cost}</span>` : "");
-  b.disabled = busy || !!state.pending;
+  const who = a.targetLabel ? ` — ${esc(a.targetLabel)}` : "";
+  b.innerHTML = esc(a.label) + who +
+    (cost ? `<span class="cost">${cost}</span>` : "");
+  // Frozen shape: ineligible actions arrive enabled:false with a reason.
+  b.disabled = busy || !!state.pending || !a.enabled;
+  if (!a.enabled && a.reason) {
+    b.title = a.reason;
+    const r = document.createElement("span");
+    r.className = "cost";
+    r.textContent = a.reason;
+    b.appendChild(r);
+  }
   b.addEventListener("click", () => onAction(a));
   return b;
 }
@@ -419,8 +570,8 @@ function buildInputRow(input, doc) {
     if (input.type === "number") {
       if (input.min != null) control.min = input.min;
       if (input.max != null) control.max = input.max;
-    } else {
-      control.maxLength = 60;
+    } else if (input.max != null) {
+      control.maxLength = input.max;
     }
   }
   control.id = id;
@@ -453,6 +604,14 @@ function collectInputs(doc) {
     } else {
       v = control.value.trim();
       if (input.required && !v) throw new Error(input.label + " is required");
+      if (v && input.min != null && v.length < input.min) {
+        throw new Error(input.label + " must be at least " + input.min +
+                        " characters");
+      }
+      if (v && input.max != null && v.length > input.max) {
+        throw new Error(input.label + " must be at most " + input.max +
+                        " characters");
+      }
     }
     payload[key] = v;
   }
@@ -512,13 +671,18 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
+const DANGER_KINDS = new Set(["surrender_final"]);
+
 function openDecisionModal() {
   const d = state.pending;
   const pill = $("decisionPill");
   if (pill) pill.hidden = true;
   lastFocusedBeforeModal = document.activeElement;
-  $("modalTitle").textContent = d.title;
-  $("modalText").textContent = d.text;
+  $("modalTitle").textContent = stripTokens(d.title);
+  // fatal/terminal choices get distinct danger styling
+  document.querySelector(".modal-box").classList.toggle(
+    "danger", DANGER_KINDS.has(d.kind));
+  $("modalText").textContent = stripTokens(d.text);
   const pp = $("modalPeople");
   pp.innerHTML = "";
   for (const pid of d.personIds) {
@@ -752,8 +916,8 @@ function renderLegacy() {
   resumeView.hidden = true;
   tabbar.hidden = true;
   legacyView.hidden = false;
-  const cont = s.continuation;
-  const eligible = (cont && cont.eligible_children) || [];
+  const eligible = (s.succession && s.succession.eligible) || [];
+  const generationNext = s.succession && s.succession.generation_next;
   legacyView.innerHTML = `
     <div class="card">
       <h2>A completed life</h2>
@@ -768,6 +932,8 @@ function renderLegacy() {
     </div>
     <div class="card" id="continueCard">
       <h2>Continue as a child</h2>
+      ${generationNext ? `<p class="muted">Generation ${esc(
+          generationNext)}</p>` : ""}
       ${eligible.length ? "" : `<p class="muted">No eligible children.</p>`}
       <div id="childList"></div>
     </div>`;
@@ -780,13 +946,13 @@ function renderLegacy() {
     const who = document.createElement("div");
     who.className = "who";
     who.innerHTML = `<div class="name">${esc(c.name)}</div>
-      <div class="role">Age ${c.age} · inherits ` +
-      `$${(c.inheritance ?? 0).toLocaleString()}</div>`;
+      <div class="role">Age ${esc(String(c.age))}</div>`;
     row.appendChild(av);
     row.appendChild(who);
     const btn = document.createElement("button");
     btn.textContent = "Continue";
-    btn.addEventListener("click", () => continueAs(c.id));
+    const pid = c.person_id || c.id;
+    btn.addEventListener("click", () => continueAs(pid));
     row.appendChild(btn);
     list.appendChild(row);
     renderAvatar(av, c.appearance, c.age, 96);
@@ -808,7 +974,7 @@ function continueAs(childId) {
   if (busy) return;
   busy = true;
   const requestId = crypto.randomUUID();
-  attempt("continue_as_child", requestId, { target_id: childId }, 0);
+  attempt("continue_as", requestId, { target_id: childId }, 0);
 }
 
 /* ---------- loading ---------- */
@@ -831,7 +997,8 @@ async function loadGame() {
   try {
     const raw = await api("/api/games/" + encodeURIComponent(gid));
     state = normalizeState(raw);
-    if (state.status === "dead" && state.continuation) {
+    if (state.status === "dead" &&
+        (state.succession || state.continuation)) {
       renderLegacy();
     } else {
       render();

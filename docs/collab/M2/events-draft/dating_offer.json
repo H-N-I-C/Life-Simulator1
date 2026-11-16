@@ -1,0 +1,32 @@
+{
+  "_status": "DRAFT; _proposal fields pending A acceptance",
+  "_oracle": "tests/fixtures/annual_events_oracle.json#events/dating_offer",
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "dating_offer",
+      "title": "A date?",
+      "text": "A {person:random} named {name} has asked you out.",
+      "category": "adult",
+      "weight": 1,
+      "chance_n": {"_proposal": "P4", "n": 16},
+      "conditions": {"min_age": 18, "once_per_lifetime": false,
+                     "requires": [{"kind": "no_partner", "_proposal": "P5 single-only"},
+                                  {"kind": "max_age_sampled", "randint": [42, 70], "_proposal": "P8 age < sampled ceiling"}]},
+      "choices": [
+        {"id": "accept", "label": "Start dating",
+         "known_effects": ["+happiness", "new partner (if compatible)"],
+         "cost": {"money": 0},
+         "outcomes": {"_proposal": "P3",
+           "compatibility_gate": true,
+           "success": {"effects": {"stats": {"happiness": {"randint": [12, 20], "_proposal": "P1"}},
+                                   "gain_partner": true, "_proposal": "P7"},
+                       "outcome_text": "You are now dating them."},
+           "failure": {"effects": {}, "outcome_text": "They rejected you."}}},
+        {"id": "reject", "label": "Reject them",
+         "known_effects": [], "cost": {"money": 0}, "effects": {},
+         "outcome_text": "You rejected them."}
+      ]
+    }
+  ]
+}

@@ -175,3 +175,24 @@ def instantiate(template, seq, name, parent_ids):
             for opt in template["options"]
         ],
     }
+
+
+def option_cost(option):
+    """Positive cost of an option, 0 when free. Accepts both the template
+    shape (effects) and the instantiated pending shape (_effects)."""
+    effects = option.get("_effects", option.get("effects", {}))
+    return max(0, -effects.get("money", 0))
+
+
+def has_free_option(template):
+    """Soft-lock rule: every decision must keep at least one option that is
+    always available (no cost), e.g. a decline/do-nothing path."""
+    return any(option_cost(o) == 0 for o in template["options"])
+
+
+def validate_templates():
+    """Structural soft-lock check over all templates."""
+    bad = [t["id"] for t in TEMPLATES if not has_free_option(t)]
+    if bad:
+        raise ValueError(
+            f"decision templates without a free option: {bad}")

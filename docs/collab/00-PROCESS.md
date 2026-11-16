@@ -29,3 +29,5 @@ Speed-up rules (user-approved, 2026-11-16)
 5. Content as data: events/careers are written in data files using a schema (defined in M2c), so content can be added without engine edits.
 6. Scenario starts: a dev-only "start as…" panel (valid states, not bare age edits) so the user can test features in minutes (A service + B UI, M2a).
 7. Git: once M1 passes, work moves to per-agent branches with small commits; Claude merges after checks.
+
+HALT AFTER M2 (user, 2026-11-16): once M2 is finalised (Codex review plus any fix round passed), ALL agents stop. No M3 or M2.5 work, drafts included, until the user has tested M2 and Claude has committed. Until then, work only on M2 fixes and polish.

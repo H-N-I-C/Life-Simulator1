@@ -1,0 +1,31 @@
+{
+  "_status": "DRAFT; _proposal fields pending A acceptance",
+  "_oracle": "tests/fixtures/annual_events_oracle.json#events/vaccination",
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "vaccination_age2",
+      "title": "Vaccination",
+      "text": "Your mother is taking you to the doctor's office to get vaccinated.",
+      "category": "childhood",
+      "weight": 1,
+      "chance_n": {"_proposal": "P4", "n": 2},
+      "conditions": {"min_age": 2, "max_age": 2, "once_per_lifetime": false, "requires": [{"kind": "alive", "role": "mother"}]},
+      "choices": [
+        {"id": "stay_calm", "label": "Try to stay calm", "known_effects": [],
+         "cost": {"money": 0}, "effects": {},
+         "outcome_text": "You remained calm."},
+        {"id": "tantrum", "label": "Throw a tantrum", "known_effects": ["-happiness", "-mother relationship"],
+         "cost": {"money": 0},
+         "effects": {"stats": {"happiness": {"randint": [25, 35], "sign": -1, "_proposal": "P1"}},
+                     "relationship": {"role": "mother", "delta": {"randint": [6, 10], "sign": -1, "_proposal": "P1"}}},
+         "outcome_text": "You threw a tantrum."},
+        {"id": "bite", "label": "Bite her", "known_effects": ["-happiness", "-mother relationship"],
+         "cost": {"money": 0},
+         "effects": {"stats": {"happiness": {"randint": [6, 10], "sign": -1, "_proposal": "P1"}},
+                     "relationship": {"role": "mother", "delta": {"randint": [25, 35], "sign": -1, "_proposal": "P1"}}},
+         "outcome_text": "You bit your mother."}
+      ]
+    }
+  ]
+}

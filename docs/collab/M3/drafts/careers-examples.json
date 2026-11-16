@@ -1,0 +1,115 @@
+{
+  "_status": "DRAFT contract examples for freeze (A-owned). Wire shapes extend M2 accepted envelopes additively; nothing here replaces frozen M2 semantics.",
+
+  "work_career_projection_example": {
+    "_comment": "Additive section under work; M2 fields (employed/salary/hours/performance/...) remain and mirror the active assignment via the declared adapter.",
+    "career": {
+      "assignment": {
+        "assignment_id": "as_0007",
+        "role_id": "electrician",
+        "role_label": "Electrician",
+        "path": "electrical",
+        "level": 2,
+        "employer_id": "voltaic_services",
+        "employer_name": "Voltaic Services",
+        "accepted_turn": "t_000031",
+        "accepted_age": 24,
+        "tenure_turns": 6,
+        "salary": 61000,
+        "hours": 38,
+        "look_override": "mechanic",
+        "effective_look": "mechanic",
+        "legacy_generic": false
+      },
+      "next_requirements": [
+        {"kind": "skill", "id": "practical", "label": "Practical skill",
+         "have": 41, "need": 55, "met": false},
+        {"kind": "skill", "id": "organization", "label": "Organization",
+         "have": 12, "need": 25, "met": false},
+        {"kind": "tenure", "id": "tenure", "label": "Years in role",
+         "have": 2, "need": 3, "met": false}
+      ],
+      "openings": [
+        {"role_id": "senior_electrician", "employer_id": "voltaic_services",
+         "label": "Senior electrician at Voltaic Services",
+         "pay_range": [72000, 88000], "requirements_met": false,
+         "missing": ["practical 55", "organization 25", "tenure 3"]}
+      ]
+    }
+  },
+
+  "job_apply_request": {
+    "expected_revision": 31,
+    "request_id": "req-apply-001",
+    "action": "job_apply",
+    "payload": {"role_id": "electrician", "employer_id": "voltaic_services"}
+  },
+  "job_apply_response_notes": [
+    "ineligible apply -> typed 409 with the concrete missing requirements (never silent)",
+    "eligible apply -> stored pending kind 'job_offer' with the sampled salary (never rerolled)",
+    "inspecting an opening costs nothing and samples nothing"
+  ],
+  "job_offer_pending_example": {
+    "kind": "job_offer",
+    "title": "Job offer",
+    "text": "Voltaic Services offers you the Electrician role at $61,000/yr (38h). Accept?",
+    "options": [
+      {"id": "accept", "label": "Accept",
+       "known_effects": ["employment starts next pay period"]},
+      {"id": "decline", "label": "Decline", "known_effects": []}
+    ]
+  },
+
+  "promotion_request": {
+    "action": "job_promotion_apply",
+    "payload": {"role_id": "senior_electrician"}
+  },
+  "promotion_policy": [
+    "bounded attempts per year (application_attempts); failure journal is honest",
+    "success transitions the assignment at the NEXT turn boundary: the current year's pay is already quoted (frozen M2 timing)",
+    "skill thresholds read C's values from the previous turn's contributions (work_income runs before education/skills)"
+  ],
+
+  "transfer_request": {
+    "action": "job_transfer",
+    "payload": {"role_id": "electrician", "employer_id": "brightwire_electrical"}
+  },
+  "transfer_policy": [
+    "default tenure resets to 0 on transfer; salary band may shift +/-10% by sampled offer",
+    "moving employer is an alternative to promotion, not a combo"
+  ],
+
+  "payroll_invariant_example": {
+    "_comment": "Adapter mirrors assignment.salary into legacy salary at transitions only; M2 payroll posts the year's legs exactly once.",
+    "turn_id": "t_000032",
+    "legs": [
+      {"source_key": "t_000032:work_income:salary:<person_id>:gross", "amount": 61000},
+      {"source_key": "t_000032:work_income:salary:<person_id>:tax", "amount": -10241},
+      {"source_key": "t_000032:work_income:salary:<person_id>:expenses", "amount": -30543},
+      {"source_key": "t_000032:work_income:salary:<person_id>:net", "amount": 20216}
+    ],
+    "apprenticeship_rule": "the apprentice role's pay is the ONE wage quote; B's program hook advances study progress; no stipend, no double pay"
+  },
+
+  "look_examples": [
+    {"case": "active nurse", "look_override": "health_worker",
+     "effective": "health_worker asset via M0b manifest fallback chain"},
+    {"case": "apprentice without a special asset", "look_override": "mechanic",
+     "effective": "falls back to regular portrait if manifest lacks the combo"},
+    {"case": "unemployed former nurse", "look_override": null,
+     "effective": "personal portrait restored; base Appearance unchanged"},
+    {"case": "person with headscarf/badges employed",
+     "rule": "override composes per manifest compatibility; never edits base skin/hair/badges"},
+    {"case": "temporary graduation look (B feature)",
+     "rule": "priority frozen with M0b owner: temporary event look > active job context > personal look, with a defined end condition"}
+  ],
+
+  "errors": {
+    "not_eligible_409": {"error": {"code": "not_allowed",
+      "message": "missing: qualification electrical_apprenticeship; practical 41/55"}},
+    "closed_opening_409": {"error": {"code": "not_allowed",
+      "message": "this employer is not hiring for that role right now"}},
+    "attempt_cap_409": {"error": {"code": "not_allowed",
+      "message": "promotion attempts this year exhausted (2/2)"}}
+  }
+}

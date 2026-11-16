@@ -1,0 +1,124 @@
+{
+  "_status": "DRAFT worked examples for the skills contract (C). Shapes to freeze; values are illustrative, not balance assertions.",
+
+  "state_envelope_example": {
+    "_comment": "env['skills'] after an evening class on practical and an apprenticeship contribution.",
+    "schema_version": 1,
+    "people": {
+      "<person_id>": {
+        "values": {"practical": 14, "organization": 3},
+        "used_this_turn": {"evening_class:practical": 1},
+        "history": [
+          {"turn_id": "t_000042", "action_id": "evening_class",
+           "skill_id": "practical", "gain": 6, "value_after": 12,
+           "occurrence": "t_000042:evening_class:practical"},
+          {"turn_id": "t_000043", "action_id": "apprenticeship",
+           "skill_id": "practical", "gain": 2, "value_after": 14,
+           "occurrence": "t_000043:apprenticeship:asg_7"}
+        ]
+      }
+    }
+  },
+
+  "projection_example": {
+    "_comment": "state['skills'] additive projection section; preserves all M2 fields.",
+    "skills": {
+      "values": {"practical": 14, "organization": 3,
+                 "communication": 0, "care": 40},
+      "remaining_uses": {"evening_class:practical": 0,
+                         "self_study:practical": 1},
+      "available_training": [
+        {"id": "evening_class", "label": "Take an evening class",
+         "known_costs": [{"label": "Course fee", "amount": 150}],
+         "limits": ["once_per_year_per_skill"],
+         "enabled": false,
+         "reason": "already trained practical this year"},
+        {"id": "self_study", "label": "Study on your own",
+         "known_costs": [], "limits": ["once_per_year_per_skill"],
+         "enabled": true, "reason": null}
+      ],
+      "linked_requirements": [
+        {"skill_id": "care", "required_by": "role:senior_nurse",
+         "min": 60, "have": 40, "met": false}
+      ]
+    }
+  },
+
+  "train_command_example": {
+    "request": {"action": "train",
+                "payload": {"action_id": "evening_class", "skill_id": "care"}},
+    "response_result": {
+      "events": [{"kind": "skills",
+                  "text": "You took an evening class in Care.",
+                  "person_ids": ["<person_id>"],
+                  "changes": {"care": 7}}],
+      "money_entries": [{"phase": "skills",
+                         "occurrence_id": "t_000044:evening_class:care",
+                         "leg": "cost",
+                         "account_owner_id": "<person_id>",
+                         "category": "other",
+                         "amount": -150,
+                         "description": "Evening class: Care"}],
+      "pending_decision": null,
+      "continuation": null,
+      "finished_turn": false
+    },
+    "refusal_examples": [
+      {"payload": {"action_id": "evening_class", "skill_id": "care"},
+       "state": "used this year",
+       "error": {"code": "not_allowed",
+                 "message": "you already trained care this year"}},
+      {"payload": {"action_id": "evening_class", "skill_id": "care"},
+       "state": "value 100",
+       "error": {"code": "not_allowed",
+                 "message": "care is already at its maximum"}},
+      {"payload": {"action_id": "evening_class", "skill_id": "care"},
+       "state": "money 40",
+       "error": {"code": "not_allowed",
+                 "message": "this training costs $150 and you have $40"}},
+      {"payload": {"action_id": "evening_class", "skill_id": "swordplay"},
+       "error": {"code": "invalid_input", "message": "unknown skill"}}
+    ]
+  },
+
+  "skill_event_example": {
+    "_comment": "Authored in the FROZEN M2c event schema plus the two proposed typed extensions (Q3 in skills-contract.md). Sampled once at offer creation.",
+    "event": {
+      "id": "mentor_offers_extra_shift",
+      "title": "A mentor's offer",
+      "text": "A senior colleague offers to take {name} along on a complex job.",
+      "category": "work",
+      "weight": 2,
+      "conditions": {"min_age": 18, "once_per_lifetime": true,
+                     "requires": [{"kind": "employed"},
+                                  {"kind": "min_skill", "skill": "practical",
+                                   "value": 20}]},
+      "choices": [
+        {"id": "join", "label": "Join the shift",
+         "known_effects": ["+practical skill (2-5)", "-happiness (1-3)"],
+         "cost": {"money": 0},
+         "effects": {"stats": {"happiness": {"randint": [1, 3],
+                                             "sign": -1}},
+                     "add_skill": {"skill": "practical",
+                                   "gain": {"randint": [2, 5]}}},
+         "outcome_text": "{name} learned a lot on the complex job."},
+        {"id": "rest", "label": "Take the evening off",
+         "known_effects": ["+happiness (2-4)"],
+         "cost": {"money": 0},
+         "effects": {"stats": {"happiness": {"randint": [2, 4]}}},
+         "outcome_text": "{name} rested."}
+      ]
+    }
+  },
+
+  "gating_example": {
+    "_comment": "A's role data references skills declaratively; the frozen query answers met/missing for UI + server gate.",
+    "role_requirements": {"role_id": "qualified_care_worker",
+                          "requirements": {"skills": [{"id": "care",
+                                                       "min": 40}],
+                                           "qualifications": ["care_diploma"]}},
+    "query_result": {"met": false,
+                     "missing": [{"kind": "skill", "id": "care",
+                                  "min": 40, "have": 33}]}
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "_comment": "Parity oracle for legacy ANNUAL events (Player.random_events + age_up yearly gated branches). Source of truth for the M2c data files: each event's data-file entry is checked against this oracle. Probabilities are exact legacy values. Owner: C; schema-independent (does NOT use event-schema.json shapes).",
+
+  "events": {
+    "lightning": {
+      "source": "player.py random_events lightning block",
+      "conditions": ["age >= 5"],
+      "occurrence": {"kind": "one_in", "n": 5000},
+      "choices": [],
+      "branches": [
+        {"name": "good", "chance": 0.5,
+         "effects": {"happiness": 100, "health": 100, "smarts": 100,
+                     "looks": 100},
+         "note": "change_* clamps to [0,100]"},
+        {"name": "bad", "chance": 0.5,
+         "effects": {"happiness": -100, "health": -100, "smarts": -100,
+                     "looks": -100},
+         "sub_branch": {"kind": "one_in", "n": 5,
+                        "effect": "die(lightning death)"}}
+      ]
+    },
+    "thanatophobia_worry": {
+      "source": "player.py age_up thanatophobia block",
+      "conditions": ["has_trait THANATOPHOBIA", "age >= randint(12,17)"],
+      "occurrence": {"kind": "one_in", "n": 10},
+      "choices": [],
+      "effects": {"happiness": {"randint": [4, 6], "sign": -1},
+                  "stress": {"randint": [3, 8], "sign": 1},
+                  "health": -1}
+    },
+    "vaccination": {
+      "source": "player.py random_events age==2 vaccination block",
+      "conditions": ["age == 2", "one_in(2)"],
+      "occurrence": {"kind": "one_in", "n": 2},
+      "choices": [
+        {"id": "stay_calm", "label": "Try to stay calm",
+         "effects": {}},
+        {"id": "tantrum", "label": "Throw a tantrum",
+         "effects": {"happiness": {"randint": [25, 35], "sign": -1},
+                     "mother_relationship": {"randint": [6, 10],
+                                             "sign": -1}}},
+        {"id": "bite", "label": "Bite her",
+         "effects": {"happiness": {"randint": [6, 10], "sign": -1},
+                     "mother_relationship": {"randint": [25, 35],
+                                             "sign": -1}}}
+      ],
+      "note": "option-2 label has a 1/4 cosmetic variant ('conniption fit'); effects identical"
+    },
+    "partner_breakup_offer": {
+      "source": "player.py random_events marital_status 1-2 branch (M1-fixed)",
+      "conditions": ["1 <= marital_status <= 2 (dating or engaged)",
+                     "partner.relationship < randint(25,35)",
+                     "one_in(3)"],
+      "occurrence": {"kind": "one_in", "n": 3,
+                     "gate": "relationship below a sampled 25-34 threshold"},
+      "pre_effects": {"happiness": {"randint": [15, 18], "sign": -1}},
+      "choices": [
+        {"id": "wish_well", "label": "Wish them well",
+         "effects": {"lose_partner": true}},
+        {"id": "beg", "label": "Beg them to stay",
+         "branch": {"kind": "two_draw_willpower",
+                    "insist_probability": "1 - (1 - willpower/100)^2",
+                    "insist_effects": {"lose_partner": true,
+                                       "happiness": {"randint": [10, 20],
+                                                     "sign": -1}},
+                    "stay_effects": {}}},
+        {"id": "insult", "label": "Insult them one last time",
+         "effects": {"karma": {"randint": [4], "sign": -1},
+                     "lose_partner": true}}
+      ]
+    },
+    "partner_divorce_offer": {
+      "source": "player.py random_events marital_status 3 branch (M1-fixed)",
+      "conditions": ["marital_status == 3 (married)",
+                     "partner.relationship <= randint(15,30)",
+                     "one_in(6)"],
+      "occurrence": {"kind": "one_in", "n": 6,
+                     "gate": "relationship at/below a sampled 15-30 threshold"},
+      "pre_effects": {"happiness": {"randint": [15, 18], "sign": -1}},
+      "choices": [
+        {"id": "honor", "label": "Wish them well",
+         "effects": {"divorce": true,
+                     "divorce_settlement": {"money_pct": [0.4, 0.6]}}},
+        {"id": "beg", "label": "Beg them to stay",
+         "branch": {"kind": "two_draw_willpower",
+                    "insist_probability": "1 - (1 - willpower/100)^2",
+                    "insist_effects": {"divorce": true},
+                    "stay_effects": {"happiness": {"randint": [15, 22],
+                                                   "sign": -1}}}},
+        {"id": "insult", "label": "Insult them one last time",
+         "effects": {"karma": {"randint": [4], "sign": -1},
+                     "divorce": true}}
+      ],
+      "note": "divorce settlement applies only when player.money > 0; happiness -randint(10,15) when it does"
+    },
+    "partner_kidnapping": {
+      "source": "player.py random_events kidnapping block",
+      "conditions": ["partner alive", "money >= 1000000",
+                     "NOT x_in_y(karma, 130)", "one_in(250)"],
+      "occurrence": {"kind": "one_in", "n": 250},
+      "pre_effects": {"happiness": {"randint": [30, 40], "sign": -1}},
+      "sampled_at_offer": {"ransom": {"money_pct": [0.2, 0.8]}},
+      "choices": [
+        {"id": "pay", "label": "Pay the ransom",
+         "cost": {"money_pct_sampled": "ransom"},
+         "branch": {"kind": "one_in", "n": 6, "on": "failure",
+                    "success_effects": {"happiness": {"randint": [6, 12],
+                                                      "sign": 1},
+                                        "partner_relationship":
+                                        {"randint": [30, 50], "sign": 1}},
+                    "failure_effect": "partner presumed dead (relation death)"}},
+        {"id": "police", "label": "Involve the police",
+         "branch": {"kind": "one_in", "n": 3, "on": "failure",
+                    "success_effects": {"happiness": {"randint": [6, 12],
+                                                      "sign": 1},
+                                        "partner_relationship":
+                                        {"randint": [30, 50], "sign": 1}},
+                    "failure_effect": "partner presumed dead (relation death)"}},
+        {"id": "nothing", "label": "Do nothing",
+         "effects": {"karma": {"randint": [8, 16], "sign": -1},
+                     "partner presumed dead": true}}
+      ]
+    },
+    "dating_offer": {
+      "source": "player.py random_events dating branch",
+      "conditions": ["age >= 18", "age < randint(42,70)",
+                     "marital_status == 0", "one_in(16)"],
+      "occurrence": {"kind": "one_in", "n": 16,
+                     "gate": "age below a sampled 42-69 ceiling"},
+      "choices": [
+        {"id": "accept", "label": "Start dating",
+         "gate": "compatibility_check(partner)",
+         "success_effects": {"happiness": {"randint": [12, 20], "sign": 1},
+                             "gain_partner": true}},
+        {"id": "reject", "label": "Reject", "effects": {}}
+      ],
+      "note": "partner generated via generate_partner (A's hook)"
+    }
+  },
+
+  "yearly_non_event_rolls": {
+    "lottery_jackpot": {"source": "player.py age_up change_jackpot",
+                        "effect": "lottery_jackpot = round(randexpo(100000, 1000000))"},
+    "surgeon_rotation": {"source": "player.py age_up",
+                         "effect": "each of 2 surgeon slots re-rolls on 1/35"}
+  },
+
+  "tolerances": {
+    "_comment": "statistical test bands: rate +- max(4*sqrt(p*(1-p)/trials), min_abs)",
+    "min_abs": 0.01
+  }
+}

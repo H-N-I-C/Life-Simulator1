@@ -1,0 +1,27 @@
+{
+  "_status": "DRAFT; _proposal fields pending A acceptance",
+  "_oracle": "tests/fixtures/annual_events_oracle.json#events/thanatophobia_worry",
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "thanatophobia_worry",
+      "title": "Fear of death",
+      "text": "You begin to worry that one day you may not be here anymore.",
+      "category": "health",
+      "weight": 1,
+      "chance_n": {"_proposal": "P4", "n": 10},
+      "conditions": {"min_age": 12, "once_per_lifetime": false,
+                     "requires": [{"kind": "flag", "name": "trait:THANATOPHOBIA"},
+                                  {"kind": "min_age_sampled", "_proposal": "P1/P8: age >= randint(12,17) — sampled gate",
+                                   "randint": [12, 17]}]},
+      "choices": [
+        {"id": "worry", "label": "...", "known_effects": ["-happiness", "+stress", "-health"],
+         "cost": {"money": 0},
+         "effects": {"stats": {"happiness": {"randint": [4, 6], "sign": -1, "_proposal": "P1 randint ranges"},
+                               "stress": {"randint": [3, 8], "_proposal": "P1"},
+                               "health": -1}},
+         "outcome_text": "The fear passes, for now."}
+      ]
+    }
+  ]
+}

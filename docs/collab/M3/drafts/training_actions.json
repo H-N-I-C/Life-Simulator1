@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "_status": "DRAFT for freeze (C-owned). Declarative training actions; the bounded rule vocabulary is: cost (M2c MoneyValue), limits, gain (M2c DeltaValue), learning_rate {stat, per, cap}. No per-skill engine branches.",
+  "actions": [
+    {
+      "id": "evening_class",
+      "label": "Take an evening class",
+      "category": "skills",
+      "input": {"id": "skill_id", "type": "choice", "choices_from": "skills",
+                "label": "Skill to train", "required": true},
+      "known_costs": [{"label": "Course fee", "amount": 150}],
+      "cost": {"money": 150},
+      "limits": ["once_per_year_per_skill"],
+      "gain": {"randint": [5, 9]},
+      "learning_rate": {"stat": "smarts", "per": 25, "cap": 2}
+    },
+    {
+      "id": "self_study",
+      "label": "Study on your own",
+      "category": "skills",
+      "input": {"id": "skill_id", "type": "choice", "choices_from": "skills",
+                "label": "Skill to study", "required": true},
+      "known_costs": [],
+      "cost": {"money": 0},
+      "limits": ["once_per_year_per_skill"],
+      "gain": {"randint": [1, 3]},
+      "learning_rate": {"stat": "smarts", "per": 50, "cap": 1}
+    },
+    {
+      "id": "volunteer_shift",
+      "label": "Volunteer for a community shift",
+      "category": "skills",
+      "input": {"id": "skill_id", "type": "choice",
+                "choices": ["care", "communication"],
+                "label": "Where to help", "required": true},
+      "known_costs": [],
+      "cost": {"money": 0},
+      "limits": ["once_per_year_per_skill"],
+      "gain": {"randint": [2, 5]},
+      "prerequisites": {"min_age": 16}
+    }
+  ],
+  "contribution_sources": {
+    "_comment": "Declared by A (careers) and B (programs) in THEIR data; applied once per turn via the frozen skills hook with occurrence ids that include the assignment/enrollment id.",
+    "form": {"skill_id": "practical", "gain": {"randint": [2, 4]},
+             "source": "apprenticeship:<assignment_id>"}
+  }
+}

@@ -29,31 +29,27 @@ if __name__ == "__main__":
 
 
 class StudentLoanPolicyTest(unittest.TestCase):
-    """Policy: tuition financed but not yet materialized as debt is not
-    retroactively charged; the stale funding flag clears; existing debt
-    survives dropout/expulsion."""
+    """Policy (Claude 2026-11-16): tuition financed by a student loan
+    becomes debt when financed; each enrolled year accrues a year's
+    tuition; leaving without graduating keeps the accrued debt — never
+    zero if any year was loan-financed."""
 
-    def test_expulsion_clears_stale_flag_no_debt(self):
-        p = make_player(age=20, grades=0, uv_years=2,
+    def test_expulsion_keeps_accrued_debt_never_zero(self):
+        # One loan-financed year accrues debt, THEN the bad grades expel.
+        p = make_player(age=20, grades=0, uv_years=1,
                         chose_student_loan=True, student_loan=0)
-        run_random_events(p)
+        run_random_events(p, randint=lambda a, b: 5000
+                          if (a, b) == (5000, 10000) else 1)
         self.assertEqual(p.uv_years, 0)
-        self.assertEqual(p.student_loan, 0)
-        self.assertFalse(p.chose_student_loan)
-
-    def test_expulsion_keeps_existing_debt(self):
-        # randint is pinned to 1 by run_random_events, so the year's debt
-        # service repays exactly $1 of the existing principal.
-        p = make_player(age=20, grades=0, uv_years=2,
-                        chose_student_loan=True, student_loan=12000)
-        run_random_events(p)
-        self.assertEqual(p.student_loan, 11999)
         self.assertTrue(p.chose_student_loan)
+        # 5000 accrued, then 1 of legacy same-year debt service repaid
+        self.assertEqual(p.student_loan, 4999)
 
-    def test_graduation_materializes_debt(self):
+    def test_graduation_keeps_accrued_debt(self):
         p = make_player(age=22, grades=50, uv_years=1,
                         chose_student_loan=True, student_loan=0)
-        run_random_events(p, randint=lambda a, b: 25000
-                          if (a, b) == (20000, 40000) else 1)
-        # principal $25,000 materializes, then $1 legacy debt service
-        self.assertEqual(p.student_loan, 24999)
+        run_random_events(p, randint=lambda a, b: 5000
+                          if (a, b) == (5000, 10000) else 1)
+        self.assertEqual(p.uv_years, 0)
+        self.assertIsNone(p.grades)
+        self.assertEqual(p.student_loan, 4999)

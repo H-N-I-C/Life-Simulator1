@@ -1,0 +1,277 @@
+{
+  "_status": "FROZEN v2.1 (Claude, 2026-11-16). Owner: Kimi C. Adds: 'auto: true' automatic events (no choices, resolved immediately, journaled, exempt from the 2-choice/soft-lock rules); 'sign' on money_pct; 'partner.compatibility' as a branches field_ref. v2 otherwise unchanged.",
+  "schema_version": 2,
+  "description": "Data-file schema for life events (M2c). Events are data, not engine code: the annual_events/decision_offer phases load event files matching this schema, evaluate conditions against the transaction-local context, sample outcomes once per offer, and resolve from stored data. Content authors add events by adding files, never by editing the engine.",
+  "file": {
+    "path_glob": "src/game/events/*.json (one file per event or small thematic bundles)",
+    "top_level": {
+      "schema_version": "int, must equal 2",
+      "events": [
+        "EventDef"
+      ]
+    }
+  },
+  "DeltaValue": "int | {randint: [lo, hi], sign?: 1|-1 (default 1)} \u2014 sampled once per offer creation via the per-game rng, stored in private sampled data, never rerolled at resolve",
+  "MoneyValue": "int | {money_pct: [lo, hi], sign?: 1|-1 (default 1)} (fraction of the account balance, sampled once) | {sampled: '<name>', sign?: 1|-1} (references this event's sampled_at_offer block)",
+  "EventDef": {
+    "id": "stable unique string, never reused across versions (e.g. 'partner_divorce_offer')",
+    "title": "short user-facing title",
+    "text": "template string; placeholders: {name} = player firstname, {person:mother|father|partner|child|random_parent|random_relation} = engine-resolved referenced person's name (never regex-parsed by content)",
+    "category": "one of: childhood | teen | adult | elder | health | family | work | finance",
+    "weight": "int >= 1; relative sampling weight among eligible events WITHOUT chance_n (see occurrence)",
+    "chance_n": "OPTIONAL int: independent per-year 1-in-N offer chance (legacy parity: lightning 1/5000, kidnapping 1/250, dating offer 1/16). Events WITH chance_n bypass the weighted-pool 1-in-3 gate \u2014 the 1/N roll IS their gate; events WITHOUT chance_n join the weighted pool gated at ~1/3 of eligible years. Omit for pure weight-pool events.",
+    "conditions": {
+      "min_age": "int",
+      "max_age": "int",
+      "once_per_lifetime": "bool (default true)",
+      "requires": "list of condition clauses (ALL must hold):",
+      "condition_clause": {
+        "ONE_OF": [
+          {
+            "kind": "alive",
+            "role": "mother|father|partner|child"
+          },
+          {
+            "kind": "no_partner",
+            "_note": "P5: single-only (marital_status == 0)"
+          },
+          {
+            "kind": "has_illness",
+            "illness": "string"
+          },
+          {
+            "kind": "employed"
+          },
+          {
+            "kind": "in_school"
+          },
+          {
+            "kind": "min_stat",
+            "stat": "happiness|health|smarts|looks|karma|stress",
+            "value": "int"
+          },
+          {
+            "kind": "min_money",
+            "value": "int"
+          },
+          {
+            "kind": "flag",
+            "name": "string"
+          },
+          {
+            "kind": "partner_status",
+            "value": "0|1|2",
+            "max": "optional inclusive upper bound (P8: value or max required)"
+          },
+          {
+            "kind": "min_age_sampled",
+            "randint": [
+              12,
+              17
+            ],
+            "_note": "P8: age >= value sampled once per offer"
+          },
+          {
+            "kind": "max_age_sampled",
+            "randint": [
+              42,
+              70
+            ],
+            "_note": "P8: age < value sampled once per offer"
+          },
+          {
+            "kind": "partner_relationship_below",
+            "randint": [
+              25,
+              35
+            ],
+            "_note": "P8: relationship < sampled threshold"
+          },
+          {
+            "kind": "karma_gate",
+            "value": 130,
+            "_note": "P8: passes when NOT x_in_y(karma, value); drawn once per offer"
+          },
+          {
+            "kind": "no_partner"
+          }
+        ]
+      }
+    },
+    "sampled_at_offer": "optional {name: MoneyValue|{randint:[a,b]}} \u2014 extra private values sampled once at offer creation (e.g. kidnapping ransom); referenced from choices via {sampled: name}; never leaves the server",
+    "effects": "OPTIONAL event-level Effects block applied BEFORE any choice is resolved (shared 'pre-effects', e.g. breakup/divorce happiness -randint(15,18)); choice effects apply on top",
+    "choices": [
+      {
+        "id": "stable within the event",
+        "label": "user-facing",
+        "known_effects": [
+          "human-readable strings shown to the user; MUST match the real effects including ranges and negatives (e.g. '-happiness (15-18)')"
+        ],
+        "cost": "{money: int >= 0 (default 0)} | {money_sampled: '<name>'} \u2014 GATES ONLY: affordability check producing enabled:false + reason; never posts money (P6 clarification)",
+        "effects": "Effects (below) applied when this choice resolves and no outcomes block is present",
+        "outcomes": "OPTIONAL list of {weight?: int>=1 (default 1), effects, outcome_text}: exactly ONE outcome is sampled at offer creation (weighted) and its effects/outcome_text become the option's resolved _effects/_outcome. Use for lottery-style uncertainty within a choice.",
+        "outcome_text": "template string (same placeholders) recorded in the journal; ignored when outcomes present (each OutcomeDef carries its own)",
+        "cost_clarification": "cost gates ONLY: affordability check (enabled:false + precise reason when unaffordable) and validation. cost NEVER posts. effects.money is the SINGLE ledger posting (signed). Author both for readability (cost.money == -effects.money) but only effects.money moves cash.",
+        "effects_extended": {
+          "stats_values": "int delta | {\"randint\": [lo, hi]} \u2014 ranges sampled ONCE per offer at instantiation, stored pre-sampled; journal records ACTUAL clamped deltas",
+          "money_form": "int delta | {\"money_pct\": [lo, hi]} \u2014 round(current_money * U(lo, hi)), sampled once per offer",
+          "relationship_roles": "mother|father|partner|child|all_parents|sibling|random_parent|random_relation \u2014 random_* resolved to a concrete person_id at instantiation (stored in pending person_ids)"
+        },
+        "branches": "OPTIONAL conditional bundle: {\"sample\": {\"kind\": \"x_in_y\", \"x\": int|field_ref, \"y\": int|field_ref, \"draws\": int}, \"then\": {effects, outcome_text}, \"else\": {effects, outcome_text}}. field_ref: \"player.karma|happiness|money\" or \"partner.willpower|relationship|craziness|compatibility\" (partner.compatibility = the engine's compatibility check for the stored generated partner, drawn once). The draw happens ONCE at offer creation; resolve never rerolls."
+      }
+    ],
+    "OutcomeDef": {
+      "chance": "0..1 | {\"one_in\": n} | \"two_draw_willpower\" | \"compatibility\" \u2014 sampling form; two_draw_willpower = two independent willpower/100 draws, short-circuit (insist probability 1-(1-p)^2; Claude-approved M1 policy); compatibility = the engine's partner compatibility check against the stored generated partner",
+      "effects": "Effects",
+      "outcome_text": "template string",
+      "terminal": "optional bool \u2014 fatal; resolves then jumps to year_close exactly once (engine performs death)"
+    },
+    "Effects": {
+      "stats": {
+        "happiness|health|smarts|looks|karma|stress": "DeltaValue, applied clamped; journal records ACTUAL delta"
+      },
+      "money": "MoneyValue (P2) \u2014 posts through the ledger authority with occurrence id {event_id}:{choice_id}; a single posting per choice (cost never posts)",
+      "relationship": {
+        "role": "mother|father|partner|child|all_parents|random_parent|random_relation",
+        "delta": "DeltaValue (P1); per-person actual delta recorded"
+      },
+      "add_illness": "illness name string",
+      "remove_illness": "illness name string",
+      "learn_trait": "trait id",
+      "lose_trait": "trait id",
+      "set_flag": {
+        "name": "string",
+        "value": "any"
+      },
+      "lose_partner": "bool (P7) \u2014 partner leaves the graph (engine performs graph mutation)",
+      "divorce": "bool (P7) \u2014 full divorce incl. settlement via the money field (money_pct)",
+      "gain_partner": "bool (P7) \u2014 the stored engine-generated partner (dating_offer) joins the graph",
+      "partner_death": "\"presumed dead\" (P7) \u2014 routes through the mortality helper (funeral decision + inheritance), engine owns graph mutation",
+      "terminal": "bool \u2014 fatal outcome; resolves then jumps to year_close exactly once"
+    },
+    "_constraints": [
+      "non-auto events: at least one choice MUST have cost 0 (soft-lock rule)",
+      "non-auto events: at least 2 choices (a real decision)",
+      "auto events: no choices key (or empty list); effects sampled and applied immediately",
+      "known_effects must match effects/outcomes exactly, including ranges and negatives",
+      "if outcomes.one_of is present, per-outcome chance values must sum to 1.0 unless a special sampling form is used",
+      "terminal outcomes never leave the turn open: continuation is year_close and no further phases run except close work"
+    ],
+    "auto": "OPTIONAL bool (default false): automatic event \u2014 no choices; the event-level effects apply immediately at offer time, are journaled, and the turn continues. Exempt from the >=2-choices and soft-lock rules (which apply only when auto is false or omitted)."
+  },
+  "sampling_policy": {
+    "when": "once per offer, at offer creation, via the per-game rng (including chance_n occurrence rolls, sampled gates, DeltaValue/money draws and outcomes.one_of picks)",
+    "stored": "sampled private data persists inside the pending record; reload/retry never rerolls",
+    "eligibility": "conditions evaluated against the transaction-local context at offer time",
+    "resolve": "resolve applies ONLY stored sampled data; ambient RNG at resolve is forbidden",
+    "ranges_and_branches": "All randomness (randint ranges, money_pct, outcome picks, branch draws) is sampled ONCE at offer creation via the per-game rng and stored pre-sampled in the pending record; resolution applies stored data only."
+  },
+  "fit_proof": {
+    "_comment": "the two M1 contextual templates (kept in sync with src/game/decisions.py until migration) expressed in v2 \u2014 unchanged from A's v1, they already conform (fixed deltas, cost gates, single money posting)",
+    "events": [
+      {
+        "id": "new_friend",
+        "title": "A new friend",
+        "text": "A kid from the neighbourhood invites {name} to play in the park.",
+        "category": "childhood",
+        "weight": 3,
+        "conditions": {
+          "min_age": 4,
+          "max_age": 9,
+          "once_per_lifetime": true,
+          "requires": []
+        },
+        "choices": [
+          {
+            "id": "play",
+            "label": "Go play",
+            "known_effects": [
+              "+happiness",
+              "+health"
+            ],
+            "cost": {
+              "money": 0
+            },
+            "effects": {
+              "stats": {
+                "happiness": 8,
+                "health": 3
+              }
+            },
+            "outcome_text": "{name} went to the park with a new friend."
+          },
+          {
+            "id": "stay_home",
+            "label": "Stay home",
+            "known_effects": [
+              "+smarts",
+              "-happiness"
+            ],
+            "cost": {
+              "money": 0
+            },
+            "effects": {
+              "stats": {
+                "smarts": 4,
+                "happiness": -2
+              }
+            },
+            "outcome_text": "{name} stayed home and read a picture book."
+          }
+        ]
+      },
+      {
+        "id": "old_friend_loan",
+        "title": "An old friend in need",
+        "text": "An old friend asks {name} to lend them $500 to get through a rough patch.",
+        "category": "finance",
+        "weight": 2,
+        "conditions": {
+          "min_age": 18,
+          "max_age": 60,
+          "once_per_lifetime": true,
+          "requires": []
+        },
+        "choices": [
+          {
+            "id": "lend",
+            "label": "Lend the money",
+            "known_effects": [
+              "-money",
+              "+happiness"
+            ],
+            "cost": {
+              "money": 500
+            },
+            "effects": {
+              "stats": {
+                "happiness": 6
+              },
+              "money": -500
+            },
+            "outcome_text": "{name} lent the money and felt good about helping."
+          },
+          {
+            "id": "say_no",
+            "label": "Say no",
+            "known_effects": [
+              "-happiness"
+            ],
+            "cost": {
+              "money": 0
+            },
+            "effects": {
+              "stats": {
+                "happiness": -2
+              }
+            },
+            "outcome_text": "{name} politely declined to lend the money."
+          }
+        ]
+      }
+    ]
+  },
+  "content_status": {
+    "_comment": "C's seven legacy annual events are drafted at docs/collab/M2/events-draft/ in the v1-proposal dialect; renaming them onto this v2 is mechanical (proposal markers P1-P8 map to the named forms above) and happens right after freeze, then they are validated against tests/fixtures/annual_events_oracle.json."
+  }
+}

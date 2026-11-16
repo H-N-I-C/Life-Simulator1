@@ -20,7 +20,8 @@ CATEGORIES = {
     "income", "tax", "expenses", "pension", "overtime", "child_net",
     "debt_borrow", "debt_repay", "loan_borrow", "loan_repay",
     "medical", "activity", "transfer", "inheritance", "lottery",
-    "gift_received", "gift_given", "wedding", "education", "other",
+    "gift_received", "gift_given", "wedding", "education",
+    "estate_close", "other",
 }
 
 
@@ -132,9 +133,15 @@ class Ledger:
         """Post several entries as a unit; rolls back on failure so a
         failed command cannot leave a half-posted turn."""
         posted = []
+        ledger_len = len(self._env["ledger"])
         try:
             for entry in entries:
-                posted.append(self.post(turn_id, age, entry))
+                row = self.post(turn_id, age, entry)
+                # idempotent replays return PRE-EXISTING rows: only rows
+                # appended by THIS batch may be rolled back
+                if len(self._env["ledger"]) > ledger_len:
+                    posted.append(row)
+                    ledger_len = len(self._env["ledger"])
         except Exception:
             for row in posted:
                 self._env["ledger"].remove(row)

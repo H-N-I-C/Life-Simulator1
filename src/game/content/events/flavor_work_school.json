@@ -1,0 +1,1768 @@
+{
+  "schema_version": 2,
+  "_comment": "Original work & school flavor events (20). Gates use existing kinds only: in_school (school events) and employed (work events). Frozen event-schema v2.1.",
+  "events": [
+    {
+      "id": "flavor_group_project_slayer",
+      "title": "The Slacker Quotient",
+      "text": "The group project is due Friday and {name}'s teammate has contributed exactly one message: 'sounds good'.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 13,
+        "max_age": 17,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "in_school"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "carry",
+          "label": "Do the whole thing yourself",
+          "known_effects": [
+            "+smarts (2-5)",
+            "-happiness (2-5)",
+            "-health (0-2)",
+            "+stress (2-5)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ],
+                "sign": -1
+              },
+              "health": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              },
+              "stress": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            }
+          },
+          "outcome_text": "I carried the project. The slacker presented with great confidence. The teacher knew."
+        },
+        {
+          "id": "confront",
+          "label": "Confront them in the group chat",
+          "known_effects": [
+            "+happiness (1-4)",
+            "+stress (1-4)",
+            "-relationship (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  4
+                ]
+              },
+              "stress": {
+                "randint": [
+                  1,
+                  4
+                ]
+              }
+            },
+            "relationship": {
+              "role": "random_relation",
+              "delta": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I sent the honest message. The teammate produced two paragraphs in eleven minutes. A miracle."
+        }
+      ]
+    },
+    {
+      "id": "flavor_exam_cram_coffee",
+      "title": "The All-Nighter",
+      "text": "Finals are tomorrow, and {name}'s study plan has collapsed into one heroic night, one lamp, and a dangerous amount of coffee.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 15,
+        "max_age": 17,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "in_school"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "cram",
+          "label": "Push through until dawn",
+          "known_effects": [
+            "+smarts (2-5)",
+            "-health (2-6)",
+            "+stress (3-7)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "health": {
+                "randint": [
+                  2,
+                  6
+                ],
+                "sign": -1
+              },
+              "stress": {
+                "randint": [
+                  3,
+                  7
+                ]
+              }
+            }
+          },
+          "outcome_text": "I crammed until the birds started. The exam went... surprisingly okay."
+        },
+        {
+          "id": "sleep",
+          "label": "Sleep and trust the semester",
+          "known_effects": [
+            "+health (2-5)",
+            "-stress (2-5)",
+            "+smarts (0-1)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "health": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "stress": {
+                "randint": [
+                  2,
+                  5
+                ],
+                "sign": -1
+              },
+              "smarts": {
+                "randint": [
+                  0,
+                  1
+                ]
+              }
+            }
+          },
+          "outcome_text": "I slept eight hours and guessed with the confidence of the well-rested."
+        }
+      ]
+    },
+    {
+      "id": "flavor_class_presentation",
+      "title": "The Whiteboard Incident",
+      "text": "{name} is mid-presentation when the marker gives up, the slide changes by itself, and the class goes very quiet.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 13,
+        "max_age": 17,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "in_school"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "improvise",
+          "label": "Improvise like a stage veteran",
+          "known_effects": [
+            "+happiness (3-6)",
+            "+smarts (1-3)",
+            "+stress (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  6
+                ]
+              },
+              "smarts": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "stress": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I turned the dead marker into a bit. The class laughed, then actually listened."
+        },
+        {
+          "id": "end",
+          "label": "Wrap up fast and sit down",
+          "known_effects": [
+            "-happiness (1-3)",
+            "-stress (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              },
+              "stress": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I finished in ninety seconds. The teacher wrote 'brave' in the margin."
+        }
+      ]
+    },
+    {
+      "id": "flavor_locker_mystery",
+      "title": "The Locker Mix-Up",
+      "text": "{name} opened what was definitely their locker and found a trombone, three yogurts, and a note that just says 'sorry'.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 12,
+        "max_age": 17,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "in_school"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "investigate",
+          "label": "Solve the mystery",
+          "known_effects": [
+            "+smarts (1-3)",
+            "+happiness (2-5)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            }
+          },
+          "outcome_text": "I traced the yogurts to a band student two halls over. The trombone was reunited. The note remained mysterious."
+        },
+        {
+          "id": "report",
+          "label": "Report it and walk away",
+          "known_effects": [
+            "+karma (1-3)",
+            "+happiness (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  0,
+                  2
+                ]
+              }
+            }
+          },
+          "outcome_text": "I handed it to the office. Somewhere, a trombone player wept with relief."
+        }
+      ]
+    },
+    {
+      "id": "flavor_library_fine",
+      "title": "The Ancient Fine",
+      "text": "The school library sends {name} a notice: a book from freshman year was never returned. It has been 'due' for three years.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 15,
+        "max_age": 17,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "in_school"
+          },
+          {
+            "kind": "min_money",
+            "value": 8
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "pay",
+          "label": "Pay the fine honestly ($8)",
+          "known_effects": [
+            "-$8",
+            "+karma (2-4)",
+            "+happiness (1-3)"
+          ],
+          "cost": {
+            "money": 8
+          },
+          "effects": {
+            "stats": {
+              "karma": {
+                "randint": [
+                  2,
+                  4
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            },
+            "money": -8
+          },
+          "outcome_text": "I paid the fine. The librarian stamped it 'RESOLVED' with visible relief."
+        },
+        {
+          "id": "find",
+          "label": "Find the book at home and return it",
+          "known_effects": [
+            "+karma (1-3)",
+            "-happiness (0-2) \u2014 it was under the bed"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "The book was under the bed, sandwiched in a pizza box. It went back. The pizza box did not."
+        }
+      ]
+    },
+    {
+      "id": "flavor_job_interview_tie",
+      "title": "The Interview",
+      "text": "{name} has a job interview in twenty minutes and has just discovered the tie has a stain shaped like a small country.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 18,
+        "max_age": 45,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "min_money",
+            "value": 30
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "buy_tie",
+          "label": "Buy a new tie ($30) and make it",
+          "known_effects": [
+            "-$30",
+            "+happiness (2-5)",
+            "+smarts (1-2)",
+            "+stress (0-2)"
+          ],
+          "cost": {
+            "money": 30
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "smarts": {
+                "randint": [
+                  1,
+                  2
+                ]
+              },
+              "stress": {
+                "randint": [
+                  0,
+                  2
+                ]
+              }
+            },
+            "money": -30
+          },
+          "outcome_text": "I bought the tie, arrived sweaty, and nailed every question. The interviewer never knew about the country."
+        },
+        {
+          "id": "no_tie",
+          "label": "Go tieless and own the look",
+          "known_effects": [
+            "+happiness (1-4)",
+            "-stress (0-2)",
+            "+smarts (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  4
+                ]
+              },
+              "stress": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              },
+              "smarts": {
+                "randint": [
+                  0,
+                  2
+                ]
+              }
+            }
+          },
+          "outcome_text": "I walked in tieless and confident. The interviewer said it showed 'modern thinking'. Sure."
+        }
+      ]
+    },
+    {
+      "id": "flavor_office_cake",
+      "title": "The Birthday Cake Protocol",
+      "text": "It's a coworker's birthday and {name} has been handed a paper plate with a slab of supermarket cake the size of a brick.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 20,
+        "max_age": 55,
+        "once_per_lifetime": false,
+        "requires": [
+          {
+            "kind": "employed"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "cake",
+          "label": "Eat the cake, compliment the cake",
+          "known_effects": [
+            "+happiness (2-5)",
+            "-health (1-3)",
+            "+relationship (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "health": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            },
+            "relationship": {
+              "role": "random_relation",
+              "delta": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I ate the brick. The coworker beamed. Team morale rose eleven percent."
+        },
+        {
+          "id": "decline",
+          "label": "Quietly decline",
+          "known_effects": [
+            "+health (0-2)",
+            "-happiness (0-1)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "health": {
+                "randint": [
+                  0,
+                  2
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  0,
+                  1
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I smiled and held an empty plate. The cake understood."
+        }
+      ]
+    },
+    {
+      "id": "flavor_promotion_rumor",
+      "title": "The Water Cooler Oracle",
+      "text": "Office rumor says a promotion is coming and {name}'s name is in the running. The source is a woman from accounting who is never wrong.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 23,
+        "max_age": 55,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "employed"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "campaign",
+          "label": "Campaign subtly",
+          "known_effects": [
+            "+stress (2-6)",
+            "+happiness (2-5)",
+            "+smarts (1-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "stress": {
+                "randint": [
+                  2,
+                  6
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "smarts": {
+                "randint": [
+                  1,
+                  2
+                ]
+              }
+            }
+          },
+          "outcome_text": "I campaigned with quiet excellence. Whether it works remains, as ever, the accounting woman's secret."
+        },
+        {
+          "id": "zen",
+          "label": "Keep your head down and work",
+          "known_effects": [
+            "-stress (1-4)",
+            "+health (0-2)",
+            "+happiness (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "stress": {
+                "randint": [
+                  1,
+                  4
+                ],
+                "sign": -1
+              },
+              "health": {
+                "randint": [
+                  0,
+                  2
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  0,
+                  2
+                ]
+              }
+            }
+          },
+          "outcome_text": "I let the rumor pass like weather. The work spoke for itself, eventually."
+        }
+      ]
+    },
+    {
+      "id": "flavor_bad_boss_email",
+      "title": "Reply All Catastrophe",
+      "text": "{name}'s boss sent a department-wide email that is wrong in three provable ways. The cursor hovers over 'Reply All'.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 22,
+        "max_age": 55,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "employed"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "reply_all",
+          "label": "Reply all, professionally, with citations",
+          "known_effects": [
+            "+smarts (1-3)",
+            "+happiness (1-4)",
+            "+stress (3-7)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  1,
+                  4
+                ]
+              },
+              "stress": {
+                "randint": [
+                  3,
+                  7
+                ]
+              }
+            }
+          },
+          "outcome_text": "I replied all with three attachments and perfect manners. The boss conceded by lunch. The stress lasted a week."
+        },
+        {
+          "id": "private",
+          "label": "Correct them privately",
+          "known_effects": [
+            "+karma (1-3)",
+            "+smarts (0-1)",
+            "+relationship (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "smarts": {
+                "randint": [
+                  0,
+                  1
+                ]
+              }
+            },
+            "relationship": {
+              "role": "random_relation",
+              "delta": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I sent a gentle private note. The boss corrected the email and owes them one."
+        }
+      ]
+    },
+    {
+      "id": "flavor_work_from_home",
+      "title": "The Home Office",
+      "text": "{name} is working from home today. The couch has other ideas. The fridge has opened itself four times.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 22,
+        "max_age": 55,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "employed"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "focus",
+          "label": "Barricade in the spare room and focus",
+          "known_effects": [
+            "+smarts (1-3)",
+            "+happiness (1-3)",
+            "-stress (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "stress": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I worked in focused bursts. The couch sent its regards and waited."
+        },
+        {
+          "id": "surrender",
+          "label": "Let the couch win, mostly",
+          "known_effects": [
+            "+happiness (2-5)",
+            "+health (0-2)",
+            "+stress (0-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "health": {
+                "randint": [
+                  0,
+                  2
+                ]
+              },
+              "stress": {
+                "randint": [
+                  0,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I did the meetings and little else. Productive? No. Restful? Also no. Worth it? Somehow."
+        }
+      ]
+    },
+    {
+      "id": "flavor_side_hustle",
+      "title": "The Side Hustle",
+      "text": "A friend talks {name} into selling handmade candles at the weekend market. The candles are lopsided. The enthusiasm is not.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 20,
+        "max_age": 55,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "min_money",
+            "value": 20
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "invest",
+          "label": "Buy supplies and go for it ($20)",
+          "known_effects": [
+            "-$20",
+            "+$40-90 sales",
+            "+happiness (2-6)",
+            "-health (0-2)"
+          ],
+          "cost": {
+            "money": 20
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  6
+                ]
+              },
+              "health": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            },
+            "money": {
+              "randint": [
+                20,
+                70
+              ]
+            }
+          },
+          "outcome_text": "I sold lopsided candles to people who called them 'rustic'. The stall made a profit and a memory."
+        },
+        {
+          "id": "decline",
+          "label": "Decline the candle empire",
+          "known_effects": [
+            "+happiness (0-2)",
+            "-stress (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  0,
+                  2
+                ]
+              },
+              "stress": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I declined. The friend's candles remain unsold and much loved by their cat."
+        }
+      ]
+    },
+    {
+      "id": "flavor_meeting_that_email",
+      "title": "The Meeting About the Meeting",
+      "text": "{name} has been invited to a meeting to discuss a project that was already settled by email. The calendar invite is forty-five minutes long.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 22,
+        "max_age": 55,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "employed"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "attend",
+          "label": "Attend and take notes",
+          "known_effects": [
+            "+smarts (1-2)",
+            "-happiness (1-4)",
+            "+stress (2-5)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  1,
+                  2
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  1,
+                  4
+                ],
+                "sign": -1
+              },
+              "stress": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            }
+          },
+          "outcome_text": "I attended. The meeting confirmed the email. Forty-five minutes, gone, like autumn leaves."
+        },
+        {
+          "id": "decline",
+          "label": "Decline politely with a full calendar",
+          "known_effects": [
+            "+happiness (1-4)",
+            "-stress (1-3)",
+            "+karma (-1 to +1)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  4
+                ]
+              },
+              "stress": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I declined with 'a conflict'. The conflict was peace and quiet, and it was glorious."
+        }
+      ]
+    },
+    {
+      "id": "flavor_coworker_lunch",
+      "title": "The Lunch Invitation",
+      "text": "A coworker invites {name} to the new lunch place downtown. It is expensive, it is trendy, and the coworker is nice but talks about juicing.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 22,
+        "max_age": 55,
+        "once_per_lifetime": false,
+        "requires": [
+          {
+            "kind": "employed"
+          },
+          {
+            "kind": "min_money",
+            "value": 25
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "go",
+          "label": "Go ($25)",
+          "known_effects": [
+            "-$25",
+            "+happiness (2-5)",
+            "+relationship (2-5)",
+            "-happiness (0-2) \u2014 juicing talk"
+          ],
+          "cost": {
+            "money": 25
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            },
+            "relationship": {
+              "role": "random_relation",
+              "delta": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            },
+            "money": -25
+          },
+          "outcome_text": "I went. The sandwich was tiny, the company was good, and the juicing seminar lasted the entire walk back."
+        },
+        {
+          "id": "packed",
+          "label": "Stick to the packed lunch",
+          "known_effects": [
+            "+$0",
+            "+health (1-3)",
+            "-relationship (0-1)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "health": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            },
+            "relationship": {
+              "role": "random_relation",
+              "delta": {
+                "randint": [
+                  0,
+                  1
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I ate leftovers at their desk, serene and solvent."
+        }
+      ]
+    },
+    {
+      "id": "flavor_fired_peer",
+      "title": "The Empty Desk",
+      "text": "A coworker was let go today, and their desk is already half-boxed. People are walking past a little faster than usual.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 25,
+        "max_age": 55,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "employed"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "reach",
+          "label": "Reach out and help them network",
+          "known_effects": [
+            "+karma (2-5)",
+            "-happiness (1-3)",
+            "+stress (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "karma": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              },
+              "stress": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I wrote recommendations and made calls. The coworker landed somewhere better within a month."
+        },
+        {
+          "id": "quiet",
+          "label": "Keep your head down",
+          "known_effects": [
+            "-karma (0-2)",
+            "+stress (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "karma": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              },
+              "stress": {
+                "randint": [
+                  0,
+                  2
+                ]
+              }
+            }
+          },
+          "outcome_text": "I kept quiet and worked. The empty desk stayed empty, and the silence was a little loud."
+        }
+      ]
+    },
+    {
+      "id": "flavor_skill_workshop",
+      "title": "The Workshop Flyer",
+      "text": "The company offers a weekend workshop that might actually be useful. It also consumes the one free weekend {name} had this month.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 22,
+        "max_age": 55,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "employed"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "attend",
+          "label": "Give up the weekend and go",
+          "known_effects": [
+            "+smarts (2-5)",
+            "-happiness (1-3)",
+            "+stress (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              },
+              "stress": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I went and actually learned things. The weekend forgave them eventually."
+        },
+        {
+          "id": "weekend",
+          "label": "Protect the weekend",
+          "known_effects": [
+            "+happiness (2-5)",
+            "-stress (2-5)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "stress": {
+                "randint": [
+                  2,
+                  5
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I guarded the weekend like a dragon. It was two days of pure, useless joy."
+        }
+      ]
+    },
+    {
+      "id": "flavor_pop_quiz",
+      "title": "The Pop Quiz",
+      "text": "{name} walks into class to find a pop quiz on the one chapter nobody read, including, technically, {name}.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 12,
+        "max_age": 17,
+        "once_per_lifetime": false,
+        "requires": [
+          {
+            "kind": "in_school"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "bluff",
+          "label": "Write with total confidence",
+          "known_effects": [
+            "+happiness (2-5) \u2014 audacity points",
+            "+smarts (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "smarts": {
+                "randint": [
+                  0,
+                  2
+                ]
+              }
+            }
+          },
+          "outcome_text": "I answered every question decisively. Half were wrong, but the confidence was unshaken."
+        },
+        {
+          "id": "honest",
+          "label": "Write 'see me after class' and accept fate",
+          "known_effects": [
+            "+karma (1-3)",
+            "-happiness (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I took the zero honestly and got a study plan instead of a lecture. Fair trade."
+        }
+      ]
+    },
+    {
+      "id": "flavor_school_bake_sale",
+      "title": "The Bake Sale Wars",
+      "text": "The school bake sale needs volunteers, and {name}'s class is losing the fundraising race to a rival class with suspiciously professional brownies.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 12,
+        "max_age": 17,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "in_school"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "bake",
+          "label": "Bake your famous (lopsided) cookies",
+          "known_effects": [
+            "-$12 ingredients",
+            "+happiness (2-6)",
+            "+karma (2-4)"
+          ],
+          "cost": {
+            "money": 12
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  6
+                ]
+              },
+              "karma": {
+                "randint": [
+                  2,
+                  4
+                ]
+              }
+            },
+            "money": -12
+          },
+          "outcome_text": "My cookies were lopsided but legendary. The rival brownies won on presentation, lost on heart."
+        },
+        {
+          "id": "buy",
+          "label": "Just buy three brownies and call it a day",
+          "known_effects": [
+            "-$6",
+            "+happiness (1-4)",
+            "-karma (0-1)"
+          ],
+          "cost": {
+            "money": 6
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  4
+                ]
+              },
+              "karma": {
+                "randint": [
+                  0,
+                  1
+                ],
+                "sign": -1
+              }
+            },
+            "money": -6
+          },
+          "outcome_text": "I bought the enemy brownies. They were, annoyingly, excellent."
+        },
+        {
+          "id": "volunteer",
+          "label": "Volunteer to run the stall (free)",
+          "known_effects": [
+            "+karma (2-4)",
+            "-happiness (0-2) \u2014 standing all day"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "karma": {
+                "randint": [
+                  2,
+                  4
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I ran the stall all afternoon. Feet: ruined. Class pride: restored."
+        }
+      ]
+    },
+    {
+      "id": "flavor_office_plantsitter",
+      "title": "The Plant Sitting Request",
+      "text": "A coworker going on vacation asks {name} to water their desk jungle for two weeks. There are eleven plants. One has a name.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 22,
+        "max_age": 55,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "employed"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Accept the sacred duty",
+          "known_effects": [
+            "+happiness (2-5)",
+            "+karma (2-4)",
+            "-stress (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "karma": {
+                "randint": [
+                  2,
+                  4
+                ]
+              },
+              "stress": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            },
+            "relationship": {
+              "role": "random_relation",
+              "delta": {
+                "randint": [
+                  2,
+                  4
+                ]
+              }
+            }
+          },
+          "outcome_text": "I kept all eleven alive, including Gerald the fern. The coworker returned to a jungle, thriving."
+        },
+        {
+          "id": "decline",
+          "label": "Cite a black thumb",
+          "known_effects": [
+            "+happiness (0-1)",
+            "-karma (0-1)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  0,
+                  1
+                ]
+              },
+              "karma": {
+                "randint": [
+                  0,
+                  1
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I declined on grounds of historical plant casualties. The plants were assigned elsewhere."
+        }
+      ]
+    },
+    {
+      "id": "flavor_retirement_speech",
+      "title": "The Goodbye Party",
+      "text": "A beloved coworker is retiring and {name} has been asked to say a few words. The coworker once saved the whole project with one stapler.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 30,
+        "max_age": 65,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "employed"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "speech",
+          "label": "Give the full speech, stapler story included",
+          "known_effects": [
+            "+happiness (3-7)",
+            "+karma (1-3)",
+            "+relationship (2-4)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  7
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            },
+            "relationship": {
+              "role": "random_relation",
+              "delta": {
+                "randint": [
+                  2,
+                  4
+                ]
+              }
+            }
+          },
+          "outcome_text": "I told the stapler story. The room laughed, then cried, then laughed again. Retirement achieved properly."
+        },
+        {
+          "id": "short",
+          "label": "Keep it to a heartfelt toast",
+          "known_effects": [
+            "+happiness (1-4)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  4
+                ]
+              }
+            }
+          },
+          "outcome_text": "I kept it short. The stapler story lives on, told only among those who were there."
+        }
+      ]
+    },
+    {
+      "id": "flavor_summer_reading_list",
+      "title": "The Summer Reading List",
+      "text": "School's out and {name} has a reading list of four books. The first one is three hundred pages. The pool is also three hundred feet away.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 12,
+        "max_age": 16,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "in_school"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "read",
+          "label": "Read them all, first week",
+          "known_effects": [
+            "+smarts (2-5)",
+            "-happiness (0-2)",
+            "+health (0-1) \u2014 indoors"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              },
+              "health": {
+                "randint": [
+                  0,
+                  1
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I read all four and returned to school insufferably prepared."
+        },
+        {
+          "id": "pool",
+          "label": "Read the first chapter of each (technically started)",
+          "known_effects": [
+            "+happiness (2-5)",
+            "+health (1-3)",
+            "+smarts (0-1)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "health": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "smarts": {
+                "randint": [
+                  0,
+                  1
+                ]
+              }
+            }
+          },
+          "outcome_text": "I started every book and finished none, but the tan is excellent and chapter ones were promising."
+        }
+      ]
+    }
+  ]
+}

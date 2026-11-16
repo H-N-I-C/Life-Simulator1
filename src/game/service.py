@@ -320,18 +320,26 @@ class GameService:
                 if not isinstance(pending, dict):
                     raise TypeError("pending")
                 for key, typ in (("id", str), ("title", str),
-                                 ("text", str), ("person_ids", list),
-                                 ("options", list)):
+                                 ("text", str), ("options", list)):
                     if not isinstance(pending.get(key), typ):
                         raise TypeError("pending." + key)
+                if "person_ids" in pending                         and not isinstance(pending["person_ids"], list):
+                    raise TypeError("pending.person_ids")
+                if "kind" in pending:
+                    pending.setdefault("person_ids", [])
                 for option in pending["options"]:
-                    if not isinstance(option, dict):
+                    if not isinstance(option, dict) \
+                            or not isinstance(option.get("id"), str) \
+                            or not isinstance(option.get("label"), str):
                         raise TypeError("pending option")
-                    for key, typ in (("id", str), ("label", str),
-                                     ("known_effects", list),
-                                     ("_effects", dict), ("_outcome", str)):
-                        if not isinstance(option.get(key), typ):
-                            raise TypeError("pending option." + key)
+                if "kind" not in pending:
+                    # M1 template pendings resolve through the service path
+                    for option in pending["options"]:
+                        for key, typ in (("known_effects", list),
+                                         ("_effects", dict),
+                                         ("_outcome", str)):
+                            if not isinstance(option.get(key), typ):
+                                raise TypeError("pending option." + key)
 
             for entry in env["journal"]:
                 if not isinstance(entry, dict):
@@ -356,6 +364,7 @@ class GameService:
             env.setdefault("ledger_next_id", 1)
             env.setdefault("generation", 1)
             env.setdefault("completed_lives", [])
+            env.setdefault("turn", {})
             if not isinstance(env["ledger"], list) \
                     or not isinstance(env["balances"], dict):
                 raise TypeError("ledger fields")
@@ -555,28 +564,77 @@ class GameService:
         actions = []
         pending = env.get("pending")
         if env["status"] == "alive" and not pending:
-            actions.append({"id": "age_up", "label": "Age up"})
+            actions.append({"id": "age_up", "label": "Age up",
+                            "category": "life", "inputs": [],
+                            "known_costs": [], "limits": [],
+                            "enabled": True, "reason": None})
+            from src.menus import rule_actions
+            from src.game.context import RuleContext
+            covered_targets = set()
+            try:
+                for spec in rule_actions.action_specs(
+                        RuleContext(env, self)):
+                    spec.setdefault("inputs", [])
+                    spec.setdefault("known_costs", [])
+                    spec.setdefault("enabled", True)
+                    spec.setdefault("reason", None)
+                    actions.append(spec)
+                    if spec.get("id") == "spend_time" and spec.get(
+                            "target_id"):
+                        covered_targets.add(spec["target_id"])
+            except Exception:
+                pass  # rule projection must never break state reads
             spent = env["year_actions"].get("spend_time", [])
             for person in self._walk_people(player):
-                if isinstance(person, Parent) and person.person_id not in spent:
+                if isinstance(person, Parent) and person.person_id not in spent \
+                        and person.person_id not in covered_targets:
                     actions.append({
                         "id": "spend_time",
                         "label": f"Spend time with {person.firstname}",
+                        "category": "relationships",
                         "target_id": person.person_id,
+                        "inputs": [], "known_costs": [],
+                        "limits": ["once_per_year"],
+                        "enabled": True, "reason": None,
                     })
 
         pending_out = None
         if pending:
+            options_out = []
+            for o in pending["options"]:
+                enabled = o.get("enabled", True)
+                reason = o.get("reason")
+                if "kind" not in pending and enabled:
+                    # M1 template: gate paid options on actual affordability
+                    eff = o.get("_effects") or {}
+                    cost = max(0, -eff.get("money", 0))
+                    if cost and player.money < cost:
+                        enabled = False
+                        reason = (f"this choice costs ${cost} and you have "
+                                  f"${player.money}")
+                options_out.append({
+                    "id": o["id"], "label": o["label"],
+                    "known_effects": list(o.get("known_effects", [])),
+                    "enabled": enabled, "reason": reason,
+                    "inputs": o.get("inputs", [])})
+            # SOFT-LOCK GUARANTEE: at least one option stays available
+            if options_out and not any(o["enabled"] for o in options_out):
+                by_id = {x["id"]: (x.get("_effects") or {})
+                         for x in pending["options"]}
+                free = next(o for o in options_out
+                            if max(0, -by_id.get(o["id"], {})
+                                   .get("money", 0)) == 0)
+                free["enabled"] = True
+                free["reason"] = None
             pending_out = {
                 "id": pending["id"],
+                "kind": pending.get("kind"),
+                "event_id": pending.get("event_id"),
                 "title": pending["title"],
                 "text": pending["text"],
-                "person_ids": list(pending["person_ids"]),
-                "options": [
-                    {"id": o["id"], "label": o["label"],
-                     "known_effects": list(o["known_effects"])}
-                    for o in pending["options"]
-                ],
+                "person_ids": list(pending.get("person_ids", [])) or
+                [player.person_id],
+                "options": options_out,
             }
 
         return {
@@ -599,6 +657,116 @@ class GameService:
                         for e in env["journal"]],
             "available_actions": actions,
             "pending_decision": pending_out,
+            "education": self._education_view(player),
+            "work": self._work_view(player),
+            "health": {"illnesses": [str(i) for i in player.illnesses],
+                       "treatments_available": []},
+            "family": {
+                "parents": [p.person_id for p in
+                            env["player"].parents.values()
+                            if p.person_id not in env.get("dead_ids", [])],
+                "partner": env["player"].partner.person_id
+                if env["player"].partner else None,
+                "partner_status": env["player"].partner.status
+                if env["player"].partner else None,
+                "children": [c.person_id for c in env["player"].children],
+                "siblings": [],
+            },
+            "finances": self._finances_view(env),
+            "turn": {"turn_id": env.get("turn", {}).get("turn_id"),
+                     "cursor": env.get("turn", {}).get("cursor"),
+                     "pending": bool(pending)},
+            "generation": env.get("generation", 1),
+            "completed_lives": list(env.get("completed_lives", [])),
+            "succession": self._succession_view(env),
+        }
+
+    def _succession_view(self, env):
+        if env.get("status") != "dead":
+            return None
+        from src.menus import rule_actions
+        eligible = rule_actions.eligible_successors(env["player"])
+        return {
+            "eligible": [{
+                "person_id": c.person_id,
+                "name": c.name,
+                "age": c.age,
+            } for c in eligible],
+            "generation_next": env.get("generation", 1) + 1,
+        }
+
+    def _finances_view(self, env):
+        from src.game.finance import Ledger
+        from src.people.classes.player import annual_income_quote
+        ledger = Ledger(env, resolver=self._make_resolver(env))
+        player = env["player"]
+        # Deterministic preview: the quote at the retention mean (U(0.4,0.8)
+        # -> 0.6). The actual retention is sampled once per account/turn at
+        # year close and posted; previews never consume gameplay RNG.
+        estimate = annual_income_quote(
+            player.salary, player.has_job, player.job_hours, 0.6)
+        return {
+            "balance": player.money,
+            "debts": ledger.debt_projection(),
+            "annual_estimate": estimate,
+            "last_closed_turn": env.get("turn", {}).get("turn_id"),
+            "ledger": ledger.entries_for(
+                owner_id=player.person_id),
+        }
+
+    @staticmethod
+    def _education_view(player):
+        if player.uv_years > 0 or getattr(player, "graduated_uv", False):
+            stage = "university"
+        elif player.is_in_school():
+            if player.age <= 11:
+                stage = "elementary"
+            elif player.age <= 13:
+                stage = "middle"
+            else:
+                stage = "high"
+        else:
+            stage = "none"
+        return {
+            "stage": stage,
+            "enrolled": player.is_in_school() or player.uv_years > 0,
+            "grades": player.grades if isinstance(player.grades, int)
+            else 0,
+            "dropped_out": player.dropped_out,
+            "university_years_remaining": player.uv_years,
+            "graduated_high_school": player.age > 17 and not player.dropped_out,
+            "loan": {
+                "principal": getattr(player, "student_loan", 0),
+                "remaining": player.student_loan,
+                "has_loan": player.student_loan > 0,
+                # funding source chosen at enrollment; the PRINCIPAL lands
+                # at graduation (legacy parity), so has_loan stays false
+                # while enrolled — funded_by shows the source meanwhile
+                "funded_by": "loan" if getattr(
+                    player, "chose_student_loan", False) else None,
+            },
+        }
+
+    @staticmethod
+    def _work_view(player):
+        # C's retire path: lose_job() then salary = pension. A fired
+        # worker also has has_job False but salary reset to 0, so
+        # salary > 0 at retirement age distinguishes the pensioner.
+        retired = (not player.has_job) and player.salary > 0 \
+            and player.age >= 65
+        return {
+            "employed": player.has_job,
+            "retired": retired,
+            "job_label": "Generic job" if player.has_job else None,
+            "hours": player.job_hours,
+            "salary": player.salary,
+            "effective_annual_gross": player.salary,
+            "pension": player.salary if retired else 0,
+            "performance": player.performance,
+            "stress": player.stress,
+            "years_worked": player.years_worked,
+            "can_retire": (not retired) and player.years_worked >= 10
+            and player.age >= 65,
         }
 
     # ------------------------------------------------------------- games
@@ -624,6 +792,22 @@ class GameService:
                     "revision": env["revision"],
                 })
             return {"games": games}
+
+    def delete_game(self, game_id):
+        """Confirmed destructive delete (B's UI owns the double-confirm).
+        Removes the save file; listing and replay state reflect it."""
+        with self._lock:
+            path = self._path(game_id)
+            if not os.path.isfile(path) or os.path.islink(path):
+                raise _not_found("unknown game")
+            try:
+                os.unlink(path)
+            except OSError as e:
+                raise GameError(
+                    "internal_error",
+                    "the operation failed; no changes were applied",
+                    500) from e
+            return {"deleted": True, "game_id": game_id}
 
     def get_state(self, game_id):
         with self._lock:
@@ -657,30 +841,60 @@ class GameService:
             if not isinstance(appearance, dict):
                 raise _invalid("appearance must be an object")
             GameService._validate_appearance_ids(appearance)
+        scenario = profile.get("scenario")
+        if scenario is not None:
+            from src.game.scenarios import SCENARIOS
+            if not isinstance(scenario, str) or scenario not in SCENARIOS:
+                raise _invalid(f"unknown scenario: {scenario!r}")
         return gender
 
     @staticmethod
     def _validate_appearance_ids(data):
-        singles = ("skin_tone", "face_shape", "eye_shape", "eye_color",
-                   "brows", "nose", "mouth", "hair_texture", "hair_color",
-                   "hair_style", "facial_hair", "outfit_style",
-                   "outfit_color")
-        for field in singles:
-            if field in data and not catalog.is_valid_id(field, data[field]):
-                raise _invalid(f"appearance.{field} is not a valid catalog ID")
-        if "marks" in data:
-            marks = data["marks"]
-            if not isinstance(marks, list) or any(
-                    not catalog.is_valid_id("marks", m) for m in marks):
-                raise _invalid("appearance.marks contains an invalid ID")
-        if "accessories" in data:
-            acc = data["accessories"]
-            if not isinstance(acc, dict):
-                raise _invalid("appearance.accessories must be an object")
-            for cat in catalog.ACCESSORY_CATEGORIES:
-                if cat in acc and not catalog.is_valid_id(cat, acc[cat]):
+        """Validate only the fields the CURRENT catalog knows: every
+        present field belonging to a live category must hold a valid id
+        (v1 ids are accepted — the model migrates them at load); fields
+        from older/newer schema versions that the catalog no longer has
+        are ignored (tolerant contract)."""
+        for field, value in data.items():
+            if field in ("schema_version", "seed"):
+                continue
+            if field == "marks":
+                if value is None:
+                    continue
+                if not isinstance(value, list) or (
+                        "marks" in catalog.CATEGORIES and any(
+                            not catalog.is_valid_id("marks", m)
+                            for m in value)):
                     raise _invalid(
-                        f"appearance.accessories.{cat} is not a valid catalog ID")
+                        "appearance.marks contains an invalid ID")
+                continue
+            if field in getattr(catalog, "MULTI_CATEGORIES", set()):
+                # list-valued category (v2 badges: up to 2 of
+                # glasses/earrings/cap/crown/flower)
+                if not isinstance(value, list) or any(
+                        not catalog.is_valid_id(field, v) for v in value):
+                    raise _invalid(
+                        f"appearance.{field} contains an invalid ID")
+                if field == "badges" and len(value) > 2:
+                    raise _invalid(
+                        "appearance.badges allows at most 2 badges")
+                continue
+            if field == "accessories":
+                if value is None:
+                    continue
+                if not isinstance(value, dict):
+                    raise _invalid("appearance.accessories must be an object")
+                for cat in catalog.ACCESSORY_CATEGORIES:
+                    if cat in value and cat in catalog.CATEGORIES \
+                            and not catalog.is_valid_id(cat, value[cat]):
+                        raise _invalid(
+                            f"appearance.accessories.{cat} is not a "
+                            f"valid catalog ID")
+                continue
+            if field in catalog.CATEGORIES and not catalog.is_valid_id(
+                    field, value):
+                raise _invalid(f"appearance.{field} is not a valid "
+                               f"catalog ID")
 
     def new_game(self, profile, request_id):
         with self._lock:
@@ -810,6 +1024,34 @@ class GameService:
                 except OSError:
                     pass
                 raise
+            scenario = profile.get("scenario")
+            if scenario is not None:
+                from src.game.scenarios import drive_scenario
+                try:
+                    state = drive_scenario(self, game_id, scenario)
+                except GameError as e:
+                    # dev-only path: roll the unfinished scenario back so
+                    # a retry starts clean
+                    try:
+                        os.unlink(self._path(game_id))
+                    except OSError:
+                        pass
+                    ledger.pop(request_id, None)
+                    self._save_creations(ledger)
+                    # terminal events can end a driven life early
+                    # (lightning now actually kills): retry with a
+                    # shifted seed, documented dev-factory limit
+                    if "life ended early" in e.message:
+                        seed = profile.get("seed", 1)
+                        if isinstance(seed, int) and seed < 10 ** 9:
+                            return self.new_game(
+                                dict(profile, seed=seed + 1), request_id)
+                    raise
+                # replays of the creation request return the SCENARIO state
+                env = self._load(game_id)
+                env["creation"]["response"] = json.loads(
+                    json.dumps(state))
+                self._save(env)
             return json.loads(json.dumps(state))
 
     # ------------------------------------------------------------- replay
@@ -834,8 +1076,20 @@ class GameService:
         with self._lock:
             if not isinstance(request_id, str) or not request_id or len(request_id) > 128:
                 raise _invalid("request_id must be a non-empty string")
-            if not isinstance(action, str) or action not in (
-                    "age_up", "spend_time", "resolve_decision"):
+            from src.menus import rule_actions
+            rule_actions_set = set(getattr(
+                rule_actions, "ACTION_IDS", ()))
+            for table in ("_TARGET_ACTIONS", "_SELF_ACTIONS",
+                          "_PARENT_ACTIONS", "_OFFER_ACTIONS"):
+                rule_actions_set |= set(getattr(
+                    rule_actions, table, {}))
+            rule_actions_set.add("find_partner")
+            rule_actions_set.add("continue_as")
+            rule_actions_set.add("lottery")
+            if not isinstance(action, str) or (
+                    action not in ("age_up", "spend_time",
+                                   "resolve_decision")
+                    and action not in rule_actions_set):
                 raise _invalid("unknown action")
             if payload is None:
                 payload = {}
@@ -847,7 +1101,17 @@ class GameService:
                 raise _invalid("expected_revision must be a non-negative integer")
 
             env = self._load(game_id)
+            state = self._execute(
+                env, expected_revision, request_id, action, payload)
+            self._save(env)  # rollback = discard env; nothing else mutated
+            return state
 
+    def _execute(self, env, expected_revision, request_id, action, payload):
+        """Validate and apply one command to a loaded envelope. Callers own
+        persistence: GameService.command saves after success (discarding
+        the envelope on failure); the dev scenario driver runs many
+        commands in memory and persists once at the end."""
+        if True:
             # Known replay is checked before the revision check; the stored
             # response is returned unchanged (byte-identical) so retries,
             # including after a restart, never reapply effects.
@@ -866,86 +1130,53 @@ class GameService:
                     f"expected_revision {expected_revision} does not match "
                     f"current revision {env['revision']}")
 
-            if env["pending"] and action != "resolve_decision":
+            if env["pending"] and action not in (
+                    "resolve_decision", "continue_as"):
                 raise _conflict(
                     "pending_decision",
                     "resolve the pending decision before other actions")
-            if env["status"] != "alive" and action != "resolve_decision":
+            if env["status"] != "alive" and action not in (
+                    "resolve_decision", "continue_as"):
                 raise _conflict("game_over", "this life has ended")
 
             with _GameRNG(self, env):
                 if action == "age_up":
                     self._cmd_age_up(env)
-                elif action == "spend_time":
-                    self._cmd_spend_time(env, payload)
-                else:
+                elif action == "resolve_decision":
                     self._cmd_resolve(env, payload)
+                elif action == "continue_as":
+                    self._cmd_continue_as(env, payload)
+                else:
+                    self._cmd_rule_action(env, action, payload)
 
             env["revision"] += 1
             state = self._state(env)
             self._record_replay(env, request_id, action, payload, state)
-            self._save(env)  # rollback = discard env; nothing else mutated
             return state
 
     # ------------------------------------------------------------- actions
 
     def _cmd_age_up(self, env):
+        from src.game import coordinator
         player = env["player"]
-        env["year_actions"] = {"spend_time": []}
-        before = (player.happiness, player.health, player.smarts, player.looks)
-
-        player.total_happiness += player.happiness
-        # Core drift only: Player.age_up drives the terminal UI and may
-        # prompt for input, so the web slice uses Person.age_up plus the
-        # documented legacy extras below (karma drift, relation aging).
-        Person.age_up(player)
-        player.change_karma(randint(-2, 2))
-        for relation in list(player.relations):
-            relation.age_up()
-            if isinstance(relation, Parent):
-                relation.change_relationship(
-                    1 if player.age < 18 else random.choice((-1, -1, 0)))
-            if relation.death_check():
-                player.relations.remove(relation)
-                env["dead_ids"].append(relation.person_id)
-                # keep the person reachable for history/portraits
-                if relation not in env["archive"]:
-                    env["archive"].append(relation)
-                self._journal(
-                    env, "relation_death",
-                    f"{relation.name} passed away at the age of {relation.age}.",
-                    [relation.person_id])
-
-        after = (player.happiness, player.health, player.smarts, player.looks)
-        labels = ("happiness", "health", "smarts", "looks")
-        changes = {label: new - old for label, old, new in
-                   zip(labels, before, after) if new != old}
-        self._journal(env, "year", f"{player.firstname} turned {player.age}.",
-                      [player.person_id], changes)
-
-        if player.death_check():
-            env["status"] = "dead"
-            env["dead_ids"].append(player.person_id)
-            self._journal(
-                env, "death",
-                f"{player.name} passed away at the age of {player.age}.",
-                [player.person_id])
-            env["pending"] = None
-            return
-
-        template = decisions.sample(
-            random, player.age, env["used_decisions"],
-            [p.person_id for p in self._walk_people(player)
-             if isinstance(p, Parent)])
-        if template is not None:
-            parent_ids = ([p.person_id for p in self._walk_people(player)
-                           if isinstance(p, Parent)]
-                          if template["person_ids"] == "parents" else [])
-            seq = env["next_decision_num"]
-            env["next_decision_num"] += 1
-            env["pending"] = decisions.instantiate(
-                template, seq, player.firstname, parent_ids)
-            env["used_decisions"].append(template["id"])
+        before = (player.happiness, player.health, player.smarts,
+                  player.looks)
+        completed = coordinator.run_turn(env, self, random)
+        if env["status"] != "dead":
+            after = (player.happiness, player.health, player.smarts,
+                     player.looks)
+            labels = ("happiness", "health", "smarts", "looks")
+            changes = {label: new - old for label, old, new in
+                       zip(labels, before, after) if new != old}
+            self._journal(env, "year",
+                          f"{player.firstname} turned {player.age}.",
+                          [player.person_id], changes)
+            if completed:
+                # the year ran to completion: a fresh turn begins on the
+                # next age_up; the projected cursor always names a valid
+                # phase (never null)
+                env["turn"] = {"cursor": {"phase_id": "year_start",
+                                          "item_cursor": 0}}
 
     def _cmd_spend_time(self, env, payload):
         player = env["player"]
@@ -1022,8 +1253,16 @@ class GameService:
         option = next((o for o in pending["options"] if o["id"] == option_id), None)
         if option is None:
             raise _invalid("unknown option")
+        if "kind" in pending:
+            # rule-owned pending (M2): resolve through C's boundary with the
+            # stored pre-sampled outcomes; never the M1 template path
+            return self._resolve_rule_pending(env, pending, option_id,
+                                              payload.get("inputs"))
         player = env["player"]
         person_ids = list(pending["person_ids"])
+        if option.get("_person_ids_extra"):
+            person_ids += [i for i in option["_person_ids_extra"]
+                           if i not in person_ids]
         effects = option["_effects"]
         # authoritative affordability gate
         cost = effects.get("money", 0)
@@ -1045,7 +1284,20 @@ class GameService:
 
         for key, amount in effects.items():
             if key == "money":
-                player.money = max(0, player.money + amount)
+                # the ledger is the single authority for cash: post the
+                # decision's money effect once (idempotent per
+                # decision/option), never mutate directly
+                from src.game.finance import Ledger
+                ledger = Ledger(env, resolver=self._make_resolver(env))
+                ledger.post(env["turn"].get(
+                    "turn_id", f"t_{env['revision']}"), player.age, {
+                    "phase": "decision_offer",
+                    "occurrence_id": f"{pending['id']}:{option['id']}",
+                    "account_owner_id": player.person_id,
+                    "category": "other",
+                    "amount": amount,
+                    "description": f"Decision: {option['label']}",
+                })
             elif key == "relationship":
                 for pid in person_ids:
                     target = self._find_person(env, pid)
@@ -1072,3 +1324,272 @@ class GameService:
                       option["_outcome"].format(name=player.firstname),
                       [player.person_id] + person_ids, changes)
         env["pending"] = None
+        # M1 template decisions can also interrupt a year (sampled in
+        # decision_offer): resume the persisted continuation until the
+        # next decision or real year_close
+        if (env["status"] == "alive"
+                and env.get("turn", {}).get("interrupted")):
+            from src.game import coordinator
+            completed = coordinator.run_turn(env, self, random)
+            if completed:
+                env["turn"] = {"cursor": {"phase_id": "year_start",
+                                          "item_cursor": 0}}
+
+    def _cmd_continue_as(self, env, payload):
+        """M2c succession: continue as one of the deceased's children.
+        C supplies the transfer/gameplay instructions; A performs the
+        identity-preserving graph conversion and ledger postings."""
+        from src.menus import rule_actions
+        from src.game.context import RuleContext
+        from src.game.finance import Ledger
+        from src.people.classes.parent import Parent
+        from src.people.classes.sibling import Sibling
+        from src.people.classes.person import Person
+        from random import randint
+        from src.lifesim_lib.lifesim_lib import (
+            Gender, round_stochastic)
+
+        if env["status"] != "dead":
+            raise _conflict("game_over", "this life has not ended")
+        player = env["player"]
+        target_id = payload.get("target_id")
+        if not isinstance(target_id, str):
+            raise _invalid("target_id is required")
+        eligible = rule_actions.eligible_successors(player)
+        child = next((c for c in eligible if c.person_id == target_id),
+                     None)
+        if child is None:
+            raise _not_found("unknown or ineligible successor")
+        instructions = rule_actions.succession_instructions(
+            player, child, random)
+        turn_id = f"t_succ_g{instructions['generation']}"
+        ledger = Ledger(env, resolver=self._make_resolver(env))
+        # C's instructions carry share + residual where share uses legacy
+        # stochastic rounding (money/num): share + residual == money, but
+        # posting +share/-residual nets to 2*share-money (manufactures or
+        # drops $1 on odd balances). A owns posting: the estate debit is
+        # the share (residual stays on the deceased's archived account —
+        # never manufactured, never dropped); books balance exactly.
+        entries = []
+        estate_residual = instructions.get("estate_residual", 0)
+        for entry in instructions["money_entries"]:
+            if entry["category"] == "estate_close":
+                entry = dict(entry)
+                entry["amount"] = -(
+                    player.money - estate_residual)
+            entries.append(entry)
+        ledger.post_many(turn_id, player.age, entries)
+        env["replay"] = []  # a new life: fresh replay ledger
+
+        # completed-life record + archive the deceased (journal refs stay
+        # resolvable through the archive)
+        env.setdefault("completed_lives", []).append({
+            "generation": env.get("generation", 1),
+            "person_id": player.person_id,
+            "name": player.name,
+            "age_at_death": player.age,
+            "net_worth_at_death": player.money,
+        })
+        if player not in env["archive"]:
+            env["archive"].append(player)
+
+        # identity-preserving successor graph conversion (mirrors the
+        # legacy convert semantics; person_id/appearance/name preserved)
+        successor = Player(child.firstname, child.lastname, child.gender)
+        successor.person_id = child.person_id
+        from src.appearance.integration import copy_appearance
+        successor.appearance = copy_appearance(child.appearance)
+        gp = instructions["gameplay"]
+        successor.age = gp["age"]
+        successor.gender = child.gender
+        successor.happiness = gp["happiness"]
+        successor.health = gp["health"]
+        successor.smarts = gp["smarts"]
+        successor.looks = gp["looks"]
+        successor.total_happiness = child.total_happiness
+        successor.money = child.money  # share already posted to the child
+        successor.generation = instructions["generation"]
+        if "university" in gp:
+            successor.chose_student_loan = True
+            successor.uv_years = gp["university"]["uv_years"]
+            successor.calc_grades(randint(-5, 10))
+        if "job" in gp:
+            successor.has_job = True
+            successor.salary = gp["job"]["salary"]
+            successor.years_worked = gp["job"]["years_worked"]
+            successor.salary_years = list(gp["job"]["salary_years"])
+            successor.stress = randint(20, 50)
+            successor.performance = randint(40, 80)
+        successor.change_happiness(-randint(0, 50))
+
+        successor.relations = []
+        successor.parents = {}
+        successor.children = []
+        if child.mother and type(child.mother).__name__ != "Player":
+            mother = Parent(child.mother.lastname, child.mother.age,
+                            Gender.Female)
+            mother.firstname = child.mother.firstname
+            mother.appearance = copy_appearance(child.mother.appearance)
+            mother.person_id = child.mother.person_id
+            mother.update_name()
+            mother.health = child.mother.health
+            mother.relationship = (randint(90, 100)
+                                   - randint(0, min(child.age, 50)))
+            successor.relations.append(mother)
+            successor.parents["Mother"] = mother
+        if child.father and type(child.father).__name__ != "Player":
+            father = Parent(child.father.lastname, child.father.age,
+                            Gender.Male)
+            father.firstname = child.father.firstname
+            father.appearance = copy_appearance(child.father.appearance)
+            father.person_id = child.father.person_id
+            father.update_name()
+            father.health = child.father.health
+            father.relationship = (randint(90, 100)
+                                   - randint(0, min(child.age, 50)))
+            successor.relations.append(father)
+            successor.parents["Father"] = father
+        for other in player.children:
+            if other is child:
+                continue  # the successor is not their own sibling
+            sib = Sibling(other.lastname, other.age, other.gender,
+                          other.smarts, other.looks)
+            sib.firstname = other.firstname
+            sib.appearance = copy_appearance(other.appearance)
+            sib.person_id = other.person_id
+            sib.update_name()
+            import random as _r
+            sib.change_relationship(round_stochastic(_r.gauss(0, 8)))
+            successor.relations.append(sib)
+        if child.partner:
+            successor.partner = child.partner
+            successor.partner.change_relationship(randint(-10, 10))
+            successor.relations.append(child.partner)
+
+        # archive the old life's relations that are not carried into the
+        # successor's graph (e.g. the deceased's partner) so every old
+        # journal reference stays resolvable
+        carried = {p.person_id for p in successor.relations}
+        carried.add(successor.person_id)
+        for relation in list(player.relations):
+            if relation.person_id not in carried \
+                    and relation not in env["archive"]:
+                env["archive"].append(relation)
+        env["player"] = successor
+        env["status"] = "alive"
+        env["pending"] = None
+        env["turn"] = {"cursor": {"phase_id": "year_start",
+                                  "item_cursor": 0}}
+        env["year_actions"] = {"spend_time": []}
+        env["dead_ids"] = [pid for pid in env.get("dead_ids", [])
+                           if pid != successor.person_id]
+        env["generation"] = instructions["generation"]
+        self._journal(
+            env, "succession",
+            f"{successor.name} continues the family legacy "
+            f"(generation {successor.generation}).",
+            [successor.person_id])
+
+    def _apply_event_death(self, env, death):
+        """Single graph transition for event-driven deaths (#3):
+        archive/remove/mark-dead exactly once, preserving journal refs.
+        `cause` is the stored outcome — never resampled."""
+        pid = death.get("person_id")
+        person = None
+        for candidate in env["player"].relations:
+            if candidate.person_id == pid:
+                person = candidate
+                break
+        if person is None or pid in env.get("dead_ids", []):
+            return  # already transitioned (replay/idempotence)
+        env["player"].relations.remove(person)
+        env["dead_ids"].append(pid)
+        if person not in env["archive"]:
+            env["archive"].append(person)
+        if env["player"].partner is person:
+            for c in env["player"].children:
+                if c.father is person:
+                    c.father = None
+                elif c.mother is person:
+                    c.mother = None
+            env["player"].partner = None
+        if type(person).__name__ == "Child" and person in env["player"].children:
+            env["player"].children.remove(person)
+        self._journal(env, "death",
+                      death.get("announcement")
+                      or f"{person.name} {death.get('cause', 'passed away')}.",
+                      [pid])
+
+    def _cmd_rule_action(self, env, action, payload):
+        from src.game.context import RuleContext
+        from src.game import rule_adapter
+        from src.menus import rule_actions
+        ctx = RuleContext(env, self)
+        try:
+            result = rule_actions.apply_action(ctx, action, payload, random)
+        except rule_actions.RuleError as e:
+            status = 409 if e.code in ("not_allowed", "refused") \
+                else 404 if e.code == "not_found" else 400
+            raise GameError(e.code, e.message, status)
+        turn_id = env["turn"].get("turn_id", f"t_{env['revision'] + 1}")
+        rule_adapter.post_money_entries(
+            env, self, turn_id, env["player"].age,
+            result.get("money_entries"))
+        rule_adapter.journal_events(env, result.get("events"))
+        if "pending_decision" in result:
+            env["pending"] = result["pending_decision"]
+            if env["pending"] is not None:
+                env["pending"]["id"] = f"d_{env['next_decision_num']}"
+                env["next_decision_num"] += 1
+
+    def _resolve_rule_pending(self, env, pending, option_id, inputs):
+        from src.game import coordinator
+        from src.game import rule_adapter
+        from src.game.context import RuleContext
+        from src.menus import rule_actions
+        ctx = RuleContext(env, self)
+        try:
+            result = rule_actions.resolve_choice(
+                ctx, pending, option_id, inputs, random)
+        except rule_actions.RuleError as e:
+            status = 409 if e.code in ("not_allowed", "refused") \
+                else 404 if e.code == "not_found" else 400
+            raise GameError(e.code, e.message, status)
+        turn_id = env["turn"].get("turn_id", f"t_{env['revision'] + 1}")
+        rule_adapter.post_money_entries(
+            env, self, turn_id, env["player"].age,
+            result.get("money_entries"))
+        rule_adapter.journal_events(env, result.get("events"))
+        for death in result.get("deaths") or []:
+            self._apply_event_death(env, death)
+        if result.get("finished_turn"):
+            # terminal rule resolve (surrender): A performs the death;
+            # no later phases run (only year_close/estate work remains)
+            env["status"] = "dead"
+            env["dead_ids"].append(env["player"].person_id)
+            env["turn"]["cursor"] = {"phase_id": "year_close",
+                                     "item_cursor": 0}
+        # a resolve may carry the NEXT stored decision (e.g. university
+        # application resolve returns the funding offer) — persist it
+        env["pending"] = result.get("pending_decision")
+        if env["pending"] is not None and "id" not in env["pending"]:
+            env["pending"]["id"] = f"d_{env['next_decision_num']}"
+            env["next_decision_num"] += 1
+        # multi-death years: serve the next queued funeral immediately
+        # (unless the resolve itself carried the next decision)
+        if pending.get("kind") == "funeral" and env["pending"] is None:
+            queue = env["turn"].get("funeral_queue", [])
+            if queue:
+                env["pending"] = queue.pop(0)
+                env["pending"]["id"] = f"d_{env['next_decision_num']}"
+                env["next_decision_num"] += 1
+        # resume the interrupted year from its persisted continuation
+        # (same turn id/done markers/snapshot) until the next decision or
+        # real year_close
+        if (env["pending"] is None and env["status"] == "alive"
+                and env.get("turn", {}).get("interrupted")):
+            from src.game import coordinator
+            completed = coordinator.run_turn(env, self, random)
+            if completed:
+                env["turn"] = {"cursor": {"phase_id": "year_start",
+                                          "item_cursor": 0}}

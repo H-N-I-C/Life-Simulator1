@@ -24,18 +24,18 @@ a supported path rather than fabricated state.
 
 | ID | Parity rows | Scenario setup | Browser actions | Key assertions | Evidence | Status |
 |----|-------------|----------------|-----------------|----------------|----------|--------|
-| M2a-S1 | 15,17,62,64,65 | Child age 10, enrolled, grades set (factory) | study_harder ×2 → age up → skip_school → age up | grades change exactly per rule, once/year limit enforced on 2nd attempt (typed rejection, no mutation); journal entries present once | m2a-s1-*.png + report | **blocked: factory + api-examples.json (A)** |
-| M2a-S2 | 16,66,56 | Age 17, accepted to university, funding decision pending | resolve funding (loan option) → age up through uv years → graduation | loan principal lands once at graduation; debt decreases by 1k–3k×min rule on later years; uv stage transitions exact | m2a-s2-*.png | **blocked: A** |
-| M2a-S3 | 18,19,21,22,54,71,74,75 | Age 18+, unemployed, smarts/karma fixed (factory) | find_job → offer decision (stored, no reroll — resolve twice with same request_id → identical result) → apply → adjust_hours 55 → work_harder → age up | offer salary identical across reload; hours gross = salary×55/40 via expected_income_quote; performance/stress move per rules once | m2a-s3-*.png | **blocked: A** |
-| M2a-S4 | 20,55,73 | Worker with 10+ years, age 65 (factory) | request_raise (reject path) → retire via decision → age up ×2 | pension = expected_pension(salary_years, years) independent of job_hours after retire; income legs post once with source_key `t_*:income:salary:*` | m2a-s4-*.png | **blocked: A** |
-| M2a-S5 | 55 (accounting audit) | Fixed salary/hours scenario | age up; read `finances.ledger` | for the service's own sampled retention: gross−tax−expenses==net; sum(amounts)==Δbalance; keys unique; estimate ≠ posted rows | m2a-s5-ledger.json | **blocked: A** |
-| M2a-S6 | 71 | Employee performance <15 at year boundary (factory) | age up | fired once; salary stops next turn; no duplicate final pay | m2a-s6-*.png | **blocked: A** |
+| M2a-S1 | 15,17,62,64,65 | `high_school_first_day` (age 14, enrolled) | study_harder ×2 → age up | grades change per rule; 2nd study same year = typed 409 + no mutation (revision unchanged); age +1 exactly once after settle | `m2a-s1-*` in browser report | **covered** (`m2a-s1-school-limits`, green) |
+| M2a-S2 | 16,66,56 | `university_pending_17` (seed 4242; application accepted, decision OPEN) | resolve application (Yes) → await funding → loan option → assert education.loan.has_loan | loan recorded at acceptance per frozen shape | m2a-s2-*.png | **pending-engine** — funding decision now appears and resolves ("Student Loan") but `education.loan.has_loan` stays false (A/C: funding resolution doesn't record the loan) |
+| M2a-S3 | 18,19,21,22,54,71,74,75 | `graduating_18` → find_job | offer decision → apply → adjust_hours 55 → settle year | gross == round(salary×55/40), tax == bracket calc (signed legs), gross+tax+expenses==net, Σlegs == Δbalance, ledger shape per frozen rows | `m2a-s3-ledger` | **blocked: scenario regression** — `unemployed_18` now lands enrolled in university (3y remaining), so find_job 409s; violates its frozen spec (A to fix) |
+| M2a-S4 | 20,55,73 | `near_retirement_64` → age to 65 (offer answered keep_working) → retire action → settle | pension = calc_pension (salary becomes pension, has_job False); pension-year income legs post once; WARN-masked: projection shows retired:false/pension:0 (finding, A) | `m2a-s4-pension` | **covered** (`m2a-s4-retirement-pension`, fully strict — retired projection fixed by A, pension gross == 54218) |
+| M2a-S5 | 55 (accounting audit) | Fixed salary/hours scenario | age up; read `finances.ledger` | for the service's own sampled retention: gross−tax−expenses==net; sum(amounts)==Δbalance; keys unique; estimate ≠ posted rows | m2a-s5-ledger.json | **pending-factory (flow authored)** |
+| M2a-S6 | 71 | Employee performance <15 at year boundary (factory) | age up | fired once; salary stops next turn; no duplicate final pay | m2a-s6-*.png | **pending-factory (flow authored)** |
 
 ## M2b — health, activities, family
 
 | ID | Parity rows | Scenario setup | Browser actions | Key assertions | Status |
 |----|-------------|----------------|-----------------|----------------|--------|
-| M2b-S1 | 29 | Adult with 2 illnesses + cash (factory) | visit_doctor → treat cheapest → age up | $100 fee (18+) posted once before confirm; cure applied once; health delta matches journal | blocked: A (health projection) |
+| M2b-S1 | 29 | Adult with 2 illnesses + cash (factory) | visit_doctor → treat cheapest → age up | $100 fee (18+) posted once before confirm; cure applied once; health delta matches journal | pending-factory (flow not yet authored — M2b) |
 | M2b-S2 | 30,35 | Age 18+ with cash | witch doctor (fixed fee bounds 50–100) → plastic surgeon decline | cost within bounds, posted once; no silent death path | blocked: A |
 | M2b-S3 | 25,26,27,31,32,33,34 | Ages 3/5/12/18 via factory | each activity once → repeat same year | once/year limit; second attempt rejected with typed error, no effect | blocked: A |
 | M2b-S4 | 28,70 | Single 18+, date_options available | find_partner → ask-out decision; separately seed dating-offer event | stored offer not rerolled; compatibility effect once | blocked: A |
@@ -73,3 +73,15 @@ a supported path rather than fabricated state.
   scenario; will not be claimed from random aging.
 - Row 53 lightning (1/5000), row 59 cancer (1/2000): same — factory or
   honest "not performed".
+
+## M2b execution status (2026-11-16, browser flows live)
+
+| ID | Flow | Status |
+|----|------|--------|
+| M2b-S1 | conversation/argument (`m2b-s1-conversation`) | **covered** — direct effect, repeat allowed (no annual limit in parity), partner identity preserved |
+| M2b-S2 | wedding venues (`m2b-s2-wedding-venues`) | **pending-path** — divorce works; `find_partner` never becomes available within 12 commands (dating path not wired from divorced state) |
+| M2b-S3 | baby naming (`m2b-s3-baby-naming`) | **pending-engine** — try_for_baby applies but no birth/naming pending within 6 years (pregnancy→birth decision path not firing; same gap seen on `pregnant_25`) |
+| M2b-S4 | adoption + rename (`m2b-s4-adoption`) | **covered** — offer→adopt→rename chain, child added via canonical hook, cost within 10k–30k posted once (`:adoption:` source key, category `other`) |
+| M2b-S5 | doctor fees/cures (`m2b-s5-doctor-cures`) | **covered** — treat Common Cold -$100 once, cured; Flu remains; second treat cures Flu |
+| M2b-S6 | witch doctor (`m2b-s6-witch-doctor`) | **covered** — take it; fee within 50–100 posted once |
+| M2b-S7 | funeral (`m2b-s7-funeral`) | **failing: engine gap** — parents age 62/55 at scenario start reach 92/85 with ZERO relation deaths in 30 seeded years; P3 relation mortality apparently not wired (finding routed to A/C) |

@@ -1,0 +1,50 @@
+{
+  "_status": "DRAFT; _proposal fields pending A acceptance",
+  "_oracle": "tests/fixtures/annual_events_oracle.json#events/partner_kidnapping",
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "partner_kidnapping",
+      "title": "Kidnapping",
+      "text": "Your {person:partner} has been kidnapped and is being held for ransom!",
+      "category": "family",
+      "weight": 1,
+      "chance_n": {"_proposal": "P4", "n": 250},
+      "conditions": {"once_per_lifetime": false,
+                     "requires": [{"kind": "alive", "role": "partner"},
+                                  {"kind": "min_money", "value": 1000000},
+                                  {"kind": "karma_below_sampled", "value": 130, "_proposal": "P8 NOT x_in_y(karma,130) gate"}]},
+      "sampled_at_offer": {"_proposal": "P2",
+        "ransom": {"money_pct": [0.2, 0.8]}},
+      "choices": [
+        {"id": "pay", "label": "Pay the ransom",
+         "known_effects": ["-ransom (20-80% of money)", "usually safe return"],
+         "cost": {"money_sampled": "ransom", "_proposal": "P2 cost from sampled value"},
+         "effects": {"money": {"sampled": "ransom", "sign": -1, "_proposal": "P2"}},
+         "outcomes": {"_proposal": "P3",
+           "one_in": 6, "on": "failure",
+           "success": {"effects": {"stats": {"happiness": {"randint": [6, 12], "_proposal": "P1"}},
+                                   "relationship": {"role": "partner", "delta": {"randint": [30, 50], "_proposal": "P1"}}},
+                       "outcome_text": "You paid the ransom for their release."},
+           "failure": {"partner_death": "presumed dead", "_proposal": "P7 relation-death outcome",
+                       "outcome_text": "You paid, but they never returned."}}},
+        {"id": "police", "label": "Involve the police",
+         "known_effects": ["usually a rescue"],
+         "cost": {"money": 0},
+         "outcomes": {"_proposal": "P3",
+           "one_in": 3, "on": "failure",
+           "success": {"effects": {"stats": {"happiness": {"randint": [6, 12], "_proposal": "P1"}},
+                                   "relationship": {"role": "partner", "delta": {"randint": [30, 50], "_proposal": "P1"}}},
+                       "outcome_text": "The police secured their release."},
+           "failure": {"partner_death": "presumed dead", "_proposal": "P7",
+                       "outcome_text": "The police could not secure their release."}}},
+        {"id": "nothing", "label": "Do nothing",
+         "known_effects": ["-karma", "partner presumed dead"],
+         "cost": {"money": 0},
+         "effects": {"stats": {"karma": {"randint": [8, 16], "sign": -1, "_proposal": "P1"}},
+                     "partner_death": "presumed dead", "_proposal": "P7"},
+         "outcome_text": "You did absolutely nothing."}
+      ]
+    }
+  ]
+}

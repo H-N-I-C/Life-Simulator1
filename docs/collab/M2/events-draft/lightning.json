@@ -1,0 +1,30 @@
+{
+  "_status": "DRAFT under docs/collab/M2/event-schema.json (not frozen); fields marked _proposal depend on C review points 1-7 not yet accepted by A",
+  "_oracle": "tests/fixtures/annual_events_oracle.json#events/lightning",
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "lightning_strike",
+      "title": "Lightning",
+      "text": "You were struck by lightning!",
+      "category": "adult",
+      "weight": 1,
+      "chance_n": {"_proposal": "P4 per-event occurrence chance", "n": 5000},
+      "conditions": {"min_age": 5, "once_per_lifetime": false, "requires": []},
+      "choices": [
+        {"id": "struck", "label": "...", "known_effects": ["???"],
+         "cost": {"money": 0},
+         "outcomes": {"_proposal": "P3 conditional outcomes: one sampled at offer",
+           "one_of": [
+             {"chance": 0.5, "effects": {"stats": {"happiness": 100, "health": 100, "smarts": 100, "looks": 100}},
+              "outcome_text": "You feel strangely energized."},
+             {"chance": 0.5,
+              "effects": {"stats": {"happiness": -100, "health": -100, "smarts": -100, "looks": -100}},
+              "outcome_text": "You were badly hurt.",
+              "sub_outcome": {"chance_n": 5, "terminal": true,
+                              "outcome_text": "You died after being struck by lightning."}}
+           ]}}
+      ]
+    }
+  ]
+}

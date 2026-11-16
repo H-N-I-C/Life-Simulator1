@@ -62,15 +62,19 @@ class ActivitiesToyMenuTest(unittest.TestCase):
         player = make_player(age=3)
         player.played = False
         buf = io.StringIO()
-        # Pin the saying choice too: some toy sayings do not contain the
-        # word "played", so a live random.choice makes this test flaky.
+        # random.choice stays LIVE: the assertion is that the printed line
+        # IS one of the toy sayings (present verbatim in activities.py),
+        # not which one was picked.
         with mock.patch("builtins.input", return_value="2"), \
              mock.patch.object(random, "uniform", return_value=0.0), \
-             mock.patch.object(random, "choice",
-                               side_effect=lambda seq: seq[0]), \
              redirect_stdout(buf):
             activities_mod.activities_menu(player)
-        self.assertIn("played", buf.getvalue())
+        source = open(os.path.join(
+            os.path.dirname(activities_mod.__file__),
+            "activities.py")).read()
+        lines = [l for l in buf.getvalue().splitlines() if l.strip()]
+        saying = lines[-1]  # last output line is the picked saying
+        self.assertIn(saying, source)
         self.assertTrue(player.played)
 
 

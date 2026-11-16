@@ -1,0 +1,485 @@
+{
+  "schema_version": 2,
+  "_comment": "Original flavor events, teen years (ages 13-17).",
+  "events": [
+    {
+      "id": "flavor_diner_shift",
+      "title": "The Late Diner",
+      "text": "After the game, the whole team piles into a diner that smells like fries and possibility. {name} has exactly enough for one milkshake.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 14,
+        "max_age": 17,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "share",
+          "label": "Buy a shake to share",
+          "known_effects": [
+            "-$4",
+            "+happiness (4-7)"
+          ],
+          "cost": {
+            "money": 4
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  4,
+                  7
+                ]
+              }
+            },
+            "money": -4
+          },
+          "outcome_text": "I split a shake four ways. It tasted like victory and strawberry."
+        },
+        {
+          "id": "water",
+          "label": "Nurse a free water",
+          "known_effects": [
+            "+smarts (1-2)",
+            "-happiness (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  1,
+                  2
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I laughed along and quietly memorized the menu prices."
+        }
+      ]
+    },
+    {
+      "id": "flavor_exam_cram",
+      "title": "Night Before the Exam",
+      "text": "The big exam is tomorrow and {name} is not ready. The textbook is open. The bed is also open. Both are calling.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 13,
+        "max_age": 17,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "in_school"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "cram",
+          "label": "Cram all night",
+          "known_effects": [
+            "+smarts (2-5)",
+            "-health (2-5)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "health": {
+                "randint": [
+                  2,
+                  5
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I learned three chapters and forgot what sleep was."
+        },
+        {
+          "id": "sleep",
+          "label": "Sleep like a sensible person",
+          "known_effects": [
+            "+health (2-5)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "health": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            }
+          },
+          "outcome_text": "I slept well and guessed beautifully on chapter four."
+        }
+      ]
+    },
+    {
+      "id": "flavor_first_dance",
+      "title": "The Gymnasium Lights",
+      "text": "The spring dance is on and {name} is standing by the wall pretending to be very interested in the punch.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 13,
+        "max_age": 17,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "dance",
+          "label": "Ask someone to dance",
+          "known_effects": [
+            "+happiness (4-8) \u2014 courage pays off"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  4,
+                  8
+                ]
+              }
+            }
+          },
+          "outcome_text": "I asked, and the song was mercifully short either way."
+        },
+        {
+          "id": "punch",
+          "label": "Guard the punch table",
+          "known_effects": [
+            "+happiness (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I became the punch table's silent, loyal guardian."
+        }
+      ]
+    },
+    {
+      "id": "flavor_drivers_permit",
+      "title": "The Permit Test",
+      "text": "{name} is sitting in the license office with a permit test and a pencil that has seen things. Parallel parking is on there. Oh no.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 15,
+        "max_age": 17,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "focus",
+          "label": "Focus and ace it",
+          "known_effects": [
+            "+smarts (1-3)",
+            "+happiness (3-6)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  3,
+                  6
+                ]
+              }
+            }
+          },
+          "outcome_text": "I passed. The family car quietly began avoiding the driveway."
+        },
+        {
+          "id": "wing",
+          "label": "Wing it and hope",
+          "known_effects": [
+            "+happiness (1-2)",
+            "-happiness (1-4)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  2
+                ]
+              }
+            }
+          },
+          "outcome_text": "I guessed 'yield' for most answers. Retake scheduled."
+        }
+      ]
+    },
+    {
+      "id": "flavor_summer_job_flyer",
+      "title": "The Flyer on the Lamppost",
+      "text": "A sun-faded flyer offers summer work at a berry farm: honest pay, honest dirt. {name} could actually earn something.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 13,
+        "max_age": 17,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "call",
+          "label": "Take the job",
+          "known_effects": [
+            "+$80-140",
+            "-health (1-4)",
+            "-happiness (0-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "health": {
+                "randint": [
+                  1,
+                  4
+                ],
+                "sign": -1
+              },
+              "happiness": {
+                "randint": [
+                  0,
+                  3
+                ],
+                "sign": -1
+              }
+            },
+            "money": {
+              "randint": [
+                80,
+                140
+              ]
+            }
+          },
+          "outcome_text": "I picked berries for two weeks and owns the world's stickiest sneakers."
+        },
+        {
+          "id": "skip",
+          "label": "Keep the summer free",
+          "known_effects": [
+            "+happiness (2-5)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            }
+          },
+          "outcome_text": "I spent the summer doing gloriously nothing."
+        }
+      ]
+    },
+    {
+      "id": "flavor_rumor_reply",
+      "title": "The Group Chat Verdict",
+      "text": "A rumor about {name} is going around school. It is not true, it is very specific, and three people have already 'just heard'.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 13,
+        "max_age": 17,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "in_school"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "reply",
+          "label": "Post the truth, calmly",
+          "known_effects": [
+            "+happiness (2-5)",
+            "+karma (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I replied once, clearly. The rumor suffocated by Thursday."
+        },
+        {
+          "id": "ignore",
+          "label": "Let it burn out",
+          "known_effects": [
+            "+smarts (1-2)",
+            "-happiness (1-4)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  1,
+                  2
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  1,
+                  4
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I ignored it. It took longer to die, but it died."
+        }
+      ]
+    },
+    {
+      "id": "flavor_old_bike_restore",
+      "title": "The Barn Bike",
+      "text": "Grandpa offers {name} a rusted bicycle from the barn: 'Fix it up and it's yours.' It has cobwebs, one wheel, and enormous potential.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 13,
+        "max_age": 17,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "restore",
+          "label": "Spend weekends restoring it",
+          "known_effects": [
+            "+happiness (4-8)",
+            "+smarts (2-4)",
+            "-health (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  4,
+                  8
+                ]
+              },
+              "smarts": {
+                "randint": [
+                  2,
+                  4
+                ]
+              },
+              "health": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I spent a month on that bike. First ride: silent, except grandpa applauding."
+        },
+        {
+          "id": "decline",
+          "label": "Politely decline",
+          "known_effects": [
+            "+happiness (1-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  2
+                ]
+              }
+            }
+          },
+          "outcome_text": "The bike stayed in the barn, dreaming of wheels."
+        }
+      ]
+    }
+  ]
+}

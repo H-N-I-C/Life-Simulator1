@@ -1,0 +1,44 @@
+{
+  "_status": "DRAFT; _proposal fields pending A acceptance",
+  "_oracle": "tests/fixtures/annual_events_oracle.json#events/partner_divorce_offer",
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "partner_divorce_offer",
+      "title": "Divorce",
+      "text": "Your {person:partner} wants a divorce.",
+      "category": "family",
+      "weight": 1,
+      "chance_n": {"_proposal": "P4", "n": 6},
+      "conditions": {"once_per_lifetime": false,
+                     "requires": [{"kind": "partner_status", "value": 2, "_proposal": "P8 married"},
+                                  {"kind": "partner_relationship_below", "randint": [15, 30], "_proposal": "P8 sampled gate (<= threshold)"}]},
+      "choices": [
+        {"id": "honor", "label": "Wish them well",
+         "known_effects": ["-happiness (before)", "divorce + settlement 40-60% of money"],
+         "cost": {"money": 0},
+         "effects": {"stats": {"happiness": {"randint": [15, 18], "sign": -1, "_proposal": "P1 pre-effect"}},
+                     "divorce": true,
+                     "money": {"money_pct": [0.4, 0.6], "sign": -1, "_proposal": "P2 proportional money"}},
+         "outcome_text": "You honored the request for a divorce."},
+        {"id": "beg", "label": "Beg them to stay",
+         "known_effects": ["-happiness (before)", "maybe divorce"],
+         "cost": {"money": 0},
+         "effects": {"stats": {"happiness": {"randint": [15, 18], "sign": -1, "_proposal": "P1 pre-effect"}}},
+         "outcomes": {"_proposal": "P3",
+           "two_draw_willpower": true,
+           "insist": {"effects": {"divorce": true},
+                      "outcome_text": "They insisted on getting a divorce."},
+           "stay": {"effects": {"stats": {"happiness": {"randint": [15, 22], "sign": -1, "_proposal": "P1"}}},
+                    "outcome_text": "They decided to stay with you."}}},
+        {"id": "insult", "label": "Insult them one last time",
+         "known_effects": ["-happiness (before)", "-karma", "divorce"],
+         "cost": {"money": 0},
+         "effects": {"stats": {"happiness": {"randint": [15, 18], "sign": -1, "_proposal": "P1 pre-effect"},
+                               "karma": {"randint": [4], "sign": -1, "_proposal": "P1"}},
+                     "divorce": true},
+         "outcome_text": "They divorced you."}
+      ]
+    }
+  ]
+}

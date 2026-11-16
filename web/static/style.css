@@ -140,8 +140,6 @@ h2 { font-size: 17px; margin: 18px 0 8px; }
 .stats { display: grid; gap: 8px; }
 .stat { display: grid; grid-template-columns: 90px 1fr 32px; gap: 8px; align-items: center; font-size: 14px; font-weight: 700; text-transform: capitalize; }
 .stat .track { height: 10px; border-radius: 5px; background: #e8ecf5; overflow: hidden; }
-.stat .fill { height: 100%; background: var(--header); border-radius: 5px; }
-.stat .fill.low { background: #a53b3b; }
 .journal { margin: 0; padding-left: 0; list-style: none; }
 .journal li { padding: 8px 0; border-bottom: 1px solid #eef1f7; font-size: 14px; }
 .journal .jage {
@@ -230,6 +228,61 @@ button.primary .cost { color: #d6efe0; }
 .journal .jtext { vertical-align: middle; }
 
 /* stat bars coloured by value (mockup: green/amber/red) */
-.stat .fill { background: #17813c; }
+.stat .fill { height: 100%; background: #17813c; border-radius: 5px; }
 .stat .fill.mid { background: #d9a53b; }
 .stat .fill.low { background: #a53b3b; }
+
+/* M0b avatar chips: circular image on the appearance background colour */
+.avatar, .avatar.mini, .avatar.big {
+  border-radius: 50%; overflow: hidden; position: relative;
+  background: #eeeae4; display: inline-block; line-height: 0;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.badge-corner {
+  position: absolute; right: -2px; bottom: -2px; display: flex;
+  gap: 1px; line-height: 0;
+}
+.badge-icon {
+  width: 38%; max-width: 20px; height: auto; display: inline-block;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.25));
+}
+
+/* fatal decision styling (surrender final warning) */
+.modal-box.danger { border: 2px solid #a53b3b; }
+.modal-box.danger h2 { color: #a53b3b; }
+
+/* mockup A creator */
+.preview.big-circle {
+  width: 240px; height: 240px; border-radius: 50%; overflow: hidden;
+  background: #eeeae4; margin: 0 auto; line-height: 0;
+}
+.preview.big-circle img { width: 100%; height: 100%; object-fit: cover; }
+.creator-hero { text-align: center; }
+.swatch-thumb {
+  width: 30px; height: 30px; border-radius: 50%; object-fit: cover;
+  background: #eeeae4; flex: 0 0 auto;
+}
+
+/* timeline: per-age cards */
+.journal .jcard {
+  border: 1px solid #e8ecf5; border-radius: 12px; padding: 10px 12px;
+  margin-bottom: 10px; list-style: none;
+}
+.journal .jcard-head {
+  font-weight: 800; color: var(--header); font-size: 13px;
+  text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;
+}
+.journal .jline { padding: 3px 0; font-size: 14px; }
+
+/* tab bar: equal tabs, no scroll at phone width */
+.tabbar { overflow: hidden; }
+.tabbar button {
+  flex: 1 1 0; min-width: 0; padding: 6px 2px; font-size: 10.5px;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  line-height: 1.1; white-space: nowrap;
+}
+.tabbar button span { font-size: 10.5px; }
+.journal .jquiet {
+  list-style: none; color: var(--muted); font-size: 12.5px;
+  font-style: italic; text-align: center; padding: 4px 0;
+}

@@ -58,6 +58,12 @@ class RuleContext:
     def data(self):
         return {"version": 2}
 
+    @property
+    def turn_snapshot(self):
+        """person_ids that receive yearly updates this turn (frozen at
+        year_start; newborns are excluded until next year)."""
+        return list(self._env.get("turn", {}).get("snapshot", []))
+
     # -- person creation hook (canonical identity/appearance) --------------
 
     def new_person_id(self):

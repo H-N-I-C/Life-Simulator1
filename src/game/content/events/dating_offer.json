@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "events": [
+    {
+      "id": "dating_offer",
+      "title": "A date?",
+      "text": "A {person:random_relation} named {name} has asked you out.",
+      "category": "adult",
+      "weight": 1,
+      "chance_n": 16,
+      "conditions": {
+        "min_age": 18,
+        "once_per_lifetime": false,
+        "requires": [
+          {
+            "kind": "no_partner"
+          },
+          {
+            "kind": "max_age_sampled",
+            "randint": [
+              42,
+              70
+            ]
+          }
+        ]
+      },
+      "_comment": "Acceptance runs the engine's compatibility check against the stored generated partner; 'partner.compatibility' as a field_ref is a content-driven additive interpretation (compatibility chance form), flagged to A/Claude in the M2c report. The generated partner is created by the engine at offer time and stored in the pending record (gain_partner joins them on success).",
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Start dating",
+          "known_effects": [
+            "+happiness (12-20)",
+            "new partner (if compatible)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "branches": {
+            "sample": {
+              "kind": "x_in_y",
+              "x": "partner.compatibility",
+              "y": 100,
+              "draws": 1
+            },
+            "then": {
+              "effects": {
+                "stats": {
+                  "happiness": {
+                    "randint": [
+                      12,
+                      20
+                    ]
+                  }
+                },
+                "gain_partner": true
+              },
+              "outcome_text": "You are now dating them."
+            },
+            "else": {
+              "effects": {},
+              "outcome_text": "They rejected you."
+            }
+          }
+        },
+        {
+          "id": "reject",
+          "label": "Reject them",
+          "known_effects": [],
+          "cost": {
+            "money": 0
+          },
+          "effects": {},
+          "outcome_text": "I rejected them."
+        }
+      ]
+    }
+  ]
+}

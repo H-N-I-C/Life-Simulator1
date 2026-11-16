@@ -12,9 +12,11 @@ Logic
 - [ ] Save/load: new fields survive a pickle round-trip and old saves load (migration or default).
 - [ ] Shown costs and eligibility match what is actually applied; you can't pay for something you can't afford.
 - [ ] Age/state gates: the action is impossible when ineligible, server-side, not just hidden in the UI.
+- [ ] No soft-locks: every decision keeps at least one always-available option (decline/do-nothing/free); a $0 life can always make a legal move (validator check + $0 test over every template).
 
 Hygiene
 - [ ] Only files and functions I own (00-TEAM.md) were edited; shared files were re-read before editing.
 - [ ] No probability or balance changes beyond the agreed bug fixes.
 - [ ] Focused tests pass; flaky-prone tests were run under 3 PYTHONHASHSEED values.
 - [ ] UI (B): keyboard works, focus is kept, phone width has no overflow, every person shown has an avatar, contrast is ≥ 4.5:1.
+- [ ] Regression tests FORCE the rare path (seeded or injected trigger, e.g. force the auto event), never rely on a random roll happening to fire. After bulk or string-replacement edits, grep that earlier fixes are still in place.

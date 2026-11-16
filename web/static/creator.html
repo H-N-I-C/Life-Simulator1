@@ -17,15 +17,37 @@
   </nav>
 </header>
 <main>
-  <section class="card preview-wrap" aria-label="Preview">
-    <div id="preview" class="preview" aria-live="polite"></div>
+  <section class="card preview-wrap creator-hero" aria-label="Preview">
+    <div id="preview" class="preview big-circle" aria-live="polite"></div>
     <p class="row" style="justify-content:center; margin:8px 0 0;">
       <strong id="ageLabel">Adult · 30</strong>
     </p>
-    <label class="field" for="age">
+    <label class="field" for="age" style="margin-bottom:0;">
       Age preview
       <input type="range" id="age" min="0" max="80" value="30">
     </label>
+  </section>
+
+  <section class="card" aria-label="Customization">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div id="options" class="swatches"></div>
+    <div class="row" style="margin-top:12px;">
+      <button class="primary small" id="randomAll">🎲 Randomize</button>
+      <button class="small" id="randomCat">Randomize tab</button>
+      <button class="small" id="resetBtn">Reset</button>
+      <label class="field" for="preset" style="margin:0;flex:1;min-width:130px;">
+        <select id="preset" aria-label="Preset"></select>
+      </label>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <button class="primary" id="startBtn">Start life</button>
+      <button id="saveBtn">Export JSON</button>
+      <button id="printBtn">Print JSON</button>
+    </div>
+    <p id="startMsg" style="color:#a53b3b;font-weight:700;"></p>
   </section>
 
   <section class="card" aria-label="Identity">
@@ -41,28 +63,6 @@
     <label class="field" for="country">Country
       <select id="country"></select>
     </label>
-  </section>
-
-  <section class="card">
-    <div class="row" style="margin-bottom:10px;">
-      <button class="primary" id="randomAll">🎲 Randomize all</button>
-      <button id="randomCat">Randomize category</button>
-      <button id="resetBtn">Reset</button>
-    </div>
-    <label class="field" for="preset">Preset
-      <select id="preset"></select>
-    </label>
-    <div class="tabs" role="tablist" id="tabs"></div>
-    <div id="options" class="swatches"></div>
-  </section>
-
-  <section class="card">
-    <div class="row">
-      <button class="primary" id="startBtn">Start life</button>
-      <button id="saveBtn">Export JSON</button>
-      <button id="printBtn">Print JSON</button>
-    </div>
-    <p id="startMsg" style="color:#a53b3b;font-weight:700;"></p>
   </section>
 </main>
 <script type="module" src="/static/creator.js"></script>

@@ -1,0 +1,50 @@
+{
+  "schema_version": 2,
+  "events": [
+    {
+      "id": "thanatophobia_worry",
+      "title": "Fear of death",
+      "text": "You begin to worry that one day you may not be here anymore.",
+      "category": "health",
+      "weight": 1,
+      "chance_n": 10,
+      "conditions": {
+        "min_age": 12,
+        "once_per_lifetime": false,
+        "requires": [
+          {
+            "kind": "flag",
+            "name": "trait:THANATOPHOBIA"
+          },
+          {
+            "kind": "min_age_sampled",
+            "randint": [
+              12,
+              17
+            ]
+          }
+        ]
+      },
+      "effects": {
+        "stats": {
+          "happiness": {
+            "randint": [
+              4,
+              6
+            ],
+            "sign": -1
+          },
+          "stress": {
+            "randint": [
+              3,
+              8
+            ]
+          },
+          "health": -1
+        }
+      },
+      "auto": true,
+      "_comment": "Automatic event (schema v2.1 auto:true): the worry applies immediately; legacy has no choice."
+    }
+  ]
+}

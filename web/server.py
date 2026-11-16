@@ -22,12 +22,14 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer  # noqa: E40
 from urllib.parse import urlparse, parse_qs, unquote  # noqa: E402
 
 from src.appearance import render as avatar_render  # noqa: E402
+from src.appearance.render import avatar_image_key  # noqa: E402,F401
 from src.game.service import GameError  # noqa: E402
 from src.game.service import GameService  # noqa: E402
 
 SERVICE_SOURCE = "src.game.service"
 
 STATIC = os.path.join(ROOT, "web", "static")
+AVATAR_STATIC = os.path.join(STATIC, "avatars")
 FIXTURES = os.path.join(ROOT, "tests", "fixtures", "appearances")
 SAVE_DIR = os.path.join(ROOT, "game_saves", "web")
 
@@ -38,58 +40,37 @@ AGE_LABELS = {1: "Baby", 8: "Child", 15: "Teen", 30: "Adult", 70: "Elder"}
 
 PRESETS = [
     {"name": "Classic Alex", "appearance": {
-        "skin_tone": "skin_04", "face_shape": "oval", "eye_shape": "almond",
-        "eye_color": "brown_dark", "brows": "soft", "nose": "button",
-        "mouth": "smile", "hair_texture": "straight",
-        "hair_color": "brown_medium", "marks": [], "hair_style": "short_crop",
-        "facial_hair": "none",
-        "accessories": {"glasses": "none", "headwear": "none",
-                        "earrings": "none"},
-        "outfit_style": "tee", "outfit_color": "blue"}},
+        "schema_version": 2, "seed": 101, "base": "person",
+        "skin_tone": "medium-light", "hair": "default",
+        "facial_hair": "none", "headwear": "none", "badges": [],
+        "background": "bg_05", "look_override": "none"}},
     {"name": "Curly Priya", "appearance": {
-        "skin_tone": "skin_06", "face_shape": "heart", "eye_shape": "round",
-        "eye_color": "brown_light", "brows": "arched", "nose": "upturned",
-        "mouth": "full", "hair_texture": "curly", "hair_color": "black",
-        "marks": ["beauty_mark"], "hair_style": "long_curly",
-        "facial_hair": "none",
-        "accessories": {"glasses": "cat_eye", "headwear": "none",
-                        "earrings": "hoops"},
-        "outfit_style": "dress", "outfit_color": "red"}},
+        "schema_version": 2, "seed": 102, "base": "woman",
+        "skin_tone": "medium", "hair": "curly",
+        "facial_hair": "none", "headwear": "none",
+        "badges": ["earrings"], "background": "bg_04",
+        "look_override": "none"}},
     {"name": "Elder Mr. Okafor", "appearance": {
-        "skin_tone": "skin_09", "face_shape": "round",
-        "eye_shape": "monolid", "eye_color": "brown_dark", "brows": "thick",
-        "nose": "wide", "mouth": "neutral", "hair_texture": "coily",
-        "hair_color": "gray", "marks": ["mole"], "hair_style": "buzz",
-        "facial_hair": "beard_short",
-        "accessories": {"glasses": "round", "headwear": "none",
-                        "earrings": "none"},
-        "outfit_style": "suit", "outfit_color": "blue"}},
+        "schema_version": 2, "seed": 103, "base": "man",
+        "skin_tone": "dark", "hair": "white",
+        "facial_hair": "beard", "headwear": "none", "badges": ["glasses"],
+        "background": "bg_09", "look_override": "none"}},
     {"name": "Sporty Sam", "appearance": {
-        "skin_tone": "skin_03", "face_shape": "square", "eye_shape": "round",
-        "eye_color": "blue", "brows": "straight", "nose": "straight",
-        "mouth": "smile", "hair_texture": "straight",
-        "hair_color": "blonde", "marks": ["freckles"],
-        "hair_style": "undercut", "facial_hair": "none",
-        "accessories": {"glasses": "none", "headwear": "cap",
-                        "earrings": "none"},
-        "outfit_style": "hoodie", "outfit_color": "green"}},
+        "schema_version": 2, "seed": 104, "base": "man",
+        "skin_tone": "light", "hair": "red",
+        "facial_hair": "none", "headwear": "none", "badges": ["cap"],
+        "background": "bg_03", "look_override": "none"}},
     {"name": "Boho Ines", "appearance": {
-        "skin_tone": "skin_02", "face_shape": "long",
-        "eye_shape": "downturned", "eye_color": "green", "brows": "soft",
-        "nose": "pointed", "mouth": "smile", "hair_texture": "wavy",
-        "hair_color": "auburn", "marks": ["freckles"],
-        "hair_style": "long_wavy", "facial_hair": "none",
-        "accessories": {"glasses": "none", "headwear": "sun_hat",
-                        "earrings": "dangles"},
-        "outfit_style": "sweater", "outfit_color": "purple"}},
-    {"name": "Punk Ren", "appearance": {
-        "skin_tone": "skin_05", "face_shape": "oval", "eye_shape": "upturned",
-        "eye_color": "hazel", "brows": "thin", "nose": "button",
-        "mouth": "smile", "hair_texture": "straight", "hair_color": "red",
-        "marks": ["scar_brow"], "hair_style": "undercut", "facial_hair": "none",
-        "accessories": {"glasses": "cat_eye", "headwear": "none",
-                        "earrings": "studs"},
-        "outfit_style": "tee", "outfit_color": "black"}},
+        "schema_version": 2, "seed": 105, "base": "woman",
+        "skin_tone": "light", "hair": "default",
+        "facial_hair": "none", "headwear": "headscarf",
+        "badges": ["flower"], "background": "bg_08",
+        "look_override": "none"}},
+    {"name": "Grad Robin", "appearance": {
+        "schema_version": 2, "seed": 106, "base": "person",
+        "skin_tone": "medium-dark", "hair": "default",
+        "facial_hair": "none", "headwear": "none", "badges": ["crown"],
+        "background": "bg_02", "look_override": "student"}},
 ]
 
 DEFAULT_APPEARANCE = PRESETS[0]["appearance"]
@@ -130,79 +111,91 @@ def _bounded_int(value, lo, hi, name):
     return ivalue
 
 
-def _cell(svg, label=""):
-    label_html = ('<figcaption>%s</figcaption>' % html.escape(label)
+def _img_cell(app, age, label=""):
+    import base64
+    raw = json.dumps(app, separators=(",", ":")).encode()
+    b64 = base64.urlsafe_b64encode(raw).decode()
+    label_html = ("<figcaption>%s</figcaption>" % html.escape(label)
                   if label else "")
-    return '<figure class="cell">%s%s</figure>' % (svg, label_html)
+    return ('<figure class="cell"><img loading="lazy" '
+            'src="/api/avatar.png?app=%s&amp;age=%d" alt="">%s</figure>'
+            % (b64, age, label_html))
+
+
+V2_BASE = {"schema_version": 2, "seed": 7, "base": "person",
+           "skin_tone": "default", "hair": "default",
+           "facial_hair": "none", "headwear": "none", "badges": [],
+           "background": "bg_01", "look_override": "none"}
+
+
+def _v2(**over):
+    app = dict(V2_BASE)
+    app.update(over)
+    return app
 
 
 def grid_skins(size):
-    return "".join(
-        _cell(render_svg(dict(DEFAULT_APPEARANCE, skin_tone=e["id"]),
-                         30, size), e["label"])
-        for e in catalog().get("skin_tone", []))
+    return "".join(_img_cell(_v2(skin_tone=e["id"]), 30, e["label"])
+                   for e in catalog().get("skin_tone", []))
 
 
 def grid_ages(size):
-    return "".join(_cell(render_svg(DEFAULT_APPEARANCE, age, size),
-                         AGE_LABELS[age]) for age in AGES)
-
-
-def grid_hair_hats(size):
-    """Every catalog hair style x every headwear, from the real catalog."""
-    out = []
-    hats = ["none"] + [e["id"] for e in catalog().get("headwear", [])
-                       if e["id"] != "none"]
-    for h in [e["id"] for e in catalog().get("hair_style", [])]:
-        for hat in hats:
-            app = dict(DEFAULT_APPEARANCE, hair_style=h)
-            app["accessories"] = {"glasses": "none", "headwear": hat,
-                                  "earrings": "none"}
-            out.append(_cell(render_svg(app, 30, size),
-                             "%s + %s" % (h, hat)))
-    return "".join(out)
-
-
-def grid_feature(category, size):
-    """Survey of one feature category (eye_shape, brows, nose, mouth,
-    face_shape, hair_texture, facial_hair, outfit_style)."""
-    out = []
-    for e in catalog().get(category, []):
-        app = dict(DEFAULT_APPEARANCE)
-        if category == "facial_hair":
-            app[category] = e["id"]
-            out.append(_cell(render_svg(app, 40, size), e["label"]))
-        elif category == "outfit_style":
-            app[category] = e["id"]
-            out.append(_cell(render_svg(app, 30, size), e["label"]))
-        else:
-            app[category] = e["id"]
-            out.append(_cell(render_svg(app, 30, size), e["label"]))
-    return "".join(out)
+    return "".join(_img_cell(V2_BASE, age, AGE_LABELS[age]) for age in AGES)
 
 
 def grid_matrix(size):
-    """Skin tone x age stage matrix (all 12 tones x 5 stages)."""
     out = []
     for e in catalog().get("skin_tone", []):
         for age in AGES:
-            out.append(_cell(render_svg(dict(DEFAULT_APPEARANCE,
-                                             skin_tone=e["id"]), age, size),
-                             "%s · %s" % (e["label"], AGE_LABELS[age])))
+            out.append(_img_cell(_v2(skin_tone=e["id"]), age,
+                                 "%s · %s" % (e["label"], AGE_LABELS[age])))
     return "".join(out)
 
 
-def grid_glasses_earrings(size):
-    acc = catalog()
+def grid_hair(size):
     out = []
-    for gl in acc.get("glasses", []):
-        for ea in acc.get("earrings", []):
-            app = dict(DEFAULT_APPEARANCE)
-            app["accessories"] = {"glasses": gl["id"], "headwear": "none",
-                                  "earrings": ea["id"]}
-            out.append(_cell(render_svg(app, 30, size),
-                             "%s + %s" % (gl["label"], ea["label"])))
+    for e in catalog().get("hair", []):
+        out.append(_img_cell(_v2(hair=e["id"]), 30, e["label"]))
+        out.append(_img_cell(_v2(base="woman", hair=e["id"]), 30,
+                             "woman · %s" % e["label"]))
+        out.append(_img_cell(_v2(base="man", hair=e["id"]), 30,
+                             "man · %s" % e["label"]))
+    for e in catalog().get("facial_hair", []):
+        if e["id"] != "none":
+            out.append(_img_cell(_v2(base="man", facial_hair=e["id"]), 45,
+                                 e["label"]))
+    for e in catalog().get("headwear", []):
+        if e["id"] != "none":
+            out.append(_img_cell(_v2(base="woman", headwear=e["id"]), 40,
+                                 e["label"]))
     return "".join(out)
+
+
+def grid_extras(size):
+    out = []
+    for e in catalog().get("badges", []):
+        out.append(_img_cell(_v2(badges=[e["id"]]), 35, e["label"]))
+    for e in catalog().get("background", []):
+        out.append(_img_cell(_v2(background=e["id"]), 30, e["label"]))
+    return "".join(out)
+
+
+def grid_looks(size):
+    looks = sorted({k.split(":")[1] for k in _avatar_combos()
+                    if k.startswith("look:")})
+    out = []
+    for look in looks:
+        out.append(_img_cell(_v2(look_override=look), 40, look))
+    return "".join(out)
+
+
+def _avatar_combos():
+    try:
+        import json as _json
+        with open(avatar_render.MANIFEST_PATH, encoding="utf-8") as f:
+            return _json.load(f).get("combos", {})
+    except Exception:
+        return {}
 
 
 def load_people():
@@ -254,12 +247,13 @@ class Handler(BaseHTTPRequestHandler):
             return True
         return origin == "http://" + expected_host
 
-    def _send(self, body, ctype="text/html; charset=utf-8", code=200):
+    def _send(self, body, ctype="text/html; charset=utf-8", code=200,
+              cache="no-store"):
         data = body.encode("utf-8") if isinstance(body, str) else body
         self.send_response(code)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(data)))
-        self.send_header("Cache-Control", "no-store")
+        self.send_header("Cache-Control", cache)
         self.end_headers()
         self.wfile.write(data)
 
@@ -313,6 +307,19 @@ class Handler(BaseHTTPRequestHandler):
             with open(os.path.join(STATIC, PAGES[path]), "rb") as f:
                 self._send(f.read())
             return
+        if path.startswith("/static/avatars/"):
+            fn = os.path.normpath(unquote(path[len("/static/avatars/"):]))
+            full = os.path.join(AVATAR_STATIC, fn)
+            real = os.path.realpath(full)
+            if (os.path.commonpath([real, os.path.realpath(AVATAR_STATIC)])
+                    != os.path.realpath(AVATAR_STATIC)
+                    or os.path.islink(full) or not os.path.isfile(real)
+                    or not real.endswith(".png")):
+                self._send("not found", code=404)
+                return
+            with open(real, "rb") as f:
+                self._send(f.read(), "image/png")
+            return
         if path.startswith("/static/"):
             fn = os.path.normpath(unquote(path[len("/static/"):]))
             full = os.path.join(STATIC, fn)
@@ -330,8 +337,49 @@ class Handler(BaseHTTPRequestHandler):
             with open(full, "rb") as f:
                 self._send(f.read(), ctype)
             return
+        if path.startswith("/api/avatar.png"):
+            # stateless GET variant for <img> cells: ?app=<base64url json>
+            # &age=<int>; read-only, no game state touched.
+            import base64
+            raw = qs.get("app", [""])[0]
+            try:
+                # tolerate stripped padding (client omits it)
+                pad = "=" * (-len(raw) % 4)
+                app_dict = json.loads(base64.urlsafe_b64decode(
+                    (raw + pad).encode()).decode())
+            except Exception:
+                self._error("invalid_input", "malformed app parameter", 400)
+                return
+            if not isinstance(app_dict, dict):
+                self._error("invalid_input", "malformed app parameter", 400)
+                return
+            try:
+                age = _bounded_int(qs.get("age", ["30"])[0], 0, 120, "age")
+                key = avatar_render.avatar_image_key(app_dict, age)
+            except GameError as exc:
+                self._error(exc.code, exc.message, exc.status)
+                return
+            if not key["found"]:
+                self._error("internal_error",
+                            "avatar asset missing for this look", 500)
+                return
+            with open(os.path.join(avatar_render.AVATAR_DIR, key["file"]),
+                      "rb") as f:
+                # immutable per (appearance, age): cache to avoid the
+                # intermittent refetch flake on the creator
+                self._send(f.read(), "image/png",
+                           cache="public, max-age=3600")
+            return
         if path == "/api/service-info":
-            self._json({"service": SERVICE_SOURCE})
+            self._json({"service": SERVICE_SOURCE,
+                        "dev": bool(getattr(self.server, "dev_mode", False))})
+            return
+        if path == "/api/scenarios":
+            # dev-only scenario starts; hidden in normal play
+            if not getattr(self.server, "dev_mode", False):
+                self._error("not_found", "unknown route", 404)
+                return
+            self._json(_scenarios())
             return
         if path == "/api/catalog":
             self._json({"catalog": catalog(), "presets": PRESETS,
@@ -349,17 +397,8 @@ class Handler(BaseHTTPRequestHandler):
                 self._error(exc.code, exc.message, exc.status)
                 return
             grids = {"skins": grid_skins, "ages": grid_ages,
-                     "hair-hats": grid_hair_hats,
-                     "glasses-earrings": grid_glasses_earrings,
-                     "matrix": grid_matrix,
-                     "eye-shapes": lambda n: grid_feature("eye_shape", n),
-                     "brows": lambda n: grid_feature("brows", n),
-                     "noses": lambda n: grid_feature("nose", n),
-                     "mouths": lambda n: grid_feature("mouth", n),
-                     "face-shapes": lambda n: grid_feature("face_shape", n),
-                     "textures": lambda n: grid_feature("hair_texture", n),
-                     "outfits": lambda n: grid_feature("outfit_style", n),
-                     "facial-hair": lambda n: grid_feature("facial_hair", n)}
+                     "matrix": grid_matrix, "hair": grid_hair,
+                     "extras": grid_extras, "looks": grid_looks}
             fn = grids.get(path[len("/api/grid/"):])
             if not fn:
                 self._send("unknown grid", code=404)
@@ -372,7 +411,7 @@ class Handler(BaseHTTPRequestHandler):
             except GameError as exc:
                 self._error(exc.code, exc.message, exc.status)
             except Exception:
-                self._error("internal", "unexpected server error", 500)
+                self._error("internal_error", "unexpected server error", 500)
             return
         if path.startswith("/api/games/"):
             game_id = path[len("/api/games/"):]
@@ -384,7 +423,7 @@ class Handler(BaseHTTPRequestHandler):
             except GameError as exc:
                 self._error(exc.code, exc.message, exc.status)
             except Exception:
-                self._error("internal", "unexpected server error", 500)
+                self._error("internal_error", "unexpected server error", 500)
             return
         self._send("not found", code=404)
 
@@ -396,6 +435,9 @@ class Handler(BaseHTTPRequestHandler):
             return
         try:
             if path == "/api/render":
+                # M0b: resolves the Fluent 3D avatar asset and streams the
+                # PNG. `size` is accepted for client compatibility; assets
+                # are served at their fetched resolution.
                 payload = self._read_json_body()
                 app_dict = payload.get("appearance")
                 if app_dict is None:
@@ -404,14 +446,21 @@ class Handler(BaseHTTPRequestHandler):
                     raise GameError("invalid_input",
                                     "appearance must be an object", 400)
                 age = _bounded_int(payload.get("age", 30), 0, 120, "age")
-                size = _bounded_int(payload.get("size", 128), 8, 512, "size")
-                self._send(render_svg(app_dict, age, size), "image/svg+xml")
+                _bounded_int(payload.get("size", 128), 8, 512, "size")
+                key = avatar_render.avatar_image_key(app_dict, age)
+                if not key["found"]:
+                    raise GameError("internal_error",
+                                    "avatar asset missing for this look",
+                                    500)
+                with open(os.path.join(avatar_render.AVATAR_DIR,
+                                       key["file"]), "rb") as f:
+                    self._send(f.read(), "image/png")
                 return
             if path == "/api/games":
                 payload = self._read_json_body()
                 profile = {k: payload.get(k) for k in (
                     "first_name", "last_name", "gender", "country",
-                    "appearance", "seed")}
+                    "appearance", "seed", "scenario")}
                 request_id = self._require_request_id(payload)
                 state = self.server.service.new_game(profile, request_id)
                 self._json(state, 201)
@@ -442,11 +491,10 @@ class Handler(BaseHTTPRequestHandler):
             self._send("not found", code=404)
         except GameError as exc:
             self._error(exc.code, exc.message, exc.status)
-        except (ValueError, TypeError):
-            self._error("invalid_input", "invalid field types", 400)
         except Exception:
-            # no traceback/path exposure
-            self._error("internal", "unexpected server error", 500)
+            # All deliberate validation raises GameError; anything else is
+            # a server fault — no traceback/path exposure.
+            self._error("internal_error", "unexpected server error", 500)
 
     def _require_request_id(self, payload):
         request_id = payload.get("request_id")
@@ -483,8 +531,36 @@ def make_server(port=8765, save_dir=SAVE_DIR):
     return server
 
 
-def main(port=8765):
+# The frozen scenario set lives in docs/collab/M2/api-examples.json
+# (scenario_start_example) — the contract is the single source of truth for
+# what the dev panel may offer. Server-side extras are not advertised.
+_EXAMPLES_PATH = os.path.join(ROOT, "docs", "collab", "M2",
+                              "api-examples.json")
+
+
+def _frozen_scenarios():
+    try:
+        with open(_EXAMPLES_PATH, encoding="utf-8") as f:
+            ex = json.load(f)
+        return [(s["id"], s.get("label", s["id"]))
+                for s in ex["scenario_start_example"]["scenarios"]]
+    except Exception:
+        return []
+
+
+def _scenarios():
+    try:
+        from src.game.scenarios import SCENARIOS
+        return {"scenarios": [{"id": k, "label": label}
+                              for k, label in _frozen_scenarios()
+                              if k in SCENARIOS]}
+    except Exception:
+        return {"scenarios": []}
+
+
+def main(port=8765, dev=False):
     server = make_server(port)
+    server.dev_mode = dev
     print("Life Simulator web UI (service: %s)" % SERVICE_SOURCE)
     print("  Game:         http://127.0.0.1:%d/game" % port)
     print("  Creator:      http://127.0.0.1:%d/creator" % port)
@@ -500,4 +576,6 @@ def main(port=8765):
 
 
 if __name__ == "__main__":
-    main(int(sys.argv[1]) if len(sys.argv) > 1 else 8765)
+    args = [a for a in sys.argv[1:] if a != "--dev"]
+    main(*(int(args[0]),) if args else (),
+         **{"dev": "--dev" in sys.argv})

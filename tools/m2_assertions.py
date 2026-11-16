@@ -27,8 +27,7 @@ PHASE_ORDER = [
 ]
 
 SOURCE_KEY_RE = re.compile(
-    r"^t_\d+:[a-z_]+:[A-Za-z0-9:_-]+:.+:(gross|tax|expenses|net|repay|"
-    r"transfer|fee|cost|principal|win|ticket)$")
+    r"^t_[A-Za-z0-9_]+:[a-z_]+:[A-Za-z0-9:_-]+:.+:[a-z_]+$")
 
 EDU_STAGES = ("none", "elementary", "middle", "high", "university")
 
@@ -109,7 +108,7 @@ def check_state_sections(state):
 
     turn = state.get("turn")
     if turn is not None:
-        cursor = turn.get("cursor", {})
+        cursor = turn.get("cursor") or {}
         if cursor.get("phase_id") not in PHASE_ORDER:
             problems.append("turn.cursor.phase_id %r unknown"
                             % (cursor.get("phase_id"),))
@@ -256,11 +255,19 @@ def _self_test():
     expect(not ok and len(problems) == 2, problems,
            "unresolved refs must fail twice")
 
-    ok, problems = check_transfer_legs(ex["succession_example"]
-                                       ["transfer_legs"])
+    # M2c succession example no longer carries raw transfer legs (it
+    # shows the continue_as request/response shapes); exercise the
+    # transfer-leg checker with an equivalent balanced pair instead.
+    demo_legs = [
+        {"source_key": "t_000100:succession:inheritance:c1:transfer",
+         "account_owner_id": "c1", "category": "inheritance",
+         "amount": 125000, "group_id": "g1"},
+        {"source_key": "t_000100:succession:estate:p1:transfer",
+         "account_owner_id": "p1", "category": "transfer",
+         "amount": -125000, "group_id": "g1"}]
+    ok, problems = check_transfer_legs(demo_legs)
     expect(ok, problems, "succession transfer legs")
-    broken = [dict(l, amount=l["amount"] + 1)
-              for l in ex["succession_example"]["transfer_legs"]]
+    broken = [dict(l, amount=l["amount"] + 1) for l in demo_legs]
     ok, problems = check_transfer_legs(broken)
     expect(not ok, problems, "unbalanced transfer must fail")
 

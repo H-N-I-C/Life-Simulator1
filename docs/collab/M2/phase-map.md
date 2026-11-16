@@ -10,15 +10,17 @@ One canonical yearly phase list. C's rule_actions implements work_income
 names below. Composite legacy `age_up`/`random_events` stay FORBIDDEN in the
 web coordinator; C exposes the headless subrules named in §1.
 
-## 0. Legacy parity baseline (source of the ordering)
+## 0. Ordering baseline
 
-Verified against `src/people/classes/player.py`:
-- relations age first (`age_up` relation loop), then the player's old-age
-  `death_check` (line ~511), then relation sudden/old-age deaths (line ~618),
-  and income accrues last inside `random_events` (line ~646). So legacy
-  pays nobody who died before the income accrual.
-- Illness/cancer deaths happen INSIDE `random_events` — after income.
-The phase order below preserves exactly that.
+Legacy (`src/people/classes/player.py`) ages relations, then checks the
+player's old-age death, then relation deaths, and income accrues LAST
+inside `random_events`. The phase order below preserves exactly that
+(FINAL, Claude 2026-11-16 — no exceptions): deaths run BEFORE
+work_income, the deceased are not paid, and relation deaths plus
+inheritance post in the mortality phase. Debt timing is also legacy
+parity: education (graduation-year loan principal) runs BEFORE
+debt_service, so a new graduate's first repayment lands in the SAME year
+as in the legacy game.
 
 ## 1. Canonical phases (order frozen)
 
@@ -27,22 +29,23 @@ The phase order below preserves exactly that.
 | 1 | year_start | P1 | A | orchestration; snapshot living people by person_id | player.age, total_happiness, annual flags/limits, turn snapshot |
 | 2 | relations_age | P2 | C | `increment_age(person)` for snapshot members; `relation_year_drift` | relation ages, relationship values (NO deaths) |
 | 3 | player_stats | P3 | C | `stat_drift(player, rng)`, `apply_yearly_trait_effects(player, rng)` (existing-trait modifiers only) | player stat fields, teen_looks_inc, karma, surgeon list |
-| 4 | mortality | — | A/C | player old-age check (C helper) + relation deaths; inheritance posts HERE | status, dead_ids, archive, inheritance money_entries |
+| 4 | mortality | — | A/C | player old-age check + relation deaths (C subrule `sample_relation_death`); inheritance money_entries post HERE | status, dead_ids, archive, inheritance |
 | 5 | work_income | P5 | C | `yearly_work_phase`: stress/perf/years, retirement offer, firing; income via `annual_income_quote` legs (money_entries only) | employment fields; NO direct money mutation |
-| 6 | debt_service | — | C→A | student-loan repayment computation | loan balances via money_entries only |
-| 7 | education | P6 | C | `yearly_education_phase`: grade drift, school stages, university | grades/enrollment/uv years; loan principal via money_entries |
+| 6 | education | P6 | C | `yearly_education_phase`: grade drift, school stages, university; graduation-year loan principal (before debt_service) | grades/enrollment/uv years; loan principal via money_entries |
+| 7 | debt_service | — | C→A | student-loan repayment computation | loan balances via money_entries only |
 | 8 | family_events | P7 | C (M2b) | `child_stat_year`, `child_money_year(child)->money_entry`, `child_social_year` (job/partner), pregnancy/births (A creation hook) | partner/child state, births, relationship values (NO deaths) |
 | 9 | illness | — | C (M2b) | illness onset/progression; deaths here return a TERMINAL transition | illnesses, health, treatment money_entries |
 | 10 | annual_events | — | C (M2b/M2c) | legacy random_events branches as stored choices; trait gains ONLY here | event-specific fields; money_entries |
 | 11 | decision_offer | — | A | M1 contextual templates (RETAINED) | pending choice record only |
 | 12 | year_close | — | A | journal year entry (ACTUAL deltas), ledger close, cursor reset | journal, cursor |
 
-Deaths before income ⇒ the deceased are not paid (legacy parity). A fatal
-effect in phases 9–10 returns `finished_turn: true` with continuation
-{phase_id: year_close}: only close/estate work runs afterward, exactly once.
-Phases that may run after player death: year_close only (+ estate postings
-inside it). decision_offer is only reached alive (legacy never offers a
-choice to someone who died of old age; illness deaths abort the turn).
+Deaths before income (legacy parity): the deceased are not paid; relation
+deaths and inheritance post in the mortality phase (4). A fatal effect in
+illness/annual_events returns `finished_turn: true` with continuation
+{phase_id: year_close}: only close work runs afterward, exactly once.
+Phases that may run after player death: year_close only. Player old-age
+mortality (phase 4) and relation deaths are processed BEFORE
+decision_offer (11): the dying never face a new contextual choice.
 
 ## 2. Ageing invariant
 
@@ -72,10 +75,13 @@ inputs/membership before any mutation or RNG draw.
   wedding, lottery, tuition). Rule code never mutates `money`.
 - Income quote: C's pure deterministic `annual_income_quote(salary,
   has_job, job_hours, expense_factor)` returns integer gross/tax/expenses/
-  net with `net == gross - tax - expenses` exactly; the expense factor is
-  sampled once per account/turn through the supplied rng and stored in the
-  cursor; A persists the immutable quote per account/turn and posts legs
-  with `round_stochastic` allocation that keeps the invariant exact.
+  net with `net == gross - tax - expenses` exactly. Rounding policy
+  (frozen, C): deterministic integers with residual allocated to expenses;
+  NO posting-time RNG. The expense factor is sampled once per account/turn
+  through the supplied rng and stored in the cursor; A persists the
+  immutable quote per account/turn and posts its legs verbatim.
+  Executable fixture: quote(30000, True, 40, 0.6) = 30000/3401/10640/15959
+  (tests/test_rules_income.py AnnualIncomeQuoteTest).
   The legacy terminal helper keeps its internal sampling (parity).
 - Employment state is read at work_income; mid-turn job/retirement changes
   (annual_events choices) take effect next turn (matches legacy, where

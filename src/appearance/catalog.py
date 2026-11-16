@@ -1,258 +1,233 @@
-"""Appearance catalog: category -> ordered list of {id, label, ...}.
+"""Appearance catalog v2 (Fluent emoji avatars): category -> allowed IDs.
 
 Every value used by an Appearance is a stable string ID from this catalog.
-Each category includes a safe default as its first entry; unknown IDs must
-fall back to the default (see model.Appearance.from_dict).
+Each category includes a safe default; unknown IDs fall back to the default
+(see model.Appearance.from_dict). The v1 catalog is retained under V1_* for
+the v1->v2 migration only.
 """
 
-CATALOG_VERSION = 1
+CATALOG_VERSION = 2
 
-# Each entry: {"id": str, "label": str}. Colour categories add "hex".
-# The first entry of every category is the safe default.
+BASES = [
+    {"id": "person", "label": "Person"},
+    {"id": "woman", "label": "Woman"},
+    {"id": "man", "label": "Man"},
+]
 
 SKIN_TONES = [
-    {"id": "skin_01", "label": "Porcelain", "hex": "#f7ece5"},
-    {"id": "skin_02", "label": "Ivory", "hex": "#f3e3d3"},
-    {"id": "skin_03", "label": "Sand", "hex": "#eed7bf"},
-    {"id": "skin_04", "label": "Honey", "hex": "#e6c5a2"},
-    {"id": "skin_05", "label": "Warm Olive", "hex": "#d9b78f"},
-    {"id": "skin_06", "label": "Tan", "hex": "#cfa276"},
-    {"id": "skin_07", "label": "Caramel", "hex": "#bd8a5b"},
-    {"id": "skin_08", "label": "Bronze", "hex": "#a57144"},
-    {"id": "skin_09", "label": "Brown", "hex": "#8a5a33"},
-    {"id": "skin_10", "label": "Espresso", "hex": "#6d4527"},
-    {"id": "skin_11", "label": "Deep Umber", "hex": "#503119"},
-    {"id": "skin_12", "label": "Ebony", "hex": "#38220f"},
+    {"id": "default", "label": "Default"},
+    {"id": "light", "label": "Light"},
+    {"id": "medium-light", "label": "Medium-light"},
+    {"id": "medium", "label": "Medium"},
+    {"id": "medium-dark", "label": "Medium-dark"},
+    {"id": "dark", "label": "Dark"},
 ]
 
-FACE_SHAPES = [
-    {"id": "oval", "label": "Oval"},
-    {"id": "round", "label": "Round"},
-    {"id": "square", "label": "Square"},
-    {"id": "heart", "label": "Heart"},
-    {"id": "long", "label": "Long"},
-    {"id": "diamond", "label": "Diamond"},
-]
-
-EYE_SHAPES = [
-    {"id": "almond", "label": "Almond"},
-    {"id": "round", "label": "Round"},
-    {"id": "upturned", "label": "Upturned"},
-    {"id": "downturned", "label": "Downturned"},
-    {"id": "hooded", "label": "Hooded"},
-    {"id": "monolid", "label": "Monolid"},
-    {"id": "deep_set", "label": "Deep-set"},
-]
-
-EYE_COLORS = [
-    {"id": "brown_dark", "label": "Dark brown", "hex": "#3b2a20"},
-    {"id": "brown_light", "label": "Light brown", "hex": "#7a5230"},
-    {"id": "hazel", "label": "Hazel", "hex": "#8c6a3f"},
-    {"id": "amber", "label": "Amber", "hex": "#a87b32"},
-    {"id": "green", "label": "Green", "hex": "#4d7a4d"},
-    {"id": "blue", "label": "Blue", "hex": "#4a6fa5"},
-    {"id": "gray", "label": "Gray", "hex": "#7d8891"},
-    {"id": "blue_green", "label": "Blue-green", "hex": "#3f7d7a"},
-]
-
-BROWS = [
-    {"id": "soft", "label": "Soft"},
-    {"id": "thick", "label": "Thick"},
-    {"id": "thin", "label": "Thin"},
-    {"id": "arched", "label": "Arched"},
-    {"id": "straight", "label": "Straight"},
-    {"id": "bushy", "label": "Bushy"},
-]
-
-NOSES = [
-    {"id": "button", "label": "Button"},
-    {"id": "straight", "label": "Straight"},
-    {"id": "wide", "label": "Wide"},
-    {"id": "pointed", "label": "Pointed"},
-    {"id": "upturned", "label": "Upturned"},
-    {"id": "hooked", "label": "Hooked"},
-]
-
-MOUTHS = [
-    {"id": "smile", "label": "Smile"},
-    {"id": "neutral", "label": "Neutral"},
-    {"id": "full", "label": "Full lips"},
-    {"id": "thin", "label": "Thin lips"},
-    {"id": "wide", "label": "Wide"},
-    {"id": "pout", "label": "Pout"},
-]
-
-HAIR_TEXTURES = [
-    {"id": "straight", "label": "Straight"},
-    {"id": "wavy", "label": "Wavy"},
+HAIRS = [
+    {"id": "default", "label": "Default"},
     {"id": "curly", "label": "Curly"},
-    {"id": "coily", "label": "Coily"},
-]
-
-HAIR_COLORS = [
-    {"id": "black", "label": "Black", "hex": "#191414"},
-    {"id": "brown_dark", "label": "Dark brown", "hex": "#3a2a1c"},
-    {"id": "brown_medium", "label": "Brown", "hex": "#6b4a2c"},
-    {"id": "brown_light", "label": "Light brown", "hex": "#9c7040"},
-    {"id": "blonde_dark", "label": "Dark blonde", "hex": "#b08d4f"},
-    {"id": "blonde", "label": "Blonde", "hex": "#d9bc72"},
-    {"id": "blonde_platinum", "label": "Platinum blonde", "hex": "#e9dcb5"},
-    {"id": "red", "label": "Red", "hex": "#9e3b22"},
-    {"id": "auburn", "label": "Auburn", "hex": "#7a3b24"},
-    {"id": "chestnut", "label": "Chestnut", "hex": "#5c3a24"},
-    {"id": "gray", "label": "Gray", "hex": "#9a9a9a"},
-    {"id": "white", "label": "White", "hex": "#e8e8e8"},
-    {"id": "blue_black", "label": "Blue-black", "hex": "#141a24"},
-]
-
-HAIR_STYLES = [
-    {"id": "short_crop", "label": "Short crop"},
-    {"id": "buzz", "label": "Buzz cut"},
+    {"id": "red", "label": "Red"},
+    {"id": "white", "label": "White"},
     {"id": "bald", "label": "Bald"},
-    {"id": "side_part", "label": "Side part"},
-    {"id": "undercut", "label": "Undercut"},
-    {"id": "curtains", "label": "Curtains"},
-    {"id": "slick_back", "label": "Slicked back"},
-    {"id": "man_bun", "label": "Man bun"},
-    {"id": "ponytail", "label": "Ponytail"},
-    {"id": "high_ponytail", "label": "High ponytail"},
-    {"id": "braids", "label": "Braids"},
-    {"id": "locs", "label": "Locs"},
-    {"id": "afro_medium", "label": "Afro"},
-    {"id": "afro_large", "label": "Large afro"},
-    {"id": "long_straight", "label": "Long straight"},
-    {"id": "long_wavy", "label": "Long wavy"},
-    {"id": "long_curly", "label": "Long curly"},
-    {"id": "wavy_bob", "label": "Wavy bob"},
-    {"id": "bob", "label": "Bob"},
-    {"id": "bun", "label": "Bun"},
-    {"id": "bangs", "label": "Bangs"},
 ]
 
 FACIAL_HAIR = [
     {"id": "none", "label": "None"},
-    {"id": "stubble", "label": "Stubble"},
-    {"id": "mustache", "label": "Mustache"},
-    {"id": "goatee", "label": "Goatee"},
-    {"id": "beard_short", "label": "Short beard"},
-    {"id": "beard_full", "label": "Full beard"},
-]
-
-MARKS = [
-    {"id": "freckles", "label": "Freckles"},
-    {"id": "mole", "label": "Mole"},
-    {"id": "beauty_mark", "label": "Beauty mark"},
-    {"id": "scar_brow", "label": "Brow scar"},
-    {"id": "birthmark", "label": "Birthmark"},
-]
-
-GLASSES = [
-    {"id": "none", "label": "None"},
-    {"id": "round", "label": "Round"},
-    {"id": "square", "label": "Square"},
-    {"id": "rectangle", "label": "Rectangle"},
-    {"id": "oval", "label": "Oval"},
-    {"id": "cat_eye", "label": "Cat-eye"},
+    {"id": "beard", "label": "Beard"},
 ]
 
 HEADWEAR = [
     {"id": "none", "label": "None"},
-    {"id": "cap", "label": "Cap"},
-    {"id": "beanie", "label": "Beanie"},
     {"id": "headscarf", "label": "Headscarf"},
-    {"id": "sun_hat", "label": "Sun hat"},
-    {"id": "headband", "label": "Headband"},
-    {"id": "beret", "label": "Beret"},
 ]
 
-EARRINGS = [
+BADGES = [
+    {"id": "glasses", "label": "Glasses"},
+    {"id": "earrings", "label": "Earrings"},
+    {"id": "cap", "label": "Cap"},
+    {"id": "crown", "label": "Crown"},
+    {"id": "flower", "label": "Flower"},
+]
+
+BACKGROUNDS = [
+    {"id": "bg_01", "label": "Rose", "hex": "#f2d8d8"},
+    {"id": "bg_02", "label": "Sand", "hex": "#f2e6d0"},
+    {"id": "bg_03", "label": "Butter", "hex": "#f5f0c8"},
+    {"id": "bg_04", "label": "Mint", "hex": "#d8ecd8"},
+    {"id": "bg_05", "label": "Sky", "hex": "#d0e8f0"},
+    {"id": "bg_06", "label": "Lavender", "hex": "#d8d8f0"},
+    {"id": "bg_07", "label": "Lilac", "hex": "#ecd8f0"},
+    {"id": "bg_08", "label": "Blush", "hex": "#f0d8e0"},
+    {"id": "bg_09", "label": "Fog", "hex": "#e8e8e8"},
+    {"id": "bg_10", "label": "Stone", "hex": "#e0d8c8"},
+]
+
+LOOK_OVERRIDES = [
     {"id": "none", "label": "None"},
-    {"id": "studs", "label": "Studs"},
-    {"id": "hoops", "label": "Hoops"},
-    {"id": "dangles", "label": "Dangles"},
-    {"id": "clip_ons", "label": "Clip-ons"},
-]
-
-OUTFIT_STYLES = [
-    {"id": "tee", "label": "T-shirt & jeans"},
-    {"id": "shirt", "label": "Button-up"},
-    {"id": "hoodie", "label": "Hoodie"},
-    {"id": "sweater", "label": "Sweater"},
-    {"id": "dress", "label": "Dress"},
-    {"id": "blouse", "label": "Blouse & skirt"},
-    {"id": "suit", "label": "Suit"},
-    {"id": "jacket", "label": "Jacket"},
-]
-
-OUTFIT_COLORS = [
-    {"id": "blue", "label": "Blue", "hex": "#3b6ea5"},
-    {"id": "red", "label": "Red", "hex": "#a53b3b"},
-    {"id": "green", "label": "Green", "hex": "#3ba55b"},
-    {"id": "yellow", "label": "Yellow", "hex": "#d9b53b"},
-    {"id": "purple", "label": "Purple", "hex": "#7a3ba5"},
-    {"id": "pink", "label": "Pink", "hex": "#d97ab0"},
-    {"id": "orange", "label": "Orange", "hex": "#d97a3b"},
-    {"id": "black", "label": "Black", "hex": "#2b2b2b"},
-    {"id": "white", "label": "White", "hex": "#f0f0f0"},
-    {"id": "gray", "label": "Gray", "hex": "#888888"},
-    {"id": "brown", "label": "Brown", "hex": "#7a5230"},
-    {"id": "teal", "label": "Teal", "hex": "#3ba5a0"},
+    {"id": "student", "label": "Student"},
+    {"id": "health_worker", "label": "Health worker"},
+    {"id": "police", "label": "Police"},
+    {"id": "chef", "label": "Chef"},
+    {"id": "farmer", "label": "Farmer"},
+    {"id": "mechanic", "label": "Mechanic"},
+    {"id": "scientist", "label": "Scientist"},
+    {"id": "artist", "label": "Artist"},
+    {"id": "judge", "label": "Judge"},
+    {"id": "pilot", "label": "Pilot"},
+    {"id": "graduate", "label": "Graduate"},
+    {"id": "bride", "label": "Bride"},
+    {"id": "groom", "label": "Groom"},
 ]
 
 CATEGORIES = {
+    "base": BASES,
     "skin_tone": SKIN_TONES,
-    "face_shape": FACE_SHAPES,
-    "eye_shape": EYE_SHAPES,
-    "eye_color": EYE_COLORS,
-    "brows": BROWS,
-    "nose": NOSES,
-    "mouth": MOUTHS,
-    "hair_texture": HAIR_TEXTURES,
-    "hair_color": HAIR_COLORS,
-    "hair_style": HAIR_STYLES,
+    "hair": HAIRS,
     "facial_hair": FACIAL_HAIR,
-    "marks": MARKS,
-    "glasses": GLASSES,
     "headwear": HEADWEAR,
-    "earrings": EARRINGS,
-    "outfit_style": OUTFIT_STYLES,
-    "outfit_color": OUTFIT_COLORS,
+    "badges": BADGES,
+    "background": BACKGROUNDS,
+    "look_override": LOOK_OVERRIDES,
 }
 
-# marks is the only multi-select physical category; all others are single IDs.
-MULTI_CATEGORIES = {"marks"}
+# badges is the only multi-select category (max 2, enforced in the model).
+MULTI_CATEGORIES = {"badges"}
+BADGE_LIMIT = 2
 
-ACCESSORY_CATEGORIES = ("glasses", "headwear", "earrings")
-
-_DEFAULTS = None
+# Service-side profile validation iterates these names inside the
+# accessories object. v1 names keep validating against the v1 tables; v2
+# profiles use "badges" (validated per-item elsewhere by the model).
+ACCESSORY_CATEGORIES = ("badges", "glasses", "headwear", "earrings")
 
 
 def default_id(category):
-    """Safe default ID for a category (first entry)."""
     entries = CATEGORIES[category]
     return entries[0]["id"]
 
 
 def is_valid_id(category, value):
-    return any(e["id"] == value for e in CATEGORIES[category])
+    """Accept v2 IDs; for v1-era category names also accept the v1 IDs
+    (service validation and old fixtures must keep passing — the model
+    migrates v1 data to v2 on load)."""
+    entries = CATEGORIES.get(category)
+    if entries is None:
+        entries = V1_CATEGORIES.get(category)
+        if entries is None:
+            return False
+    elif category in V1_CATEGORIES:
+        # shared name (skin_tone): accept both generations
+        return any(e["id"] == value for e in entries) or any(
+            e["id"] == value for e in V1_CATEGORIES[category])
+    return any(e["id"] == value for e in entries)
 
 
 def normalize_id(category, value):
     """Return value if valid, else the category default."""
     if value is None:
         return default_id(category)
-    if isinstance(value, str) and is_valid_id(category, value):
+    entries = CATEGORIES.get(category, V1_CATEGORIES.get(category))
+    if entries is None:
         return value
-    return default_id(category)
+    if isinstance(value, str) and any(e["id"] == value for e in entries):
+        return value
+    return entries[0]["id"]
+
+
+def normalize_multi(category, values, limit=None):
+    """Validate a multi-select list: drop unknowns/duplicates, cap at limit."""
+    if not isinstance(values, (list, tuple)):
+        return []
+    seen = []
+    for v in values:
+        v = normalize_id(category, v)
+        if v not in seen:
+            seen.append(v)
+    cap = limit or BADGE_LIMIT
+    return seen[:cap]
 
 
 def entry(category, value):
-    """Look up the catalog entry for a valid ID, else the default entry."""
-    for e in CATEGORIES[category]:
+    entries = CATEGORIES.get(category, V1_CATEGORIES.get(category))
+    if entries is None:
+        raise KeyError(category)
+    for e in entries:
         if e["id"] == value:
             return e
-    return CATEGORIES[category][0]
+    return entries[0]
 
 
 def all_ids(category):
-    return [e["id"] for e in CATEGORIES[category]]
+    entries = CATEGORIES.get(category, V1_CATEGORIES.get(category))
+    if entries is None:
+        raise KeyError(category)
+    return [e["id"] for e in entries]
+
+
+# --------------------------------------------------------------------- v1
+# Retained for the v1 -> v2 migration AND backward compatibility: the
+# service validates creator profiles and old saves against these IDs, and
+# Appearance.from_dict migrates them to v2. Do not use for new content.
+
+V1_SKIN_TONES = [
+    {"id": "skin_01"}, {"id": "skin_02"}, {"id": "skin_03"}, {"id": "skin_04"},
+    {"id": "skin_05"}, {"id": "skin_06"}, {"id": "skin_07"}, {"id": "skin_08"},
+    {"id": "skin_09"}, {"id": "skin_10"}, {"id": "skin_11"}, {"id": "skin_12"},
+]
+
+# v1-only categories, keyed exactly as the v1 catalog named them. Kept so
+# is_valid_id()/normalize_id() keep accepting everything that was valid
+# before the v2 switch (service validation, old saves, fixtures).
+V1_CATEGORIES = {
+    "skin_tone": V1_SKIN_TONES,
+    "face_shape": [{"id": v} for v in (
+        "oval", "round", "square", "heart", "long", "diamond")],
+    "eye_shape": [{"id": v} for v in (
+        "almond", "round", "upturned", "downturned", "hooded", "monolid",
+        "deep_set")],
+    "eye_color": [{"id": v} for v in (
+        "brown_dark", "brown_light", "hazel", "amber", "green", "blue",
+        "gray", "blue_green")],
+    "brows": [{"id": v} for v in (
+        "soft", "thick", "thin", "arched", "straight", "bushy")],
+    "nose": [{"id": v} for v in (
+        "button", "straight", "wide", "pointed", "upturned", "hooked")],
+    "mouth": [{"id": v} for v in (
+        "smile", "neutral", "full", "thin", "wide", "pout")],
+    "hair_texture": [{"id": v} for v in ("straight", "wavy", "curly", "coily")],
+    "hair_color": [{"id": v} for v in (
+        "black", "brown_dark", "brown_medium", "brown_light", "blonde_dark",
+        "blonde", "blonde_platinum", "red", "auburn", "chestnut", "gray",
+        "white", "blue_black")],
+    "hair_style": [{"id": v} for v in (
+        "short_crop", "buzz", "bald", "side_part", "undercut", "curtains",
+        "slick_back", "man_bun", "ponytail", "high_ponytail", "braids",
+        "locs", "afro_medium", "afro_large", "long_straight", "long_wavy",
+        "long_curly", "wavy_bob", "bob", "bun", "bangs")],
+    "facial_hair": [{"id": v} for v in (
+        "none", "stubble", "mustache", "goatee", "beard_short", "beard_full")],
+    "marks": [{"id": v} for v in (
+        "freckles", "mole", "beauty_mark", "scar_brow", "birthmark")],
+    "glasses": [{"id": v} for v in (
+        "none", "round", "square", "rectangle", "oval", "cat_eye")],
+    "headwear": [{"id": v} for v in (
+        "none", "cap", "beanie", "headscarf", "sun_hat", "headband",
+        "beret")],
+    "earrings": [{"id": v} for v in (
+        "none", "studs", "hoops", "dangles", "clip_ons")],
+    "outfit_style": [{"id": v} for v in (
+        "tee", "shirt", "hoodie", "sweater", "dress", "blouse", "suit",
+        "jacket")],
+    "outfit_color": [{"id": v} for v in (
+        "blue", "red", "green", "yellow", "purple", "pink", "orange",
+        "black", "white", "gray", "brown", "teal")],
+}
+
+# v1 tones are ordered light -> dark; pairwise buckets map into the 6 v2 tones.
+V1_SKIN_MAP = {}
+for _i, _e in enumerate(V1_SKIN_TONES):
+    V1_SKIN_MAP[_e["id"]] = SKIN_TONES[_i // 2]["id"]
+
+V1_CURLY_TEXTURES = {"curly", "coily"}
+V1_RED_HAIR = {"red", "auburn"}
+V1_WHITE_HAIR = {"white", "gray"}
+V1_BADGE_CAP_HAIR = {"cap"}

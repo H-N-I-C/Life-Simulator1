@@ -1,0 +1,91 @@
+{
+  "_status": "DRAFT for freeze (M0b engine owner: Kimi C per 00-TEAM.md 2026-11-16). Appearance schema v2 — Fluent 3D emoji avatars. B and D build against THIS file; changes go through Claude to Kimi C.",
+
+  "schema_version": 2,
+
+  "appearance": {
+    "_comment": "Age is NOT stored; stages are derived at render (see age_stages). person_id stays on the Person object (integration.ensure_person_id); appearance keeps only `seed` for deterministic aging.",
+
+    "fields": {
+      "schema_version": {"type": "int", "value": 2},
+      "seed": {"type": "int", "note": "preserved from v1; drives deterministic aging"},
+      "base": {"one_of": ["person", "woman", "man"], "default": "person", "note": "independent of gameplay gender; default derived from gender at generation, 'person' when unknown (e.g. standalone migration)"},
+      "skin_tone": {"one_of": ["default", "light", "medium-light", "medium", "medium-dark", "dark"], "default": "default"},
+      "hair": {"one_of": ["default", "curly", "red", "white", "bald"], "default": "default", "note": "'white' is also applied by ageing at render time (greying/elder stages) when hair != bald"},
+      "facial_hair": {"one_of": ["none", "beard"], "default": "none", "note": "adults only; engine clears it for babies/children"},
+      "headwear": {"one_of": ["none", "headscarf"], "default": "none"},
+      "badges": {"type": "list", "max_items": 2, "items": {"one_of": ["glasses", "earrings", "cap", "crown", "flower"]}, "default": [], "note": "corner badges on the portrait, not drawn on the face"},
+      "background": {"one_of": ["bg_01", "bg_02", "bg_03", "bg_04", "bg_05", "bg_06", "bg_07", "bg_08", "bg_09", "bg_10"], "default": "bg_01"},
+      "look_override": {"one_of": ["none", "student", "health_worker", "police", "chef", "farmer", "mechanic", "scientist", "artist", "judge", "pilot", "graduate", "bride", "groom"], "default": "none", "optional": true, "note": "set by game state (job, wedding); renderer uses it when the asset exists, else the regular look"}
+    },
+
+    "age_stages": {
+      "baby": {"age": "0-2"},
+      "child": {"age": "3-12"},
+      "teen_adult": {"age": "13-59"},
+      "greying": {"age": "60-69", "effect": "effective hair -> white when hair != bald"},
+      "elder": {"age": "70+"}
+    },
+
+    "backgrounds": {
+      "bg_01": "#f2d8d8", "bg_02": "#f2e6d0", "bg_03": "#f5f0c8",
+      "bg_04": "#d8ecd8", "bg_05": "#d0e8f0", "bg_06": "#d8d8f0",
+      "bg_07": "#ecd8f0", "bg_08": "#f0d8e0", "bg_09": "#e8e8e8",
+      "bg_10": "#e0d8c8"
+    }
+  },
+
+  "migration_v1_to_v2": {
+    "_comment": "lossy but stable; keeps seed; base='person' unless the owning Person's gender is supplied (integration refines it)",
+    "skin_tone": "v1 skin_01..12 ordered light->dark map pairwise into [default, light, medium-light, medium, medium-dark, dark]",
+    "hair": "hair_texture in (curly, coily) -> curly; hair_color in (red, auburn) -> red; hair_style == bald -> bald; hair_color in (white, gray) -> white; else default",
+    "facial_hair": "v1 'none' -> none; anything else -> beard",
+    "headwear": "v1 accessories.headwear == 'headscarf' -> headscarf; else none",
+    "badges": "[glasses if v1 accessories.glasses != none] + [earrings if v1 accessories.earrings != none] + [cap if v1 accessories.headwear == cap], capped at 2",
+    "background": "deterministic from seed: bg_(1 + seed % 10)",
+    "look_override": "none"
+  },
+
+  "generation_rules": {
+    "random": "uniform picks per field via the caller's rng; age-appropriate pass after",
+    "inheritance": "skin_tone: one parent's tone (50/50) or the in-between tone when both known (documented 50% chance of in-between); hair: either parent's hair; NEVER inherit badges or headwear (fresh random); facial_hair none until adulthood",
+    "age_appropriate": "baby/child: badges=[], facial_hair=none, headwear=none; beard only from stage teen_adult; badges capped at 2 always"
+  },
+
+  "examples": {
+    "newborn_migrated": {
+      "_comment": "v1 save data migrated; parents' genders unknown at data level so base='person'",
+      "in": {"schema_version": 1, "seed": 7, "skin_tone": "skin_03", "face_shape": "oval", "eye_shape": "almond", "eye_color": "brown_dark", "brows": "soft", "nose": "button", "mouth": "smile", "hair_texture": "curly", "hair_color": "black", "marks": ["freckles"], "hair_style": "short_crop", "facial_hair": "none", "accessories": {"glasses": "none", "headwear": "none", "earrings": "none"}, "outfit_style": "tee", "outfit_color": "blue"},
+      "out": {"schema_version": 2, "seed": 7, "base": "person", "skin_tone": "light", "hair": "curly", "facial_hair": "none", "headwear": "none", "badges": [], "background": "bg_08", "look_override": "none"}
+    },
+    "adult_man_bearded": {
+      "schema_version": 2, "seed": 424242, "base": "man", "skin_tone": "medium-dark", "hair": "bald", "facial_hair": "beard", "headwear": "none", "badges": ["glasses", "cap"], "background": "bg_05", "look_override": "none",
+      "_render_at_45": {"stage": "teen_adult", "effective_hair": "bald"}
+    },
+    "elder_woman_derived_white": {
+      "schema_version": 2, "seed": 99, "base": "woman", "skin_tone": "light", "hair": "default", "facial_hair": "none", "headwear": "headscarf", "badges": ["earrings"], "background": "bg_02", "look_override": "none",
+      "_render_at_64": {"stage": "greying", "effective_hair": "white", "_note": "hair->white derived at render; stored hair stays 'default'"},
+      "_render_at_45": {"stage": "teen_adult", "effective_hair": "default"}
+    },
+    "bride_look_override": {
+      "schema_version": 2, "seed": 5, "base": "woman", "skin_tone": "medium", "hair": "red", "facial_hair": "none", "headwear": "none", "badges": ["flower"], "background": "bg_08", "look_override": "bride",
+      "_render_note": "wedding sets look_override=bride/groom; renderer falls back to the regular look if the asset is missing"
+    },
+    "baby_guardrails": {
+      "_comment": "what the engine enforces regardless of input data",
+      "at_age_1": {"badges": [], "facial_hair": "none", "headwear": "none"},
+      "rule": "generation and age_appropriate never produce beards/badges/headscarves on babies"
+    }
+  },
+
+  "renderer_contract": {
+    "_comment": "for Kimi B: avatar_image_key(appearance, age, context) resolves through D's manifest; person chip = image in a circle on appearance.background colour, badges in the corner; render_avatar_svg is deleted with this switch",
+    "context": {"may_include": ["job", "wedding"]},
+    "look_override_source": "game state sets it (engine never invents job looks); unknown/missing asset -> regular look"
+  },
+
+  "asset_pipeline": {
+    "_comment": "for Kimi D: tools/fetch_fluent_avatars.py per M0b spec; key space implied by the fields above",
+    "key_shape": "<base>-<stage>-<skin|default>[-hair-<hair>][-beard][-headscarf][-look-<look_override>] with documented fallbacks; see manifest.json"
+  }
+}

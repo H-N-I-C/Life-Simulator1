@@ -161,3 +161,25 @@ class LedgerTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_post_many_rollback_preserves_preexisting_replayed_rows(self):
+        # Codex minor: a batch that replays an existing key and then
+        # fails must not remove the pre-existing row
+        svc, env = make_env()
+        led = Ledger(env)
+        pid = env["player"].person_id
+        entry = {"phase": "income", "occurrence_id": "salary",
+                 "account_owner_id": pid, "category": "income",
+                 "amount": 1000}
+        led.post("t1", 30, entry)
+        self.assertEqual(len(env["ledger"]), 1)
+        with self.assertRaises(ValueError):
+            led.post_many("t1", 30, [
+                entry,
+                {"phase": "income", "occurrence_id": "bad",
+                 "account_owner_id": pid, "category": "nope",
+                 "amount": 5},
+            ])
+        self.assertEqual(len(env["ledger"]), 1)
+        self.assertEqual(env["player"].money, 1000)
+        self.assertEqual(led.balance(pid), 1000)

@@ -1,11 +1,12 @@
 import { loadCatalog, renderAvatar, rng, pick } from "./common.js";
 
 const TABS = [
-  ["body", ["skin_tone", "face_shape"]],
-  ["face", ["eye_shape", "eye_color", "brows", "nose", "mouth", "marks"]],
-  ["hair", ["hair_texture", "hair_color", "hair_style", "facial_hair"]],
-  ["style", ["outfit_style", "outfit_color"]],
-  ["accessories", ["glasses", "headwear", "earrings"]],
+  ["look", ["base"]],
+  ["skin", ["skin_tone"]],
+  ["hair", ["hair"]],
+  ["extras", ["facial_hair", "headwear"]],
+  ["badges", ["badges"]],
+  ["background", ["background"]],
 ];
 
 const data = await loadCatalog();
@@ -20,24 +21,31 @@ let seedCounter = app.seed;
 
 const $ = (id) => document.getElementById(id);
 
+const THUMB_CATEGORIES = new Set(["base", "skin_tone", "hair",
+                                  "facial_hair", "headwear", "badges"]);
+
+const CATEGORY_LABELS = {
+  base: "Look", skin_tone: "Skin tone", hair: "Hair",
+  facial_hair: "Facial hair", headwear: "Headwear", badges: "Badges",
+  background: "Background",
+};
+
+function avatarUrl(appearance, age) {
+  const raw = btoa(unescape(encodeURIComponent(
+    JSON.stringify(appearance))));
+  return "/api/avatar.png?app=" + raw.replace(/\+/g, "-")
+      .replace(/\//g, "_").replace(/=+$/, "") + "&age=" + age;
+}
+
 /* ---- catalog accessors (marks is a list; accessories are single ids) ---- */
 function entriesFor(category) {
   return cat[category] || [];
 }
 function getVal(category) {
-  if (category === "glasses" || category === "headwear" ||
-      category === "earrings") {
-    return app.accessories[category];
-  }
   return app[category];
 }
 function setVal(category, id) {
-  if (category === "glasses" || category === "headwear" ||
-      category === "earrings") {
-    app.accessories[category] = id;
-  } else {
-    app[category] = id;
-  }
+  app[category] = id;
 }
 
 const preview = $("preview");
@@ -95,7 +103,8 @@ function buildOptions() {
   const cats = TABS.find(([n]) => n === activeTab)[1];
   for (const category of cats) {
     const label = document.createElement("h2");
-    label.textContent = category.replace(/_/g, " ");
+    label.textContent = CATEGORY_LABELS[category] ||
+      category.replace(/_/g, " ");
     optionsBox.appendChild(label);
     const row = document.createElement("div");
     row.className = "swatches";
@@ -111,16 +120,39 @@ function buildOptions() {
         dot.className = "dot";
         dot.style.background = e.hex;
         sw.appendChild(dot);
+      } else if (THUMB_CATEGORIES.has(category)) {
+        // Fluent thumbnail: the option applied to the current look.
+        // Retries absorb transient load races so a swatch never shows a
+        // broken icon.
+        const thumb = document.createElement("img");
+        thumb.className = "swatch-thumb";
+        thumb.alt = "";
+        const variant = { ...app };
+        let src;
+        if (category === "badges") {
+          variant.badges = [e.id];
+          src = "/static/avatars/badge_" + encodeURIComponent(e.id) + ".png";
+        } else {
+          variant[category] = e.id;
+          src = avatarUrl(variant, 30);
+        }
+        let tries = 0;
+        thumb.onerror = () => {
+          if (++tries < 3) setTimeout(() => { thumb.src = src; }, 300);
+          else thumb.style.visibility = "hidden";
+        };
+        thumb.src = src;
+        sw.appendChild(thumb);
       }
       sw.appendChild(document.createTextNode(e.label));
       sw.setAttribute("aria-pressed", "false");
       sw.addEventListener("click", () => onSwatch(sw));
       row.appendChild(sw);
     }
-    if (category === "marks") {
+    if (category === "badges") {
       const none = document.createElement("button");
       none.className = "swatch";
-      none.dataset.category = "marks";
+      none.dataset.category = "badges";
       none.dataset.value = "";
       none.textContent = "None";
       none.setAttribute("aria-pressed", "false");
@@ -136,15 +168,15 @@ function onSwatch(sw) {
   const category = sw.dataset.category;
   const value = sw.dataset.value;
   lastFocusedSwatch = sw;
-  if (category === "marks") {
-    // list semantics: toggle membership; "None" clears
+  if (category === "badges") {
+    // list semantics: toggle membership; "None" clears; contract cap 2
     if (value === "") {
-      app.marks = [];
+      app.badges = [];
     } else {
-      app.marks = Array.isArray(app.marks) ? app.marks : [];
-      const i = app.marks.indexOf(value);
-      if (i >= 0) app.marks.splice(i, 1);
-      else app.marks.push(value);
+      app.badges = Array.isArray(app.badges) ? app.badges : [];
+      const i = app.badges.indexOf(value);
+      if (i >= 0) app.badges.splice(i, 1);
+      else if (app.badges.length < 2) app.badges.push(value);
     }
   } else {
     setVal(category, value);
@@ -157,9 +189,9 @@ function updatePressedStates() {
     const category = sw.dataset.category;
     const value = sw.dataset.value;
     let pressed;
-    if (category === "marks") {
-      pressed = value === "" ? (app.marks || []).length === 0
-                             : (app.marks || []).includes(value);
+    if (category === "badges") {
+      pressed = value === "" ? (app.badges || []).length === 0
+                             : (app.badges || []).includes(value);
     } else {
       pressed = getVal(category) === value;
     }
@@ -193,8 +225,8 @@ function randomize(categories) {
   for (const category of categories) {
     const list = entriesFor(category);
     if (!list.length) continue;
-    if (category === "marks") {
-      app.marks = rand() < 0.5 ? [] : [pick(rand, entriesFor("marks")).id];
+    if (category === "badges") {
+      app.badges = rand() < 0.5 ? [] : [pick(rand, entriesFor("badges")).id];
     } else {
       setVal(category, pick(rand, list).id);
     }
@@ -218,7 +250,7 @@ function buildSave() {
     schema_version: 1,
     seed: app.seed,
     ...app,
-    marks: Array.isArray(app.marks) ? [...app.marks] : [],
+    badges: Array.isArray(app.badges) ? [...app.badges] : [],
     identity: {
       name: $("name").value,
       gender: $("gender").value,
@@ -243,6 +275,58 @@ $("printBtn").addEventListener("click", () => {
   document.querySelector("main").appendChild(pre);
 });
 
+/* ---- dev-only tools: Export/Print JSON hidden in normal play so
+ * Start life is the main action ---- */
+function applyDevToolsVisibility() {
+  const dev = !!window.__devMode;
+  for (const id of ["saveBtn", "printBtn"]) {
+    const b = $(id);
+    if (b) b.hidden = !dev;
+  }
+}
+
+/* ---- dev scenario panel (only when the server exposes it) ---- */
+let scenarioId = null;
+(async () => {
+  try {
+    // Only probe scenarios when the server reports dev mode — avoids a
+    // pointless 404 (and keeps the page idle) in normal play.
+    const info = await fetch("/api/service-info").then((r) =>
+      r.ok ? r.json() : null);
+    window.__devMode = !!(info && info.dev);
+    applyDevToolsVisibility();
+    if (!window.__devMode) return;
+    const res = await fetch("/api/scenarios");
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.scenarios || !data.scenarios.length) return;
+    const card = document.createElement("section");
+    card.className = "card";
+    card.innerHTML = `<h2>Dev: start as…</h2>
+      <p class="muted">Development-only scenario starts — real transitions,
+      ordinary saves. Pick one or leave blank for a normal birth.</p>`;
+    const row = document.createElement("div");
+    row.className = "row";
+    for (const sc of data.scenarios) {
+      const b = document.createElement("button");
+      b.className = "small";
+      b.textContent = sc.label;
+      b.setAttribute("aria-pressed", "false");
+      b.addEventListener("click", () => {
+        scenarioId = (scenarioId === sc.id) ? null : sc.id;
+        for (const x of row.querySelectorAll("button")) {
+          x.setAttribute("aria-pressed", "false");
+        }
+        if (scenarioId) b.setAttribute("aria-pressed", "true");
+      });
+      row.appendChild(b);
+    }
+    card.appendChild(row);
+    document.querySelector("main").insertBefore(
+      card, document.getElementById("startBtn").closest("section"));
+  } catch (e) { /* dev panel unavailable — normal play */ }
+})();
+
 /* ---- start life: retry-stable creation operation ----
  * The operation (immutable profile snapshot + request_id) is persisted per
  * tab BEFORE sending and reused on every uncertain retry, including after
@@ -258,7 +342,7 @@ function buildProfile() {
     gender: $("gender").value,
     country: countrySel.value,
     appearance: { ...app, seed: app.seed,
-                  marks: Array.isArray(app.marks) ? [...app.marks] : [] },
+                  badges: Array.isArray(app.badges) ? [...app.badges] : [] },
   };
 }
 
@@ -282,6 +366,12 @@ startBtn.addEventListener("click", async () => {
   let op = loadCreateOp();
   if (!op) {
     op = { profile: buildProfile(), request_id: crypto.randomUUID() };
+    // badges: omit when empty (server validation rejects explicit [])
+    const ap = op.profile.appearance;
+    if (ap && Array.isArray(ap.badges) && ap.badges.length === 0) {
+      delete ap.badges;
+    }
+    if (scenarioId) op.profile.scenario = scenarioId;
     sessionStorage.setItem(CREATE_OP_KEY, JSON.stringify(op));
   }
   try {
@@ -313,5 +403,6 @@ startBtn.addEventListener("click", async () => {
   }
 });
 
-selectTab("body", true);
+applyDevToolsVisibility();
+selectTab("look", true);
 refresh();

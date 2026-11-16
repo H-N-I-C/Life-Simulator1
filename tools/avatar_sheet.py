@@ -1,221 +1,127 @@
-"""Generate labelled avatar contact sheets as PNG evidence.
+"""Generate labelled avatar contact sheets as PNG evidence (M0b Fluent).
 
-Renders every catalog option through src/appearance/render.py, lays the
-avatars out in labelled SVG grids, and rasterises the sheets with
-rsvg-convert. Fully deterministic: no randomness, no wall-clock input.
+Composes sheets from the downloaded Fluent 3D assets
+(web/static/avatars via tools/fetch_fluent_avatars.py) using the
+manifest's published combo key space. The legacy SVG-renderer sheets
+were removed when the renderer was retired.
 
-Sheets (in docs/collab/evidence/avatars/):
-  - skin-age matrix      12 skin tones x 5 age stages
-  - hair x headwear      every hair style under every hat
-  - one sheet per face feature category (face_shape, eye_shape, brows,
-    nose, mouth, eye_color, hair_texture, hair_color, facial_hair, marks)
-  - outfits              outfit_style x outfit_color
-  - accessories          glasses x earrings
-Every sheet is produced at 32 px and 128 px cell sizes.
+Deterministic: no randomness, no wall-clock input.
+Sheets (docs/collab/evidence/avatars/): fluent_matrix (stage x skin),
+fluent_hair, fluent_looks, fluent_extras.
 
 Run: python3 tools/avatar_sheet.py
 """
 
-import html
+import json
 import os
-import re
-import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if ROOT not in sys.path:
-    sys.path.insert(0, ROOT)
-
-from src.appearance import catalog  # noqa: E402
-from src.appearance.render import render_avatar_svg  # noqa: E402
 
 OUT_DIR = os.path.join(ROOT, "docs", "collab", "evidence", "avatars")
 
-AGES = [1, 8, 16, 30, 70]  # baby, child, teen, adult, elder
-FONT = "Noto Sans"
-LABEL_H = 16
-PAD = 6
 
-# A neutral adult base so one varying option is clearly visible per cell.
-BASE = {
-    "skin_tone": "skin_04", "face_shape": "oval", "eye_shape": "almond",
-    "eye_color": "brown_dark", "brows": "soft", "nose": "button",
-    "mouth": "smile", "hair_texture": "straight",
-    "hair_color": "brown_medium", "hair_style": "short_crop",
-    "facial_hair": "none", "outfit_style": "tee", "outfit_color": "blue",
-    "marks": [], "accessories": {"glasses": "none", "headwear": "none",
-                                 "earrings": "none"},
-}
+def fluent_sheets():
+    """Compose contact sheets from the Fluent 3D asset set (M0b)."""
+    import PIL.Image
+    import PIL.ImageDraw
+    import PIL.ImageFont
 
+    av_dir = os.path.join(ROOT, "web", "static", "avatars")
+    with open(os.path.join(av_dir, "manifest.json")) as f:
+        man = json.load(f)
+    combos = man["combos"]
 
-def app_with(**over):
-    app = dict(BASE)
-    app["accessories"] = dict(BASE["accessories"])
-    app.update(over)
-    return app
+    def img_for(combo):
+        chain = combos.get(combo)
+        if not chain:
+            return None
+        return PIL.Image.open(os.path.join(av_dir,
+                                           man["assets"][chain[0]]))
 
+    font = PIL.ImageFont.truetype(
+        "/usr/share/fonts/noto/NotoSans-Regular.ttf", 16)
+    font_b = PIL.ImageFont.truetype(
+        "/usr/share/fonts/noto/NotoSans-Regular.ttf", 18)
+    CELL = 128
+    LABEL = 22
 
-def inner_svg(avatar_svg, size):
-    """Extract the rendered <svg> and resize its viewport to size px."""
-    m = re.match(r'<svg[^>]*>(.*)</svg>$', avatar_svg, re.S)
-    body = m.group(1)
-    return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" '
-            'width="%d" height="%d">%s</svg>' % (size, size, body))
+    def sheet(name, columns):
+        """columns: list of (column header, [ (label, combo), ... ])."""
+        n_rows = max(len(cells) for _, cells in columns)
+        col_ws = []
+        for header, cells in columns:
+            w = CELL + 8
+            for label, _ in cells:
+                w = max(w, int(font.getlength(label)) + 12)
+            w = max(w, int(font_b.getlength(header)) + 12)
+            col_ws.append(w)
+        hdr_h = 28
+        row_h = CELL + LABEL + 6
+        W = sum(col_ws) + 8
+        H = hdr_h + n_rows * row_h + 8
+        canvas = PIL.Image.new("RGB", (W, H), "white")
+        draw = PIL.ImageDraw.Draw(canvas)
+        x = 4
+        for (header, cells), cw in zip(columns, col_ws):
+            draw.text((x + cw / 2, 4), header, font=font_b, fill="black",
+                      anchor="ma")
+            for ri, (label, combo) in enumerate(cells):
+                y = hdr_h + ri * row_h
+                im = img_for(combo)
+                if im is not None:
+                    canvas.paste(im.resize((CELL, CELL)), (x + (cw - CELL) // 2,
+                                                           y), im.resize((CELL, CELL)))
+                draw.text((x + cw / 2, y + CELL + 2), label, font=font,
+                          fill="#333333", anchor="ma")
+            x += cw
+        out = os.path.join(OUT_DIR, name + ".png")
+        canvas.save(out, optimize=True)
+        print("wrote %s (%dx%d)" % (out, W, H))
 
+    skins = man["skins"]
+    stages = [("Baby", "person-baby-%s"), ("Child", "person-child-%s"),
+              ("teen_adult", "person-teen_adult-%s"),
+              ("Greying", "person-greying-%s"),
+              ("Elder", "person-elder-%s")]
+    sheet("fluent_matrix",
+          [(s, [(sk, pat % sk) for sk in skins]) for s, pat in stages]
+          + [("adult " + b,
+              [(sk, "%s-teen_adult-%s" % (b, sk)) for sk in skins])
+             for b in ("woman", "man")]
+          + [("elder " + b,
+              [(sk, "%s-elder-%s" % (b, sk)) for sk in skins])
+             for b in ("woman", "man")])
 
-def cell_svg(app, age, size, label, width):
-    off = max(0.0, (width - size) / 2)
-    return ('<g transform="translate(%.1f,%d)">%s'
-            '<text x="%d" y="%d" font-family="%s" font-size="11" '
-            'text-anchor="middle" fill="#333">%s</text></g>'
-            % (off, LABEL_H, inner_svg(render_avatar_svg(app, age, size), size),
-               size / 2, LABEL_H - 4, FONT, html.escape(label)))
+    hairs = ["default", "curly", "red", "white", "bald"]
+    sheet("fluent_hair",
+          [("woman: " + h, [(sk, "woman-teen_adult-%s-hair-%s" % (sk, h))
+                            for sk in skins]) for h in hairs]
+          + [("man: " + h, [(sk, "man-teen_adult-%s-hair-%s" % (sk, h))
+                            for sk in skins]) for h in hairs])
 
+    sheet("fluent_looks",
+          [(lk.replace("_", " "),
+            [(sk, "person-teen_adult-%s-look-%s" % (sk, lk)) for sk in skins])
+           for lk in man["looks"]])
 
-def sheet(name, columns, size):
-    """columns: list of (column header, [ (label, app, age), ... ])."""
-    n_rows = max(len(cells) for _, cells in columns)
-    # Column width must fit the longest label or header, not just the avatar.
-    def text_w(s):
-        return int(6.2 * len(s)) + 8
-    col_w = size + PAD
-    col_ws = [max(col_w, text_w(header),
-                  max((text_w(label) for label, _, _ in cells), default=0))
-              for header, cells in columns]
-    row_h = size + LABEL_H + PAD
-    hdr_h = 18  # header text + padding; rows start right below it
-    w = sum(col_ws) + PAD
-    h = PAD + hdr_h + n_rows * row_h + PAD
-    parts = ['<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" '
-             'font-family="%s">' % (w, h, FONT),
-             '<rect width="100%%" height="100%%" fill="#ffffff"/>'
-             % ()]
-    for ci, ((header, cells), cw) in enumerate(zip(columns, col_ws)):
-        x = PAD + sum(col_ws[:ci])
-        parts.append('<text x="%d" y="%d" font-family="%s" font-size="12" '
-                     'font-weight="bold" text-anchor="middle" fill="#111">'
-                     '%s</text>'
-                     % (x + cw / 2, PAD + 11, FONT, html.escape(header)))
-        for ri, (label, app, age) in enumerate(cells):
-            y = PAD + hdr_h + ri * row_h
-            parts.append('<g transform="translate(%d,%d)">%s</g>'
-                         % (x, y, cell_svg(app, age, size, label, cw)))
-    parts.append("</svg>")
-    return "".join(parts), w, h
-
-
-def option_sheet(category, age=30):
-    """One column per catalog entry of a single category."""
-    col = []
-    for e in catalog.CATEGORIES[category]:
-        kw = {category: e["id"]}
-        if category in catalog.ACCESSORY_CATEGORIES:
-            acc = dict(BASE["accessories"])
-            acc[category] = e["id"]
-            kw = {"accessories": acc}
-        if category == "marks":
-            kw = {"marks": [e["id"]]}
-        col.append((e["label"], app_with(**kw), age))
-    return [(catalog_key_title(category), col)]
-
-
-def catalog_key_title(category):
-    return category.replace("_", " ").title()
-
-
-def hair_hats_columns():
-    cols = []
-    for h in catalog.CATEGORIES["headwear"]:
-        acc = dict(BASE["accessories"])
-        acc["headwear"] = h["id"]
-        cells = [(s["label"], app_with(hair_style=s["id"], accessories=acc),
-                  30) for s in catalog.CATEGORIES["hair_style"]]
-        cols.append((h["label"], cells))
-    return cols
-
-
-def outfit_columns():
-    cols = []
-    for c in catalog.CATEGORIES["outfit_color"]:
-        cells = [(s["label"],
-                  app_with(outfit_style=s["id"], outfit_color=c["id"]), 30)
-                 for s in catalog.CATEGORIES["outfit_style"]]
-        cols.append((c["label"], cells))
-    return cols
-
-
-def accessory_columns():
-    cols = []
-    for g in catalog.CATEGORIES["glasses"]:
-        acc = dict(BASE["accessories"])
-        acc["glasses"] = g["id"]
-        cells = []
-        for e in catalog.CATEGORIES["earrings"]:
-            a2 = dict(acc)
-            a2["earrings"] = e["id"]
-            cells.append((e["label"], app_with(accessories=a2), 30))
-        cols.append((g["label"], cells))
-    return cols
-
-
-def marks_columns():
-    col = [("All marks", app_with(marks=catalog.all_ids("marks")), 30)]
-    for e in catalog.CATEGORIES["marks"]:
-        col.append((e["label"], app_with(marks=[e["id"]]), 30))
-    return [("Marks", col)]
-
-
-def matrix_columns():
-    cols = []
-    for skin in catalog.CATEGORIES["skin_tone"]:
-        cells = [(str(a), app_with(skin_tone=skin["id"]), a) for a in AGES]
-        cols.append((skin["label"], cells))
-    return cols
-
-
-def lifecycle_columns():
-    ages = [0, 1, 2, 5, 10, 13, 16, 21, 30, 45, 60, 70, 85, 100]
-    return [("Age", [(str(a), app_with(), a) for a in ages])]
-
-
-def build_sheets():
-    sheets = {
-        "matrix": matrix_columns,
-        "lifecycle": lifecycle_columns,
-        "hair-headwear": hair_hats_columns,
-        "face-shape": lambda: option_sheet("face_shape"),
-        "eye-shape": lambda: option_sheet("eye_shape"),
-        "eye-color": lambda: option_sheet("eye_color"),
-        "brows": lambda: option_sheet("brows"),
-        "nose": lambda: option_sheet("nose"),
-        "mouth": lambda: option_sheet("mouth"),
-        "hair-texture": lambda: option_sheet("hair_texture", age=8),
-        "hair-color": lambda: option_sheet("hair_color"),
-        "facial-hair": lambda: option_sheet("facial_hair"),
-        "marks": marks_columns,
-        "outfits": outfit_columns,
-        "accessories": accessory_columns,
-    }
-    return sheets
+    extras = [("beard (man)", "man-teen_adult-%s-hair-default-beard"),
+              ("beard (person)", "person-teen_adult-%s-hair-default-beard"),
+              ("headscarf", "woman-teen_adult-%s-hair-default-headscarf")]
+    badge_cols = [(b, [(b, "badge-%s" % b)]) for b in man["badges"]]
+    sheet("fluent_extras",
+          [(h, [(sk, p % sk) for sk in skins]) for h, p in extras]
+          + badge_cols)
 
 
 def main():
     os.makedirs(OUT_DIR, exist_ok=True)
-    sheets = build_sheets()
-    written = []
-    for size in (32, 128):
-        for name, builder in sheets.items():
-            svg, w, h = sheet(name, builder(), size)
-            svg_path = os.path.join(OUT_DIR, "_tmp_%s_%d.svg" % (name, size))
-            png_path = os.path.join(OUT_DIR, "%s_%dpx.png" % (name, size))
-            with open(svg_path, "w") as f:
-                f.write(svg)
-            subprocess.run(["rsvg-convert", "-w", str(w), "-h", str(h),
-                            "-o", png_path, svg_path], check=True)
-            os.remove(svg_path)
-            written.append(os.path.basename(png_path))
-            print("wrote %s (%dx%d)" % (png_path, w, h))
-    print("%d sheets written to %s" % (len(written), OUT_DIR))
+    if not os.path.exists(os.path.join(ROOT, "web", "static", "avatars",
+                                       "manifest.json")):
+        print("SKIP: web/static/avatars/manifest.json missing - run "
+              "python3 tools/fetch_fluent_avatars.py first")
+        return 1
+    fluent_sheets()
     return 0
 
 

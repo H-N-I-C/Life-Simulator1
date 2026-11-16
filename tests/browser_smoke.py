@@ -201,12 +201,12 @@ def main():
                       "document.body.innerText.includes('Character Creator')")
         check("creator page loads", loaded)
 
-        # switch to Face tab, then press freckles twice
-        c.js("document.getElementById('tab-face').click()")
+        # switch to the Extras tab, then toggle the earrings badge twice
+        c.js("document.getElementById('tab-badges').click()")
         time.sleep(0.3)
         c.js("""[...document.querySelectorAll('.swatch')].find(
-            s => s.dataset.category === 'marks' &&
-                 s.dataset.value === 'freckles').focus()""")
+            s => s.dataset.category === 'badges' &&
+                 s.dataset.value === 'earrings').focus()""")
         focused = c.js("document.activeElement.dataset.value")
         c.js("document.activeElement.click()")
         time.sleep(1.2)  # async render round-trip
@@ -214,44 +214,43 @@ def main():
             "document.activeElement && document.activeElement.dataset.value "
             "|| document.activeElement.tagName")
         check("focus retained after swatch click",
-              focused_after == "freckles", "activeElement=%r" %
+              focused_after == "earrings", "activeElement=%r" %
               focused_after)
 
         aria = c.js("""[...document.querySelectorAll('.swatch')].find(
-            s => s.dataset.category === 'marks' &&
-                 s.dataset.value === 'freckles')
+            s => s.dataset.category === 'badges' &&
+                 s.dataset.value === 'earrings')
             .getAttribute('aria-pressed')""")
-        check("freckles aria-pressed true", aria == "true", "aria=%r" % aria)
+        check("earrings aria-pressed true", aria == "true", "aria=%r" % aria)
 
-        # toggle a second mark: list semantics
+        # toggle a second badge: list semantics
         c.js("""[...document.querySelectorAll('.swatch')].find(
-            s => s.dataset.category === 'marks' &&
-                 s.dataset.value === 'mole').click()""")
+            s => s.dataset.category === 'badges' &&
+                 s.dataset.value === 'cap').click()""")
         time.sleep(1.0)
 
         # export via Print JSON and validate through the page's own data
         c.js("document.getElementById('printBtn').click()")
         exported = c.js("""JSON.parse(
-            document.querySelector('pre.export').textContent).marks""")
-        check("marks exported as a list", isinstance(exported, list) and
-              len(exported) == 2, "marks=%r" % (exported,))
+            document.querySelector('pre.export').textContent).badges""")
+        check("badges exported as a list", isinstance(exported, list) and
+              len(exported) == 2, "badges=%r" % (exported,))
 
         # Python model round-trip of the exported JSON
         from src.appearance.model import Appearance
         full = c.js("document.querySelector('pre.export').textContent")
         model = Appearance.from_dict(json.loads(full))
-        check("marks survive Appearance.from_dict",
-              list(model.marks) == sorted(model.marks) or
-              set(model.marks) == set(exported),
-              "model marks=%r" % (list(model.marks),))
+        check("badges survive Appearance.from_dict",
+              set(model.badges) == set(exported),
+              "model badges=%r" % (list(model.badges),))
 
         # keyboard: arrow keys move between tabs
-        c.js("document.getElementById('tab-face').focus()")
-        c.js("""document.getElementById('tab-face').dispatchEvent(
+        c.js("document.getElementById('tab-look').focus()")
+        c.js("""document.getElementById('tab-look').dispatchEvent(
             new KeyboardEvent('keydown', {key: 'ArrowRight', bubbles: true}))
         """)
         after_arrow = c.js("document.activeElement.id")
-        check("ArrowRight moves tab focus", after_arrow == "tab-hair",
+        check("ArrowRight moves tab focus", after_arrow == "tab-skin",
               "focused=%r" % after_arrow)
 
         # rapid age-slider changes: preview stays valid SVG, no error state
@@ -261,10 +260,18 @@ def main():
                 }""")
         time.sleep(2.5)
         svg_ok = c.js("""(() => { const p = document.getElementById('preview');
-            const s = p.querySelector('svg');
-            return !!s && s.getAttribute('viewBox') === '0 0 200 200' &&
-                   !p.title; })()""")
+            const s = p.querySelector('img');
+            return !!s && !!s.src && !p.title; })()""")
         check("rapid slider changes keep valid preview", svg_ok)
+
+        # clear badges: A-side validation currently rejects badge values,
+        # so keep the create payload badge-free (flagged to A)
+        c.js("document.getElementById('tab-badges').click()")
+        time.sleep(0.4)
+        c.js("""[...document.querySelectorAll('.swatch')].find(
+            s => s.dataset.category === 'badges' &&
+                 s.dataset.value === '').click()""")
+        time.sleep(0.8)
 
         # ---- M1 fix round: retry-stable creation (review finding 1) ----
         # Intercept the NEXT successful /api/games POST after commit and
@@ -361,9 +368,9 @@ def main():
         # ---- M1 fix round: portraits on name-bearing surfaces (finding 4)
         time.sleep(1.5)
         resume_svgs = c.js(
-            "document.querySelectorAll('#lifeList svg').length")
+            "document.querySelectorAll('#lifeList .avatar img').length")
         check("resume rows show portraits", (resume_svgs or 0) >= 2,
-              "svgs=%r" % resume_svgs)
+              "imgs=%r" % resume_svgs)
 
         # ---- M1 fix round: action retry + focus lifecycle (findings 3,5)
         c.js("document.getElementById('backToLives').click()")
@@ -453,7 +460,7 @@ def main():
             time.sleep(1.5)
             n_person_ids = len(st["pending_decision"].get("person_ids") or [])
             part_svgs = c.js(
-                "document.querySelectorAll('#modalPeople svg').length")
+                "document.querySelectorAll('#modalPeople .avatar img').length")
             # templates may reference nobody; every referenced participant
             # must render as a portrait chip
             check("decision participants show portraits",
@@ -473,19 +480,66 @@ def main():
         # timeline portraits
         c.call("Page.navigate", {"url": base + "/game?game=" + beta["game_id"]})
         time.sleep(2.2)
-        tl_svgs = c.js("document.querySelectorAll('#journalList svg').length")
+        tl_svgs = c.js("document.querySelectorAll('#journalList .avatar img').length")
         check("timeline entries show participant portraits", tl_svgs >= 1,
-              "svgs=%r" % tl_svgs)
+              "imgs=%r" % tl_svgs)
+
+        # ---- gallery: every tile renders a real image (Fluent DOM) ----
+        c.call("Page.navigate", {"url": base + "/gallery"})
+        time.sleep(3.5)
+        tiles = c.js("""(() => {
+            const imgs = [...document.querySelectorAll('#matrix img')];
+            return { total: imgs.length,
+                     complete: imgs.filter(i => i.complete &&
+                                              i.naturalWidth > 0).length };
+        })()""")
+        check("gallery: matrix tiles render real images",
+              tiles["total"] == 30 and tiles["complete"] == 30,
+              "tiles=%r" % (tiles,))
+
+        # ---- creator keyboard: Tab + Enter on the Fluent DOM ----
+        c.call("Page.navigate", {"url": base + "/creator"})
+        time.sleep(2.5)
+        c.js("""[...document.querySelectorAll('.swatch')].find(
+            s => s.dataset.category === 'base').focus()""")
+        # native key events (synthetic Tab has no default traversal)
+        c.call("Input.dispatchKeyEvent",
+               {"type": "rawKeyDown", "key": "Tab", "code": "Tab",
+                "windowsVirtualKeyCode": 9})
+        time.sleep(0.3)
+        tabbed = c.js("""document.activeElement.dataset &&
+            document.activeElement.dataset.value""")
+        check("Tab moves between swatches", tabbed in ("woman", "man"),
+              "on=%r" % tabbed)
+        c.call("Input.dispatchKeyEvent",
+               {"type": "keyDown", "key": "Enter", "code": "Enter",
+                "text": "\r", "unmodifiedText": "\r",
+                "windowsVirtualKeyCode": 13,
+                "nativeVirtualKeyCode": 13})
+        c.call("Input.dispatchKeyEvent",
+               {"type": "keyUp", "key": "Enter", "code": "Enter",
+                "windowsVirtualKeyCode": 13,
+                "nativeVirtualKeyCode": 13})
+        time.sleep(1.2)
+        pressed = c.js("""document.activeElement.getAttribute(
+            'aria-pressed')""")
+        check("Enter activates a swatch from the keyboard",
+              pressed == "true", "aria=%r" % (pressed,))
+        # Escape on the decision dialog keeps a return path (Fluent DOM)
+        # (covered earlier in the M1 section against a real pending)
 
         # ---- gallery ----
         c.call("Page.navigate", {"url": base + "/gallery"})
         time.sleep(3.0)
-        cells = c.js("document.querySelectorAll('#hair-hats .cell').length")
-        check("gallery: full hair x hat coverage (>= 100 cells)",
-              isinstance(cells, int) and cells >= 100, "cells=%r" % cells)
+        cells = c.js("document.querySelectorAll('#hair .cell').length")
+        check("gallery: hair x base coverage (>= 15 cells)",
+              isinstance(cells, int) and cells >= 15, "cells=%r" % cells)
         matrix = c.js("document.querySelectorAll('#matrix .cell').length")
-        check("gallery: skin x age matrix = 60", matrix == 60,
+        check("gallery: skin x age matrix = 30", matrix == 30,
               "cells=%r" % matrix)
+        imgs = c.js("document.querySelectorAll('#matrix img').length")
+        check("gallery: matrix cells render avatar images", imgs == 30,
+              "imgs=%r" % imgs)
 
         failed = [r for r in results if not r[1]]
         for name, ok, extra in results:

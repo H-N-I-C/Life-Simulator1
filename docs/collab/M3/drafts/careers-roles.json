@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "_status": "DRAFT content for freeze (A-owned). 12 roles across 3 paths per M3 spec minimums; pay ranges are fictional original data. No coding on this file until frozen.",
+
+  "roles": [
+    {
+      "id": "apprentice_electrician", "label": "Electrical apprentice",
+      "path": "electrical", "level": 1, "entry": true,
+      "requirements": {"min_age": 18, "qualifications": [],
+                       "skills": [], "legacy_education": "secondary"},
+      "pay": {"min": 34000, "max": 40000, "hours": 38},
+      "promotion_edges": [
+        {"to": "electrician",
+         "criteria": {"tenure_years": 0,
+                      "note": "graduation via B's apprenticeship credential, not time"}}
+      ],
+      "look_override": "mechanic",
+      "event_ids": ["apprentice_tool_allowance", "site_safety_scare"]
+    },
+    {
+      "id": "electrician", "label": "Electrician",
+      "path": "electrical", "level": 2, "entry": false,
+      "requirements": {"min_age": 18,
+                       "qualifications": ["electrical_apprenticeship"],
+                       "skills": [{"id": "practical", "min": 30}],
+                       "legacy_education": null},
+      "pay": {"min": 52000, "max": 68000, "hours": 38},
+      "promotion_edges": [
+        {"to": "senior_electrician",
+         "criteria": {"tenure_years": 3, "performance_min": 55,
+                      "skills": [{"id": "practical", "min": 55},
+                                 {"id": "organization", "min": 25}]}}
+      ],
+      "look_override": "mechanic",
+      "event_ids": ["electrical_fault_dilemma", "tool_theft_offer"]
+    },
+    {
+      "id": "senior_electrician", "label": "Senior electrician",
+      "path": "electrical", "level": 3, "entry": false,
+      "requirements": {"min_age": 18, "qualifications": ["electrical_apprenticeship"],
+                       "skills": [{"id": "practical", "min": 55}],
+                       "legacy_education": null},
+      "pay": {"min": 72000, "max": 88000, "hours": 38},
+      "promotion_edges": [
+        {"to": "site_supervisor",
+         "criteria": {"tenure_years": 2, "performance_min": 60,
+                      "skills": [{"id": "organization", "min": 50},
+                                 {"id": "practical", "min": 70}]}}
+      ],
+      "look_override": null,
+      "event_ids": ["crew_conflict_decision"]
+    },
+    {
+      "id": "site_supervisor", "label": "Site supervisor",
+      "path": "electrical", "level": 4, "entry": false,
+      "requirements": {"min_age": 18, "qualifications": ["electrical_apprenticeship"],
+                       "skills": [{"id": "practical", "min": 70},
+                                  {"id": "organization", "min": 50}],
+                       "legacy_education": null},
+      "pay": {"min": 95000, "max": 115000, "hours": 40},
+      "promotion_edges": [],
+      "look_override": null,
+      "event_ids": ["contract_deadline_pressure"]
+    },
+
+    {
+      "id": "office_assistant", "label": "Office assistant",
+      "path": "office", "level": 1, "entry": true,
+      "requirements": {"min_age": 18, "qualifications": [],
+                       "skills": [], "legacy_education": "secondary"},
+      "pay": {"min": 32000, "max": 40000, "hours": 38},
+      "promotion_edges": [
+        {"to": "coordinator",
+         "criteria": {"tenure_years": 4, "performance_min": 50,
+                      "skills": [{"id": "communication", "min": 40},
+                                 {"id": "organization", "min": 30}],
+                      "note": "business bachelor's satisfies skills via B bridge"}}
+      ],
+      "look_override": null,
+      "event_ids": ["office_overtime_ask"]
+    },
+    {
+      "id": "coordinator", "label": "Coordinator",
+      "path": "office", "level": 2, "entry": false,
+      "requirements": {"min_age": 18,
+                       "qualifications": ["business_bachelors"],
+                       "skills": [{"id": "communication", "min": 40}],
+                       "legacy_education": "any_degree",
+                       "note": "nondegree route: office_assistant promotion edge"},
+      "pay": {"min": 50000, "max": 62000, "hours": 38},
+      "promotion_edges": [
+        {"to": "operations_specialist",
+         "criteria": {"tenure_years": 3, "performance_min": 55,
+                      "skills": [{"id": "organization", "min": 50},
+                                 {"id": "communication", "min": 40}]}}
+      ],
+      "look_override": null,
+      "event_ids": ["process_improvement_pitch"]
+    },
+    {
+      "id": "operations_specialist", "label": "Operations specialist",
+      "path": "office", "level": 3, "entry": false,
+      "requirements": {"min_age": 18, "qualifications": ["business_bachelors"],
+                       "skills": [{"id": "organization", "min": 50}],
+                       "legacy_education": "any_degree"},
+      "pay": {"min": 68000, "max": 84000, "hours": 38},
+      "promotion_edges": [
+        {"to": "operations_manager",
+         "criteria": {"tenure_years": 3, "performance_min": 60,
+                      "skills": [{"id": "organization", "min": 70},
+                                 {"id": "communication", "min": 60}]}}
+      ],
+      "look_override": null,
+      "event_ids": ["restructure_layoff_rumor"]
+    },
+    {
+      "id": "operations_manager", "label": "Operations manager",
+      "path": "office", "level": 4, "entry": false,
+      "requirements": {"min_age": 18, "qualifications": ["business_bachelors"],
+                       "skills": [{"id": "organization", "min": 70},
+                                  {"id": "communication", "min": 60}],
+                       "legacy_education": "any_degree"},
+      "pay": {"min": 90000, "max": 120000, "hours": 40},
+      "promotion_edges": [],
+      "look_override": null,
+      "event_ids": ["budget_cut_decision"]
+    },
+
+    {
+      "id": "care_assistant", "label": "Care assistant",
+      "path": "healthcare", "level": 1, "entry": true,
+      "requirements": {"min_age": 18, "qualifications": [],
+                       "skills": [{"id": "care", "min": 10}],
+                       "legacy_education": null},
+      "pay": {"min": 30000, "max": 38000, "hours": 38},
+      "promotion_edges": [
+        {"to": "qualified_care_worker",
+         "criteria": {"tenure_years": 0,
+                      "note": "via B's care diploma credential"}}
+      ],
+      "look_override": "health_worker",
+      "event_ids": ["resident_family_complaint"]
+    },
+    {
+      "id": "qualified_care_worker", "label": "Qualified care worker",
+      "path": "healthcare", "level": 2, "entry": false,
+      "requirements": {"min_age": 18, "qualifications": ["care_diploma"],
+                       "skills": [{"id": "care", "min": 30}],
+                       "legacy_education": null},
+      "pay": {"min": 42000, "max": 52000, "hours": 38},
+      "promotion_edges": [
+        {"to": "nurse",
+         "criteria": {"tenure_years": 0,
+                      "note": "via B's nursing bachelor's; no time shortcut"}}
+      ],
+      "look_override": "health_worker",
+      "event_ids": ["double_shift_offer"]
+    },
+    {
+      "id": "nurse", "label": "Nurse",
+      "path": "healthcare", "level": 3, "entry": false,
+      "requirements": {"min_age": 18, "qualifications": ["nursing_bachelors"],
+                       "skills": [{"id": "care", "min": 40},
+                                  {"id": "communication", "min": 30}],
+                       "legacy_education": "any_degree"},
+      "pay": {"min": 62000, "max": 78000, "hours": 38},
+      "promotion_edges": [
+        {"to": "senior_nurse",
+         "criteria": {"tenure_years": 3, "performance_min": 55,
+                      "skills": [{"id": "care", "min": 65}]}}
+      ],
+      "look_override": "health_worker",
+      "event_ids": ["ward_emergency_decision"]
+    },
+    {
+      "id": "senior_nurse", "label": "Senior nurse",
+      "path": "healthcare", "level": 4, "entry": false,
+      "requirements": {"min_age": 18, "qualifications": ["nursing_bachelors"],
+                       "skills": [{"id": "care", "min": 65},
+                                  {"id": "communication", "min": 50}],
+                       "legacy_education": "any_degree"},
+      "pay": {"min": 85000, "max": 100000, "hours": 40},
+      "promotion_edges": [],
+      "look_override": "health_worker",
+      "event_ids": ["roster_shortage_decision"]
+    }
+  ]
+}

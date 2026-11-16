@@ -1,0 +1,2099 @@
+{
+  "schema_version": 2,
+  "_comment": "Original family & relationship flavor events. Adult-only romance (all romance events require min_age 18 and, where relevant, an alive partner). Frozen event-schema v2.1, existing kinds only.",
+  "events": [
+    {
+      "id": "flavor_first_date_nerves",
+      "title": "First Date Jitters",
+      "text": "{name} is ten minutes from a first date and has changed outfits four times. The fourth outfit is the same as the first.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 18,
+        "max_age": 45,
+        "once_per_lifetime": false,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "partner"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "go",
+          "label": "Go, nerves and all",
+          "known_effects": [
+            "+happiness (4-8)",
+            "+relationship (3-6)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  4,
+                  8
+                ]
+              }
+            },
+            "relationship": {
+              "role": "partner",
+              "delta": {
+                "randint": [
+                  3,
+                  6
+                ]
+              }
+            }
+          },
+          "outcome_text": "I went. The nerves dissolved somewhere between the bread basket and the second laugh."
+        },
+        {
+          "id": "cancel",
+          "label": "Cancel and hide under a blanket",
+          "known_effects": [
+            "-happiness (1-4)",
+            "-relationship (2-5)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  4
+                ],
+                "sign": -1
+              }
+            },
+            "relationship": {
+              "role": "partner",
+              "delta": {
+                "randint": [
+                  2,
+                  5
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I cancelled. The blanket understood."
+        }
+      ]
+    },
+    {
+      "id": "flavor_anniversary_dinner",
+      "title": "The Anniversary Reservation",
+      "text": "The fancy restaurant has one table left for {name}'s anniversary, and it is either tonight with a sitter, or next month with regrets.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 22,
+        "max_age": 59,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "partner"
+          },
+          {
+            "kind": "min_money",
+            "value": 120
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "book",
+          "label": "Book it ($120)",
+          "known_effects": [
+            "-$120",
+            "+happiness (5-9)",
+            "+relationship (4-7)"
+          ],
+          "cost": {
+            "money": 120
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  5,
+                  9
+                ]
+              }
+            },
+            "relationship": {
+              "role": "partner",
+              "delta": {
+                "randint": [
+                  4,
+                  7
+                ]
+              }
+            },
+            "money": -120
+          },
+          "outcome_text": "I booked the table. The couple at the next table applauded the dessert. So did I."
+        },
+        {
+          "id": "home",
+          "label": "Cook at home instead",
+          "known_effects": [
+            "+happiness (2-5)",
+            "+relationship (1-4)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            },
+            "relationship": {
+              "role": "partner",
+              "delta": {
+                "randint": [
+                  1,
+                  4
+                ]
+              }
+            }
+          },
+          "outcome_text": "I cooked. The smoke alarm sang, and it counted as ambience."
+        }
+      ]
+    },
+    {
+      "id": "flavor_in_law_dinner",
+      "title": "Dinner with the In-Laws",
+      "text": "{name}'s partner's parents are coming to dinner, and they have already mentioned twice that they 'eat early'.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 22,
+        "max_age": 59,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "partner"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "impress",
+          "label": "Attempt a five-course masterpiece",
+          "known_effects": [
+            "-$60 groceries",
+            "+happiness (3-7)",
+            "+relationship (3-6)",
+            "-health (0-2)"
+          ],
+          "cost": {
+            "money": 60
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  7
+                ]
+              },
+              "health": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            },
+            "relationship": {
+              "role": "partner",
+              "delta": {
+                "randint": [
+                  3,
+                  6
+                ]
+              }
+            },
+            "money": -60
+          },
+          "outcome_text": "I cooked for three hours. The in-laws ate at 4:30 and declared it 'interesting'. The partner beamed."
+        },
+        {
+          "id": "pizza",
+          "label": "Order pizza and own it",
+          "known_effects": [
+            "-$25",
+            "+happiness (1-4)",
+            "-relationship (1-3)"
+          ],
+          "cost": {
+            "money": 25
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  4
+                ]
+              }
+            },
+            "relationship": {
+              "role": "partner",
+              "delta": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            },
+            "money": -25
+          },
+          "outcome_text": "Pizza arrived at 4:15 sharp. The in-laws respected the punctuality, if nothing else."
+        },
+        {
+          "id": "toast",
+          "label": "Serve water and relentless charm",
+          "known_effects": [
+            "+happiness (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I served tap water with the confidence of a sommelier. The in-laws were oddly impressed."
+        }
+      ]
+    },
+    {
+      "id": "flavor_thermostat_war",
+      "title": "The Thermostat Accord",
+      "text": "{name}'s partner has moved the thermostat again. This is the fifth time this month. Diplomatic channels are strained.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 22,
+        "max_age": 65,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "partner"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "talk",
+          "label": "Negotiate a treaty",
+          "known_effects": [
+            "+happiness (2-5)",
+            "+relationship (3-6)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            },
+            "relationship": {
+              "role": "partner",
+              "delta": {
+                "randint": [
+                  3,
+                  6
+                ]
+              }
+            }
+          },
+          "outcome_text": "The Treaty of 72 Degrees was signed on the fridge. Both parties celebrated in sweaters."
+        },
+        {
+          "id": "sneak",
+          "label": "Change it back in secret",
+          "known_effects": [
+            "+happiness (1-4)",
+            "-relationship (1-4)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  4
+                ]
+              }
+            },
+            "relationship": {
+              "role": "partner",
+              "delta": {
+                "randint": [
+                  1,
+                  4
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I moved it back at 3 a.m. The war continues, silent and eternal."
+        }
+      ]
+    },
+    {
+      "id": "flavor_kitchen_dancing",
+      "title": "Radio at Full Volume",
+      "text": "An old song came on the kitchen radio and {name}'s partner grabbed their hand in the middle of doing dishes.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 21,
+        "max_age": 70,
+        "once_per_lifetime": false,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "partner"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "dance",
+          "label": "Drop everything and dance",
+          "known_effects": [
+            "+happiness (3-7)",
+            "+relationship (3-6)",
+            "-health (0-1) \u2014 a dish may not survive"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  7
+                ]
+              },
+              "health": {
+                "randint": [
+                  0,
+                  1
+                ],
+                "sign": -1
+              }
+            },
+            "relationship": {
+              "role": "partner",
+              "delta": {
+                "randint": [
+                  3,
+                  6
+                ]
+              }
+            }
+          },
+          "outcome_text": "I danced badly and happily. One plate did not make it."
+        },
+        {
+          "id": "dishes",
+          "label": "Keep scrubbing, but hum along",
+          "known_effects": [
+            "+happiness (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I hummed. The partner spun with the mop instead. Close enough."
+        }
+      ]
+    },
+    {
+      "id": "flavor_parent_advice",
+      "title": "The Sunday Phone Call",
+      "text": "{name}'s parent called 'just to chat', which means one story, two pieces of advice, and three questions about eating vegetables.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 18,
+        "max_age": 59,
+        "once_per_lifetime": false,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "mother"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "listen",
+          "label": "Settle in and listen",
+          "known_effects": [
+            "+happiness (2-6)",
+            "+relationship (2-5)",
+            "-stress (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  6
+                ]
+              },
+              "stress": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            },
+            "relationship": {
+              "role": "mother",
+              "delta": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            }
+          },
+          "outcome_text": "Ninety minutes later, I had heard about the neighbors, the garden, and one surprisingly useful life lesson."
+        },
+        {
+          "id": "short",
+          "label": "Keep it brief",
+          "known_effects": [
+            "+happiness (0-1)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  0,
+                  1
+                ]
+              }
+            }
+          },
+          "outcome_text": "I kept it to five minutes. The guilt lasted slightly longer."
+        }
+      ]
+    },
+    {
+      "id": "flavor_school_play",
+      "title": "The School Play",
+      "text": "{name}'s kid has been cast as 'Tree Number Two' in the school play and has rehearsed the rustling for weeks. The performance is tonight.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 22,
+        "max_age": 55,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "child"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "front_row",
+          "label": "Front row, flowers, full commitment",
+          "known_effects": [
+            "-$15 flowers",
+            "+happiness (4-8)",
+            "+karma (1-3)"
+          ],
+          "cost": {
+            "money": 15
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  4,
+                  8
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            },
+            "money": -15
+          },
+          "outcome_text": "Tree Number Two rustled like a professional. I cried a little. The flowers were clutched the whole ride home."
+        },
+        {
+          "id": "back_row",
+          "label": "Slip into the back row",
+          "known_effects": [
+            "+happiness (2-5)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            }
+          },
+          "outcome_text": "I watched from the back. Tree Number Two spotted them anyway and rustled twice as hard."
+        }
+      ]
+    },
+    {
+      "id": "flavor_pet_begging",
+      "title": "The Pet Campaign",
+      "text": "The kids have united behind a single cause: a dog. They have made posters. One of the posters has a pie chart.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 22,
+        "max_age": 55,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "child"
+          },
+          {
+            "kind": "min_money",
+            "value": 200
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "adopt",
+          "label": "Adopt the dog ($200)",
+          "known_effects": [
+            "-$200",
+            "+happiness (5-9)",
+            "-health (0-2) \u2014 walked daily"
+          ],
+          "cost": {
+            "money": 200
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  5,
+                  9
+                ]
+              },
+              "health": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            },
+            "money": -200
+          },
+          "outcome_text": "The dog arrived and immediately chose My slipper as its eternal rival. The kids declared it the best day ever."
+        },
+        {
+          "id": "postpone",
+          "label": "Admire the posters, postpone the dog",
+          "known_effects": [
+            "+happiness (1-3)",
+            "-happiness (0-1) \u2014 sad eyes"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I praised the pie chart sincerely. The dog has been moved to 'future negotiations'."
+        }
+      ]
+    },
+    {
+      "id": "flavor_sibling_boardgame",
+      "title": "Game Night Grudge Match",
+      "text": "A family board game night has turned serious. {name}'s sibling controls half the board and has just built a hotel. On properties {name} needs.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 18,
+        "max_age": 59,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "play_dirty",
+          "label": "Trade ruthlessly",
+          "known_effects": [
+            "+happiness (2-5)",
+            "+smarts (1-3)",
+            "-karma (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "smarts": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I traded like a shark and won. The sibling has demanded a rematch every year since."
+        },
+        {
+          "id": "let_win",
+          "label": "Let the sibling win, gracefully",
+          "known_effects": [
+            "+karma (2-4)",
+            "+happiness (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "karma": {
+                "randint": [
+                  2,
+                  4
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I lost on purpose. The sibling's victory dance lasted longer than the game."
+        }
+      ]
+    },
+    {
+      "id": "flavor_roadtrip_are_we_there",
+      "title": "Are We There Yet?",
+      "text": "Hour three of the family road trip. The kids have asked the question eleven times. The destination is still two hundred miles away.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 25,
+        "max_age": 55,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "child"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "games",
+          "label": "Invent car games for three hours",
+          "known_effects": [
+            "+happiness (2-5)",
+            "-stress (1-4)",
+            "-health (0-1)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "stress": {
+                "randint": [
+                  1,
+                  4
+                ],
+                "sign": -1
+              },
+              "health": {
+                "randint": [
+                  0,
+                  1
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I invented 'spot the weirdest barn'. The kids are undefeated. Everyone arrived oddly happy."
+        },
+        {
+          "id": "headphones",
+          "label": "Deploy the headphones",
+          "known_effects": [
+            "+stress (1-3)",
+            "-relationship (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "stress": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            },
+            "relationship": {
+              "role": "child",
+              "delta": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I put on headphones. The back seat conducted a drum solo on the seat for two hundred miles."
+        }
+      ]
+    },
+    {
+      "id": "flavor_grandparent_story",
+      "title": "The Long Version",
+      "text": "At a family dinner, {name}'s grandkid asks how grandma and grandpa met, and the grandparents exchange a look that means 'the long version'.",
+      "category": "elder",
+      "weight": 1,
+      "conditions": {
+        "min_age": 60,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "child"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "tell",
+          "label": "Tell the whole epic",
+          "known_effects": [
+            "+happiness (4-7)",
+            "+karma (1-3)",
+            "+relationship (2-4)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  4,
+                  7
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            },
+            "relationship": {
+              "role": "child",
+              "delta": {
+                "randint": [
+                  2,
+                  4
+                ]
+              }
+            }
+          },
+          "outcome_text": "It took an hour and involved a borrowed suit, a wrong bus, and a pie. The grandkid asked for it again immediately."
+        },
+        {
+          "id": "short",
+          "label": "Give the short version",
+          "known_effects": [
+            "+happiness (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I gave the thirty-second version. The grandkid sensed there was more and will absolutely ask again."
+        }
+      ]
+    },
+    {
+      "id": "flavor_burnt_holiday",
+      "title": "The Turkey Incident",
+      "text": "{name} is hosting the holiday dinner and the main dish has just gone from 'golden' to 'archaeological' in four minutes.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 25,
+        "max_age": 65,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "pivot",
+          "label": "Pivot to an emergency pizza feast",
+          "known_effects": [
+            "-$40",
+            "+happiness (3-6)"
+          ],
+          "cost": {
+            "money": 40
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  6
+                ]
+              }
+            },
+            "money": -40
+          },
+          "outcome_text": "I ordered six pizzas. The family agreed it was the best holiday dinner in years. The turkey was never spoken of."
+        },
+        {
+          "id": "serve",
+          "label": "Serve it anyway with confidence",
+          "known_effects": [
+            "+happiness (1-4)",
+            "-happiness (1-3)",
+            "-health (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  4
+                ]
+              },
+              "health": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I declared it 'smoky-style'. Everyone chewed very slowly and complimented the salad."
+        }
+      ]
+    },
+    {
+      "id": "flavor_reunion_potluck",
+      "title": "The Potato Salad Judge",
+      "text": "At the family reunion, {name} has been appointed judge of the annual potato salad contest, a position of great power and greater danger.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 25,
+        "max_age": 65,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "fair",
+          "label": "Judge with ruthless fairness",
+          "known_effects": [
+            "+happiness (2-5)",
+            "+karma (2-4)",
+            "-relationship (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "karma": {
+                "randint": [
+                  2,
+                  4
+                ]
+              }
+            },
+            "relationship": {
+              "role": "random_relation",
+              "delta": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I judged honestly. Aunt Mabel's third-place ribbon is already a family legend."
+        },
+        {
+          "id": "diplomatic",
+          "label": "Declare a five-way tie",
+          "known_effects": [
+            "+happiness (2-4)",
+            "+relationship (2-4)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  4
+                ]
+              }
+            },
+            "relationship": {
+              "role": "random_relation",
+              "delta": {
+                "randint": [
+                  2,
+                  4
+                ]
+              }
+            }
+          },
+          "outcome_text": "Everyone won. The potato salads, collectively, were adequate. The peace held."
+        }
+      ]
+    },
+    {
+      "id": "flavor_lost_tooth",
+      "title": "The Tooth Crisis",
+      "text": "A kid lost a tooth at the worst possible moment: a sleepover, thirty minutes from home. The tooth is in a napkin. The napkin is missing.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 25,
+        "max_age": 50,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "child"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "rescue",
+          "label": "Drive back and stage a tooth search",
+          "known_effects": [
+            "-$10 gas",
+            "+happiness (3-6)",
+            "+relationship (3-5)"
+          ],
+          "cost": {
+            "money": 10
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  6
+                ]
+              }
+            },
+            "relationship": {
+              "role": "child",
+              "delta": {
+                "randint": [
+                  3,
+                  5
+                ]
+              }
+            },
+            "money": -10
+          },
+          "outcome_text": "I found the napkin under a sleeping bag. The tooth fairy's reputation survived another night."
+        },
+        {
+          "id": "note",
+          "label": "Write the tooth fairy an explanatory note",
+          "known_effects": [
+            "+happiness (2-4)",
+            "+karma (1-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  4
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  2
+                ]
+              }
+            }
+          },
+          "outcome_text": "The note explained everything. The tooth fairy left a slightly smaller payment 'due to irregular circumstances'."
+        }
+      ]
+    },
+    {
+      "id": "flavor_midnight_baby",
+      "title": "3 A.M. Committee Meeting",
+      "text": "The baby is awake. The baby has opinions. {name} is holding the baby and negotiating, badly, for sleep.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 20,
+        "max_age": 50,
+        "once_per_lifetime": false,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "child"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "rock",
+          "label": "Rock and sing until dawn",
+          "known_effects": [
+            "+happiness (2-5)",
+            "+relationship (3-6)",
+            "-health (2-5)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "health": {
+                "randint": [
+                  2,
+                  5
+                ],
+                "sign": -1
+              }
+            },
+            "relationship": {
+              "role": "child",
+              "delta": {
+                "randint": [
+                  3,
+                  6
+                ]
+              }
+            }
+          },
+          "outcome_text": "I sang every song known to science. The baby slept at dawn. I did not."
+        },
+        {
+          "id": "tag",
+          "label": "Tag the partner in",
+          "known_effects": [
+            "+health (1-3)",
+            "-relationship (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "health": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            },
+            "relationship": {
+              "role": "partner",
+              "delta": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I slept. The partner handled the committee. Breakfast was slightly tense but fair."
+        }
+      ]
+    },
+    {
+      "id": "flavor_moms_birthday",
+      "title": "The Birthday Alarm",
+      "text": "{name}'s phone just flashed: MOM'S BIRTHDAY \u2014 TODAY. There are six hours until the family dinner and no gift.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 18,
+        "max_age": 59,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "mother"
+          },
+          {
+            "kind": "min_money",
+            "value": 40
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "gift",
+          "label": "Panic-buy something thoughtful ($40)",
+          "known_effects": [
+            "-$40",
+            "+happiness (3-6)",
+            "+relationship (4-7)"
+          ],
+          "cost": {
+            "money": 40
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  6
+                ]
+              }
+            },
+            "relationship": {
+              "role": "mother",
+              "delta": {
+                "randint": [
+                  4,
+                  7
+                ]
+              }
+            },
+            "money": -40
+          },
+          "outcome_text": "I found a scarf in her favorite color. The hug lasted a full minute."
+        },
+        {
+          "id": "card",
+          "label": "A handmade card and a big hug",
+          "known_effects": [
+            "+happiness (2-4)",
+            "+relationship (2-5)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  4
+                ]
+              }
+            },
+            "relationship": {
+              "role": "mother",
+              "delta": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            }
+          },
+          "outcome_text": "The card had a drawing of the two of them. It went straight on the fridge, front and center."
+        }
+      ]
+    },
+    {
+      "id": "flavor_ugly_lamp",
+      "title": "The Inherited Lamp",
+      "text": "A relative has left {name} a lamp. It is enormous, it is orange, and the family insists it has 'sentimental value'.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 22,
+        "max_age": 65,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "display",
+          "label": "Display it proudly",
+          "known_effects": [
+            "+happiness (2-5)",
+            "+karma (1-3)",
+            "-happiness (0-1)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            },
+            "relationship": {
+              "role": "random_relation",
+              "delta": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I gave the lamp a place of honor. It grew on everyone, like moss."
+        },
+        {
+          "id": "donate",
+          "label": "Donate it quietly",
+          "known_effects": [
+            "+karma (1-3)",
+            "-happiness (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "The lamp found a new home. The family asked about it once, and accepted the answer of 'safekeeping'."
+        }
+      ]
+    },
+    {
+      "id": "flavor_family_photo",
+      "title": "The Group Photo",
+      "text": "The photographer wants 'one nice photo' of the whole family. There are eleven people, two babies, and a dog with boundary issues.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 25,
+        "max_age": 65,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "choreograph",
+          "label": "Stage-manage the whole shot",
+          "known_effects": [
+            "+happiness (3-6)",
+            "-stress (2-5)",
+            "+karma (1-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  6
+                ]
+              },
+              "stress": {
+                "randint": [
+                  2,
+                  5
+                ],
+                "sign": -1
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  2
+                ]
+              }
+            }
+          },
+          "outcome_text": "I directed like a film auteur. The photo is imperfect and everyone loves it."
+        },
+        {
+          "id": "candid",
+          "label": "Let chaos take the photo",
+          "known_effects": [
+            "+happiness (2-5)",
+            "-happiness (0-1)",
+            "+karma (0-1)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            },
+            "relationship": {
+              "role": "random_relation",
+              "delta": {
+                "randint": [
+                  0,
+                  1
+                ]
+              }
+            }
+          },
+          "outcome_text": "The photo features three closed eyes and one escaping dog. It is, everyone agrees, extremely accurate."
+        }
+      ]
+    },
+    {
+      "id": "flavor_snowball_truce",
+      "title": "The Snowball Truce",
+      "text": "{name} and a sibling are forty minutes into an escalating snowball engagement. The neighbor's hedge has been declared neutral territory.",
+      "category": "childhood",
+      "weight": 1,
+      "conditions": {
+        "min_age": 5,
+        "max_age": 12,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "ambush",
+          "label": "One last sneaky volley",
+          "known_effects": [
+            "+happiness (4-7)",
+            "-health (0-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  4,
+                  7
+                ]
+              },
+              "health": {
+                "randint": [
+                  0,
+                  3
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I landed the final snowball and ran. The truce was signed over hot chocolate, terms undisclosed."
+        },
+        {
+          "id": "truce",
+          "label": "Call the truce now",
+          "known_effects": [
+            "+happiness (2-4)",
+            "+karma (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  4
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I called the truce with a white flag (a sock). Both sides retired honorably."
+        }
+      ]
+    },
+    {
+      "id": "flavor_teen_report_card",
+      "title": "The Report Card Conference",
+      "text": "{name}'s teen has brought home a report card with one A, three Bs, and a grade in gym that can only be described as theoretical.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 35,
+        "max_age": 59,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "child"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "praise",
+          "label": "Praise the effort, ignore the gym grade",
+          "known_effects": [
+            "+happiness (2-5)",
+            "+relationship (3-6)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            },
+            "relationship": {
+              "role": "child",
+              "delta": {
+                "randint": [
+                  3,
+                  6
+                ]
+              }
+            }
+          },
+          "outcome_text": "I celebrated the A. The gym teacher and I have agreed to disagree."
+        },
+        {
+          "id": "push",
+          "label": "Enroll the whole family in jogging",
+          "known_effects": [
+            "+health (2-5)",
+            "-happiness (1-3)",
+            "-relationship (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "health": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            },
+            "relationship": {
+              "role": "child",
+              "delta": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "The family jogged twice. The couch has never been more appreciated."
+        }
+      ]
+    },
+    {
+      "id": "flavor_sunday_call_home",
+      "title": "Call Home Sunday",
+      "text": "It's Sunday, and {name} hasn't called home in a while. The phone sits there, guilting silently.",
+      "category": "teen",
+      "weight": 1,
+      "conditions": {
+        "min_age": 16,
+        "max_age": 25,
+        "once_per_lifetime": false,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "mother"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "call",
+          "label": "Call, stay on a full hour",
+          "known_effects": [
+            "+happiness (2-5)",
+            "+relationship (3-6)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            },
+            "relationship": {
+              "role": "mother",
+              "delta": {
+                "randint": [
+                  3,
+                  6
+                ]
+              }
+            }
+          },
+          "outcome_text": "I called. There was news about the dog, the roof, and a neighbor's fence. All of it mattered."
+        },
+        {
+          "id": "text",
+          "label": "Send a 'thinking of you' text",
+          "known_effects": [
+            "+relationship (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "relationship": {
+              "role": "mother",
+              "delta": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I sent a text. Mom replied with nine photos and one recipe. A fair exchange."
+        }
+      ]
+    },
+    {
+      "id": "flavor_anniversary_forgot",
+      "title": "The Calendar Betrayal",
+      "text": "{name}'s partner just said 'happy anniversary' and {name}'s soul briefly left their body, because the date had completely escaped them.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 25,
+        "max_age": 65,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "partner"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "improvise",
+          "label": "Improvise a legendary evening",
+          "known_effects": [
+            "-$80",
+            "+happiness (3-7)",
+            "+relationship (3-6)"
+          ],
+          "cost": {
+            "money": 80
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  7
+                ]
+              }
+            },
+            "relationship": {
+              "role": "partner",
+              "delta": {
+                "randint": [
+                  3,
+                  6
+                ]
+              }
+            },
+            "money": -80
+          },
+          "outcome_text": "I produced flowers, a reservation, and a speech in ninety minutes. The partner suspects nothing. Or everything, and loves them anyway."
+        },
+        {
+          "id": "confess",
+          "label": "Confess and beg forgiveness",
+          "known_effects": [
+            "+happiness (0-3)",
+            "-relationship (2-5)",
+            "+karma (1-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  0,
+                  3
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  2
+                ]
+              }
+            },
+            "relationship": {
+              "role": "partner",
+              "delta": {
+                "randint": [
+                  2,
+                  5
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I confessed. The partner forgave them by breakfast, but the story will be told at parties forever."
+        }
+      ]
+    },
+    {
+      "id": "flavor_kid_interrogation",
+      "title": "The Hard Question, Again",
+      "text": "A kid has asked {name} where babies come from, in front of other adults, at full volume.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 24,
+        "max_age": 50,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "child"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "science",
+          "label": "The accurate, age-appropriate answer",
+          "known_effects": [
+            "+smarts (1-3)",
+            "+karma (1-3)",
+            "-happiness (0-2) \u2014 awkward"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I answered honestly and calmly. The kid asked a follow-up. The adults found sudden interest in their drinks."
+        },
+        {
+          "id": "defer",
+          "label": "'Ask your mother/father'",
+          "known_effects": [
+            "+happiness (1-3)",
+            "-karma (0-1)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "karma": {
+                "randint": [
+                  0,
+                  1
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I deployed the classic deflection. The other parent received the question at 6 a.m. sharp."
+        }
+      ]
+    },
+    {
+      "id": "flavor_sibling_moving_help",
+      "title": "The Favor of Doom",
+      "text": "{name}'s sibling is moving apartments and has asked for help 'for a few hours', which historically means a whole weekend and one broken shelf.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 20,
+        "max_age": 55,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "help",
+          "label": "Show up with gloves and a truck",
+          "known_effects": [
+            "+happiness (2-5)",
+            "+karma (2-4)",
+            "-health (1-4)",
+            "-relationship (0-2) \u2014 shelf casualty"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "karma": {
+                "randint": [
+                  2,
+                  4
+                ]
+              },
+              "health": {
+                "randint": [
+                  1,
+                  4
+                ],
+                "sign": -1
+              }
+            },
+            "relationship": {
+              "role": "random_relation",
+              "delta": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I carried a couch up three flights. The sibling owes them one (1) eternal favor."
+        },
+        {
+          "id": "excuse",
+          "label": "Invent a plausible excuse",
+          "known_effects": [
+            "+health (0-2)",
+            "-karma (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "health": {
+                "randint": [
+                  0,
+                  2
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I cited a fictional commitment. The shelf, inevitably, broke without them."
+        }
+      ]
+    },
+    {
+      "id": "flavor_grandkid_sleepover",
+      "title": "The Sleepover Summit",
+      "text": "A grandkid is having a sleepover at {name}'s place and has announced that bedtime is 'negotiable'.",
+      "category": "elder",
+      "weight": 1,
+      "conditions": {
+        "min_age": 55,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "child"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "firm",
+          "label": "Hold the bedtime line",
+          "known_effects": [
+            "+happiness (1-4)",
+            "+health (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  4
+                ]
+              },
+              "health": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I held the line. The grandkid fell asleep mid-negotiation. Grandparent victory."
+        },
+        {
+          "id": "give_in",
+          "label": "Negotiate: one extra hour",
+          "known_effects": [
+            "+happiness (3-6)",
+            "+relationship (2-5)",
+            "-health (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  6
+                ]
+              },
+              "health": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            },
+            "relationship": {
+              "role": "child",
+              "delta": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            }
+          },
+          "outcome_text": "An extra hour was granted in exchange for one (1) dishwashing session. The grandkid called it 'the best deal ever'."
+        }
+      ]
+    }
+  ]
+}

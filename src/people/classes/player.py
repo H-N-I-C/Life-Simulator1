@@ -865,13 +865,19 @@ class Player(Person):
 			self.money += round_stochastic(breakdown[3])
 		if self.uv_years > 0:
 			self.uv_years -= 1
+			# Student-loan policy (Claude 2026-11-16): tuition financed by a
+			# loan becomes debt WHEN FINANCED — each enrolled year accrues
+			# one year's tuition (a quarter of the legacy 20k-40k total).
+			# Leaving without graduating keeps the accrued debt; it is never
+			# zero if any year was loan-financed.
+			if self.chose_student_loan:
+				self.student_loan += randint(5000, 10000)
 			if self.uv_years == 0:
 				self.grades = None
 				display_event(_("You graduated from university."))
 				self.change_happiness(randint(14, 20))
 				self.change_smarts(randint(10, 15))
 				if self.chose_student_loan:
-					self.student_loan = randint(20000, 40000)
 					print(_("You now have to start paying back your student loan"))
 			else:
 				if self.grades < randint(10, 45):
@@ -881,11 +887,6 @@ class Player(Person):
 					self.change_happiness(-randint(30, 50))
 					self.uv_years = 0
 					self.grades = None
-					# Student-loan policy: tuition financed but not yet
-					# materialized as debt is not retroactively charged;
-					# clear the stale funding flag, keep any existing debt.
-					if self.student_loan == 0:
-						self.chose_student_loan = False
 		if self.student_loan > 0:
 			amount = min(randint(1000, 3000) for _ in range(3))
 			amount = min(amount, self.student_loan)

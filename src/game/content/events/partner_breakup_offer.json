@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "events": [
+    {
+      "id": "partner_breakup_offer",
+      "title": "Breakup",
+      "text": "Your {person:partner} wants to break up with you.",
+      "category": "family",
+      "weight": 1,
+      "chance_n": 3,
+      "conditions": {
+        "once_per_lifetime": false,
+        "requires": [
+          {
+            "kind": "partner_status",
+            "max": 1
+          },
+          {
+            "kind": "partner_relationship_below",
+            "randint": [
+              25,
+              35
+            ]
+          }
+        ]
+      },
+      "effects": {
+        "stats": {
+          "happiness": {
+            "randint": [
+              15,
+              18
+            ],
+            "sign": -1
+          }
+        }
+      },
+      "choices": [
+        {
+          "id": "wish_well",
+          "label": "Wish them well",
+          "known_effects": [
+            "-happiness (15-18)",
+            "breakup"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "lose_partner": true
+          },
+          "outcome_text": "I wished them the best."
+        },
+        {
+          "id": "beg",
+          "label": "Beg them to stay",
+          "known_effects": [
+            "-happiness (15-18)",
+            "maybe breakup"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "branches": {
+            "sample": {
+              "kind": "x_in_y",
+              "x": "partner.willpower",
+              "y": 100,
+              "draws": 2
+            },
+            "then": {
+              "effects": {
+                "lose_partner": true,
+                "stats": {
+                  "happiness": {
+                    "randint": [
+                      10,
+                      20
+                    ],
+                    "sign": -1
+                  }
+                }
+              },
+              "outcome_text": "They dumped you anyway."
+            },
+            "else": {
+              "effects": {},
+              "outcome_text": "They decided to stay with you."
+            }
+          }
+        },
+        {
+          "id": "insult",
+          "label": "Insult them one last time",
+          "known_effects": [
+            "-happiness (15-18)",
+            "-karma 4",
+            "breakup"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "karma": -4
+            },
+            "lose_partner": true
+          },
+          "outcome_text": "I insulted them as they walked out."
+        }
+      ]
+    }
+  ]
+}

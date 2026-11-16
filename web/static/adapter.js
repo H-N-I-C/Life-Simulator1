@@ -11,8 +11,11 @@
 "use strict";
 
 export const ACTION_CATEGORIES = [
-  "relationships", "education", "work", "activities", "health", "finances",
+  "relationships", "family", "education", "work", "activities", "health",
+  "finances",
 ];
+// actions whose category renders in the General bucket (not a tab)
+export const GENERAL_CATEGORIES = ["life", "other"];
 
 export function normalizeState(raw) {
   const people = Array.isArray(raw.people) ? raw.people : [];
@@ -57,6 +60,9 @@ export function normalizeState(raw) {
     generation: raw.generation ?? 1,
     completedLives: Array.isArray(raw.completed_lives) ? raw.completed_lives
                                                        : [],
+    // frozen M2c shape: dead states carry succession.eligible +
+    // generation_next (older 'continuation' block still tolerated)
+    succession: raw.succession || null,
     continuation: raw.continuation || null,
   };
 }
@@ -68,18 +74,23 @@ export function normalizeAction(a) {
     // M1 entries have no category; the UI buckets them sensibly.
     category: a.category ||
       (a.id === "spend_time" ? "relationships" :
-       a.id === "age_up" ? "other" : "other"),
+       a.id === "age_up" ? "life" : "other"),
     targetId: a.target_id ?? null,
+    targetLabel: a.target_label || null,
     inputs: (a.inputs || []).map(normalizeInput),
     knownCosts: a.known_costs || a.knownCosts || [],
     limits: a.limits || [],
+    // Frozen M2 shape: ineligible/used actions are projected with
+    // enabled:false and a precise reason.
+    enabled: a.enabled !== false,
+    reason: a.reason || "",
   };
 }
 
 export function normalizeInput(i) {
   return {
     id: i.id,
-    type: i.type,               // "number" | "text" | "choice" | "boolean"
+    type: i.type,               // "number" | "text" | "choice"
     label: i.label,
     required: !!i.required,
     min: i.min ?? null,
@@ -91,11 +102,13 @@ export function normalizeInput(i) {
 export function normalizeDecision(d) {
   return {
     id: d.id,
+    kind: d.kind || null,
     title: d.title,
     text: d.text,
     personIds: d.person_ids || [],
     inputs: (d.inputs || []).map(normalizeInput),
     options: (d.options || []).map(normalizeOption),
+    continuation: d.continuation_after_resolve || null,
   };
 }
 
@@ -130,10 +143,10 @@ export function financeRows(state) {
   const f = state.sections.finances;
   if (!f) return { estimate: null, ledger: [], debts: [] };
   return {
-    estimate: f.current_annual_estimate || null,
-    ledger: f.ledger_entries || f.ledger || [],
-    debts: f.debts || f.debt_breakdown || [],
-    lastClosedYear: f.last_closed_year ?? null,
+    estimate: f.annual_estimate || null,
+    ledger: f.ledger || [],
+    debts: f.debts || [],
+    lastClosedTurn: f.last_closed_turn ?? null,
     balance: f.balance ?? state.money,
   };
 }

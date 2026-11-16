@@ -1,0 +1,43 @@
+{
+  "_status": "DRAFT; _proposal fields pending A acceptance",
+  "_oracle": "tests/fixtures/annual_events_oracle.json#events/partner_breakup_offer",
+  "schema_version": 1,
+  "events": [
+    {
+      "id": "partner_breakup_offer",
+      "title": "Breakup",
+      "text": "Your {person:partner} wants to break up with you.",
+      "category": "family",
+      "weight": 1,
+      "chance_n": {"_proposal": "P4", "n": 3},
+      "conditions": {"once_per_lifetime": false,
+                     "requires": [{"kind": "partner_status", "max": 1, "_proposal": "P8 marital_status 1-2"},
+                                  {"kind": "partner_relationship_below", "randint": [25, 35], "_proposal": "P8 sampled gate"}]},
+      "choices": [
+        {"id": "wish_well", "label": "Wish them well",
+         "known_effects": ["-happiness (before)", "breakup"],
+         "cost": {"money": 0},
+         "effects": {"stats": {"happiness": {"randint": [15, 18], "sign": -1, "_proposal": "P1 (pre-effects on all choices)"}},
+                     "lose_partner": true, "_proposal_role_field": "P7"},
+         "outcome_text": "You wished them the best."},
+        {"id": "beg", "label": "Beg them to stay",
+         "known_effects": ["-happiness (before)", "maybe breakup"],
+         "cost": {"money": 0},
+         "effects": {"stats": {"happiness": {"randint": [15, 18], "sign": -1, "_proposal": "P1 pre-effect"}}},
+         "outcomes": {"_proposal": "P3",
+           "two_draw_willpower": true,
+           "insist": {"effects": {"lose_partner": true,
+                                  "stats": {"happiness": {"randint": [10, 20], "sign": -1, "_proposal": "P1"}}},
+                      "outcome_text": "They dumped you anyway."},
+           "stay": {"effects": {}, "outcome_text": "They decided to stay with you."}}},
+        {"id": "insult", "label": "Insult them one last time",
+         "known_effects": ["-happiness (before)", "-karma", "breakup"],
+         "cost": {"money": 0},
+         "effects": {"stats": {"happiness": {"randint": [15, 18], "sign": -1, "_proposal": "P1 pre-effect"},
+                               "karma": {"randint": [4], "sign": -1, "_proposal": "P1"}},
+                     "lose_partner": true},
+         "outcome_text": "You insulted them as they walked out."}
+      ]
+    }
+  ]
+}

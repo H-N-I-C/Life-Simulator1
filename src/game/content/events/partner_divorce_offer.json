@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "events": [
+    {
+      "id": "partner_divorce_offer",
+      "title": "Divorce",
+      "text": "Your {person:partner} wants a divorce.",
+      "category": "family",
+      "weight": 1,
+      "chance_n": 6,
+      "conditions": {
+        "once_per_lifetime": false,
+        "requires": [
+          {
+            "kind": "partner_status",
+            "value": 2
+          },
+          {
+            "kind": "partner_relationship_below",
+            "randint": [
+              15,
+              30
+            ]
+          }
+        ]
+      },
+      "effects": {
+        "stats": {
+          "happiness": {
+            "randint": [
+              15,
+              18
+            ],
+            "sign": -1
+          }
+        }
+      },
+      "_comment": "settlement money_pct is negative (paid TO the partner); 'sign' on money_pct is a content-driven additive interpretation. The divorce happiness penalty (10-15) applies to every branch that ends in divorce, matching legacy player.divorce().",
+      "choices": [
+        {
+          "id": "honor",
+          "label": "Wish them well",
+          "known_effects": [
+            "-happiness (15-18)",
+            "divorce + settlement (40-60% of your money)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "divorce": true,
+            "money": {
+              "money_pct": [
+                0.4,
+                0.6
+              ],
+              "sign": -1
+            },
+            "stats": {
+              "happiness": {
+                "randint": [
+                  10,
+                  15
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I honored the request for a divorce."
+        },
+        {
+          "id": "beg",
+          "label": "Beg them to stay",
+          "known_effects": [
+            "-happiness (15-18)",
+            "maybe divorce"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "branches": {
+            "sample": {
+              "kind": "x_in_y",
+              "x": "partner.willpower",
+              "y": 100,
+              "draws": 2
+            },
+            "then": {
+              "effects": {
+                "divorce": true
+              },
+              "outcome_text": "They insisted on getting a divorce."
+            },
+            "else": {
+              "effects": {
+                "stats": {
+                  "happiness": {
+                    "randint": [
+                      15,
+                      22
+                    ],
+                    "sign": -1
+                  }
+                }
+              },
+              "outcome_text": "They decided to stay with you."
+            }
+          }
+        },
+        {
+          "id": "insult",
+          "label": "Insult them one last time",
+          "known_effects": [
+            "-happiness (15-18)",
+            "-karma 4",
+            "divorce"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "karma": -4,
+              "happiness": {
+                "randint": [
+                  10,
+                  15
+                ],
+                "sign": -1
+              }
+            },
+            "divorce": true
+          },
+          "outcome_text": "They divorced you."
+        }
+      ]
+    }
+  ]
+}

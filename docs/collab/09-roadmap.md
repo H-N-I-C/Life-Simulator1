@@ -7,6 +7,7 @@ Detailed milestone specs and exit checks: 07-roadmap-codex.md. Each milestone is
 | M0 | Avatars (in progress) | Creator, gallery, avatar next to every name |
 | M1 | Real game in the browser | Create → be born → age up → events → save/reload |
 | M2 | Everything the old game had, fixed | School, jobs, romance, kids, health, death, continue as child; money ledger; life journal |
+| M2.5 | Romance & Family pack (CK3-style, see user-wishlist.md) | Dating, drama, weddings, polygamy/relatives/same-sex as modifiers, religion & laws, parenting |
 | M3 | Real careers & education | Named jobs, promotions, degrees, trades, skills |
 | M4 | Friends, classmates, coworkers | Clubs, popularity, bullying, NPCs who remember you and invite you |
 | M5 | Money, homes, cars | Rent/buy, mortgages, bills, possessions, inheritance |

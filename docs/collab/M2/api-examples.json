@@ -10,9 +10,11 @@
       "university_years_remaining": 0,
       "graduated_high_school": true,
       "loan": {
-        "principal": 0,
-        "remaining": 0,
-        "has_loan": false
+        "principal": 15000,
+        "remaining": 12500,
+        "has_loan": true,
+        "funded_by": "loan | parents | scholarship | null",
+        "_policy": "APPROVED POLICY #3: loan-financed university years accrue debt EACH YEAR (randint 5000-10000 per financed year) \u2014 no graduation lump sum. has_loan becomes true after the first financed year and reflects the accrued balance minus repayments (debt_service runs each year). funded_by shows the enrollment-time funding choice."
       }
     },
     "work": {
@@ -54,7 +56,8 @@
         "gross": 40000,
         "tax": 5800,
         "expenses": 12000,
-        "net": 22200
+        "net": 22200,
+        "_policy": "deterministic preview at the retention mean (U(0.4,0.8) -> 0.6); the actual retention is sampled once per account/turn at year close; previews never consume gameplay RNG and are never posted"
       },
       "last_closed_turn": "t_000042",
       "ledger": [
@@ -316,36 +319,45 @@
         "amount": -2000
       }
     ],
-    "_invariant": "40000 - 5800 - 12000 == 22200 exactly; debt repayment is an additional posting, never pre-deducted; the deceased (deaths before work_income) are not paid \u2014 legacy parity"
+    "_invariant": "40000 - 5800 - 12000 == 22200 exactly; debt repayment is an additional posting, never pre-deducted. APPROVED ORDERING: end-of-year accounting \u2014 relation deaths are processed after income in family_events; the deceased earned this period and inheritance posts there; player mortality is checked before decision_offer."
   },
   "succession_example": {
-    "_comment": "M2c preview: continue as child keeps canonical person_id/appearance/name; generation increments; inherited cash is a balanced transfer (grouped legs), not a new income credit",
-    "completed_lives_entry": {
-      "generation": 1,
-      "person_id": "<parent person_id>",
-      "name": "Alex Rivers",
-      "age_at_death": 84,
-      "summary": {
-        "net_worth_at_death": 250000,
-        "children": 2
+    "_comment": "FROZEN M2c continue-as-child shapes. When status is 'dead', state carries succession.eligible; the client POSTs action 'continue_as' with the chosen child. Same game_id, generation+1.",
+    "dead_state_extras": {
+      "succession": {
+        "eligible": [
+          {
+            "person_id": "<child person_id>",
+            "name": "Robin Lee",
+            "age": 12
+          }
+        ],
+        "generation_next": 2
       }
     },
-    "transfer_legs": [
-      {
-        "source_key": "t_000100:succession:inheritance:<child person_id>:transfer",
-        "account_owner_id": "<child person_id>",
-        "category": "inheritance",
-        "amount": 125000,
-        "group_id": "succession_t_000100"
-      },
-      {
-        "source_key": "t_000100:succession:estate:<parent person_id>:transfer",
-        "account_owner_id": "<parent person_id>",
-        "category": "transfer",
-        "amount": -125000,
-        "group_id": "succession_t_000100"
+    "request": {
+      "expected_revision": 61,
+      "request_id": "req-succ-001",
+      "action": "continue_as",
+      "payload": {
+        "target_id": "<child person_id>"
       }
-    ]
+    },
+    "response_notes": [
+      "same game_id; generation increments; status back to 'alive'",
+      "the successor IS the same person: person_id, appearance and name carried over",
+      "cash inheritance posts as balanced ledger legs (share to successor + estate residual), group_id 'succession'",
+      "completed_lives gains the finished record; the deceased moves to the archive so every old journal reference still resolves",
+      "reconstructed parents/siblings keep their canonical person_ids and appearances",
+      "errors: 404 not_found (unknown target), 409 not_allowed (target not eligible / life not over)"
+    ],
+    "completed_lives_entry": {
+      "generation": 1,
+      "person_id": "<deceased person_id>",
+      "name": "Alex Lee",
+      "age_at_death": 84,
+      "net_worth_at_death": 250000
+    }
   },
   "errors": {
     "invalid_input_400": {
@@ -396,5 +408,300 @@
     "m1_fields": "all M1 state fields remain supported; new sections are additive",
     "replay": "unchanged semantics; replay checked before revision; creation replay returns original response",
     "estimate_policy": "annual_estimate is a preview computed from current state; it is never posted and never sampled with gameplay RNG"
+  },
+  "scenario_start_example": {
+    "_comment": "FROZEN dev-only scenario starts (spec addendum). Optional profile key 'scenario'; built through REAL transitions (seeded progression through the coordinator + rule boundary), never bare field edits. Dev panel is B-side, enabled via a flag in play-web.sh (e.g. --dev).",
+    "scenarios": [
+      {
+        "id": "high_school_first_day",
+        "label": "First day of high school",
+        "result": "age 14, enrolled (high), grades set, parents alive"
+      },
+      {
+        "id": "graduating_18",
+        "label": "Age 18, just graduated",
+        "result": "age 18, high school complete, unemployed"
+      },
+      {
+        "id": "unemployed_18",
+        "label": "Age 18, graduated, unemployed",
+        "result": "age 18, no job, clean actionable state"
+      },
+      {
+        "id": "enrolled_child_10",
+        "label": "Child age 10, enrolled",
+        "result": "age 10, enrolled (elementary), grades set, study limit unused"
+      },
+      {
+        "id": "employed_30",
+        "label": "30, employed",
+        "result": "age 30, generic job via the real find_job flow, salary history present"
+      },
+      {
+        "id": "near_retirement_64",
+        "label": "64, near retirement",
+        "result": "age 64, employed 10+ years"
+      },
+      {
+        "id": "retirement_eligible_65",
+        "label": "65, retirement-eligible",
+        "result": "age 65, employed 10+ years, can_retire true"
+      },
+      {
+        "id": "university_pending_17",
+        "label": "17, university acceptance pending funding",
+        "result": "age 17, application accepted, FUNDING DECISION PENDING (left open)",
+        "_provisional": "smarts-gated acceptance; typed 500 naming the gate if the seed fails \u2014 seed 4242 known-good"
+      },
+      {
+        "id": "ill_with_cash",
+        "label": "Adult, two illnesses, cash on hand",
+        "result": "age 30, two recorded illnesses, positive balance",
+        "_note": "illnesses via the canonical Player.add_illness API legacy events use; cash from real employment"
+      },
+      {
+        "id": "low_performance_30",
+        "label": "30, employed, low performance (S6 test hook)",
+        "result": "employed_30 plus performance set below 15 via a DOCUMENTED DEV-ONLY adjustment",
+        "_dev_hook": "test-only; never reachable in normal play; adjustment is part of the scenario metadata, not a game rule"
+      },
+      {
+        "id": "married_30",
+        "label": "30, married",
+        "result": "age 30, married partner (real dating/proposal/wedding flow), employment history"
+      },
+      {
+        "id": "married_with_child",
+        "label": "30, married, one child",
+        "result": "age 30, married, one named child created via the canonical birth hook"
+      },
+      {
+        "id": "pregnant_25",
+        "label": "25, married, expecting or newborn",
+        "result": "age 25, married; pregnancy in progress or a baby born this drive (yearly turns cannot freeze the in-progress window)"
+      },
+      {
+        "id": "new_parent_25",
+        "label": "25, married, new baby",
+        "result": "age 25, married, baby born and named this year"
+      },
+      {
+        "id": "wealthy_married_40",
+        "label": "40, married, $1M+ (kidnapping test hook)",
+        "result": "age 40, married partner, $1,000,000 balance; kidnapping event still rolls 1/250 naturally",
+        "_dev_hook": "documented dev-only cash adjustment; never reachable in normal play"
+      }
+    ],
+    "request": {
+      "first_name": "Dev",
+      "last_name": "Tester",
+      "gender": "female",
+      "country": "Australia",
+      "seed": 777,
+      "scenario": "employed_30",
+      "request_id": "req-dev-001"
+    },
+    "errors": {
+      "unknown_scenario_400": {
+        "error": {
+          "code": "invalid_input",
+          "message": "unknown scenario: 'time_traveler'"
+        }
+      }
+    },
+    "provisional_fields": {
+      "health.treatments_available": "PROVISIONAL until M2b health extraction"
+    }
+  },
+  "m2b_actions_example": {
+    "_comment": "FROZEN M2b action ids (dispatch through POST actions with the same revision/request_id semantics). target actions require payload.target_id (a canonical person_id); offer actions sample a pending decision; self actions take no target.",
+    "target_actions": {
+      "spend_time": {
+        "payload": {
+          "target_id": "<person_id>"
+        }
+      },
+      "conversation": {
+        "payload": {
+          "target_id": "<person_id>"
+        }
+      },
+      "compliment": {
+        "payload": {
+          "target_id": "<person_id>"
+        }
+      },
+      "insult": {
+        "payload": {
+          "target_id": "<person_id>"
+        }
+      },
+      "ask_for_money": {
+        "payload": {
+          "target_id": "<parent person_id>"
+        }
+      }
+    },
+    "self_actions": [
+      "try_for_baby",
+      "break_up",
+      "propose",
+      "call_off_engagement",
+      "plan_wedding",
+      "divorce",
+      "renew_vows",
+      "play_toys",
+      "arts_and_crafts",
+      "listen_to_music",
+      "meditate",
+      "gym",
+      "library",
+      "read_book",
+      "find_partner"
+    ],
+    "offer_actions": [
+      "doctor",
+      "witch_doctor",
+      "plastic_surgery",
+      "adoption"
+    ],
+    "pending_kinds": [
+      "argument",
+      "pregnancy",
+      "wedding_plan",
+      "date_offer",
+      "doctor_visit",
+      "witch_doctor",
+      "book_choice",
+      "plastic_surgery",
+      "adoption_offer",
+      "adoption_rename",
+      "baby_naming",
+      "funeral"
+    ],
+    "inputs_example": {
+      "_comment": "baby_naming and adoption_rename take bounded text inputs",
+      "resolve_decision_payload": {
+        "decision_id": "d_3",
+        "option_id": "name",
+        "inputs": {
+          "name": "Robin"
+        }
+      }
+    }
+  },
+  "delete_game_example": {
+    "_comment": "FROZEN destructive delete. B's UI owns the two-step confirm; the backend performs exactly one confirmed delete.",
+    "request": "DELETE /api/games/<game_id>",
+    "response_200": {
+      "deleted": true,
+      "game_id": "<game_id>"
+    },
+    "errors": {
+      "not_found_404": {
+        "error": {
+          "code": "not_found",
+          "message": "unknown game"
+        }
+      },
+      "internal_500": {
+        "error": {
+          "code": "internal_error",
+          "message": "the operation failed; no changes were applied"
+        }
+      }
+    },
+    "notes": [
+      "idempotent in effect: deleting an unknown game is 404",
+      "list_games no longer includes the game immediately",
+      "no replay ledger entry: deletion is not a replayable command"
+    ]
+  },
+  "lottery_example": {
+    "_comment": "FROZEN lottery action (row 37). Offer sampled at action time (winning numbers + next jackpot stored private, never rerolled); guesses arrive as bounded inputs at resolve.",
+    "action": "lottery",
+    "pending": {
+      "kind": "lottery",
+      "title": "Lottery",
+      "text": "Play the lottery today! Jackpot: $250,000. Guess the 4 winning numbers (1-20, unique).",
+      "options": [
+        {
+          "id": "buy_one",
+          "label": "Buy a ticket ($4)",
+          "known_costs": [
+            {
+              "label": "Ticket",
+              "amount": 4
+            }
+          ],
+          "inputs": [
+            {
+              "id": "numbers",
+              "type": "numbers",
+              "count": 4,
+              "min": 1,
+              "max": 20,
+              "unique": true,
+              "label": "Your numbers",
+              "required": true
+            }
+          ]
+        },
+        {
+          "id": "buy_ten",
+          "label": "Buy 10 tickets ($40)",
+          "known_costs": [
+            {
+              "label": "Tickets",
+              "amount": 40
+            }
+          ],
+          "inputs": [
+            {
+              "id": "numbers",
+              "type": "numbers",
+              "count": 4,
+              "min": 1,
+              "max": 20,
+              "unique": true,
+              "label": "Your numbers",
+              "required": true
+            }
+          ]
+        },
+        {
+          "id": "walk_away",
+          "label": "Walk away",
+          "known_costs": [],
+          "inputs": []
+        }
+      ]
+    },
+    "resolve_request": {
+      "decision_id": "d_5",
+      "option_id": "buy_one",
+      "inputs": {
+        "numbers": [
+          3,
+          7,
+          12,
+          19
+        ]
+      }
+    },
+    "errors": {
+      "not_allowed_409": {
+        "error": {
+          "code": "not_allowed",
+          "message": "this costs $4 and you have $1"
+        }
+      },
+      "invalid_input_400": {
+        "error": {
+          "code": "invalid_input",
+          "message": "numbers must be 4 unique integers between 1 and 20"
+        }
+      }
+    }
   }
 }

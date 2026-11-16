@@ -18,58 +18,27 @@
   </nav>
 </header>
 <main style="max-width:1100px;">
-  <div class="row" style="margin-bottom:8px;">
-    <button class="small" data-size="32">32 px</button>
-    <button class="small primary" data-size="128">128 px</button>
-    <span id="sizeLabel" style="color:#6b7280;font-weight:700;"></span>
-  </div>
   <h2>Skin tones × age stages (full matrix)</h2>
   <div class="grid" id="matrix"></div>
+  <h2>Hair × bases, facial hair, headwear</h2>
+  <div class="grid" id="hair"></div>
+  <h2>Badges & backgrounds</h2>
+  <div class="grid" id="extras"></div>
+  <h2>Looks</h2>
+  <div class="grid" id="looks"></div>
   <h2>Skin tones (single strip)</h2>
   <div class="grid" id="skins"></div>
   <h2>Age stages</h2>
   <div class="grid" id="ages"></div>
-  <h2>Hair × headwear overlaps (every catalog style × every hat)</h2>
-  <div class="grid" id="hair-hats"></div>
-  <h2>Glasses × earrings (all combinations)</h2>
-  <div class="grid" id="glasses-earrings"></div>
-  <h2>Eye shapes</h2><div class="grid" id="eye-shapes"></div>
-  <h2>Eyebrows</h2><div class="grid" id="brows"></div>
-  <h2>Noses</h2><div class="grid" id="noses"></div>
-  <h2>Mouths</h2><div class="grid" id="mouths"></div>
-  <h2>Face shapes</h2><div class="grid" id="face-shapes"></div>
-  <h2>Hair textures</h2><div class="grid" id="textures"></div>
-  <h2>Outfits</h2><div class="grid" id="outfits"></div>
-  <h2>Facial hair (adult)</h2><div class="grid" id="facial-hair"></div>
+<p class="muted" style="font-size:12px;margin-top:18px;">Avatars: <a href="https://github.com/microsoft/fluentui-emoji">Microsoft Fluent UI Emoji</a>, MIT licence.</p>
 </main>
 <script type="module">
-let size = 128;
-const GRIDS = ["matrix", "skins", "ages", "hair-hats", "glasses-earrings",
-               "eye-shapes", "brows", "noses", "mouths", "face-shapes",
-               "textures", "outfits", "facial-hair"];
-async function load() {
-  document.getElementById("sizeLabel").textContent = size + " px";
-  for (const kind of GRIDS) {
-    const el = document.getElementById(kind);
-    el.innerHTML = "Loading…";
-    const res = await fetch(`/api/grid/${kind}?size=${size}`);
-    if (!res.ok) {
-      el.innerHTML = `<span style="color:#a53b3b">failed: ${res.status}</span>`;
-      continue;
-    }
+for (const kind of ["matrix", "hair", "extras", "looks", "skins", "ages"]) {
+  const el = document.getElementById(kind);
+  fetch(`/api/grid/${kind}?size=128`).then(async (res) => {
     el.innerHTML = await res.text();
-  }
-}
-for (const b of document.querySelectorAll("[data-size]")) {
-  b.addEventListener("click", () => {
-    size = +b.dataset.size;
-    for (const x of document.querySelectorAll("[data-size]")) {
-      x.classList.toggle("primary", x === b);
-    }
-    load();
   });
 }
-load();
 </script>
 </body>
 </html>

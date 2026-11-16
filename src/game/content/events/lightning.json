@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "events": [
+    {
+      "id": "lightning_strike",
+      "title": "Lightning",
+      "text": "You were struck by lightning!",
+      "category": "adult",
+      "weight": 1,
+      "chance_n": 5000,
+      "conditions": {
+        "min_age": 5,
+        "once_per_lifetime": false,
+        "requires": []
+      },
+      "effects": {},
+      "auto": true,
+      "_comment": "Automatic event (schema v2.1 auto:true): applies the sampled outcome immediately at offer time and journals it. Weights 5/4/1 = good 1/2, bad 2/5, bad+death 1/10 (the legacy nested 1/5 death composed into the pick).",
+      "outcomes": [
+        {
+          "weight": 5,
+          "effects": {
+            "stats": {
+              "happiness": 100,
+              "health": 100,
+              "smarts": 100,
+              "looks": 100
+            }
+          },
+          "outcome_text": "I feel strangely energized."
+        },
+        {
+          "weight": 4,
+          "effects": {
+            "stats": {
+              "happiness": -100,
+              "health": -100,
+              "smarts": -100,
+              "looks": -100
+            }
+          },
+          "outcome_text": "I was badly hurt."
+        },
+        {
+          "weight": 1,
+          "effects": {
+            "stats": {
+              "happiness": -100,
+              "health": -100,
+              "smarts": -100,
+              "looks": -100
+            }
+          },
+          "outcome_text": "I died after being struck by lightning.",
+          "terminal": true
+        }
+      ]
+    }
+  ]
+}

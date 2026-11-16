@@ -1,0 +1,559 @@
+{
+  "schema_version": 2,
+  "_comment": "Original flavor events, childhood (ages 3-12). C content; frozen event-schema v2.1; existing condition/effect types only.",
+  "events": [
+    {
+      "id": "flavor_puddle_sailboat",
+      "title": "Regatta of One",
+      "text": "A perfect puddle has formed at the end of the street, and {name}'s paper boat is ready for its maiden voyage.",
+      "category": "childhood",
+      "weight": 1,
+      "conditions": {
+        "min_age": 3,
+        "max_age": 7,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "sail",
+          "label": "Launch the fleet",
+          "known_effects": [
+            "+happiness (6-10)",
+            "-health (1-4) \u2014 you got soaked"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  6,
+                  10
+                ]
+              },
+              "health": {
+                "randint": [
+                  1,
+                  4
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I raced the boat until the puddle won."
+        },
+        {
+          "id": "watch",
+          "label": "Watch from the dry sidewalk",
+          "known_effects": [
+            "+smarts (1-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  1,
+                  2
+                ]
+              }
+            }
+          },
+          "outcome_text": "I took notes on buoyancy like a tiny scientist."
+        }
+      ]
+    },
+    {
+      "id": "flavor_pet_rock",
+      "title": "A Very Good Rock",
+      "text": "A kid on the playground is offering a 'pet rock' with a painted face for a dollar. It is, objectively, the best rock {name} has ever seen.",
+      "category": "childhood",
+      "weight": 1,
+      "conditions": {
+        "min_age": 4,
+        "max_age": 9,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "min_money",
+            "value": 1
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "buy",
+          "label": "Buy the rock",
+          "known_effects": [
+            "-$1",
+            "+happiness (4-8)"
+          ],
+          "cost": {
+            "money": 1
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  4,
+                  8
+                ]
+              }
+            },
+            "money": -1
+          },
+          "outcome_text": "I named the rock Gerald and it never left the windowsill."
+        },
+        {
+          "id": "admire",
+          "label": "Admire it from afar",
+          "known_effects": [],
+          "cost": {
+            "money": 0
+          },
+          "effects": {},
+          "outcome_text": "I waved at Gerald as his new owner carried him home."
+        }
+      ]
+    },
+    {
+      "id": "flavor_vegetable_standoff",
+      "title": "The Broccoli Summit",
+      "text": "Dinner has become a negotiation. A single broccoli spear sits on {name}'s plate, and both sides are dug in.",
+      "category": "childhood",
+      "weight": 1,
+      "conditions": {
+        "min_age": 3,
+        "max_age": 9,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "alive",
+            "role": "mother"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "eat",
+          "label": "Eat the broccoli",
+          "known_effects": [
+            "+health (2-4)",
+            "+mother relationship (2-5)",
+            "-happiness (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "health": {
+                "randint": [
+                  2,
+                  4
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            },
+            "relationship": {
+              "role": "mother",
+              "delta": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            }
+          },
+          "outcome_text": "I ate the broccoli. It was, against all expectations, fine."
+        },
+        {
+          "id": "hide",
+          "label": "Hide it in a napkin",
+          "known_effects": [
+            "+happiness (2-4)",
+            "-mother relationship (3-6)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  4
+                ]
+              }
+            },
+            "relationship": {
+              "role": "mother",
+              "delta": {
+                "randint": [
+                  3,
+                  6
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I hid the broccoli. The dog was not fooled. The mother was."
+        }
+      ]
+    },
+    {
+      "id": "flavor_roof_rain",
+      "title": "Rain on the Tin Roof",
+      "text": "A storm knocked the power out, and {name}'s whole family is sitting in the dark listening to the rain drum on the roof.",
+      "category": "childhood",
+      "weight": 1,
+      "conditions": {
+        "min_age": 4,
+        "max_age": 12,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "stories",
+          "label": "Ask for stories",
+          "known_effects": [
+            "+happiness (3-6)",
+            "+smarts (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  6
+                ]
+              },
+              "smarts": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I heard the story of the year grandpa met a goat. It explained a lot."
+        },
+        {
+          "id": "sleep",
+          "label": "Fall asleep to the drumming",
+          "known_effects": [
+            "+health (2-5)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "health": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            }
+          },
+          "outcome_text": "I slept deeply while the rain did all the talking."
+        }
+      ]
+    },
+    {
+      "id": "flavor_school_trade",
+      "title": "The Lunchbox Exchange",
+      "text": "Someone at school wants to trade their fruit cup for {name}'s cookie. The fruit cup has cherries. The cookie has chocolate. This is complicated.",
+      "category": "childhood",
+      "weight": 1,
+      "conditions": {
+        "min_age": 6,
+        "max_age": 12,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "in_school"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "trade",
+          "label": "Make the trade",
+          "known_effects": [
+            "+health (1-3)",
+            "-happiness (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "health": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I ate cherries and thought about the cookie with quiet dignity."
+        },
+        {
+          "id": "keep",
+          "label": "Keep the cookie",
+          "known_effects": [
+            "+happiness (3-6)",
+            "-health (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  6
+                ]
+              },
+              "health": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I enjoyed every crumb of that cookie."
+        }
+      ]
+    },
+    {
+      "id": "flavor_bike_ramp",
+      "title": "The Ramp of Destiny",
+      "text": "The older kids built a ramp at the bottom of the hill. It is clearly too big for {name}'s bike, which is exactly why it matters.",
+      "category": "childhood",
+      "weight": 1,
+      "conditions": {
+        "min_age": 7,
+        "max_age": 12,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "jump",
+          "label": "Send it",
+          "known_effects": [
+            "+happiness (5-9)",
+            "-health (2-6)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  5,
+                  9
+                ]
+              },
+              "health": {
+                "randint": [
+                  2,
+                  6
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I caught two whole seconds of air and one week of bruises. Worth it."
+        },
+        {
+          "id": "decline",
+          "label": "Stick to the flat road",
+          "known_effects": [
+            "+smarts (1-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  1,
+                  2
+                ]
+              }
+            }
+          },
+          "outcome_text": "I watched someone else's bike get bent and felt very wise."
+        }
+      ]
+    },
+    {
+      "id": "flavor_lost_mitten",
+      "title": "The Case of the Missing Mitten",
+      "text": "One mitten is gone. Again. {name} is standing in the snow with a bare hand and a mystery.",
+      "category": "childhood",
+      "weight": 1,
+      "conditions": {
+        "min_age": 3,
+        "max_age": 9,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "search",
+          "label": "Retrace every step",
+          "known_effects": [
+            "+happiness (2-5)",
+            "-health (0-2) \u2014 cold hands"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              },
+              "health": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I found the mitten on the swings. Case closed."
+        },
+        {
+          "id": "ask",
+          "label": "Ask for help",
+          "known_effects": [
+            "+mother relationship (2-4)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "relationship": {
+              "role": "all_parents",
+              "delta": {
+                "randint": [
+                  2,
+                  4
+                ]
+              }
+            }
+          },
+          "outcome_text": "My parent produced a spare mitten from nowhere, like a magician."
+        }
+      ]
+    },
+    {
+      "id": "flavor_firefly_jar",
+      "title": "The Lightning Bug Jar",
+      "text": "{name} caught a jar full of lightning bugs, and the whole backyard is blinking like a tiny galaxy.",
+      "category": "childhood",
+      "weight": 1,
+      "conditions": {
+        "min_age": 4,
+        "max_age": 10,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "release",
+          "label": "Let them all go",
+          "known_effects": [
+            "+happiness (4-7)",
+            "+karma (2-4)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  4,
+                  7
+                ]
+              },
+              "karma": {
+                "randint": [
+                  2,
+                  4
+                ]
+              }
+            }
+          },
+          "outcome_text": "I opened the jar and the galaxy floated back into the dark."
+        },
+        {
+          "id": "keep",
+          "label": "Keep them on the nightstand",
+          "known_effects": [
+            "+happiness (2-3)",
+            "-karma (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  3
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I kept the jar one night, then felt bad and let them go anyway."
+        }
+      ]
+    }
+  ]
+}

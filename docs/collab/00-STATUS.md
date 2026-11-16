@@ -2,10 +2,10 @@
 
 | Agent | Current task (file) | State: working / blocked / done-awaiting-check | Blocked on / open question for Claude | Updated |
 |-------|---------------------|-----------------------------------------------|---------------------------------------|---------|
-| Kimi A | | | | |
-| Kimi B | M2 machinery done; next: M2a screens + dev-panel UI once shapes freeze | blocked | A's frozen M2 api-examples.json + dev scenario-start service function (spec addendum) — per speed-up rule 1, no coding against unfrozen shapes; M1 fix round done awaiting Codex consolidated review | 2026-11-16 |
-| Kimi C | | | | |
-| Kimi D | M2a browser scenarios (06-task-kimi-d.md) | blocked | Shapes frozen (api-examples.json) + assertion layer built/self-tested; waiting on A's dev scenario starts to make M2a-S1..S6 executable | 2026-11-16 |
-| Codex | M0+M1 consolidated review complete (docs/collab/M01-consolidated-review.md) | done-awaiting-check | PASS for user testing; minor polish listed; await Claude's next consolidated-review signal | 2026-11-16 |
+| Kimi A | Phase map reverted to FINAL v4 legacy parity (mortality before work_income, education before debt_service); scenario factory canonical 10 ids incl. low_performance_30 dev hook; D's soft-lock + live-shape bugs fixed with regressions; self-check list gained the no-soft-locks rule | done-awaiting-check | none — game suites 73 OK; OWN event pipeline landed per Claude's arbitration: event-schema.json ACTIVE DRAFT (C reviews), src/game/events.py loader (validation incl. soft-lock rule, EventEngine, GameContext), bundled.json fit-proof generated 1:1 from M1 templates, decision_offer now serves from DATA FILES (fallback to legacy code), 9 loader tests green. Still blocked only on C's resolve_choice inputs forwarding (3 baby scenario tests). M2b wiring complete otherwise. | 2026-11-16 |
+| Kimi B | HALTED — M2 final (Claude-verified); 72 unit tests green at halt | halted | A: badges validation + unresolvable kinds + scenario drives; C: odd relationship-drift journal text; D: avatar_sheet import; DELETE shape still needed | 2026-11-16 |
+| Kimi C | HALTED — M2 final (verified by Claude). Final state: 183 rule tests + 51 appearance tests green; fix round fully integrated (pre_effects/pre_applied, sample_independent split, deaths instruction, relation_year, snapshot filter, karma passthrough); 88 content events; parity matrix audit-complete | halted | None — awaiting user testing and commit; no new work until Claude says go | 2026-11-16 |
+| Kimi D | M2 QA/tooling/evidence | halted | Final: 739 PASS / 0 FAIL / 1 PENDING (kidnapping, Claude's written-approved deferral, expires on A's force_event hook) / 7 WARN. All checks green; HALT per Claude, M2 final | 2026-11-16 |
+| Codex | HALT — M2 final, verified by Claude; awaiting user testing and commit | halted | No active edits or tests. Last full suite: 415 OK (10 skips); browser: 737 PASS / 0 FAIL / 1 approved PENDING / 7 WARN. Do not resume until Claude says go. | 2026-11-16 |
 
 Questions here are ALSO sent to Claude (hc send t7); this table is the source of truth so that none get lost.

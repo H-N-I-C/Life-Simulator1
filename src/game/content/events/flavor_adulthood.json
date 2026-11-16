@@ -1,0 +1,762 @@
+{
+  "schema_version": 2,
+  "_comment": "Original flavor events, adulthood (ages 18-59).",
+  "events": [
+    {
+      "id": "flavor_office_plant",
+      "title": "The Dying Office Plant",
+      "text": "A neglected plant on {name}'s desk has entered its final act. Coworkers walk past slowly, like it is a hospital.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 18,
+        "max_age": 59,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "employed"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "rescue",
+          "label": "Become its personal physician",
+          "known_effects": [
+            "+happiness (2-5)",
+            "-$10 for soil and hope"
+          ],
+          "cost": {
+            "money": 10
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            },
+            "money": -10
+          },
+          "outcome_text": "I repotted the plant. Two weeks later, a single brave leaf appeared."
+        },
+        {
+          "id": "compost",
+          "label": "Let nature take its course",
+          "known_effects": [
+            "-happiness (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "The plant went to the big windowsill in the sky."
+        }
+      ]
+    },
+    {
+      "id": "flavor_neighbor_ladder",
+      "title": "The Ladder Incident",
+      "text": "{name}'s neighbor is standing under a wobbling ladder, holding a gutter, radiating false confidence.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 18,
+        "max_age": 59,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "help",
+          "label": "Hold the ladder",
+          "known_effects": [
+            "+karma (3-5)",
+            "+happiness (2-4)",
+            "-health (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "karma": {
+                "randint": [
+                  3,
+                  5
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  2,
+                  4
+                ]
+              },
+              "health": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I held the ladder. The gutter is fixed and both ankles survived."
+        },
+        {
+          "id": "wave",
+          "label": "Wave and keep walking",
+          "known_effects": [
+            "+happiness (0-1)",
+            "-karma (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  0,
+                  1
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I waved. The ladder wobbled on, unwitnessed."
+        }
+      ]
+    },
+    {
+      "id": "flavor_surprise_raise_pitch",
+      "title": "A Friend's Big Ask",
+      "text": "An old friend wants to start a food truck and asks {name} to invest. The business plan is a napkin. The napkin is confident.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 18,
+        "max_age": 59,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "min_money",
+            "value": 500
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "invest",
+          "label": "Invest $500",
+          "known_effects": [
+            "-$500",
+            "+happiness (3-6) \u2014 faith in a friend"
+          ],
+          "cost": {
+            "money": 500
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  6
+                ]
+              }
+            },
+            "money": -500
+          },
+          "outcome_text": "I invested. The truck, at last report, serves 'experimental dumplings' to four brave regulars."
+        },
+        {
+          "id": "decline",
+          "label": "Wish them luck (buy nothing)",
+          "known_effects": [
+            "+happiness (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I wished the napkin-business well and kept the wallet shut."
+        }
+      ]
+    },
+    {
+      "id": "flavor_marathon_bet",
+      "title": "The Charity Fun Run",
+      "text": "Coworkers dared {name} to join the charity fun run. The cause is good. The knees are skeptical.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 18,
+        "max_age": 49,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "employed"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "run",
+          "label": "Run it",
+          "known_effects": [
+            "-$15 entry",
+            "+health (3-7)",
+            "+happiness (2-5)",
+            "-happiness (0-2) \u2014 knees"
+          ],
+          "cost": {
+            "money": 15
+          },
+          "effects": {
+            "stats": {
+              "health": {
+                "randint": [
+                  3,
+                  7
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            },
+            "money": -15
+          },
+          "outcome_text": "I finished 214th and raised real money. The knees filed a complaint."
+        },
+        {
+          "id": "sponsor",
+          "label": "Just sponsor the runners",
+          "known_effects": [
+            "-$10",
+            "+karma (1-3)"
+          ],
+          "cost": {
+            "money": 10
+          },
+          "effects": {
+            "stats": {
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            },
+            "money": -10
+          },
+          "outcome_text": "I sponsored the team from a comfortable chair."
+        },
+        {
+          "id": "cheer",
+          "label": "Cheer from the curb (free)",
+          "known_effects": [
+            "+happiness (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            }
+          },
+          "outcome_text": "I cheered loudly from a folding chair. Zero dollars, full heart."
+        }
+      ]
+    },
+    {
+      "id": "flavor_power_outage_potluck",
+      "title": "Blackout Potluck",
+      "text": "The whole street lost power, and someone suggested a candlelight potluck on the sidewalk. {name} owns one flashlight and a can of beans with opinions.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 18,
+        "max_age": 59,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "join",
+          "label": "Bring the beans",
+          "known_effects": [
+            "+happiness (3-7)",
+            "+karma (1-3)",
+            "+relationship (2-4)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  7
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            },
+            "relationship": {
+              "role": "random_relation",
+              "delta": {
+                "randint": [
+                  2,
+                  4
+                ]
+              }
+            }
+          },
+          "outcome_text": "My beans were, shockingly, the hit of the blackout."
+        },
+        {
+          "id": "home",
+          "label": "Stay home with the flashlight",
+          "known_effects": [
+            "+smarts (1-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  1,
+                  2
+                ]
+              }
+            }
+          },
+          "outcome_text": "I read by flashlight and heard the party through the wall."
+        }
+      ]
+    },
+    {
+      "id": "flavor_dentist_prize",
+      "title": "The Cavity Lottery",
+      "text": "{name} has been flossing for six months purely out of spite, and the dentist's verdict is coming.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 18,
+        "max_age": 59,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "clean",
+          "label": "Strut in confidently",
+          "known_effects": [
+            "-$60 checkup",
+            "+health (2-4)",
+            "+happiness (2-5)"
+          ],
+          "cost": {
+            "money": 60
+          },
+          "effects": {
+            "stats": {
+              "health": {
+                "randint": [
+                  2,
+                  4
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            },
+            "money": -60
+          },
+          "outcome_text": "'No cavities,' the dentist said, deflated. I floated home."
+        },
+        {
+          "id": "avoid",
+          "label": "Skip it this year",
+          "known_effects": [
+            "+$60 unspent",
+            "-health (2-5)",
+            "-happiness (0-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "health": {
+                "randint": [
+                  2,
+                  5
+                ],
+                "sign": -1
+              },
+              "happiness": {
+                "randint": [
+                  0,
+                  2
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I saved $60 and gained a tiny shadow of doubt."
+        }
+      ]
+    },
+    {
+      "id": "flavor_wedding_toast",
+      "title": "The Unexpected Toast",
+      "text": "At a cousin's wedding, the microphone is suddenly in {name}'s hand and two hundred relatives are waiting.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 18,
+        "max_age": 59,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "toast",
+          "label": "Give the toast",
+          "known_effects": [
+            "+happiness (4-8)",
+            "-happiness (0-3) \u2014 depending on the joke"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  4,
+                  8
+                ]
+              }
+            }
+          },
+          "outcome_text": "My toast made the bride laugh and the grandmother cry. Perfect."
+        },
+        {
+          "id": "pass",
+          "label": "Pass it to someone braver",
+          "known_effects": [
+            "+happiness (1-2)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  2
+                ]
+              }
+            }
+          },
+          "outcome_text": "I passed the microphone like a hot coal."
+        }
+      ]
+    },
+    {
+      "id": "flavor_layoff_scare",
+      "title": "The Rumor Mill",
+      "text": "A memo says the company is 'optimizing synergies.' Nobody knows what it means, but everyone's updating their resumes.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 18,
+        "max_age": 59,
+        "once_per_lifetime": true,
+        "requires": [
+          {
+            "kind": "employed"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "id": "network",
+          "label": "Update everything and network",
+          "known_effects": [
+            "+smarts (2-4)",
+            "-happiness (1-3)",
+            "+stress (3-7)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "smarts": {
+                "randint": [
+                  2,
+                  4
+                ]
+              },
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ],
+                "sign": -1
+              },
+              "stress": {
+                "randint": [
+                  3,
+                  7
+                ]
+              }
+            }
+          },
+          "outcome_text": "I updated the resume. The synergy, so far, spared everyone."
+        },
+        {
+          "id": "zen",
+          "label": "Serenely ignore it",
+          "known_effects": [
+            "+happiness (1-3)",
+            "-stress (2-5)",
+            "-smarts (0-1)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  3
+                ]
+              },
+              "stress": {
+                "randint": [
+                  2,
+                  5
+                ],
+                "sign": -1
+              },
+              "smarts": {
+                "randint": [
+                  0,
+                  1
+                ],
+                "sign": -1
+              }
+            }
+          },
+          "outcome_text": "I chose peace. The memo was never seen again."
+        }
+      ]
+    },
+    {
+      "id": "flavor_street_performer",
+      "title": "The Bucket Drummer",
+      "text": "A street musician is playing buckets outside the station like they owe him money, and a crowd is gathering.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 18,
+        "max_age": 59,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "tip",
+          "label": "Drop a few dollars in the hat",
+          "known_effects": [
+            "-$3-8",
+            "+happiness (3-6)",
+            "+karma (1-3)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  6
+                ]
+              },
+              "karma": {
+                "randint": [
+                  1,
+                  3
+                ]
+              }
+            },
+            "money": {
+              "randint": [
+                3,
+                8
+              ],
+              "sign": -1
+            }
+          },
+          "outcome_text": "I tipped. The drummer nodded in perfect rhythm."
+        },
+        {
+          "id": "listen",
+          "label": "Stay for one song, no tip",
+          "known_effects": [
+            "+happiness (1-4)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  1,
+                  4
+                ]
+              }
+            }
+          },
+          "outcome_text": "I stayed for one song. It became three."
+        }
+      ]
+    },
+    {
+      "id": "flavor_garden_tomatoes",
+      "title": "The Tomato Glut",
+      "text": "{name}'s garden has produced forty tomatoes at once. FORTY. The neighbors are hiding behind their curtains.",
+      "category": "adult",
+      "weight": 1,
+      "conditions": {
+        "min_age": 25,
+        "max_age": 59,
+        "once_per_lifetime": true,
+        "requires": []
+      },
+      "choices": [
+        {
+          "id": "share",
+          "label": "Doorbell-tomato everyone",
+          "known_effects": [
+            "+happiness (3-6)",
+            "+karma (2-4)",
+            "+relationship (2-5)"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  3,
+                  6
+                ]
+              },
+              "karma": {
+                "randint": [
+                  2,
+                  4
+                ]
+              }
+            },
+            "relationship": {
+              "role": "random_relation",
+              "delta": {
+                "randint": [
+                  2,
+                  5
+                ]
+              }
+            }
+          },
+          "outcome_text": "I became the tomato fairy of the neighborhood."
+        },
+        {
+          "id": "sauce",
+          "label": "Make a heroic batch of sauce",
+          "known_effects": [
+            "+$30-60 sauce sales",
+            "-happiness (0-3) \u2014 kitchen chaos"
+          ],
+          "cost": {
+            "money": 0
+          },
+          "effects": {
+            "stats": {
+              "happiness": {
+                "randint": [
+                  0,
+                  3
+                ],
+                "sign": -1
+              }
+            },
+            "money": {
+              "randint": [
+                30,
+                60
+              ]
+            }
+          },
+          "outcome_text": "I sold jars of sauce to people who now fear the word 'harvest'."
+        }
+      ]
+    }
+  ]
+}

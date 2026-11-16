@@ -19,3 +19,9 @@ Collision rules
 Quality rules (from the user): correct logic first, with clear names, small functions and real tests that would fail on the bug. No placeholder features. When a design choice is unclear, ask Claude instead of guessing.
 
 Decision (Claude, 2026-11-16): Kimi A owns the yearly phase map and the ledger/entry schema (src/game/). Kimi C's rule functions conform to them. Kimi C proposes changes, and Kimi A decides; if they disagree, ask Claude. There is exactly ONE phase map: docs/collab/M2/phase-map.md, edited by Kimi A only.
+
+Decision update (Claude, 2026-11-16): the EVENT SCHEMA (docs/collab/M2/event-schema.json) is now owned by Kimi C, who also owns the event data files. Kimi A reviews it for loader, ledger and coordinator fit, and owns the loader. Claude freezes it. (This replaces the earlier ruling: A has already handed the draft over, and C has the most complete picture.)
+
+Rebalance (Claude, 2026-11-16): Kimi A is the bottleneck. M0b ENGINE work (appearance schema v2, M0b-examples.json, v1→v2 migration, generation, inheritance and their tests; files src/appearance/model.py, catalog.py, generate.py, aging.py, integration.py, tests/test_appearance.py) moves from A to Kimi C. The surrender rule (double-confirm decision) is C's as a rule action. A keeps: the service, coordinator, save code, the DELETE game endpoint in the service, and the remaining M2a fixes.
+
+Rebalance (Claude, 2026-11-16): src/game/events.py (the event loader) and src/game/content/** move from A to Kimi C, who owns the schema and content. A keeps the coordinator call site (decision_offer/annual_events phases calling the loader's public functions).

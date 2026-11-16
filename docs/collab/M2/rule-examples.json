@@ -49,7 +49,7 @@
       "item_cursor": 0
     },
     "finished_turn": false,
-    "_money_note": "amounts ILLUSTRATIVE until C's annual_income_quote lands with real tax brackets; executable fixture must assert gross - tax - expenses == net exactly"
+    "_money_note": "Real values from C's annual_income_quote: quote(30000, True, 40, 0.6) = gross 30000 / tax 3401 / expenses 10640 / net 15959; executable assertion in tests/test_rules_income.py AnnualIncomeQuoteTest. Rounding: deterministic integers, residual to expenses, no posting-time RNG."
   },
   "multi_account_example": {
     "_comment": "income phase with TWO accounts: player and working child. Child income posts to the CHILD's account, not the household. Posting keys differ by account_id, so no collision.",
@@ -297,5 +297,127 @@
     "balance_after": 31250,
     "description": "Annual gross salary",
     "group_id": null
+  },
+  "continuation_chain_example": {
+    "_comment": "C-updated (2026-11-16, Claude decision): order FLIPPED \u2014 work_income(4) -> education(6) -> debt_service(5) -> family_events(7) \u2014 so a new graduate's loan principal (education) is repaid in the SAME year (legacy timing). Executable mirror: tests/test_rules_continuations.py.",
+    "chain": [
+      {
+        "phase_id": "work_income",
+        "result_continuation": {
+          "phase_id": "education",
+          "item_cursor": 0
+        },
+        "money_entries": [
+          {
+            "phase": "work_income",
+            "occurrence_id": "salary",
+            "leg": "gross",
+            "account_owner_id": "<player person_id>",
+            "category": "income",
+            "amount": 30000,
+            "description": "Annual gross pay"
+          },
+          {
+            "phase": "work_income",
+            "occurrence_id": "salary",
+            "leg": "tax",
+            "account_owner_id": "<player person_id>",
+            "category": "tax",
+            "amount": -3401,
+            "description": "Income tax"
+          },
+          {
+            "phase": "work_income",
+            "occurrence_id": "salary",
+            "leg": "expenses",
+            "account_owner_id": "<player person_id>",
+            "category": "expenses",
+            "amount": -10640,
+            "description": "Living expenses"
+          }
+        ]
+      },
+      {
+        "phase_id": "education",
+        "result_continuation": {
+          "phase_id": "debt_service",
+          "item_cursor": 0
+        },
+        "money_entries": []
+      },
+      {
+        "phase_id": "debt_service",
+        "result_continuation": {
+          "phase_id": "family_events",
+          "item_cursor": 0
+        },
+        "money_entries": [
+          {
+            "phase": "debt_service",
+            "occurrence_id": "student_loan",
+            "leg": "repay",
+            "account_owner_id": "<player person_id>",
+            "category": "loan_repay",
+            "amount": -1200,
+            "description": "Student loan repayment"
+          }
+        ]
+      }
+    ],
+    "pending_interruption_example": {
+      "_comment": "work_income offers voluntary retirement: the chain pauses; resolving returns the continuation AFTER the decision, i.e. debt_service. Re-resolution is a no-op (applied marker).",
+      "pending_kind": "retirement_offer",
+      "continuation_after_resolve": {
+        "phase_id": "education",
+        "item_cursor": 0
+      }
+    }
+  },
+  "executable_examples_c": {
+    "_comment": "C-added (2026-11-16). Executable mirror: tests/test_rules_continuations.py. Frozen shapes unchanged; examples only. Scenarios A requested:",
+    "two_choices_one_phase": {
+      "scenario": "education phase at 17 yields a university_application decision; accepting an accepted application yields a SECOND decision (university_funding) from the same phase \u2014 two stored choices, each with private sampled data, resumed in order.",
+      "first_decision": {
+        "kind": "university_application",
+        "options": [
+          "apply",
+          "decline"
+        ]
+      },
+      "second_decision": {
+        "kind": "university_funding",
+        "options": [
+          "scholarship",
+          "student_loan",
+          "parents"
+        ]
+      },
+      "continuation_after_first": "funding pending (same phase, next item)",
+      "continuation_after_second": {
+        "phase_id": "family_events",
+        "item_cursor": 0
+      }
+    },
+    "two_people_note": {
+      "status": "pending M2b/M2c rules",
+      "note": "True two-people single-phase choices are family_events (divorce partner A then child event B) and two-account income (child_money_year); both are C-owned extractions not yet implemented. Shapes shown in two_choices_one_phase_example/two_people_example remain the frozen target; C will add the executable version with M2b."
+    },
+    "debt_before_family": {
+      "scenario": "canonical order work_income -> education -> debt_service -> family_events; a student loan repayment posts in debt_service AFTER education, so a fresh graduate's principal is repaid in the same year (legacy timing).",
+      "order": [
+        "work_income",
+        "education",
+        "debt_service",
+        "family_events"
+      ]
+    },
+    "interruption_after_one_posting": {
+      "scenario": "work_income result computed; command fails before posting; the phase is re-run with the SAME rng state (A replays the persisted stream) producing byte-ident money entries, so A's Ledger idempotent keys return the original rows \u2014 no double credit.",
+      "player_keys": [
+        "t_000042:work_income:salary:<player person_id>:gross",
+        "t_000042:work_income:salary:<player person_id>:tax",
+        "t_000042:work_income:salary:<player person_id>:expenses"
+      ]
+    }
   }
 }

@@ -183,3 +183,36 @@ test_render 14 OK, test_web_m1 26 OK.
 - [x] Focused tests pass under PYTHONHASHSEED 0/1/42.
 - [x] UI: keyboard/focus verified in real browser; phone-width screenshots
       clean; every person surface has an avatar; contrast ≥ 4.5:1.
+
+### Addendum 2 (M01 consolidated review items 1–4)
+1. **Hair-side white patches closed.** Reproduced across all 21 styles at
+   ages 8/16/30 with dark hair on light and dark skin. Fixes: the scalp cap
+   now hugs the skull (0.8-unit overhang) and its side coverage reaches eye
+   level; the rounded fringe is a temple-to-temple cubic that stays low at
+   the sides; slick_back gained short sideburns to close its temple gap;
+   curtains and long/bob front strands now overlap the head edge instead of
+   floating beside it. Verified clean at full resolution on both skin tones.
+2. **Elder recession evidence** with matched seeds: seed 10 recedes (raised
+   hairline, thinner top), seed 40 keeps full grey hair — same style, same
+   age 70: docs/collab/evidence/avatars/elder_recession_seeds10_40.png.
+   Matches A's ~35%-of-seeds rule; a single repeated matrix seed is not a
+   population sample.
+3. **Stat bars consolidated:** one `.stat .fill` rule set (green ≥60 /
+   amber ≥35 / red <35) with numeric labels always shown, so meaning never
+   relies on colour alone; duplicate CSS rules removed.
+4. **Favicon:** /static/favicon.svg served (200) and linked on all four
+   pages.
+
+Avatar sheets regenerated via D's tool (30 sheets). Focused tests: 40 OK.
+
+## Self-check (00-SELF-CHECK.md) — addendum 2
+- [x] Tests use real renderer/service; no mocks.
+- [x] Fixes verified with failing-before evidence (Codex's sheet showed the
+      patches; seed-10/40 contrast demonstrates the renderer change).
+- [x] No RNG added; renderer remains seed-deterministic.
+- [x] No new inputs/endpoints.
+- [x] Money/identity/save items: no engine changes (B scope).
+- [x] Only owned files edited; no balance changes.
+- [x] Focused tests pass (test_render 14, test_web_m1 26).
+- [x] UI: colours + labels (not colour-only), favicon resolves, phone-width
+      screenshots clean.

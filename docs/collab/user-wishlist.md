@@ -1,0 +1,25 @@
+# User wishlist
+
+## Romance & Family pack — scheduled RIGHT AFTER M2 (before or alongside M3), user decision 2026-11-16
+Included: dating depth, relationship drama, weddings & marriage, parenting & kids.
+
+Core rule (user): romance and marriage like CK3 — any adult character can romance or marry any other adult character. Nothing is hard-blocked except the limits below. Everything else is MODIFIERS (acceptance chance, opinion, reputation, legal and religious consequences), driven by religion, culture, local laws and personal traits:
+- same-sex and opposite-sex relationships
+- multiple partners, concubines, polygamy (legal or illegal by religion and law; scandal if illegal)
+- relatives, step-family and in-laws (opinion/reputation penalties by religion and law; CK3-style consanguinity health risks for children)
+- large age gaps between adults, cross-class and cross-religion relationships, affairs and secret lovers
+Hard limits (non-negotiable, set by Claude): both characters must be adults (18+) for anything romantic or sexual; teens 13–17 may only date same-age teens (14–17, within 2 years), non-sexually; nothing romantic below 13. NPCs have their own acceptance, so consent matters.
+
+Needs new systems: religion (beliefs, tenets that set the modifiers, conversion), local laws per country (marriage types, legality), character orientation/attraction as a modifier, reputation/scandal, secrecy and discovery.
+
+Feature list (to be specced by Codex after M2):
+- Dating: apps, blind dates, first-date choices, compatibility (traits/interests/religion), chemistry over time, flirting, rejection.
+- Drama: cheating and affairs, jealousy, getting caught, forgiveness, exes returning, in-laws, money and child-rearing fights.
+- Weddings & marriage: planning (guests, dress, venue, honeymoon), anniversaries, prenups, vow renewal, marital happiness over the years, multiple spouses where allowed.
+- Parenting: parenting styles, kids' personalities and milestones, requests, teen troubles, grandchildren, family holidays.
+- Family tree view (pulled forward from M8 if needed for relatives/consanguinity).
+
+### Update (user, 2026-11-16)
+- No marriage restrictions in the rules: everything is a modifier (religion, law, culture, relation, orientation, class, age gap, existing spouses).
+- Character editor (like BitLife's character editing): the player can edit characters' attributes AND these romance modifiers later in play, e.g. attraction/orientation, religion and its tenets, culture, personal openness, jealousy, monogamy preference, and local law toggles. Edits apply immediately and persist in saves.
+- The only fixed limit (Claude, not editable): romance, sex and marriage require both characters to be 18+. The editor cannot change a character's age to get around this, and age edits can't make a minor eligible.
