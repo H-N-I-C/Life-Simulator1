@@ -1,0 +1,8 @@
+public enum CULT_PHILOSOPHY
+{
+	NONE = 0,
+	ALIEN = 1,
+	ANTI_ESTABLISHMENT = 2,
+	ARMAGEDDON = 3,
+	NEW_AGE = 4
+}

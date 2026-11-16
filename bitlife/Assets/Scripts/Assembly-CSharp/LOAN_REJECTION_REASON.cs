@@ -1,0 +1,7 @@
+public enum LOAN_REJECTION_REASON
+{
+	NONE = 0,
+	FINANCES = 1,
+	NO_JOB = 2,
+	NUMBER_OF_LOANS = 3
+}

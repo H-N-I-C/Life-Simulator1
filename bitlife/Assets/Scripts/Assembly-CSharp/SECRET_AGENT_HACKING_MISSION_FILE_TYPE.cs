@@ -1,0 +1,8 @@
+public enum SECRET_AGENT_HACKING_MISSION_FILE_TYPE
+{
+	NONE = 0,
+	AUDIO = 1,
+	VIDEO = 2,
+	IMAGE = 3,
+	TEXT = 4
+}

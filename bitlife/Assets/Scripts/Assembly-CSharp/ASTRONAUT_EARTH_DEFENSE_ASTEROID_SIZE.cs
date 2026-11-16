@@ -1,0 +1,9 @@
+public enum ASTRONAUT_EARTH_DEFENSE_ASTEROID_SIZE
+{
+	NONE = 0,
+	HUGE = 1,
+	LARGE = 2,
+	MEDIUM = 3,
+	SMALL = 4,
+	TINY = 5
+}

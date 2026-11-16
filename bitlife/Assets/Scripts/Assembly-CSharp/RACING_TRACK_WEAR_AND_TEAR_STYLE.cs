@@ -1,0 +1,6 @@
+public enum RACING_TRACK_WEAR_AND_TEAR_STYLE
+{
+	NORMAL = 0,
+	SKIP = 1,
+	EXTRA = 2
+}

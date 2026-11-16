@@ -1,0 +1,13 @@
+public enum MUSIC_ROLE
+{
+	NONE = 0,
+	SINGER = 1,
+	GUITARIST = 2,
+	BASSIST = 3,
+	DRUMMER = 4,
+	KEYBOARDIST = 5,
+	PIANIST = 6,
+	VIOLINIST = 7,
+	CELLIST = 8,
+	SAXOPHONIST = 9
+}

@@ -1,0 +1,7 @@
+public enum BUSINESS_COMPANY_HEALTH
+{
+	NONE = 0,
+	BAD = 1,
+	AVERAGE = 2,
+	GOOD = 3
+}

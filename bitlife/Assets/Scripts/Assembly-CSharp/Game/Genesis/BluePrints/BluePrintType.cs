@@ -1,0 +1,41 @@
+namespace Game.Genesis.BluePrints
+{
+	public enum BluePrintType
+	{
+		None = 0,
+		Random = 1,
+		Crime = 2,
+		FriendRecruit = 3,
+		BankBalance = 5,
+		Paywall = 6,
+		Lawsuit = 7,
+		RewardedVideo = 8,
+		DefendLawsuit = 9,
+		AskOut = 10,
+		Compliment = 11,
+		Conversation = 12,
+		Gift = 13,
+		GiveMoney = 14,
+		Hookup = 15,
+		Insult = 16,
+		Party = 17,
+		SpendTime = 18,
+		Argue = 19,
+		SafeSex = 20,
+		AttackHero = 21,
+		NpcAttacks = 22,
+		HeroDeath = 4,
+		SendHeroToPrison = 23,
+		SendHeroToJuvie = 24,
+		ModifyEntity = 25,
+		CreateEntity = 26,
+		InitFeatureContainer = 27,
+		AddToGfcCollection = 28,
+		AssignEntity = 29,
+		SetGenesisVar = 30,
+		AddToCappedCollection = 31,
+		RemoveFromGfcCollection = 32,
+		AssignSlot = 33,
+		Telemetry = 35
+	}
+}

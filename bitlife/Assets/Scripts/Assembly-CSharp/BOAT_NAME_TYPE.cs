@@ -1,0 +1,7 @@
+public enum BOAT_NAME_TYPE
+{
+	NONE = 0,
+	PRIVATE = 1,
+	COMMERCIAL = 2,
+	PIRATE = 4
+}

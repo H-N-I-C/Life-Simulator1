@@ -1,0 +1,10 @@
+public enum STREET_TYPE
+{
+	RESIDENTIAL = 1,
+	RURAL = 2,
+	CITY = 3,
+	COMMUNE = 4,
+	DEALER = 5,
+	CASINO = 6,
+	RACING_GARAGE = 7
+}

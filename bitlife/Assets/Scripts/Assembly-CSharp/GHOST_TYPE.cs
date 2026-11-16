@@ -1,0 +1,9 @@
+public enum GHOST_TYPE
+{
+	GHOST = 0,
+	PHANTOM = 1,
+	SPECTER = 2,
+	DEMON = 3,
+	POLTERGEIST = 4,
+	BANSHEE = 5
+}

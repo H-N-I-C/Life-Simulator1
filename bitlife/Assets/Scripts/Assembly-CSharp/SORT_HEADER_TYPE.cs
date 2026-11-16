@@ -1,0 +1,5 @@
+public enum SORT_HEADER_TYPE
+{
+	CEMETERY = 0,
+	LEADERBOARDS = 1
+}

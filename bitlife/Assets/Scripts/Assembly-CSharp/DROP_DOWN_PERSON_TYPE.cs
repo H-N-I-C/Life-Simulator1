@@ -1,0 +1,8 @@
+public enum DROP_DOWN_PERSON_TYPE
+{
+	PARENT = 0,
+	LOVER = 1,
+	SIBLING = 2,
+	CHILD = 3,
+	FRIEND = 4
+}

@@ -1,0 +1,6 @@
+public enum MINESWEEPER_OUTCOME
+{
+	FAIL = 0,
+	SUCCESS = 1,
+	DESERT = 2
+}

@@ -1,0 +1,9 @@
+public enum RECREATIONAL_VEHICLE_TYPE
+{
+	NONE = 0,
+	RV = 1,
+	ATV = 2,
+	DIRT_BIKE = 3,
+	MOUNTAIN_BIKE = 4,
+	ROAD_BIKE = 5
+}

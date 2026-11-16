@@ -1,0 +1,5 @@
+public enum MILITARY_STATUS
+{
+	ENLISTED = 1,
+	OFFICER = 2
+}

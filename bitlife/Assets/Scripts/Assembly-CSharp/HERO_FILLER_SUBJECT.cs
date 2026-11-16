@@ -1,0 +1,12 @@
+public enum HERO_FILLER_SUBJECT
+{
+	NONE = 0,
+	CHILD = 1,
+	FATHER = 2,
+	MOTHER = 3,
+	SIBLING = 4,
+	LOVER = 5,
+	GRANDCHILD = 6,
+	FAMILIAR = 7,
+	MAKER = 8
+}

@@ -1,0 +1,9 @@
+public enum CULT_PROPERTY_TYPE
+{
+	NONE = 0,
+	HERMITAGE = 1,
+	HUNTING_LODGE = 2,
+	RETREAT = 3,
+	SANCTUARY = 4,
+	COMPOUND = 5
+}

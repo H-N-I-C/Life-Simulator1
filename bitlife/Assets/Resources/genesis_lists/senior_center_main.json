@@ -1,0 +1,156 @@
+{
+  "ListID": "senior_center_main",
+  "Title": "Senior Center",
+  "PresentationMode": "Normal",
+  "Items": [
+    {
+      "Title": "Seniors",
+      "SecondLine": "",
+      "Subtitle": "",
+      "Icon": "old-person-male",
+      "BarGraph": {
+        "Title": "Relationship",
+        "Value": "{genesis.seniorcenterrelationshipstrength}",
+        "Style": "LOW_IS_RED",
+        "Bubbles": 1,
+        "TwoLine": false
+      },
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ListID": "senior_center_seniors"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Activities",
+      "IsSeparator": true
+    },
+    {
+      "Title": "Bingo",
+      "SecondLine": "Win the small bucks",
+      "Icon": "game-dice",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "SENIOR_CENTER_BINGO",
+              "ScenarioFile": "genesis_senior_center"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Excursions",
+      "SecondLine": "Go on adventures, carefully",
+      "Icon": "cityscape",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "SENIOR_CENTER_EXCURSION",
+              "ScenarioFile": "genesis_senior_center"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Start Drama",
+      "SecondLine": "Make a scene",
+      "Icon": "shout",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "SENIOR_CENTER_DRAMA",
+              "ScenarioFile": "genesis_senior_center"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Swing",
+      "SecondLine": "Swing with other couples",
+      "Icon": "women-bunny-ears",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "SENIOR_CENTER_SWING",
+              "ScenarioFile": "genesis_senior_center",
+              "Condition": [
+                {"Expression": "{hero.HasLover}"},
+                {"Expression": "{genesis.AutoNumSwingSearches} < 3"},
+                {"Expression": "{genesis.AutoNumSwingCompleted} < 3"}
+              ]
+            }
+          ]
+        },
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "SENIOR_CENTER_SWING_SINGLE",
+              "ScenarioFile": "genesis_senior_center",
+              "Condition": [
+                {"Expression": "!{hero.HasLover}"}                
+              ]
+            }
+          ]
+        },
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "SENIOR_CENTER_SWING_NO_FOUND",
+              "ScenarioFile": "genesis_senior_center"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Water Aerobics",
+      "SecondLine": "Stretch your muscles",
+      "Icon": "woman-water-polo",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "SENIOR_CENTER_WATER_AEROBICS",
+              "ScenarioFile": "genesis_senior_center",
+              "Condition": [
+                {"Expression" : "{genesis.AutoNumTimesDidAerobics} < 3"}
+              ],
+              "Methods": [
+                "{memory.AutoNumTimesDidAerobics={genesis.AutoNumTimesDidAerobics}+1}",
+                "{game.Hero.ImpactHealth(1)}"
+              ]
+            }
+          ]
+        },
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "SENIOR_CENTER_WATER_AEROBICS_NOIMPACT",
+              "ScenarioFile": "genesis_senior_center"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

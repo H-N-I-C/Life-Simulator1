@@ -1,0 +1,8 @@
+public enum CULT_LEAVE_REASON
+{
+	NONE = 0,
+	EDUCATE = 1,
+	LOYALTY = 2,
+	OFFERING = 3,
+	CEREMONY = 4
+}

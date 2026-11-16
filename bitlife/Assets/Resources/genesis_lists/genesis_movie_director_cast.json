@@ -1,0 +1,292 @@
+{
+  "ListID": "genesis_movie_director_cast",
+  "Title": "CAST",
+  "PresentationMode": "Normal",
+  "Sections": [
+    {
+      "Items": [
+        {
+          "TileID": "tile.movieDirector.castRole.lead.vacant",
+          "Title": "<film.cast.lead.character_name>",
+          "Subtitle": "<film.cast.lead.role_type> Role",
+          "SecondLine": "Post a casting call for this role",
+          "Icon": "movie-director_cast",
+          "IsVisible": "[film.cast.lead.actor_id=]",
+          "EntityObjectDataFocusTag": "<film.cast.lead>",
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last>>scenario.movieDirector.castingCall",
+                  "ScenarioFile": "genesis_movie_director"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "TileID": "tile.movieDirector.castRole.lead.vacant.dead",
+          "Title": "Lead Role",
+          "SecondLine": "Post a casting call for this role",
+          "Icon": "movie-director_cast",
+          "IsVisible": "![film.cast.lead.actor_id=]![film.cast.lead.alive=true]",
+          "EntityObjectDataFocusTag": "<film.cast.lead>",
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last>>BP_MODIFY_ENTITY=entity:roles_cast_count=<function:max:<function:sub:<film.roles_cast_count>:1>:0>,cast.lead.salary=0>>BP_ASSIGN_SLOT=film.cast.lead.actor_id:->>BP_SET_GENESIS_VAR=mdLeadCastFilled:false>>scenario.movieDirector.castingCall",
+                  "ScenarioFile": "genesis_movie_director"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "TileID": "tile.movieDirector.castRole.lead.filled",
+          "Title": "<film.cast.lead.name>",
+          "Subtitle": "Lead Role",
+          "Icon": "<film.cast.lead.emoji>",
+          "ButtonStyle": "arrow",
+          "IsVisible": "[film.cast.lead.alive=true]",
+          "EntityObjectDataFocusTag": "<film.cast.lead>",
+          "FocusEntityReference": "<film.cast.lead.actor_id>",
+          "FocusMemoryKey": "npc",
+          "BarGraph": {
+            "Title": "Performance",
+            "Value": "<film.cast.lead.performance>",
+            "Style": "LOW_IS_RED"
+          },
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_SET_GENESIS_VAR=mdTelemetryProjectId:<film.entityid>>>BP_SET_GENESIS_VAR=mdTelemetryRoleName:<focus_data.character_name>"
+                },
+                {
+                  "ListID": "genesis_movie_cast_hub"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "TileID": "tile.movieDirector.castRole.support_1.vacant",
+          "Title": "<film.cast.support_1.character_name>",
+          "Subtitle": "<film.cast.support_1.role_type> Role",
+          "SecondLine": "Post a casting call for this role",
+          "Icon": "movie-director_cast",
+          "IsVisible": "[film.cast.support_1.actor_id=]",
+          "EntityObjectDataFocusTag": "<film.cast.support_1>",
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last>>scenario.movieDirector.castingCall_support_1",
+                  "ScenarioFile": "genesis_movie_director"
+                }
+              ]
+            }
+          ],
+          "IsEnabled": "{genesis.mdLeadCastFilled}&&[film.cast.lead.alive=true]"
+        },
+        {
+          "TileID": "tile.movieDirector.castRole.support_1.vacant.dead",
+          "Title": "<film.cast.support_1.character_name>",
+          "Subtitle": "<film.cast.support_1.role_type> Role",
+          "SecondLine": "Post a casting call for this role",
+          "Icon": "movie-director_cast",
+          "IsVisible": "![film.cast.support_1.actor_id=]![film.cast.support_1.alive=true]",
+          "EntityObjectDataFocusTag": "<film.cast.support_1>",
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last>>BP_MODIFY_ENTITY=entity:roles_cast_count=<function:max:<function:sub:<film.roles_cast_count>:1>:0>,cast.support_1.salary=0>>BP_ASSIGN_SLOT=film.cast.support_1.actor_id:->>BP_SET_GENESIS_VAR=mdSupport1CastFilled:false>>scenario.movieDirector.castingCall_support_1",
+                  "ScenarioFile": "genesis_movie_director"
+                }
+              ]
+            }
+          ],
+          "IsEnabled": "{genesis.mdLeadCastFilled}&&[film.cast.lead.alive=true]"
+        },
+        {
+          "TileID": "tile.movieDirector.castRole.support_1.filled",
+          "Title": "<film.cast.support_1.name>",
+          "Subtitle": "Supporting Role",
+          "Icon": "<film.cast.support_1.emoji>",
+          "ButtonStyle": "arrow",
+          "IsVisible": "[film.cast.support_1.alive=true]",
+          "EntityObjectDataFocusTag": "<film.cast.support_1>",
+          "FocusEntityReference": "<film.cast.support_1.actor_id>",
+          "FocusMemoryKey": "npc",
+          "BarGraph": {
+            "Title": "Performance",
+            "Value": "<film.cast.support_1.performance>",
+            "Style": "LOW_IS_RED"
+          },
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_SET_GENESIS_VAR=mdTelemetryProjectId:<film.entityid>>>BP_SET_GENESIS_VAR=mdTelemetryRoleName:<focus_data.character_name>"
+                },
+                {
+                  "ListID": "genesis_movie_cast_hub_support_1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "TileID": "tile.movieDirector.castRole.support_2.vacant",
+          "Title": "<film.cast.support_2.character_name>",
+          "Subtitle": "<film.cast.support_2.role_type> Role",
+          "SecondLine": "Post a casting call for this role",
+          "Icon": "movie-director_cast",
+          "IsVisible": "[film.main_cast_size>=3][film.cast.support_2.actor_id=]",
+          "EntityObjectDataFocusTag": "<film.cast.support_2>",
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last>>scenario.movieDirector.castingCall_support_2",
+                  "ScenarioFile": "genesis_movie_director"
+                }
+              ]
+            }
+          ],
+          "IsEnabled": "{genesis.mdLeadCastFilled}&&[film.cast.lead.alive=true]"
+        },
+        {
+          "TileID": "tile.movieDirector.castRole.support_2.vacant.dead",
+          "Title": "<film.cast.support_2.character_name>",
+          "Subtitle": "<film.cast.support_2.role_type> Role",
+          "SecondLine": "Post a casting call for this role",
+          "Icon": "movie-director_cast",
+          "IsVisible": "[film.main_cast_size>=3]![film.cast.support_2.actor_id=]![film.cast.support_2.alive=true]",
+          "EntityObjectDataFocusTag": "<film.cast.support_2>",
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last>>BP_MODIFY_ENTITY=entity:roles_cast_count=<function:max:<function:sub:<film.roles_cast_count>:1>:0>,cast.support_2.salary=0>>BP_ASSIGN_SLOT=film.cast.support_2.actor_id:->>BP_SET_GENESIS_VAR=mdSupport2CastFilled:false>>scenario.movieDirector.castingCall_support_2",
+                  "ScenarioFile": "genesis_movie_director"
+                }
+              ]
+            }
+          ],
+          "IsEnabled": "{genesis.mdLeadCastFilled}&&[film.cast.lead.alive=true]"
+        },
+        {
+          "TileID": "tile.movieDirector.castRole.support_2.filled",
+          "Title": "<film.cast.support_2.name>",
+          "Subtitle": "Supporting Role",
+          "Icon": "<film.cast.support_2.emoji>",
+          "ButtonStyle": "arrow",
+          "IsVisible": "[film.main_cast_size>=3][film.cast.support_2.alive=true]",
+          "EntityObjectDataFocusTag": "<film.cast.support_2>",
+          "FocusEntityReference": "<film.cast.support_2.actor_id>",
+          "FocusMemoryKey": "npc",
+          "BarGraph": {
+            "Title": "Performance",
+            "Value": "<film.cast.support_2.performance>",
+            "Style": "LOW_IS_RED"
+          },
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_SET_GENESIS_VAR=mdTelemetryProjectId:<film.entityid>>>BP_SET_GENESIS_VAR=mdTelemetryRoleName:<focus_data.character_name>"
+                },
+                {
+                  "ListID": "genesis_movie_cast_hub_support_2"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "TileID": "tile.movieDirector.castRole.support_3.vacant",
+          "Title": "<film.cast.support_3.character_name>",
+          "Subtitle": "<film.cast.support_3.role_type> Role",
+          "SecondLine": "Post a casting call for this role",
+          "Icon": "movie-director_cast",
+          "IsVisible": "[film.main_cast_size>=4][film.cast.support_3.actor_id=]",
+          "EntityObjectDataFocusTag": "<film.cast.support_3>",
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last>>scenario.movieDirector.castingCall_support_3",
+                  "ScenarioFile": "genesis_movie_director"
+                }
+              ]
+            }
+          ],
+          "IsEnabled": "{genesis.mdLeadCastFilled}&&[film.cast.lead.alive=true]"
+        },
+        {
+          "TileID": "tile.movieDirector.castRole.support_3.vacant.dead",
+          "Title": "<film.cast.support_3.character_name>",
+          "Subtitle": "<film.cast.support_3.role_type> Role",
+          "SecondLine": "Post a casting call for this role",
+          "Icon": "movie-director_cast",
+          "IsVisible": "[film.main_cast_size>=4]![film.cast.support_3.actor_id=]![film.cast.support_3.alive=true]",
+          "EntityObjectDataFocusTag": "<film.cast.support_3>",
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last>>BP_MODIFY_ENTITY=entity:roles_cast_count=<function:max:<function:sub:<film.roles_cast_count>:1>:0>,cast.support_3.salary=0>>BP_ASSIGN_SLOT=film.cast.support_3.actor_id:->>BP_SET_GENESIS_VAR=mdSupport3CastFilled:false>>scenario.movieDirector.castingCall_support_3",
+                  "ScenarioFile": "genesis_movie_director"
+                }
+              ]
+            }
+          ],
+          "IsEnabled": "{genesis.mdLeadCastFilled}&&[film.cast.lead.alive=true]"
+        },
+        {
+          "TileID": "tile.movieDirector.castRole.support_3.filled",
+          "Title": "<film.cast.support_3.name>",
+          "Subtitle": "Supporting Role",
+          "Icon": "<film.cast.support_3.emoji>",
+          "ButtonStyle": "arrow",
+          "IsVisible": "[film.main_cast_size>=4][film.cast.support_3.alive=true]",
+          "EntityObjectDataFocusTag": "<film.cast.support_3>",
+          "FocusEntityReference": "<film.cast.support_3.actor_id>",
+          "FocusMemoryKey": "npc",
+          "BarGraph": {
+            "Title": "Performance",
+            "Value": "<film.cast.support_3.performance>",
+            "Style": "LOW_IS_RED"
+          },
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_SET_GENESIS_VAR=mdTelemetryProjectId:<film.entityid>>>BP_SET_GENESIS_VAR=mdTelemetryRoleName:<focus_data.character_name>"
+                },
+                {
+                  "ListID": "genesis_movie_cast_hub_support_3"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

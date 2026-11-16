@@ -1,0 +1,6 @@
+public enum DEALER_STREET_PERSON_TYPE
+{
+	NORMAL = 0,
+	POLICE = 1,
+	RIVAL_DEALER = 2
+}

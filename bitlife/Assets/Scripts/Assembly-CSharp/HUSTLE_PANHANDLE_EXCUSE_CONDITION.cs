@@ -1,0 +1,6 @@
+public enum HUSTLE_PANHANDLE_EXCUSE_CONDITION
+{
+	DEFAULT = 0,
+	CHILD = 1,
+	PET = 2
+}

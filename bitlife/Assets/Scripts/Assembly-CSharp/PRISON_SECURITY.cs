@@ -1,0 +1,7 @@
+public enum PRISON_SECURITY
+{
+	MINIMUM = 1,
+	MEDIUM = 2,
+	MAXIMUM = 3,
+	JUVENILE = 4
+}

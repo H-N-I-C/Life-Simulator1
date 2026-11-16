@@ -1,0 +1,10 @@
+public enum LOVER_RELATIONSHIP_STATUS
+{
+	NONE = 0,
+	DATING = 1,
+	ENGAGED = 2,
+	MARRIED = 3,
+	DIVORCED = 4,
+	HOOKUP = 5,
+	THREESOME = 6
+}

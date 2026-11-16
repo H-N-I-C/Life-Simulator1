@@ -1,0 +1,6 @@
+public enum SCHOOL_FRAT_STATUS
+{
+	INACTIVE = 0,
+	ACTIVE = 1,
+	QUIT = 2
+}

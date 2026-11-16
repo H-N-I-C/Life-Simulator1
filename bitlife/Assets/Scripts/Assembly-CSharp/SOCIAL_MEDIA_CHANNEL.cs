@@ -1,0 +1,11 @@
+public enum SOCIAL_MEDIA_CHANNEL
+{
+	NONE = 0,
+	FACEBOOK = 1,
+	INSTAGRAM = 2,
+	TIKTOK = 3,
+	TWITTER = 4,
+	YOUTUBE = 5,
+	TWITCH = 6,
+	ONLYFANS = 7
+}

@@ -1,0 +1,7 @@
+public enum SCENARIO_CREATOR_BUTTON
+{
+	DISMISS = 0,
+	ADD = 1,
+	REMOVE = 2,
+	EXIT_EDIT_MODE = 3
+}

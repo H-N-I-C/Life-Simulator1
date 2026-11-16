@@ -1,0 +1,7 @@
+public enum CRUISE_CABIN
+{
+	INTERIOR = 0,
+	OCEAN_VIEW = 1,
+	BALCONY = 2,
+	SUITE = 3
+}

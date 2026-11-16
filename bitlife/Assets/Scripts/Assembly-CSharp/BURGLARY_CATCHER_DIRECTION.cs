@@ -1,0 +1,5 @@
+public enum BURGLARY_CATCHER_DIRECTION
+{
+	LEFT = 0,
+	RIGHT = 1
+}

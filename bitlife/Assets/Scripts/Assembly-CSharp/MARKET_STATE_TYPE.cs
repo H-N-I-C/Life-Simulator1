@@ -1,0 +1,9 @@
+public enum MARKET_STATE_TYPE
+{
+	NONE = 0,
+	DOWNWARD_TREND = 1,
+	UPWARD_TREND = 2,
+	COLLAPSE = 3,
+	STABLE = 4,
+	BUBBLE = 5
+}

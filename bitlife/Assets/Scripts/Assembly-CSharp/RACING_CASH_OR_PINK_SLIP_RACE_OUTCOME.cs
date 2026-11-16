@@ -1,0 +1,7 @@
+public enum RACING_CASH_OR_PINK_SLIP_RACE_OUTCOME
+{
+	NONE = 0,
+	WIN = 1,
+	LOSE = 2,
+	DRAW = 3
+}

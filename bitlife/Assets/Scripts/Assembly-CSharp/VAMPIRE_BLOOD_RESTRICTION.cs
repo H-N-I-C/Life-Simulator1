@@ -1,0 +1,7 @@
+public enum VAMPIRE_BLOOD_RESTRICTION
+{
+	NONE = 0,
+	GENDER = 1,
+	SEXUALITY = 2,
+	PROFESSION = 3
+}

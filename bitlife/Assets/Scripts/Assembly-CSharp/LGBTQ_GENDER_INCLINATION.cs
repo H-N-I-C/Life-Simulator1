@@ -1,0 +1,6 @@
+public enum LGBTQ_GENDER_INCLINATION
+{
+	NONE = 0,
+	OPPOSITE = 1,
+	OTHER = 2
+}

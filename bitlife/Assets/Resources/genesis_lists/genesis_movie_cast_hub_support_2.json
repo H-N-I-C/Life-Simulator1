@@ -1,0 +1,246 @@
+{
+  "ListID": "genesis_movie_cast_hub_support_2",
+  "Title": "CAST MEMBER",
+  "IsVisible": "[film.cast.support_2.alive=true]",
+  "PresentationMode": "Normal",
+  "Items": [
+    {
+      "TileID": "tile.movieDirector.castMemberProfile.support_2",
+      "SpecialItem": "PersonProfile",
+      "Subtitle": "<focus_data.role_type>",
+      "FocusMemoryKey": "npc",
+      "FocusEntityReference": "<film.cast.support_2.actor_id>",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "scenario.movieDirector.profile_fromCastmember",
+              "ScenarioFile": "genesis_movie_director"
+            }
+          ]
+        }
+      ],
+      "EntityObjectDataFocusTag": "<film.cast.support_2>"
+    },
+    {
+      "TileID": "tile.movieDirector.edit",
+      "SpecialItem": "GodMode",
+      "FocusMemoryKey": "npc"
+    },
+    {
+      "SpecialItem": "Divider",
+      "Title": "Activities"
+    },
+    {
+      "TileID": "tile.movieDirector.askOut.support_2",
+      "Title": "Ask Out",
+      "SecondLine": "Ask <film.cast.support_2.him|her> out",
+      "Icon": "heart-red",
+      "FocusMemoryKey": "npc",
+      "IsVisible": "!{npc.IsCurrentLover}",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "scenario.movieDirector.loveInterest",
+              "ScenarioFile": "genesis_movie_director"
+            }
+          ]
+        }
+      ],
+      "EntityObjectDataFocusTag": "<film.cast.support_2>",
+      "FocusEntityReference": "<film.cast.support_2.actor_id>"
+    },
+    {
+      "TileID": "tile.movieDirector.befriend.support_2",
+      "Title": "Befriend",
+      "SecondLine": "Befriend <film.cast.support_2.him|her>",
+      "Icon": "handshake",
+      "FocusMemoryKey": "npc",
+      "IsVisible": "!{npc.IsFriend}&&!{npc.IsCurrentLover}",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "scenario.movieDirector.befriend",
+              "ScenarioFile": "genesis_movie_director"
+            }
+          ]
+        }
+      ],
+      "EntityObjectDataFocusTag": "<film.cast.support_2>",
+      "FocusEntityReference": "<film.cast.support_2.actor_id>"
+    },
+    {
+      "TileID": "tile.movieDirector.coach.support_2",
+      "Title": "Coach",
+      "SecondLine": "Coach <film.cast.support_2.him|her>",
+      "Icon": "users",
+      "FocusMemoryKey": "npc",
+      "ActionList": [
+        {
+          "Index": 0,
+          "AdvancedLogic": {
+            "cases": [
+              {
+                "if": {
+                  "expression": "(<npc:coaching_used> < 3) && (<npc:acting> <= 40)"
+                },
+                "then": {
+                  "route_options": [
+                    {
+                      "route_to": "BP_MODIFY_ENTITY=npc:performance=+1,coaching_used=+1>>scenario.movieDirector.onceMoreFromTheTop",
+                      "scenario_file": "genesis_movie_director",
+                      "weight": 70
+                    },
+                    {
+                      "route_to": "BP_MODIFY_ENTITY=npc:performance=+2,coaching_used=+1>>scenario.movieDirector.onceMoreFromTheTop",
+                      "scenario_file": "genesis_movie_director",
+                      "weight": 20
+                    },
+                    {
+                      "route_to": "BP_MODIFY_ENTITY=npc:performance=+3,coaching_used=+1>>scenario.movieDirector.onceMoreFromTheTop",
+                      "scenario_file": "genesis_movie_director",
+                      "weight": 10
+                    }
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "expression": "(<npc:coaching_used> < 3) && (<npc:acting> <= 80)"
+                },
+                "then": {
+                  "route_options": [
+                    {
+                      "route_to": "BP_MODIFY_ENTITY=npc:performance=+1,coaching_used=+1>>scenario.movieDirector.onceMoreFromTheTop",
+                      "scenario_file": "genesis_movie_director",
+                      "weight": 20
+                    },
+                    {
+                      "route_to": "BP_MODIFY_ENTITY=npc:performance=+2,coaching_used=+1>>scenario.movieDirector.onceMoreFromTheTop",
+                      "scenario_file": "genesis_movie_director",
+                      "weight": 50
+                    },
+                    {
+                      "route_to": "BP_MODIFY_ENTITY=npc:performance=+3,coaching_used=+1>>scenario.movieDirector.onceMoreFromTheTop",
+                      "scenario_file": "genesis_movie_director",
+                      "weight": 30
+                    }
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "expression": "(<npc:coaching_used> < 3)"
+                },
+                "then": {
+                  "route_options": [
+                    {
+                      "route_to": "BP_MODIFY_ENTITY=npc:performance=+1,coaching_used=+1>>scenario.movieDirector.onceMoreFromTheTop",
+                      "scenario_file": "genesis_movie_director",
+                      "weight": 10
+                    },
+                    {
+                      "route_to": "BP_MODIFY_ENTITY=npc:performance=+2,coaching_used=+1>>scenario.movieDirector.onceMoreFromTheTop",
+                      "scenario_file": "genesis_movie_director",
+                      "weight": 30
+                    },
+                    {
+                      "route_to": "BP_MODIFY_ENTITY=npc:performance=+3,coaching_used=+1>>scenario.movieDirector.onceMoreFromTheTop",
+                      "scenario_file": "genesis_movie_director",
+                      "weight": 60
+                    }
+                  ]
+                }
+              }
+            ],
+            "else_when_no_matches": {
+              "route_options": [
+                {
+                  "route_to": "BP_TELEMETRY=BitLife_MovieDirectorCastInteraction|ProjectID:{genesis.mdTelemetryProjectId};ActorName:<npc:name>;RoleName:{genesis.mdTelemetryRoleName};InteractionType:coach;InteractionResult:fail;RelationshipPct:<npc:relationship>>>scenario.movieDirector.letSRunIt",
+                  "scenario_file": "genesis_movie_director"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "EntityObjectDataFocusTag": "<film.cast.support_2>",
+      "FocusEntityReference": "<film.cast.support_2.actor_id>"
+    },
+    {
+      "TileID": "tile.movieDirector.compliment.support_2",
+      "Title": "Compliment",
+      "SecondLine": "Compliment <film.cast.support_2.him|her>",
+      "Icon": "face-kiss",
+      "FocusMemoryKey": "npc",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "scenario.movieDirector.geeYouReSwell",
+              "ScenarioFile": "genesis_movie_director"
+            }
+          ]
+        }
+      ],
+      "EntityObjectDataFocusTag": "<film.cast.support_2>",
+      "FocusEntityReference": "<film.cast.support_2.actor_id>"
+    },
+    {
+      "TileID": "tile.movieDirector.fire.support_2",
+      "Title": "Fire",
+      "SecondLine": "Fire <film.cast.support_2.him|her>",
+      "Icon": "fire",
+      "ConfirmationString": "Are you sure you want to fire <film.cast.support_2.first_name> from your film? Their salary will be returned to your casting budget.",
+      "FocusMemoryKey": "npc",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "Condition": [
+                {
+                  "Expression": "{genesis.mdFilmStarted}"
+                }
+              ],
+              "ScenarioID": "scenario.movieDirector.inTooDeep",
+              "ScenarioFile": "genesis_movie_director"
+            },
+            {
+              "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last>>scenario.movieDirector.offMySet_support_2",
+              "ScenarioFile": "genesis_movie_director"
+            }
+          ]
+        }
+      ],
+      "EntityObjectDataFocusTag": "<film.cast.support_2>"
+    },
+    {
+      "TileID": "tile.movieDirector.hookUp.support_2",
+      "Title": "Hook Up",
+      "SecondLine": "Hook up with <film.cast.support_2.him|her>",
+      "Icon": "heart-black",
+      "FocusMemoryKey": "npc",
+      "IsVisible": "!{npc.IsCurrentLover}",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "scenario.movieDirector.hookUp",
+              "ScenarioFile": "genesis_movie_director"
+            }
+          ]
+        }
+      ],
+      "EntityObjectDataFocusTag": "<film.cast.support_2>",
+      "FocusEntityReference": "<film.cast.support_2.actor_id>"
+    }
+  ]
+}

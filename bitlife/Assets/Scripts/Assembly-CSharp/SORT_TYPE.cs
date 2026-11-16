@@ -1,0 +1,10 @@
+public enum SORT_TYPE
+{
+	DATE_PLAYED = 0,
+	LEGACY = 1,
+	NET_WORTH = 2,
+	RIBBON = 3,
+	AGE = 4,
+	CHILDREN = 5,
+	LOVERS = 6
+}

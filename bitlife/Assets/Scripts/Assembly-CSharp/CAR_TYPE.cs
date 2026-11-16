@@ -1,0 +1,16 @@
+public enum CAR_TYPE
+{
+	HATCHBACK = 1,
+	COUPE = 2,
+	CONVERTIBLE = 3,
+	SEDAN = 4,
+	WAGON = 5,
+	SUV = 6,
+	MINIVAN = 7,
+	TRUCK = 8,
+	EXOTIC = 9,
+	FOURBYFOUR = 10,
+	HEARSE = 11,
+	STOCK_CAR = 12,
+	FORMULA = 13
+}

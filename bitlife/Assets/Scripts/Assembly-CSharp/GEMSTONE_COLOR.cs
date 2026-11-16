@@ -1,0 +1,15 @@
+public enum GEMSTONE_COLOR
+{
+	BLACK = 1,
+	BLUE = 2,
+	CLEAR = 3,
+	GREEN = 4,
+	INDIGO = 5,
+	PEARL = 6,
+	PURPLE = 7,
+	RED = 8,
+	YELLOW = 9,
+	ORANGE = 10,
+	TURQUOISE = 11,
+	PINK = 12
+}

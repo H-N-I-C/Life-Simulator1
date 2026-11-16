@@ -1,0 +1,6 @@
+public enum ASTRONAUT_MISSION_SCENARIO_TYPE
+{
+	NONE = 0,
+	DESCENT = 1,
+	LIFTOFF = 2
+}

@@ -1,0 +1,9 @@
+public enum MAGAZINE_POSE_TYPE
+{
+	NONE = 0,
+	CLOTHED = 1,
+	SWIMSUIT = 2,
+	TOPLESS = 3,
+	NUDE = 4,
+	CENTERFOLD = 5
+}

@@ -1,0 +1,7 @@
+public enum FIGHTING_DISPLAY_FONT_SIZE
+{
+	NONE = 0,
+	SMALL = 1,
+	MEDIUM = 2,
+	LARGE = 3
+}

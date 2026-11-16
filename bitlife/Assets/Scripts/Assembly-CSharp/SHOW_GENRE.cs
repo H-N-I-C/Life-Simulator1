@@ -1,0 +1,13 @@
+public enum SHOW_GENRE
+{
+	NONE = 0,
+	ACTION = 1,
+	CRIME = 2,
+	DOCUDRAMA = 3,
+	DRAMA = 4,
+	FANTASY = 5,
+	SITCOM = 6,
+	SOAP_OPERA = 7,
+	TELENOVELA = 8,
+	CHILDRENS = 9
+}

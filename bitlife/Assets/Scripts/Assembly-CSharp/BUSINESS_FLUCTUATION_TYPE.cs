@@ -1,0 +1,6 @@
+public enum BUSINESS_FLUCTUATION_TYPE
+{
+	NONE = 0,
+	INCREASE = 1,
+	DECREASE = 2
+}

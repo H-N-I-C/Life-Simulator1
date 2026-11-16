@@ -1,0 +1,6 @@
+public enum AUCTION_HOUSE_TYPE
+{
+	NONE = 0,
+	STORAGE_UNIT = 1,
+	REGULAR_AUCTION = 2
+}

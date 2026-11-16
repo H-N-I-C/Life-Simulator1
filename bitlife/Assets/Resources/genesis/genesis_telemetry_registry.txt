@@ -1,0 +1,29 @@
+event_name,properties,cooldown,ActiveFrom,ActiveUntil,owner,status
+Fixture_TelemetryEvergreen,"ProbeString:string:derived;ProbeInt:int:derived",none,,,QA-fixture,live
+Fixture_TelemetryExpired,"ProbeString:string:derived",none,,2020-01-01T00:00:00Z,QA-fixture,approved
+Fixture_TelemetryFuture,"ProbeString:string:derived",none,2999-01-01T00:00:00Z,,QA-fixture,approved
+# ── Movie Director — workbook-authoritative permanent GameEvents (evergreen). ──
+BitLife_MovieDirectorProjectPitched,"ProjectID:string:<object:entityid>;Result:{hired,rejected}:route-derived;MovieTitle:string:<film.title>;Studio:string:<film.studio>;Genre:string:<film.genre>;Subgenre:string:<film.subgenre>;Rating:string:<film.rating>;Budget:int:<film.budget>;Compensation:int:<film.compensation>;ScriptQuality:int:<film.script_quality>;DirectorReputation:int:<GFC.movie_director.DirectorReputation>;EffectiveReputation:int:derived;ToneChoice:string:<film.tone>;ThemeChoice:string:<film.theme>;IsExecContactRvUsed:int:route-derived;NumFilmsReleasedLifetime:int:<GFC.movie_director.FilmsReleased>",none,,,Chen (data),approved
+BitLife_MovieDirectorFinishBudget,"ProjectID:string:<object:entityid>;MovieTitle:string:<film.title>;BudgetTotal:int:<film.budget>;BudgetAllocated:string:<film.budget_special_effects>/<film.budget_production_design>/<film.budget_marketing> (slash-delimited, brace-free scalar)",none,,,Chen (data),approved
+BitLife_MovieDirectorFinishCastRole,"ProjectID:string:<object:entityid>;RoleName:string:<film.cast.{role}.character_name>;RoleType:{Lead,Supporting}:<film.cast.{role}.role_type>;ActorName:string:<film.cast.{role}.name>;ActorCompensation:int:<film.cast.{role}.salary>;ActorActingSkill:int:<film.cast.{role}.acting>;ActorFame:int:<film.cast.{role}.fame>;NumRolesCast:int:<function:count_alive_slots:film:cast.lead:cast.support_1:cast.support_2:cast.support_3>;NumRolesTotal:int:<film.main_cast_size>",none,,,Chen (data),approved
+BitLife_MovieDirectorFinishFilmingSession,"ProjectID:string:<object:entityid>;SessionNumber:int:<film.film_activities_count>;FilmingProgressPct:int:{genesis.mdFilmProgress}",none,,,Chen (data),approved
+BitLife_MovieDirectorCastInteraction,"ProjectID:string:<object:entityid>;ActorName:string:route-resolved;RoleName:string:<film.cast.{role}.character_name>;InteractionType:{compliment,coach,fire_actor,date,befriend,hook_up,inquire}:route-modeled;InteractionResult:{success,fail,neutral}:route-derived;RelationshipPct:int:route-resolved",none,,,Chen (data),approved
+BitLife_MovieDirectorProjectReleased,"ProjectID:string:<object:entityid>;MovieTitle:string:<film.title>;Genre:string:<film.genre>;Studio:string:<film.studio>;Budget:int:<film.budget>;Reception:int:<film.audience_reception_score>;DirectorReputationPost:int:<GFC.movie_director.DirectorReputation>;NumFilmsReleasedLifetime:int:<GFC.movie_director.FilmsReleased>",none,,,Chen (data),approved
+BitLife_MovieDirectorProjectAbandoned,"ProjectID:string:<object:entityid>;PhaseAtExit:{budget,casting,filming,post_production}:container-flag-derived;FilmingProgressPct:int:{genesis.mdFilmProgress};Reason:{player_quit,life_ended}:route-derived",none,,,Chen (data),approved
+BitLife_MovieDirectorAwardOutcome,"ProjectID:string:<object:entityid>;MovieTitle:string:<film.title>;Origin:{player_submission,ageup_narrative}:route-modeled;AwardName:string:route-modeled;Result:{won,lost,not_selected}:route-derived;IsCeremonyAttended:int:route-derived;NumAwardsWonLifetime:int:<GFC.movie_director.awardsWon>",none,,,Chen (data),approved
+MovieDirector_Completed_Pitch,,none,,,,approved
+MovieDirector_Completed_ContractOffer,,none,,,,approved
+MovieDirector_Completed_Production_Budget,,none,,,,approved
+MovieDirector_Win_AwardSeason,,none,,,,approved
+MovieDirector_Win_Asscar_Award,,none,,,,approved
+MovieDirector_Win_SilverGlobes_Award,,none,,,,approved
+MovieDirector_Win_Bitcademy_Award,,none,,,,approved
+MovieDirector_Completed_Filmography,,none,,,,approved
+MovieDirector_Submit_FilmFestival,,none,,,,approved
+MovieDirector_Win_BestDirector,,none,,,,approved
+MovieDirector_Hookup_Actors,,none,,,,approved
+Temp_BitLife_Md_TeaserScenario1Viewed,,none,,,Chen (data),approved
+Temp_BitLife_Md_TeaserScenario2Viewed,,none,,,Chen (data),approved
+Temp_BitLife_Md_TeaserScenario3Viewed,,none,,,Chen (data),approved
+Temp_BitLife_Md_TeaserScenario4Viewed,,none,,,Chen (data),approved
+Temp_BitLife_Md_TeaserScenario5Viewed,"Result:{win,lose}:view-derived",none,,,Chen (data),approved

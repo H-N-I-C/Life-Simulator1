@@ -1,0 +1,65 @@
+tag_id,description,example,cache_tag_for_value
+<number:naturalX-Y>,A random natural number between X and Y (inclusive).,"Sentence with tag:
+You opened the drawer and saw <number:natural10-12000> cockroaches.
+
+Assume the game draws:
+6413
+
+Conversion:
+You opened the drawer and saw 6413 cockroaches.",<cache.number:naturalX-Y.value>
+<number:naturalX-Y_roundup_10>,"Same behavior as <number:naturalX-Y>, except the calculated end result is rounded up to the nearest 10. The logic is: (1) make a draw in the range, (2) round up to nearest 10.","Sentence with tag:
+You opened the drawer and saw <number:natural10-12000_roundup_10> cockroaches.
+
+Assume the game draws:
+6413
+
+Conversion:
+You opened the drawer and saw 6420 cockroaches.",<cache.number:naturalX-Y_roundup_10.value>
+<number:naturalX-Y_roundup_100>,"Same behavior as <number:naturalX-Y>, except the calculated end result is rounded up to the nearest 100. The logic is: (1) make a draw in the range, (2) round up to nearest 100.","Sentence with tag:
+You opened the drawer and saw <number:natural10-12000_roundup_100> cockroaches.
+
+Assume the game draws:
+6413
+
+Conversion:
+You opened the drawer and saw 6500 cockroaches.",<cache.number:naturalX-Y_roundup_100.value>
+<number:naturalX-Y_roundup_1000>,"Same behavior as <number:naturalX-Y>, except the calculated end result is rounded up to the nearest 1000. The logic is: (1) make a draw in the range, (2) round up to nearest 1000.","Sentence with tag:
+You opened the drawer and saw <number:natural10-12000_roundup_1000> cockroaches.
+
+Assume the game draws:
+6413
+
+Conversion:
+You opened the drawer and saw 7000 cockroaches.",<cache.number:naturalX-Y_roundup_1000.value>
+<number:currencyX-Y>,"Random natural number between X and Y (inclusive), formatted as currency.","Sentence with tag:
+You looked inside the front pocket of a pair of old jeans and found <number:currency120-1000>.
+
+Assume the game draws:
+388
+
+Conversion:
+You looked inside the front pocket of a pair of old jeans and found $388.",<cache.number:currencyX-Y.value>
+<number:currencyX-Y_roundup_10>,"Same behavior as <number:currencyX-Y>, except the calculated end result is rounded to the nearest 10.","Sentence with tag:
+You looked inside the front pocket of a pair of old jeans and found <number:currency120-1000_roundup_10>.
+
+Assume the game draws:
+388
+
+Conversion:
+You looked inside the front pocket of a pair of old jeans and found $390.",<cache.number:currencyX-Y_roundup_10.value>
+<number:currencyX-Y_roundup_100>,"Same behavior as <number:currencyX-Y>, except the calculated end result is rounded to the nearest 100.","Sentence with tag:
+You looked inside the front pocket of a pair of old jeans and found <number:currency120-1000_roundup_100>.
+
+Assume the game draws:
+388
+
+Conversion:
+You looked inside the front pocket of a pair of old jeans and found $400.",<cache.number:currencyX-Y_roundup_100.value>
+<number:currencyX-Y_roundup_1000>,"Same behavior as <number:currencyX-Y>, except the calculated end result is rounded to the nearest 1000.","Sentence with tag:
+You looked inside the front pocket of a pair of old jeans and found <number:currency120-1000_roundup_1000>.
+
+Assume the game draws:
+388
+
+Conversion:
+You looked inside the front pocket of a pair of old jeans and found $1000.",<cache.number:currencyX-Y_roundup_1000.value>

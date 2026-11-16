@@ -1,0 +1,7 @@
+public enum CULT_TATTOO_LOCATION
+{
+	NONE = 0,
+	FOREHEAD = 1,
+	LEFT_CHEEK = 2,
+	RIGHT_CHEEK = 3
+}

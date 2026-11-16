@@ -1,0 +1,11 @@
+public enum RACING_STYLE
+{
+	NONE = 0,
+	SINGLE_RACE = 1,
+	TEST_DRIVE = 2,
+	CASH_RACE = 3,
+	PINK_SLIP_RACE = 4,
+	BETTING_RACE = 5,
+	TIME_TRIAL = 6,
+	CUP_RACE = 7
+}

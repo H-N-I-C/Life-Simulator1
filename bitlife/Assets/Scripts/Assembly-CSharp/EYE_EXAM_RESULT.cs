@@ -1,0 +1,7 @@
+public enum EYE_EXAM_RESULT
+{
+	WIN = 0,
+	LOSE_WRONG_ANSWER = 1,
+	LOSE_TIMES_UP = 2,
+	QUIT = 3
+}

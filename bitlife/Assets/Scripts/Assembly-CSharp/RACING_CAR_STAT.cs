@@ -1,0 +1,8 @@
+public enum RACING_CAR_STAT
+{
+	NONE = 0,
+	ACCELERATION = 1,
+	SPEED = 2,
+	HANDLING = 3,
+	DURABILITY = 4
+}

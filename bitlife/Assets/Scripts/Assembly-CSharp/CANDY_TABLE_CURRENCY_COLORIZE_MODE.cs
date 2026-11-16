@@ -1,0 +1,7 @@
+public enum CANDY_TABLE_CURRENCY_COLORIZE_MODE
+{
+	NONE = 0,
+	NEGATIVE = 1,
+	POSITIVE = 2,
+	BOTH = 3
+}

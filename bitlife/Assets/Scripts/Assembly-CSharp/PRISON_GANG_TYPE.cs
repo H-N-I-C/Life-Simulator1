@@ -1,0 +1,11 @@
+public enum PRISON_GANG_TYPE
+{
+	NORMAL = 0,
+	BITIZEN = 1,
+	AGE = 2,
+	VIOLENT = 3,
+	LOOKS = 4,
+	SMARTS = 5,
+	FOREIGNER = 6,
+	MONEY = 7
+}

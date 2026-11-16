@@ -1,0 +1,11 @@
+public enum T1_BUTTON_STATE
+{
+	INFANT = 0,
+	OCCUPATION = 1,
+	SCHOOL = 2,
+	JOB = 3,
+	PRISON = 4,
+	PRISON_JUVENILE = 104,
+	DEATH = 5,
+	SEASON_DEAD = 6
+}

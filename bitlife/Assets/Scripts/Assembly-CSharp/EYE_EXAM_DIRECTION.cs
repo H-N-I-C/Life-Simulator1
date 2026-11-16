@@ -1,0 +1,11 @@
+public enum EYE_EXAM_DIRECTION
+{
+	UP = 0,
+	UPPER_RIGHT = 1,
+	RIGHT = 2,
+	LOWER_RIGHT = 3,
+	BOTTOM = 4,
+	LOWER_LEFT = 5,
+	LEFT = 6,
+	UPPER_LEFT = 7
+}

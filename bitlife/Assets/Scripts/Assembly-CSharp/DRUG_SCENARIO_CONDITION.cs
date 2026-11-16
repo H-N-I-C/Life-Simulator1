@@ -1,0 +1,8 @@
+public enum DRUG_SCENARIO_CONDITION
+{
+	NONE = 0,
+	SCHOOL = 1,
+	JOB = 2,
+	CLUB = 3,
+	PRISON = 4
+}

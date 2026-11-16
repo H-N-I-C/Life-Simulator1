@@ -1,0 +1,22 @@
+public enum PET_ANIMAL
+{
+	BIRD = 1,
+	CAT = 2,
+	DOG = 3,
+	FISH = 4,
+	RODENT = 5,
+	RABBIT = 6,
+	SNAKE = 7,
+	BIG_CAT = 8,
+	PRIMATE = 9,
+	HORSE = 10,
+	UNICORN = 11,
+	LLAMA = 12,
+	TURTLE = 13,
+	KOMODO_DRAGON = 14,
+	SLOTH = 15,
+	SKUNK = 16,
+	ZEBRA = 17,
+	PLATYPUS = 18,
+	PANGOLIN = 19
+}

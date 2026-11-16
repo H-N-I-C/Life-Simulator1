@@ -1,0 +1,7 @@
+public enum ALCOHOL_SCENARIO_CONDITION
+{
+	NONE = 0,
+	LOVER = 1,
+	JOB = 2,
+	CLUB = 3
+}

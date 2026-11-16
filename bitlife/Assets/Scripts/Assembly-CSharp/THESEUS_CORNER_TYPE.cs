@@ -1,0 +1,8 @@
+public enum THESEUS_CORNER_TYPE
+{
+	UPPER_LEFT = 0,
+	UPPER_RIGHT = 1,
+	LOWER_LEFT = 2,
+	LOWER_RIGHT = 3,
+	NONE = 4
+}

@@ -1,0 +1,25 @@
+{
+  "ListID": "genesis_movie_director_filmography",
+  "Title": "FILMOGRAPHY",
+  "PresentationMode": "Normal",
+  "_note": "AutoPopulate over filmography collection (template tile)",
+  "Sections": [
+    {
+      "DataSource": "gfc:movie_director:filmography",
+      "TitleProperty": "title",
+      "SubtitleProperty": "genre",
+      "IconProperty": "genre_emoji",
+      "BarGraph": {
+        "Title": "Audience Reception",
+        "Value": "audience_reception_score"
+      },
+      "FallbackRoutes": [
+        {
+          "RouteType": "Scenario",
+          "ScenarioID": "scenario.movieDirector.filmographyFilmDetails",
+          "ScenarioFile": "genesis_movie_director"
+        }
+      ]
+    }
+  ]
+}

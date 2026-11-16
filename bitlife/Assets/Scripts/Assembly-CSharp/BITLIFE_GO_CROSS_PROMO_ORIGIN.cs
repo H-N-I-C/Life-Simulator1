@@ -1,0 +1,6 @@
+public enum BITLIFE_GO_CROSS_PROMO_ORIGIN
+{
+	NONE = 0,
+	MENU = 1,
+	COMMUNITY = 2
+}

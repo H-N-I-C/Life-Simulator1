@@ -1,0 +1,6 @@
+public enum AGED_HAIR_COLOR_TYPE
+{
+	NO_CHANGE = 0,
+	GRAY_STAGE_4 = 1,
+	GRAY_STAGE_5 = 2
+}

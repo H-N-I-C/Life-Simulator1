@@ -1,0 +1,7 @@
+public enum LOCAL_NOTIFICATION_TYPE
+{
+	SHALLOW = 1,
+	DEEP = 2,
+	DAILY = 3,
+	DEEP_DAILY = 4
+}

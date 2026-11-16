@@ -1,0 +1,5 @@
+public enum OFFLINE_AD_TYPE
+{
+	INTERSTITIAL = 0,
+	REWARDED = 1
+}

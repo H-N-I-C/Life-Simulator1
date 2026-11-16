@@ -1,0 +1,7 @@
+public enum SCHOOL_EXPEL_REASON
+{
+	NONE = 0,
+	FIGHTING = 1,
+	PERFORMANCE = 2,
+	DISCIPLINARY = 3
+}

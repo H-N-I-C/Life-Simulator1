@@ -1,0 +1,8 @@
+public enum AIRCRAFT_TYPE
+{
+	AIRPLANE = 1,
+	HELICOPTER = 2,
+	GLIDER = 3,
+	BLIMP = 4,
+	BALLOON = 5
+}

@@ -1,0 +1,24 @@
+public enum CAR_COLOR
+{
+	BEIGE = 1,
+	BLACK = 2,
+	BLUE = 3,
+	BROWN = 4,
+	BURGUNDY = 5,
+	CREAM = 6,
+	GOLD = 7,
+	GRAY = 8,
+	GREEN = 9,
+	MUSTARD = 10,
+	OLIVE = 11,
+	ORANGE = 12,
+	PINK = 13,
+	PURPLE = 14,
+	RED = 15,
+	SEAFOAM = 16,
+	SILVER = 17,
+	TAN = 18,
+	TURQUOISE = 19,
+	WHITE = 20,
+	YELLOW = 21
+}

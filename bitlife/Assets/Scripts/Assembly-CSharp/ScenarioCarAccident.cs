@@ -1,0 +1,28 @@
+public class ScenarioCarAccident : Scenario
+{
+	protected SimCar _car;
+
+	protected float _cost;
+
+	protected int _injurySentences;
+
+	protected string _narrative;
+
+	public override void RefreshScenario()
+	{
+	}
+
+	public override void ChoiceSelectedAtIndex(int indexZI)
+	{
+	}
+
+	public new static bool ScenarioIsEligibleForRandomPush()
+	{
+		return false;
+	}
+
+	public static SimCar GetMostAccidentProneCar()
+	{
+		return null;
+	}
+}

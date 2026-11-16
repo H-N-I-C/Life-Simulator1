@@ -1,0 +1,9 @@
+public enum DEALER_RANK
+{
+	NONE = 0,
+	DEALER = 1,
+	RUNNER = 2,
+	MANUFACTURER = 3,
+	LIEUTENANT = 4,
+	KINGPIN = 5
+}

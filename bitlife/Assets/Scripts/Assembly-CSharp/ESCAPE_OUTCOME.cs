@@ -1,0 +1,7 @@
+public enum ESCAPE_OUTCOME
+{
+	CANCEL = 0,
+	SUCCESS = 1,
+	FAIL = 2,
+	SURRENDER = 3
+}

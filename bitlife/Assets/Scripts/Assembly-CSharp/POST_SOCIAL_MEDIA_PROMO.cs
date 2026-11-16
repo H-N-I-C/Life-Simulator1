@@ -1,0 +1,8 @@
+public enum POST_SOCIAL_MEDIA_PROMO
+{
+	NONE = 0,
+	TWITTER = 1,
+	INSTAGRAM = 2,
+	TIKTOK = 3,
+	SHARE = 4
+}

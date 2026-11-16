@@ -1,0 +1,13 @@
+public enum RECREATIONAL_VEHICLE_COLOR
+{
+	BLACK = 0,
+	BLUE = 1,
+	CREAM = 2,
+	GRAY = 3,
+	PINK = 4,
+	RED = 5,
+	YELLOW = 6,
+	GOLD = 7,
+	GREEN = 8,
+	PURPLE = 9
+}

@@ -1,0 +1,10 @@
+public enum SCHOOL_FUND_SOURCE
+{
+	NONE = -1,
+	FREE = 0,
+	LOAN = 1,
+	PARENTS = 2,
+	SCHOLARSHIP = 3,
+	CASH = 4,
+	PUBLIC = 5
+}

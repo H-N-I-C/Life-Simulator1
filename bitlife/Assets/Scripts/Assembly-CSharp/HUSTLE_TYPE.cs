@@ -1,0 +1,8 @@
+public enum HUSTLE_TYPE
+{
+	NONE = 0,
+	BUSKER = 1,
+	PANHANDLER = 2,
+	SCAMMER = 3,
+	PERFORMER = 4
+}

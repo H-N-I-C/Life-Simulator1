@@ -1,0 +1,9 @@
+public enum BOOST_ATTRIBUTE
+{
+	NONE = 0,
+	HAPPINESS = 1,
+	HEALTH = 2,
+	INTELLIGENCE = 3,
+	APPEARANCE = 4,
+	ESSENCE = 5
+}

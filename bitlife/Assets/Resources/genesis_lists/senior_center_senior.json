@@ -1,0 +1,187 @@
+{
+  "ListID": "senior_center_senior",
+  "Title": "Senior",
+  "Items": [
+    {
+      "Title": "{genesis.seniorfullname} (Age {genesis.seniorage})",
+      "Icon": "{genesis.senioremoji}",
+      "BarGraph": {
+        "Title": "Relationship",
+        "Value": "{genesis.seniorrelationship}",
+        "Style": "LOW_IS_RED",
+        "Bubbles": 1,
+        "TwoLine": false
+      },
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "SENIOR_CENTER_MEMBER_PROFILE",
+              "ScenarioFile": "genesis_senior_center_sanitized"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "SpecialItem": "GodMode"
+    },
+    {
+      "SpecialItem": "Divider",
+      "Title": "Activities"
+    },
+    {
+      "Title": "Ask Out",
+      "IsVisible": "!{npc.IsCurrentLover}",
+      "SecondLine": "Ask {genesis.seniorpronounobject} out",
+      "Icon": "heart-red",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "BP_ASK_OUT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Befriend",
+      "SecondLine": "Befriend {genesis.seniorpronounobject}",
+      "Icon": "handshake",
+      "IsVisible": "!{npc.IsFriend}",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "BP_FRIEND_RECRUIT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Compliment",
+      "SecondLine": "Pay {genesis.seniorpronounobject} a compliment",
+      "Icon": "face-kiss",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "BP_COMPLIMENT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Conversation",
+      "SecondLine": "Have a conversation with {genesis.seniorpronounobject}",
+      "Icon": "users",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "BP_CONVERSATION"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Gift",
+      "SecondLine": "Give {genesis.seniorpronounobject} a gift",
+      "Icon": "gift",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "BP_GIFT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Give Money",
+      "SecondLine": "Slip {genesis.seniorpronounobject} some cash",
+      "Icon": "money-flying",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "BP_GIVE_MONEY"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Hook Up",
+      "SecondLine": "Hook up with {genesis.seniorpronounobject}",
+      "Icon": "heart-black",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "BP_HOOK_UP"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Insult",
+      "SecondLine": "Insult {genesis.seniorpronounobject}",
+      "Icon": "face-angry-curse",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "BP_INSULT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Party",
+      "SecondLine": "Get high with {genesis.seniorpronounobject}",
+      "Icon": "champagne",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "BP_PARTY"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Spend Time",
+      "SecondLine": "Spend time with {genesis.seniorpronounobject}",
+      "Icon": "clock-wood",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "BP_SPEND_TIME"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

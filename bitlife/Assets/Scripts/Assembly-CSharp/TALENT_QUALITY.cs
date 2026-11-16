@@ -1,0 +1,7 @@
+public enum TALENT_QUALITY
+{
+	AMATEUR = 0,
+	NOVICE = 1,
+	PROFESSIONAL = 2,
+	ELITE = 3
+}

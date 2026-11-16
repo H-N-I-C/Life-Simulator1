@@ -1,0 +1,9 @@
+public enum MUSIC_PRODUCER_JOB_TITLE
+{
+	NONE = 0,
+	JUNIOR = 1,
+	REGULAR = 2,
+	SENIOR = 3,
+	EXECUTIVE = 4,
+	FAMOUS = 5
+}

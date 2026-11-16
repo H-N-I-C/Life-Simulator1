@@ -1,0 +1,7 @@
+public enum RACING_TRACK_CATEGORY
+{
+	NONE = 0,
+	CIRCUIT = 1,
+	STREET = 2,
+	DEMOLITION = 3
+}

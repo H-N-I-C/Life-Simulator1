@@ -1,0 +1,5 @@
+public enum SCENARIO_BACKGROUND_EFFECT
+{
+	NONE = 0,
+	CONFETTI = 1
+}

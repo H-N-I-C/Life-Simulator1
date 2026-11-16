@@ -1,0 +1,8 @@
+public enum HOLIDAY_TYPE
+{
+	NONE = 0,
+	CHRISTMAS = 1,
+	HALLOWEEN = 2,
+	NEW_YEARS = 3,
+	THANKSGIVING = 4
+}

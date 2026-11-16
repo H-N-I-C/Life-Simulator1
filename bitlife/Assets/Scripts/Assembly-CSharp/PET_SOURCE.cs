@@ -1,0 +1,11 @@
+public enum PET_SOURCE
+{
+	WILD = 0,
+	SHELTER = 1,
+	PET_STORE = 2,
+	CAT_BREEDER = 3,
+	DOG_BREEDER = 4,
+	HORSE_RANCH = 5,
+	EXOTIC_DEALER = 6,
+	LLAMA_FARM = 7
+}

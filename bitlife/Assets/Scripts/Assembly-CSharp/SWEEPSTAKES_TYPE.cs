@@ -1,0 +1,9 @@
+public enum SWEEPSTAKES_TYPE
+{
+	NONE = 0,
+	CASH = 1,
+	CAR = 2,
+	WATERCRAFT = 3,
+	AIRCRAFT = 4,
+	JEWEL = 5
+}

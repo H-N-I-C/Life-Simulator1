@@ -1,0 +1,8 @@
+public enum RACING_TRACK_FORMAT
+{
+	NONE = 0,
+	NORMAL = 1,
+	TEST_DRIVE = 2,
+	TIME_TRIAL = 3,
+	BETTING = 4
+}

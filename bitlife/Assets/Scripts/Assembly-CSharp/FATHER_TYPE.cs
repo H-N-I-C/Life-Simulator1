@@ -1,0 +1,7 @@
+public enum FATHER_TYPE
+{
+	MARRIED = 0,
+	RELATIONSHIP = 1,
+	FLING = 2,
+	UNKNOWN = 3
+}

@@ -1,0 +1,9 @@
+public enum CASINO_TYPE
+{
+	NONE = 0,
+	GAMBLING_DEN = 1,
+	GAME_PARLOR = 2,
+	CLUBHOUSE = 3,
+	CASINO = 4,
+	LUXURY_CASINO = 5
+}

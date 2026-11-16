@@ -1,0 +1,8 @@
+public enum MUSIC_ALBUM_AWARD
+{
+	NONE = 0,
+	GOLD = 1,
+	PLATINUM = 2,
+	DOUBLE_PLATINUM = 3,
+	DIAMOND = 4
+}

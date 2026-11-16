@@ -1,0 +1,7 @@
+public enum SOCIAL_MEDIA_SUSPENSION_REASON
+{
+	NONE = 0,
+	ABUSE = 1,
+	SPAM = 2,
+	MISTAKE = 3
+}

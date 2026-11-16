@@ -1,0 +1,7 @@
+public enum DATE_REJECTION_CONDITION
+{
+	NONE = 0,
+	ALREADY_HAVE_LOVER = 1,
+	DISEASE = 2,
+	JOB = 3
+}

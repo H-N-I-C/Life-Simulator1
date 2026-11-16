@@ -1,0 +1,10 @@
+public enum OCCUPATION_TYPE
+{
+	NONE = 0,
+	STUDENT = 1,
+	EMPLOYEE = 2,
+	MILITARY = 3,
+	PRISONER = 4,
+	RETIREE = 5,
+	SPECIAL = 6
+}

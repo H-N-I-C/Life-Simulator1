@@ -1,0 +1,9 @@
+public enum MILITARY_BRANCH
+{
+	NONE = 0,
+	ARMY = 1,
+	AIR_FORCE = 2,
+	NAVY = 3,
+	MARINES = 4,
+	COAST_GUARD = 5
+}

@@ -1,0 +1,7 @@
+public enum FIGHT_CLUB_STYLE_COMPARISON
+{
+	NONE = 0,
+	EQUAL = 1,
+	SUPERIOR = 2,
+	INFERIOR = 3
+}

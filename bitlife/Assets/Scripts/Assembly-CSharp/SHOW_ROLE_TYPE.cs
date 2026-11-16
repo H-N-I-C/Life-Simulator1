@@ -1,0 +1,11 @@
+public enum SHOW_ROLE_TYPE
+{
+	NONE = 0,
+	LEAD = 1,
+	REGULAR_1 = 2,
+	REGULAR_2 = 3,
+	REGULAR_3 = 4,
+	RECURRING = 5,
+	ENSEMBLE = 6,
+	EXTRA = 7
+}

@@ -1,0 +1,8 @@
+public enum DELINQUENT_ACCOMPLICE_TYPE
+{
+	RANDOM = 0,
+	FRIEND = 1,
+	CHILD = 2,
+	LOVER = 3,
+	SIBLING = 4
+}

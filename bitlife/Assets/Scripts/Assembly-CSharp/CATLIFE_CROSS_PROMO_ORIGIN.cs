@@ -1,0 +1,8 @@
+public enum CATLIFE_CROSS_PROMO_ORIGIN
+{
+	NONE = 0,
+	LOG_LINK = 1,
+	MENU = 2,
+	COMMUNITY = 3,
+	CHALLENGE = 4
+}

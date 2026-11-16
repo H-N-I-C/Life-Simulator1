@@ -1,0 +1,6 @@
+public enum CHILD_DISCIPLINE_SCENARIO_CONDITION
+{
+	NONE = 0,
+	LOVER = 1,
+	JOB = 2
+}

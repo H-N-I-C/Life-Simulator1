@@ -1,0 +1,7 @@
+public enum RACING_WHIP_TYPE
+{
+	NONE = 0,
+	TOO_MANY_RACES = 1,
+	NO_CAR_AVAILABLE = 2,
+	CAR_NEEDS_REPAIR = 3
+}

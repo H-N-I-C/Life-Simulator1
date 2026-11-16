@@ -1,0 +1,8 @@
+public enum FIGHT_CLUB_ATTRIBUTE
+{
+	NONE = 0,
+	STRENGTH = 1,
+	TOUGHNESS = 2,
+	AGILITY = 3,
+	TECHNIQUE = 4
+}

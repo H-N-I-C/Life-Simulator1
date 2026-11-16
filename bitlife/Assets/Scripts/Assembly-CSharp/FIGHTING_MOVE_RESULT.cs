@@ -1,0 +1,9 @@
+public enum FIGHTING_MOVE_RESULT
+{
+	NONE = 0,
+	HIT = 1,
+	CRITICAL_HIT = 2,
+	ILLEGAL_HIT = 3,
+	DODGED = 4,
+	BLOCKED = 5
+}

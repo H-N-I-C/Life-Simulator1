@@ -1,0 +1,8 @@
+public enum LIFE_CREATION_TYPE
+{
+	UNKNOWN = 0,
+	RANDOM = 1,
+	CUSTOM = 2,
+	REPEAT = 3,
+	GENERATION = 4
+}

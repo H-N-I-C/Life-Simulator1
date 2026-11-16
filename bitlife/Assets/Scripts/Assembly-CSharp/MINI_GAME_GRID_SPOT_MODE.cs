@@ -1,0 +1,5 @@
+public enum MINI_GAME_GRID_SPOT_MODE
+{
+	BURGLARY = 0,
+	THESEUS = 1
+}

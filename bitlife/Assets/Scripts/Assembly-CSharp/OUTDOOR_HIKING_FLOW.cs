@@ -1,0 +1,25 @@
+public enum OUTDOOR_HIKING_FLOW
+{
+	None = 0,
+	SoloHookUpEscape = 1,
+	SoloHookUpCaught = 2,
+	SoloCheat = 3,
+	SoloEncounterAnimalSafe = 4,
+	SoloEncounterAnimalDeath = 5,
+	SoloTrailDrink = 6,
+	SoloTrailPlant = 7,
+	SoloTrailTreasure = 8,
+	SoloLandmark = 9,
+	SoloTrailWallet = 10,
+	CompanionLoverHookUp = 11,
+	CompanionDrug = 12,
+	CompanionEncounterAnimalSafe = 13,
+	CompanionEncounterAnimalDeath = 14,
+	CompanionLandmark = 15,
+	DogCuriosityCallBackEmpty = 16,
+	DogCuriosityCallBackItem = 17,
+	DogCuriosityChase = 18,
+	DogCuriosityChaseEncounterSafe = 19,
+	DogCuriosityChaseEncounterDeath = 20,
+	DogCash = 21
+}

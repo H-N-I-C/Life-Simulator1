@@ -1,0 +1,23 @@
+{
+  "ListID": "genesis_movie_director_talent_network",
+  "Title": "TALENT NETWORK",
+  "PresentationMode": "Normal",
+  "Sections": [
+    {
+      "DataSource": "gfc:movie_director:talent_network",
+      "TitleProperty": "name",
+      "SubtitleProperty": "background",
+      "BarGraph": {
+        "Title": "Acting",
+        "Value": "acting",
+        "Style": "LOW_IS_RED"
+      },
+      "FallbackRoutes": [
+        {
+          "RouteType": "List",
+          "ListID": "genesis_movie_director_actor_hub"
+        }
+      ]
+    }
+  ]
+}

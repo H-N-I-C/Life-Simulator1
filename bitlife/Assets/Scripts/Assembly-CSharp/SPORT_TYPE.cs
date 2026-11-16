@@ -1,0 +1,11 @@
+public enum SPORT_TYPE
+{
+	NONE = 0,
+	FOOTBALL = 1,
+	BASKETBALL = 2,
+	BASEBALL = 3,
+	HOCKEY = 4,
+	SOCCER = 5,
+	RUGBY = 6,
+	VOLLEYBALL = 7
+}

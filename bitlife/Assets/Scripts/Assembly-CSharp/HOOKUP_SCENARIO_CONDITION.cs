@@ -1,0 +1,5 @@
+public enum HOOKUP_SCENARIO_CONDITION
+{
+	NONE = 0,
+	FAME = 1
+}

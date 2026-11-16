@@ -1,0 +1,5 @@
+public enum MAKE_LOVE_REJECTION_CONDITION
+{
+	NONE = 0,
+	PRUDE = 1
+}

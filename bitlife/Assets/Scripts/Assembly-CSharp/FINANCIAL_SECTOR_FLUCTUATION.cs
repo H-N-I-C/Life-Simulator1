@@ -1,0 +1,6 @@
+public enum FINANCIAL_SECTOR_FLUCTUATION
+{
+	NONE = 0,
+	INCREASE = 1,
+	DECREASE = 2
+}

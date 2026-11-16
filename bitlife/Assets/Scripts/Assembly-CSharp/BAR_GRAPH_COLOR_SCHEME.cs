@@ -1,0 +1,10 @@
+public enum BAR_GRAPH_COLOR_SCHEME
+{
+	LOW_IS_RED = 0,
+	HIGH_IS_RED = 1,
+	ALL_RED = 2,
+	ALL_GREEN = 3,
+	ALL_GOLD = 4,
+	ALL_MAGENTA = 5,
+	STATS = 100
+}

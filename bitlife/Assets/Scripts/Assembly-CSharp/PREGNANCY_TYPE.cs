@@ -1,0 +1,8 @@
+public enum PREGNANCY_TYPE
+{
+	NONE = 0,
+	NORMAL = 1,
+	IVF = 2,
+	SPERM_DONOR = 3,
+	SURROGATE = 4
+}

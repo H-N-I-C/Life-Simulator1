@@ -1,0 +1,5 @@
+public enum BURGLARY_CHASE_TYPE
+{
+	FOLLOW = 0,
+	AMBUSH = 1
+}

@@ -1,0 +1,5 @@
+public enum LIST_HEADER_NAV_TYPE
+{
+	BY_COUNT = 0,
+	NOTHING = 1
+}

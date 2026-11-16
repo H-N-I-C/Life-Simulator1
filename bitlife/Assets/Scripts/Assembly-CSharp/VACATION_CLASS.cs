@@ -1,0 +1,8 @@
+public enum VACATION_CLASS
+{
+	BUDGET = 0,
+	ECONOMY = 1,
+	BUSINESS = 2,
+	FIRST = 3,
+	PRIVATE = 4
+}

@@ -1,0 +1,11 @@
+public enum FILM_ROLE_TYPE
+{
+	NONE = 0,
+	LEAD = 1,
+	SUPPORTING_1 = 2,
+	SUPPORTING_2 = 3,
+	SUPPORTING_3 = 4,
+	BIT = 5,
+	DIRECTOR = 6,
+	EXTRA = 7
+}

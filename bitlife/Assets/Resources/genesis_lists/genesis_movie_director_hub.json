@@ -1,0 +1,2625 @@
+{
+  "ListID": "genesis_movie_director_hub",
+  "Title": "Movie Director",
+  "PresentationMode": "Normal",
+  "Sections": [
+    {
+      "IsVisible": "{genesis.mdHasInteracted}&&!{genesis.mdIsDirecting}",
+      "Items": [
+        {
+          "Title": "You",
+          "SecondLine": "View your directorial stats",
+          "TileID": "md_you",
+          "Icon": "hero",
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.filmography:last>>scenario.movieDirector.directorProfile",
+                  "ScenarioFile": "genesis_movie_director"
+                }
+              ]
+            }
+          ],
+          "IsVisible": "{genesis.mdShowFilmography}"
+        },
+        {
+          "Title": "Filmography",
+          "TileID": "md_filmography",
+          "SecondLine": "View your past releases",
+          "Icon": "film-frames",
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ListID": "genesis_movie_director_filmography"
+                }
+              ]
+            }
+          ],
+          "IsVisible": "{genesis.mdShowFilmography}"
+        },
+        {
+          "Title": "Talent Network",
+          "TileID": "tile.movieDirector.talentNetwork",
+          "SecondLine": "Interact with past cast members",
+          "Icon": "face-stars",
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ListID": "genesis_movie_director_talent_network"
+                }
+              ]
+            }
+          ],
+          "IsVisible": "{genesis.mdShowFilmography}"
+        }
+      ]
+    },
+    {
+      "IsVisible": "!{genesis.mdIsDirecting}&&!{genesis.mdHasInteracted}",
+      "DataSource": "gfc:movie_director:scripts",
+      "AutoPopulate": true,
+      "AutoPopulateEntityType": "movieDirector_film",
+      "DrawCount": 12,
+      "RerollPolicy": "ageup",
+      "SortTilesByMetric": "script_quality",
+      "TitleProperty": "title",
+      "SubtitleProperty": "genre",
+      "IconProperty": "genre_emoji",
+      "BarGraph": {
+        "Title": "Script Quality",
+        "Value": "script_quality"
+      },
+      "FallbackRoutes": [
+        {
+          "RouteType": "Scenario",
+          "ScenarioID": "scenario.movieDirector.littleMissMoonshine_isLookingForA",
+          "ScenarioFile": "genesis_movie_director"
+        }
+      ]
+    },
+    {
+      "Header": "Scripts",
+      "IsVisible": "!{genesis.mdIsDirecting}&&{genesis.mdHasInteracted}",
+      "DataSource": "gfc:movie_director:scripts",
+      "AutoPopulate": true,
+      "AutoPopulateEntityType": "movieDirector_film",
+      "DrawCount": 12,
+      "RerollPolicy": "ageup",
+      "SortTilesByMetric": "script_quality",
+      "TitleProperty": "title",
+      "SubtitleProperty": "genre",
+      "IconProperty": "genre_emoji",
+      "BarGraph": {
+        "Title": "Script Quality",
+        "Value": "script_quality"
+      },
+      "FallbackRoutes": [
+        {
+          "RouteType": "Scenario",
+          "ScenarioID": "scenario.movieDirector.littleMissMoonshine_isLookingForA",
+          "ScenarioFile": "genesis_movie_director"
+        }
+      ]
+    },
+    {
+      "IsVisible": "{genesis.mdIsDirecting}",
+      "Items": [
+        {
+          "Title": "You",
+          "TileID": "md_you_director",
+          "Icon": "hero",
+          "BarGraph": {
+            "Title": "Reputation",
+            "Value": "<GFC.movie_director.DirectorReputation>",
+            "Style": "LOW_IS_RED"
+          },
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last>>scenario.movieDirector.directorProfile",
+                  "ScenarioFile": "genesis_movie_director"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "IsVisible": "{genesis.mdIsDirecting}",
+      "DataSource": "gfc:movie_director:my_film",
+      "EntityTypeFilter": "movieDirector_film",
+      "TitleProperty": "title",
+      "SubtitleProperty": "genre",
+      "SecondLine": "Review the details of your film",
+      "IconProperty": "genre_emoji",
+      "FallbackRoutes": [
+        {
+          "RouteType": "Scenario",
+          "ScenarioID": "scenario.movieDirector.littleMissMoonshine",
+          "ScenarioFile": "genesis_movie_director"
+        }
+      ]
+    },
+    {
+      "IsVisible": "{genesis.mdIsDirecting}",
+      "Items": [
+        {
+          "Title": "Production Assistant",
+          "TileID": "tile.movieDirector.assistant",
+          "SecondLine": "Learn about movie-making",
+          "Icon": "memo",
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last>>scenario.movieDirector.productionAssistant",
+                  "ScenarioFile": "genesis_movie_director"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Header": "Activities",
+      "IsVisible": "{genesis.mdIsDirecting}",
+      "Items": [
+        {
+          "Title": "Budget",
+          "TileID": "tile.movieDirector.budget",
+          "SecondLine": "Allocate the budget for your film",
+          "Icon": "money-bag",
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last>>scenario.movieDirector.alreadySubmitted_youVeAlreadySubmittedThe",
+                  "ScenarioFile": "genesis_movie_director",
+                  "Condition": [
+                    {
+                      "Expression": "{genesis.mdBudgetSubmitted}"
+                    }
+                  ]
+                },
+                {
+                  "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last>>scenario.movieDirector.productionBudget_allocateFundsToDifferent",
+                  "ScenarioFile": "genesis_movie_director"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "TileID": "tile.movieDirector.cast",
+          "Title": "Cast",
+          "SecondLine": "Manage your film's cast",
+          "Icon": "movie-director_cast",
+          "FocusMemoryKey": "entity",
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last",
+                  "ScenarioFile": "genesis_movie_director"
+                },
+                {
+                  "ListID": "genesis_movie_director_cast"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "TileID": "tile.movieDirector.film.size2",
+          "Title": "Film",
+          "SecondLine": "Start filming",
+          "Icon": "clapboard",
+          "IsVisible": "!{genesis.mdFilmStarted}&&{genesis.mdCastSize} < 3",
+          "IsEnabled": "{genesis.mdLeadCastFilled}&&[film.cast.lead.alive=true]&&{genesis.mdSupport1CastFilled}&&[film.cast.support_1.alive=true]&&{genesis.mdBudgetSubmitted}&&{genesis.mdFilmProgress} < 100",
+          "FocusMemoryKey": "entity",
+          "ActionList": [
+            {
+              "Index": 0,
+              "AdvancedLogic": {
+                "setup_route": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last",
+                "cases": [
+                  {
+                    "if": {
+                      "filter": "[film.dr_used=false/film.cv_used=false]"
+                    },
+                    "then": {
+                      "route_options": [
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-daily-review.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-daily-review.narrative}>>BP_SET_GENESIS_VAR=mdActivityFeedback:{genesis.md-daily-review.title}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-daily-review.score}>>scenario.movieDirector.dailyReview",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 30
+                        },
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-creative-vision.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-creative-vision.narrative}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-creative-vision.score}>>BP_SET_GENESIS_VAR=mdActivitySourceId:{genesis.md-creative-vision.id}>>scenario.movieDirector.creativeVision",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 30
+                        },
+                        {
+                          "weight": 40,
+                          "scenario_file": "genesis_movie_director",
+                          "without_replacement_key": "movie_director.on_set",
+                          "route_pool": [
+                            {
+                              "route_to": "scenario.movieDirector.onSet01",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet02",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet03",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet04",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet05",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet06",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet07",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet08",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet09",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet10",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet11",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet12",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet13",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet14",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet15",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet16",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet17",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet18",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet19",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet20",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet21",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet22",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet23",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet24",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet25",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet26",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet27",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet28",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet29",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet30",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet31",
+                              "weight": 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "if": {
+                      "filter": "[film.dr_used=true/film.cv_used=false]"
+                    },
+                    "then": {
+                      "route_options": [
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-creative-vision.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-creative-vision.narrative}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-creative-vision.score}>>BP_SET_GENESIS_VAR=mdActivitySourceId:{genesis.md-creative-vision.id}>>scenario.movieDirector.creativeVision",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 60
+                        },
+                        {
+                          "weight": 40,
+                          "scenario_file": "genesis_movie_director",
+                          "without_replacement_key": "movie_director.on_set",
+                          "route_pool": [
+                            {
+                              "route_to": "scenario.movieDirector.onSet01",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet02",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet03",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet04",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet05",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet06",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet07",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet08",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet09",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet10",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet11",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet12",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet13",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet14",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet15",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet16",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet17",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet18",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet19",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet20",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet21",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet22",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet23",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet24",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet25",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet26",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet27",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet28",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet29",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet30",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet31",
+                              "weight": 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "if": {
+                      "filter": "[film.dr_used=false/film.cv_used=true]"
+                    },
+                    "then": {
+                      "route_options": [
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-daily-review.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-daily-review.narrative}>>BP_SET_GENESIS_VAR=mdActivityFeedback:{genesis.md-daily-review.title}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-daily-review.score}>>scenario.movieDirector.dailyReview",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 60
+                        },
+                        {
+                          "weight": 40,
+                          "scenario_file": "genesis_movie_director",
+                          "without_replacement_key": "movie_director.on_set",
+                          "route_pool": [
+                            {
+                              "route_to": "scenario.movieDirector.onSet01",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet02",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet03",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet04",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet05",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet06",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet07",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet08",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet09",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet10",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet11",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet12",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet13",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet14",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet15",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet16",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet17",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet18",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet19",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet20",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet21",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet22",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet23",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet24",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet25",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet26",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet27",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet28",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet29",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet30",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet31",
+                              "weight": 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "else_when_no_matches": {
+                  "route_options": [
+                    {
+                      "weight": 100,
+                      "scenario_file": "genesis_movie_director",
+                      "without_replacement_key": "movie_director.on_set",
+                      "route_pool": [
+                        {
+                          "route_to": "scenario.movieDirector.onSet01",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet02",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet03",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet04",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet05",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet06",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet07",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet08",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet09",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet10",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet11",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet12",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet13",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet14",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet15",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet16",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet17",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet18",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet19",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet20",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet21",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet22",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet23",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet24",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet25",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet26",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet27",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet28",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet29",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet30",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet31",
+                          "weight": 1
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "TileID": "tile.movieDirector.film.size3",
+          "Title": "Film",
+          "SecondLine": "Start filming",
+          "Icon": "clapboard",
+          "IsVisible": "!{genesis.mdFilmStarted}&&{genesis.mdCastSize} > 2&&{genesis.mdCastSize} < 4",
+          "IsEnabled": "{genesis.mdLeadCastFilled}&&[film.cast.lead.alive=true]&&{genesis.mdSupport1CastFilled}&&[film.cast.support_1.alive=true]&&{genesis.mdSupport2CastFilled}&&[film.cast.support_2.alive=true]&&{genesis.mdBudgetSubmitted}&&{genesis.mdFilmProgress} < 100",
+          "FocusMemoryKey": "entity",
+          "ActionList": [
+            {
+              "Index": 0,
+              "AdvancedLogic": {
+                "setup_route": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last",
+                "cases": [
+                  {
+                    "if": {
+                      "filter": "[film.dr_used=false/film.cv_used=false]"
+                    },
+                    "then": {
+                      "route_options": [
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-daily-review.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-daily-review.narrative}>>BP_SET_GENESIS_VAR=mdActivityFeedback:{genesis.md-daily-review.title}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-daily-review.score}>>scenario.movieDirector.dailyReview",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 30
+                        },
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-creative-vision.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-creative-vision.narrative}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-creative-vision.score}>>BP_SET_GENESIS_VAR=mdActivitySourceId:{genesis.md-creative-vision.id}>>scenario.movieDirector.creativeVision",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 30
+                        },
+                        {
+                          "weight": 40,
+                          "scenario_file": "genesis_movie_director",
+                          "without_replacement_key": "movie_director.on_set",
+                          "route_pool": [
+                            {
+                              "route_to": "scenario.movieDirector.onSet01",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet02",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet03",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet04",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet05",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet06",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet07",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet08",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet09",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet10",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet11",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet12",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet13",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet14",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet15",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet16",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet17",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet18",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet19",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet20",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet21",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet22",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet23",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet24",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet25",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet26",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet27",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet28",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet29",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet30",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet31",
+                              "weight": 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "if": {
+                      "filter": "[film.dr_used=true/film.cv_used=false]"
+                    },
+                    "then": {
+                      "route_options": [
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-creative-vision.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-creative-vision.narrative}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-creative-vision.score}>>BP_SET_GENESIS_VAR=mdActivitySourceId:{genesis.md-creative-vision.id}>>scenario.movieDirector.creativeVision",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 60
+                        },
+                        {
+                          "weight": 40,
+                          "scenario_file": "genesis_movie_director",
+                          "without_replacement_key": "movie_director.on_set",
+                          "route_pool": [
+                            {
+                              "route_to": "scenario.movieDirector.onSet01",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet02",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet03",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet04",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet05",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet06",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet07",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet08",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet09",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet10",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet11",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet12",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet13",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet14",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet15",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet16",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet17",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet18",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet19",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet20",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet21",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet22",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet23",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet24",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet25",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet26",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet27",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet28",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet29",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet30",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet31",
+                              "weight": 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "if": {
+                      "filter": "[film.dr_used=false/film.cv_used=true]"
+                    },
+                    "then": {
+                      "route_options": [
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-daily-review.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-daily-review.narrative}>>BP_SET_GENESIS_VAR=mdActivityFeedback:{genesis.md-daily-review.title}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-daily-review.score}>>scenario.movieDirector.dailyReview",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 60
+                        },
+                        {
+                          "weight": 40,
+                          "scenario_file": "genesis_movie_director",
+                          "without_replacement_key": "movie_director.on_set",
+                          "route_pool": [
+                            {
+                              "route_to": "scenario.movieDirector.onSet01",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet02",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet03",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet04",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet05",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet06",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet07",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet08",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet09",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet10",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet11",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet12",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet13",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet14",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet15",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet16",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet17",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet18",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet19",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet20",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet21",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet22",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet23",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet24",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet25",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet26",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet27",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet28",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet29",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet30",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet31",
+                              "weight": 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "else_when_no_matches": {
+                  "route_options": [
+                    {
+                      "weight": 100,
+                      "scenario_file": "genesis_movie_director",
+                      "without_replacement_key": "movie_director.on_set",
+                      "route_pool": [
+                        {
+                          "route_to": "scenario.movieDirector.onSet01",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet02",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet03",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet04",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet05",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet06",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet07",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet08",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet09",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet10",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet11",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet12",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet13",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet14",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet15",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet16",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet17",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet18",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet19",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet20",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet21",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet22",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet23",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet24",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet25",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet26",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet27",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet28",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet29",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet30",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet31",
+                          "weight": 1
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "TileID": "tile.movieDirector.film.size4",
+          "Title": "Film",
+          "SecondLine": "Start filming",
+          "Icon": "clapboard",
+          "IsVisible": "!{genesis.mdFilmStarted}&&{genesis.mdCastSize} > 3",
+          "IsEnabled": "{genesis.mdLeadCastFilled}&&[film.cast.lead.alive=true]&&{genesis.mdSupport1CastFilled}&&[film.cast.support_1.alive=true]&&{genesis.mdSupport2CastFilled}&&[film.cast.support_2.alive=true]&&{genesis.mdSupport3CastFilled}&&[film.cast.support_3.alive=true]&&{genesis.mdBudgetSubmitted}&&{genesis.mdFilmProgress} < 100",
+          "FocusMemoryKey": "entity",
+          "ActionList": [
+            {
+              "Index": 0,
+              "AdvancedLogic": {
+                "setup_route": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last",
+                "cases": [
+                  {
+                    "if": {
+                      "filter": "[film.dr_used=false/film.cv_used=false]"
+                    },
+                    "then": {
+                      "route_options": [
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-daily-review.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-daily-review.narrative}>>BP_SET_GENESIS_VAR=mdActivityFeedback:{genesis.md-daily-review.title}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-daily-review.score}>>scenario.movieDirector.dailyReview",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 30
+                        },
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-creative-vision.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-creative-vision.narrative}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-creative-vision.score}>>BP_SET_GENESIS_VAR=mdActivitySourceId:{genesis.md-creative-vision.id}>>scenario.movieDirector.creativeVision",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 30
+                        },
+                        {
+                          "weight": 40,
+                          "scenario_file": "genesis_movie_director",
+                          "without_replacement_key": "movie_director.on_set",
+                          "route_pool": [
+                            {
+                              "route_to": "scenario.movieDirector.onSet01",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet02",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet03",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet04",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet05",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet06",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet07",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet08",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet09",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet10",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet11",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet12",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet13",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet14",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet15",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet16",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet17",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet18",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet19",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet20",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet21",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet22",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet23",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet24",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet25",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet26",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet27",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet28",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet29",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet30",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet31",
+                              "weight": 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "if": {
+                      "filter": "[film.dr_used=true/film.cv_used=false]"
+                    },
+                    "then": {
+                      "route_options": [
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-creative-vision.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-creative-vision.narrative}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-creative-vision.score}>>BP_SET_GENESIS_VAR=mdActivitySourceId:{genesis.md-creative-vision.id}>>scenario.movieDirector.creativeVision",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 60
+                        },
+                        {
+                          "weight": 40,
+                          "scenario_file": "genesis_movie_director",
+                          "without_replacement_key": "movie_director.on_set",
+                          "route_pool": [
+                            {
+                              "route_to": "scenario.movieDirector.onSet01",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet02",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet03",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet04",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet05",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet06",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet07",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet08",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet09",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet10",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet11",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet12",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet13",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet14",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet15",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet16",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet17",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet18",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet19",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet20",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet21",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet22",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet23",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet24",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet25",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet26",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet27",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet28",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet29",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet30",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet31",
+                              "weight": 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "if": {
+                      "filter": "[film.dr_used=false/film.cv_used=true]"
+                    },
+                    "then": {
+                      "route_options": [
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-daily-review.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-daily-review.narrative}>>BP_SET_GENESIS_VAR=mdActivityFeedback:{genesis.md-daily-review.title}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-daily-review.score}>>scenario.movieDirector.dailyReview",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 60
+                        },
+                        {
+                          "weight": 40,
+                          "scenario_file": "genesis_movie_director",
+                          "without_replacement_key": "movie_director.on_set",
+                          "route_pool": [
+                            {
+                              "route_to": "scenario.movieDirector.onSet01",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet02",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet03",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet04",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet05",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet06",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet07",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet08",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet09",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet10",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet11",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet12",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet13",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet14",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet15",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet16",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet17",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet18",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet19",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet20",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet21",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet22",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet23",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet24",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet25",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet26",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet27",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet28",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet29",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet30",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet31",
+                              "weight": 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "else_when_no_matches": {
+                  "route_options": [
+                    {
+                      "weight": 100,
+                      "scenario_file": "genesis_movie_director",
+                      "without_replacement_key": "movie_director.on_set",
+                      "route_pool": [
+                        {
+                          "route_to": "scenario.movieDirector.onSet01",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet02",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet03",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet04",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet05",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet06",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet07",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet08",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet09",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet10",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet11",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet12",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet13",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet14",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet15",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet16",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet17",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet18",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet19",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet20",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet21",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet22",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet23",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet24",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet25",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet26",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet27",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet28",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet29",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet30",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet31",
+                          "weight": 1
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "TileID": "tile.movieDirector.film",
+          "Title": "Film",
+          "Icon": "clapboard",
+          "IsVisible": "{genesis.mdFilmStarted}",
+          "IsEnabled": "{genesis.mdLeadCastFilled}&&[film.cast.lead.alive=true]&&{genesis.mdSupport1CastFilled}&&[film.cast.support_1.alive=true]&&{genesis.mdFilmProgress} < 100&&({genesis.mdCastSize} < 3||({genesis.mdCastSize} > 2&&{genesis.mdCastSize} < 4&&{genesis.mdSupport2CastFilled}&&[film.cast.support_2.alive=true])||({genesis.mdCastSize} > 3&&{genesis.mdSupport2CastFilled}&&[film.cast.support_2.alive=true]&&{genesis.mdSupport3CastFilled}&&[film.cast.support_3.alive=true]))",
+          "FocusMemoryKey": "entity",
+          "BarGraph": {
+            "Title": "Progress",
+            "Value": "{genesis.mdFilmProgress}"
+          },
+          "ActionList": [
+            {
+              "Index": 0,
+              "AdvancedLogic": {
+                "setup_route": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last",
+                "cases": [
+                  {
+                    "if": {
+                      "filter": "[film.dr_used=false/film.cv_used=false]"
+                    },
+                    "then": {
+                      "route_options": [
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-daily-review.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-daily-review.narrative}>>BP_SET_GENESIS_VAR=mdActivityFeedback:{genesis.md-daily-review.title}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-daily-review.score}>>scenario.movieDirector.dailyReview",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 30
+                        },
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-creative-vision.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-creative-vision.narrative}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-creative-vision.score}>>BP_SET_GENESIS_VAR=mdActivitySourceId:{genesis.md-creative-vision.id}>>scenario.movieDirector.creativeVision",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 30
+                        },
+                        {
+                          "weight": 40,
+                          "scenario_file": "genesis_movie_director",
+                          "without_replacement_key": "movie_director.on_set",
+                          "route_pool": [
+                            {
+                              "route_to": "scenario.movieDirector.onSet01",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet02",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet03",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet04",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet05",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet06",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet07",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet08",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet09",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet10",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet11",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet12",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet13",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet14",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet15",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet16",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet17",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet18",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet19",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet20",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet21",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet22",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet23",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet24",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet25",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet26",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet27",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet28",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet29",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet30",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet31",
+                              "weight": 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "if": {
+                      "filter": "[film.dr_used=true/film.cv_used=false]"
+                    },
+                    "then": {
+                      "route_options": [
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-creative-vision.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-creative-vision.narrative}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-creative-vision.score}>>BP_SET_GENESIS_VAR=mdActivitySourceId:{genesis.md-creative-vision.id}>>scenario.movieDirector.creativeVision",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 60
+                        },
+                        {
+                          "weight": 40,
+                          "scenario_file": "genesis_movie_director",
+                          "without_replacement_key": "movie_director.on_set",
+                          "route_pool": [
+                            {
+                              "route_to": "scenario.movieDirector.onSet01",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet02",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet03",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet04",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet05",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet06",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet07",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet08",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet09",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet10",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet11",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet12",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet13",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet14",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet15",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet16",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet17",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet18",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet19",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet20",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet21",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet22",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet23",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet24",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet25",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet26",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet27",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet28",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet29",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet30",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet31",
+                              "weight": 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "if": {
+                      "filter": "[film.dr_used=false/film.cv_used=true]"
+                    },
+                    "then": {
+                      "route_options": [
+                        {
+                          "route_to": "BP_SET_GENESIS_VAR=mdActivityText:{genesis.data.md-daily-review.getrandommatch(<film.genre>)}>>BP_SET_GENESIS_VAR=mdActivityNarrative:{genesis.md-daily-review.narrative}>>BP_SET_GENESIS_VAR=mdActivityFeedback:{genesis.md-daily-review.title}>>BP_SET_GENESIS_VAR=mdActivityGenreMatch:{genesis.md-daily-review.score}>>scenario.movieDirector.dailyReview",
+                          "scenario_file": "genesis_movie_director",
+                          "weight": 60
+                        },
+                        {
+                          "weight": 40,
+                          "scenario_file": "genesis_movie_director",
+                          "without_replacement_key": "movie_director.on_set",
+                          "route_pool": [
+                            {
+                              "route_to": "scenario.movieDirector.onSet01",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet02",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet03",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet04",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet05",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet06",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet07",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet08",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet09",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet10",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet11",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet12",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet13",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet14",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet15",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet16",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet17",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet18",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet19",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet20",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet21",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet22",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet23",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet24",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet25",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet26",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet27",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet28",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet29",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet30",
+                              "weight": 1
+                            },
+                            {
+                              "route_to": "scenario.movieDirector.onSet31",
+                              "weight": 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "else_when_no_matches": {
+                  "route_options": [
+                    {
+                      "weight": 100,
+                      "scenario_file": "genesis_movie_director",
+                      "without_replacement_key": "movie_director.on_set",
+                      "route_pool": [
+                        {
+                          "route_to": "scenario.movieDirector.onSet01",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet02",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet03",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet04",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet05",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet06",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet07",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet08",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet09",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet10",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet11",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet12",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet13",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet14",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet15",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet16",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet17",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet18",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet19",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet20",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet21",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet22",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet23",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet24",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet25",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet26",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet27",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet28",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet29",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet30",
+                          "weight": 1
+                        },
+                        {
+                          "route_to": "scenario.movieDirector.onSet31",
+                          "weight": 1
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "Title": "Resign",
+          "TileID": "tile.moviedirector.resign",
+          "SecondLine": "Quit the project",
+          "Icon": "hand-waving",
+          "ConfirmationString": "Are you sure you want to resign from this film? Your reputation will suffer.",
+          "ActionList": [
+            {
+              "Index": 0,
+              "ConditionList": [
+                {
+                  "ScenarioID": "BP_FOCUS_ENTITY=gfc.movie_director.my_film:last>>BP_GFC_MODIFY_PROPERTY=movie_director:DirectorReputation:-2>>scenario.movieDirector.stormingOffSet",
+                  "ScenarioFile": "genesis_movie_director"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

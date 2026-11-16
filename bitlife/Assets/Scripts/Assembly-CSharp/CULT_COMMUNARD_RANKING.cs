@@ -1,0 +1,6 @@
+public enum CULT_COMMUNARD_RANKING
+{
+	NONE = 0,
+	NEOPHYTE = 1,
+	ADEPT = 2
+}

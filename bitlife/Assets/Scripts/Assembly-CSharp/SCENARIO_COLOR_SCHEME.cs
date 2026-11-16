@@ -1,0 +1,11 @@
+public enum SCENARIO_COLOR_SCHEME
+{
+	NORMAL = 0,
+	DEATH = 1,
+	PARANORMAL = 2,
+	DISEASE = 3,
+	PRISON = 4,
+	BUSINESS = 5,
+	ITEMS = 6,
+	CUSTOM_LIFE = 7
+}

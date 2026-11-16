@@ -1,0 +1,8 @@
+public enum OUTDOOR_HIKING_COMPANION
+{
+	NONE = 0,
+	DOG = 1,
+	FRIEND = 2,
+	FAMILY = 3,
+	LOVER = 4
+}

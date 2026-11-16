@@ -1,0 +1,10 @@
+public enum TIME_MACHINE_ORIGIN
+{
+	NONE = 0,
+	T4 = 1,
+	AGE_DOWN = 2,
+	PRISON = 3,
+	DEATH = 4,
+	MARKETPLACE = 5,
+	NAV_BAR = 6
+}

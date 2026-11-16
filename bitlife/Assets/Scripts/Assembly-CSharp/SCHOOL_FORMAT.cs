@@ -1,0 +1,7 @@
+public enum SCHOOL_FORMAT
+{
+	PUBLIC = 0,
+	PRIVATE = 1,
+	ALL_BOYS = 2,
+	ALL_GIRLS = 3
+}

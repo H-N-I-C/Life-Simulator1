@@ -1,0 +1,7 @@
+public enum STOCK_LIFECYCLE_PATTERN
+{
+	NONE = 0,
+	WINNER = 1,
+	LOSER = 2,
+	AVERAGE = 3
+}

@@ -1,0 +1,5 @@
+public enum COWORKER_TYPE
+{
+	GENERIC = 0,
+	SUPERVISOR = 1
+}

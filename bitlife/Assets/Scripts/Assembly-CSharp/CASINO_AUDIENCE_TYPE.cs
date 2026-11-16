@@ -1,0 +1,7 @@
+public enum CASINO_AUDIENCE_TYPE
+{
+	ANY = 0,
+	CASUAL = 1,
+	HIGH_ROLLER = 2,
+	MAFIA = 3
+}

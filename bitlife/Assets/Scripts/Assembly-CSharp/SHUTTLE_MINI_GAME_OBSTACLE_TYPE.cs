@@ -1,0 +1,5 @@
+public enum SHUTTLE_MINI_GAME_OBSTACLE_TYPE
+{
+	ASTEROID = 0,
+	UFO = 1
+}

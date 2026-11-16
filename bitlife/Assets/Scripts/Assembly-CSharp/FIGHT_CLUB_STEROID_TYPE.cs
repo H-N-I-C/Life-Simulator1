@@ -1,0 +1,9 @@
+public enum FIGHT_CLUB_STEROID_TYPE
+{
+	NONE = 0,
+	STRENGTH = 1,
+	TOUGHNESS = 2,
+	AGILITY = 3,
+	TECHNIQUE = 4,
+	GENERAL = 5
+}

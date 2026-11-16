@@ -1,0 +1,6 @@
+public enum FIGHT_CLUB_FIGHTING_MINI_GAME_OUTCOME
+{
+	NONE = 0,
+	WIN = 1,
+	LOSE = 2
+}

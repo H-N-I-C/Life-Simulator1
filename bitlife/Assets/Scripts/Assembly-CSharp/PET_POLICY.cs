@@ -1,0 +1,9 @@
+public enum PET_POLICY
+{
+	NONE = 0,
+	ALL_PETS_ALLOWED = 1,
+	DOGS_ONLY = 2,
+	CATS_ONLY = 3,
+	DOGS_AND_CATS_ONLY = 4,
+	NO_PETS_ALLOWED = 5
+}

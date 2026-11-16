@@ -1,0 +1,10 @@
+public enum PARENT_LOVER_DISAPPROVAL_REASON
+{
+	NONE = 0,
+	MONEY = 1,
+	CRAZINESS = 2,
+	LOOKS = 3,
+	SMARTS = 4,
+	AGE = 5,
+	CULTURE = 6
+}

@@ -1,0 +1,42 @@
+{
+  "Parent": "{SchoolFormat} {SchoolTitle}",
+  "SimDataProvider": "HeroDataProvider",
+  "Requirements": "{CurrentlyInSchool}=true AND {IsInPrivateSchool}=true",
+  "Items": [
+    {
+      "Title": "School Dance",
+      "Subtitle": "Attend a school dance",
+      "Order": 7,
+      "Icon": "woman-dancing",
+      "Requirements": "{HeroAge}>=12",
+      "Scenario": {
+        "ClassName": "ScenarioBackToSchoolDance"
+      },
+      "Group": "Activities",
+      "SubItems": null
+    },
+    {
+      "Title": "Change Schools",
+      "Subtitle": "Ask to go to public school",
+      "Order": 2,
+      "Icon": "yearbook",
+      "Scenario": {
+        "ClassName": "ScenarioBackToSchoolChangeRequest"
+      },
+      "Group": "Activities",
+      "SubItems": null
+    },
+    {
+      "Title": "House Party",
+      "Subtitle": "Throw a house party",
+      "Requirements": "{HeroAge}>=14 AND {HeroAge}<=17",
+      "Order": 5,
+      "Icon": "party-popper",
+      "Scenario": {
+        "ClassName": "ScenarioBackToSchoolHouseParty"
+      },
+      "Group": "Activities",
+      "SubItems": null
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+public enum SCHOOL_STATUS
+{
+	NONE = 0,
+	IN_PROGRESS = 1,
+	COMPLETED = 2,
+	DROPPED_OUT = 3,
+	EXPELLED = 4
+}

@@ -1,0 +1,6 @@
+public enum ATTACK_DEATH_OVERRIDE
+{
+	NONE = 0,
+	WILL_DIE = 1,
+	WILL_LIVE = 2
+}

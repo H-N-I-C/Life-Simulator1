@@ -1,0 +1,12 @@
+public enum NAV_BAR_BECOME_TYPE
+{
+	BITIZEN = 0,
+	FAMOUS = 1,
+	LANDLORD = 2,
+	BOSS = 3,
+	GOD = 4,
+	TIME_TRAVELER = 5,
+	FIGHT_CLUB = 6,
+	VAMPIRE = 7,
+	MOVIE_DIRECTOR = 8
+}

@@ -1,0 +1,11 @@
+tag_id,Genesis Value,description,example
+<hero:current_city>,{game.hero.PlaceOfResidence.City},Hero city of residence.,New York
+<hero:current_country>,{game.hero.PlaceOfResidence.Country.FullName()},Hero country of residence.,United States
+<hero:current_country_adjectival>,,"Hero country, formatted as an adjective.",American
+<hero:country_other>,,"A random country that is NOT the hero's country of residence, i.e. not <hero:current_country>.",Brazil
+<hero:full_name>,{game.hero.Name.FullName},Hero full name,John Doe
+<hero:first_name>,{game.hero.Name.FirstName},Hero first name,John Doe
+<hero:bank_balance>,{game.finances.GetFormattedBalance()},"The bank balance for the hero, including the relevant currency symbol.","$32,864"
+<hero:money_currency_symbol>,{game.finances.GetCurrencySymbol()},What currency of money does the hero transact in? Should be one character long.,"$, €, £, ¥"
+<hero:max_bank_balance capValue=500000>,{game.finances.getMaxBalance(capValue)},"Raw number for Hero balance, capped to capValue parameter",45000
+<hero:age>,{game.hero.Age},Hero age in years (numeric; usable in Advanced Logic expressions).,25

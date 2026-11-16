@@ -1,0 +1,7 @@
+public enum COMMERCIAL_REACH
+{
+	NONE = 0,
+	LOCAL = 1,
+	REGIONAL = 2,
+	INTERNATIONAL = 3
+}

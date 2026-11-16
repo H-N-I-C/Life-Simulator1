@@ -1,0 +1,14 @@
+public enum TEACHER_TYPE
+{
+	GENERIC = 0,
+	PRINCIPAL = 1,
+	PE = 2,
+	MUSIC = 3,
+	MATH = 11,
+	SCIENCE = 12,
+	LANGUAGE = 13,
+	HISTORY = 14,
+	ART = 15,
+	PROFESSOR = 21,
+	DEAN = 22
+}

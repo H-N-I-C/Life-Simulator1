@@ -1,0 +1,9 @@
+public enum MODEL_CAMPAIGN_TYPE
+{
+	NONE = 0,
+	PRINT_AD = 1,
+	VIDEO_AD = 2,
+	BILLBOARD = 3,
+	EDITORIAL = 4,
+	FASHION_SHOW = 5
+}

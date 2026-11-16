@@ -1,0 +1,17 @@
+public enum MUSIC_PRODUCER_GENRE
+{
+	NONE = 0,
+	POP = 1,
+	RHYTHM_AND_BLUES = 2,
+	RAP = 3,
+	HEAVY_METAL = 4,
+	K_POP = 5,
+	ROCK = 6,
+	COUNTRY = 7,
+	ALTERNATIVE = 8,
+	FOLK = 9,
+	REGGAE = 10,
+	WORSHIP = 11,
+	EDM = 12,
+	HIP_HOP = 13
+}

@@ -1,0 +1,8 @@
+public enum SIBLING_ARGUMENT_CONDITION
+{
+	NONE = 0,
+	LOVER = 1,
+	PARENTS = 2,
+	SIBLING_SPOUSE = 3,
+	PET = 4
+}

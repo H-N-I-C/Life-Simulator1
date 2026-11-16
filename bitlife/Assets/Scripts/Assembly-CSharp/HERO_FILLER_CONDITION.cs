@@ -1,0 +1,17 @@
+public enum HERO_FILLER_CONDITION
+{
+	NONE = 0,
+	CAR = 1,
+	JOB = 2,
+	STUDENT = 3,
+	PARENTS = 4,
+	SOCIAL_MEDIA = 5,
+	PRISON = 6,
+	FAME = 7,
+	OVERWORK = 8,
+	ADDICT = 9,
+	FORMER_ADDICT = 10,
+	ROYAL = 11,
+	ACTOR = 12,
+	VAMPIRE = 13
+}

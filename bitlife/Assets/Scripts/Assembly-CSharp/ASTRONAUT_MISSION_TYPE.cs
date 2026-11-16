@@ -1,0 +1,8 @@
+public enum ASTRONAUT_MISSION_TYPE
+{
+	NONE = 0,
+	MARTIAN = 1,
+	LUNAR = 2,
+	SPACE_WALK = 3,
+	EXPERIMENT = 4
+}

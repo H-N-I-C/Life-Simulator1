@@ -1,0 +1,9 @@
+public enum OUTDOOR_HANDBOOK_ENTRY_TYPE
+{
+	NONE = 0,
+	ANIMAL = 1,
+	BIRD = 2,
+	FISH = 3,
+	MARINE_LIFE = 4,
+	PLANT = 5
+}

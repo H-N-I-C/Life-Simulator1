@@ -1,0 +1,7 @@
+public enum STREET_PERSON_TYPE
+{
+	NORMAL = 0,
+	POLICE = 1,
+	PROSTITUTE = 2,
+	HUSTLER = 3
+}

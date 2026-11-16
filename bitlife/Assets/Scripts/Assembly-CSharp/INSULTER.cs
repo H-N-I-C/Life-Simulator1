@@ -1,0 +1,11 @@
+public enum INSULTER
+{
+	NONE = 0,
+	FATHER = 1,
+	MOTHER = 2,
+	LOVER = 3,
+	RANDOM = 4,
+	COWORKER = 5,
+	CLASSMATE = 6,
+	PRISONER = 7
+}

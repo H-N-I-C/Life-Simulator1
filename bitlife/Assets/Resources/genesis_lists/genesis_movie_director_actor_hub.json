@@ -1,0 +1,170 @@
+{
+  "ListID": "genesis_movie_director_actor_hub",
+  "Title": "ACTOR",
+  "PresentationMode": "Normal",
+  "Items": [
+    {
+      "TileID": "tile.movieDirector.talentActor.profile",
+      "SpecialItem": "PersonProfile",
+      "FocusMemoryKey": "npc",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "scenario.movieDirector.profile_fromActor",
+              "ScenarioFile": "genesis_movie_director"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "TileID": "tile.movieDirector.talentActor.godMode",
+      "SpecialItem": "GodMode",
+      "FocusMemoryKey": "npc"
+    },
+    {
+      "SpecialItem": "Divider",
+      "Title": "Activities"
+    },
+    {
+      "TileID": "tile.movieDirector.talentActor.askOut",
+      "Title": "Ask Out",
+      "SecondLine": "Ask this actor out",
+      "Icon": "heart-red",
+      "FocusMemoryKey": "npc",
+      "IsVisible": "!{npc.IsCurrentLover}",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "BP_SET_GENESIS_VAR=mdTelemetryProjectId:>>BP_SET_GENESIS_VAR=mdTelemetryRoleName:>>scenario.movieDirector.loveInterest",
+              "ScenarioFile": "genesis_movie_director"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "TileID": "tile.movieDirector.talentActor.befriend",
+      "Title": "Befriend",
+      "SecondLine": "Befriend this actor",
+      "Icon": "handshake",
+      "FocusMemoryKey": "npc",
+      "IsVisible": "!{npc.IsFriend}&&!{npc.IsCurrentLover}",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "BP_SET_GENESIS_VAR=mdTelemetryProjectId:>>BP_SET_GENESIS_VAR=mdTelemetryRoleName:>>scenario.movieDirector.befriend",
+              "ScenarioFile": "genesis_movie_director"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "TileID": "tile.movieDirector.talentActor.compliment",
+      "Title": "Compliment",
+      "SecondLine": "Compliment this actor",
+      "Icon": "face-kiss",
+      "FocusMemoryKey": "npc",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "BP_SET_GENESIS_VAR=mdTelemetryProjectId:>>BP_SET_GENESIS_VAR=mdTelemetryRoleName:>>scenario.movieDirector.geeYouReSwell",
+              "ScenarioFile": "genesis_movie_director"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "TileID": "tile.movieDirector.talentActor.hookUp",
+      "Title": "Hook Up",
+      "SecondLine": "Hook up with this actor",
+      "Icon": "heart-black",
+      "FocusMemoryKey": "npc",
+      "IsVisible": "!{npc.IsCurrentLover}",
+      "ActionList": [
+        {
+          "Index": 0,
+          "ConditionList": [
+            {
+              "ScenarioID": "BP_SET_GENESIS_VAR=mdTelemetryProjectId:>>BP_SET_GENESIS_VAR=mdTelemetryRoleName:>>scenario.movieDirector.hookUp",
+              "ScenarioFile": "genesis_movie_director"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "TileID": "tile.movieDirector.talentActor.inquire",
+      "Title": "Inquire",
+      "SecondLine": "Ask about this actor's current projects",
+      "Icon": "question-mark",
+      "FocusMemoryKey": "npc",
+      "ActionList": [
+        {
+          "Index": 0,
+          "AdvancedLogic": {
+            "cases": [
+              {
+                "if": {
+                  "expression": "(<npc:relationship> < 50)"
+                },
+                "then": {
+                  "route_options": [
+                    {
+                      "route_to": "BP_SET_GENESIS_VAR=mdTelemetryProjectId:>>BP_SET_GENESIS_VAR=mdTelemetryRoleName:>>BP_TELEMETRY=BitLife_MovieDirectorCastInteraction|ProjectID:{genesis.mdTelemetryProjectId};ActorName:<npc:name>;RoleName:{genesis.mdTelemetryRoleName};InteractionType:inquire;InteractionResult:fail;RelationshipPct:<npc:relationship>>>scenario.movieDirector.bookedAndBusy",
+                      "scenario_file": "genesis_movie_director"
+                    }
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "expression": "(<npc:inquiry_declined> == true)"
+                },
+                "then": {
+                  "route_options": [
+                    {
+                      "route_to": "BP_SET_GENESIS_VAR=mdTelemetryProjectId:>>BP_SET_GENESIS_VAR=mdTelemetryRoleName:>>BP_TELEMETRY=BitLife_MovieDirectorCastInteraction|ProjectID:{genesis.mdTelemetryProjectId};ActorName:<npc:name>;RoleName:{genesis.mdTelemetryRoleName};InteractionType:inquire;InteractionResult:fail;RelationshipPct:<npc:relationship>>>scenario.movieDirector.bookedAndBusy",
+                      "scenario_file": "genesis_movie_director"
+                    }
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "expression": "(<GFC.movie_director._scripts_count> > 0)"
+                },
+                "then": {
+                  "route_options": [
+                    {
+                      "route_to": "BP_SET_GENESIS_VAR=mdTelemetryProjectId:>>BP_SET_GENESIS_VAR=mdTelemetryRoleName:>>BP_TELEMETRY=BitLife_MovieDirectorCastInteraction|ProjectID:{genesis.mdTelemetryProjectId};ActorName:<npc:name>;RoleName:{genesis.mdTelemetryRoleName};InteractionType:inquire;InteractionResult:success;RelationshipPct:<npc:relationship>>>BP_FOCUS_ENTITY=gfc.movie_director.scripts:random>>scenario.movieDirector.contractOffer_yourIndustryContactPrissy",
+                      "scenario_file": "genesis_movie_director"
+                    }
+                  ]
+                }
+              }
+            ],
+            "else_when_no_matches": {
+              "route_options": [
+                {
+                  "route_to": "BP_SET_GENESIS_VAR=mdTelemetryProjectId:>>BP_SET_GENESIS_VAR=mdTelemetryRoleName:>>BP_TELEMETRY=BitLife_MovieDirectorCastInteraction|ProjectID:{genesis.mdTelemetryProjectId};ActorName:<npc:name>;RoleName:{genesis.mdTelemetryRoleName};InteractionType:inquire;InteractionResult:fail;RelationshipPct:<npc:relationship>>>scenario.movieDirector.bookedAndBusy",
+                  "scenario_file": "genesis_movie_director"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+public enum CRYPTO_EVENT_TYPE
+{
+	NONE = 0,
+	INCREASE = 1,
+	DECREASE = 2,
+	DROP = 3,
+	PARABOLIC = 4,
+	BANKRUPT = 5
+}

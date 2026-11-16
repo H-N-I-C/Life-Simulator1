@@ -1,0 +1,8 @@
+public enum MODEL_PUBLICATION_TYPE
+{
+	NONE = 0,
+	CATALOG = 1,
+	MAGAZINE = 2,
+	NEWSPAPER = 3,
+	BROCHURE = 4
+}

@@ -1,0 +1,5 @@
+public enum TENANT_LAWSUIT_TYPE
+{
+	NONE = 0,
+	WITHHOLD_DEPOSIT = 1
+}

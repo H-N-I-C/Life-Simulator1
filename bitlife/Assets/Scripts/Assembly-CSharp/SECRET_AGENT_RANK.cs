@@ -1,0 +1,8 @@
+public enum SECRET_AGENT_RANK
+{
+	NONE = 0,
+	JUNIOR = 1,
+	FIELD = 2,
+	ELITE = 3,
+	SPECIAL_OPERATIVE = 4
+}

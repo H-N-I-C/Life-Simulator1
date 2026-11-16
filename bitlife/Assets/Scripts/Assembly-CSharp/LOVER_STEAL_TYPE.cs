@@ -1,0 +1,10 @@
+public enum LOVER_STEAL_TYPE
+{
+	NONE = 0,
+	CASH = 1,
+	CONCERT = 2,
+	FRIENDS_WEEKEND = 3,
+	PASTIME = 4,
+	CAR = 5,
+	DRUG = 6
+}

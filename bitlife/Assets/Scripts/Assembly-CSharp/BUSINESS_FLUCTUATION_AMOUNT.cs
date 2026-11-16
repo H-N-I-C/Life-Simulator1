@@ -1,0 +1,7 @@
+public enum BUSINESS_FLUCTUATION_AMOUNT
+{
+	NONE = 0,
+	SMALL = 1,
+	LARGE = 2,
+	VIRAL = 3
+}

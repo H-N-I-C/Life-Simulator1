@@ -1,0 +1,8 @@
+public enum TERMINATION_CONDITION
+{
+	NONE = 0,
+	ADDICTION = 1,
+	DISEASE = 2,
+	OVERWORK = 3,
+	AGE = 4
+}

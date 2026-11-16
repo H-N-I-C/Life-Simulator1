@@ -1,0 +1,7 @@
+public enum BUSINESS_COMPENSATION_LEVEL
+{
+	NONE = 0,
+	LOW = 1,
+	AVERAGE = 2,
+	ABOVE_AVERAGE = 3
+}

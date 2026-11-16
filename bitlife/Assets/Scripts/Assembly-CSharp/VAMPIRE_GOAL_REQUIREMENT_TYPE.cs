@@ -1,0 +1,8 @@
+public enum VAMPIRE_GOAL_REQUIREMENT_TYPE
+{
+	NONE = 0,
+	OCCUPATION = 1,
+	STAT = 2,
+	SEX = 3,
+	SEXUALITY = 4
+}

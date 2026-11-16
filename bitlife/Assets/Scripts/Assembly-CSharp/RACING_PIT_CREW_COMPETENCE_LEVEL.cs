@@ -1,0 +1,7 @@
+public enum RACING_PIT_CREW_COMPETENCE_LEVEL
+{
+	NONE = 0,
+	LOW = 1,
+	MEDIUM = 2,
+	HIGH = 3
+}

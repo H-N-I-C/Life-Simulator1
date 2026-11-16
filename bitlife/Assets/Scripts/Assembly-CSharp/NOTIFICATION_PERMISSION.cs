@@ -1,0 +1,7 @@
+public enum NOTIFICATION_PERMISSION
+{
+	NONE = 0,
+	NOT_DETERMINED = 1,
+	DENIED = 2,
+	ALLOWED = 3
+}

@@ -1,0 +1,6 @@
+public enum ACTOR_DUMB_SCENARIO_TYPE
+{
+	NONE = 0,
+	PRODUCTION = 1,
+	PROMOTION = 2
+}

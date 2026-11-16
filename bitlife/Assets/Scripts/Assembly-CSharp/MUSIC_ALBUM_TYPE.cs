@@ -1,0 +1,8 @@
+public enum MUSIC_ALBUM_TYPE
+{
+	STUDIO = 0,
+	COMPILATION = 1,
+	LIVE = 2,
+	ACOUSTIC = 3,
+	SINGLE = 4
+}

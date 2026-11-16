@@ -1,0 +1,10 @@
+public enum VAMPIRE_GOAL_STAT_TYPE
+{
+	NONE = 0,
+	HOTTIE = 1,
+	UGGO = 2,
+	SMARTY = 3,
+	IDIOT = 4,
+	PSYCHO = 5,
+	SANE_PERSON = 6
+}

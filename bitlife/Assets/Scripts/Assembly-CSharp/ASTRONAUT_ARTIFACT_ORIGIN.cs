@@ -1,0 +1,5 @@
+public enum ASTRONAUT_ARTIFACT_ORIGIN
+{
+	LUNAR = 0,
+	MARTIAN = 1
+}

@@ -1,0 +1,5 @@
+public enum UILIST_TYPE
+{
+	LIST_TYPE_NORMAL = 0,
+	LIST_TYPE_MENU = 1
+}

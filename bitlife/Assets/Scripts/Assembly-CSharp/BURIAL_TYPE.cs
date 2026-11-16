@@ -1,0 +1,8 @@
+public enum BURIAL_TYPE
+{
+	NONE = 0,
+	BURIAL = 1,
+	CREMATION = 2,
+	TAXIDERMY = 3,
+	SCIENCE = 4
+}

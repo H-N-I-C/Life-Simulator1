@@ -1,0 +1,10 @@
+public enum SPECIAL_TALENT
+{
+	NONE = 0,
+	SPORTS = 1,
+	MUSIC = 2,
+	CRIME = 3,
+	ACTING = 4,
+	MODELING = 5,
+	DEALING = 6
+}

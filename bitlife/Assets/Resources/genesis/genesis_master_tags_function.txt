@@ -1,0 +1,105 @@
+tag_id,description,example,cache_tag_for_value
+<function:scale:VALUE:inMin:inMax:outMin:outMax>,"Linearly remaps VALUE from the input range [inMin,inMax] to the output range [outMin,outMax], clamped to the input range and rounded to the nearest whole number. Use it to express a scaling curve as data instead of hardcoded C# (replaces Lerp/InverseLerp curves). VALUE may be a literal, a {genesis.variable}, or a nested <function:...>.","Sentence with tag:
+After <function:scale:{genesis.steroid_uses}:1:20:25:80> percent of your muscle came from the needle.
+
+Assume the game reads genesis.steroid_uses = 10:
+scale remaps 10 from [1,20] to [25,80].
+
+Conversion:
+After 51 percent of your muscle came from the needle.",(recall: fast-follow)
+<function:clamp:VALUE:min:max>,"Clamps VALUE into the range [min,max] (bounds are swapped automatically if min>max) and rounds to the nearest whole number. Use it to keep a computed value inside safe bounds. VALUE may be a literal, a {genesis.variable}, or a nested <function:...>.","Sentence with tag:
+Your reputation settled at <function:clamp:{genesis.rep_delta}:0:100>.
+
+Assume the game reads genesis.rep_delta = 137:
+clamp forces 137 down into [0,100].
+
+Conversion:
+Your reputation settled at 100.",(recall: fast-follow)
+<function:attribute_impact:SCORE>,"Converts a Designer impact score through the standard nonlinear BitLife attribute-point mapping used by SimPerson impacts and native career reputation. SCORE may be a literal, a {genesis.variable}, or a nested <function:...>. Values are rounded to a whole impact score and clamped by the shared game helper.","Sentence with tag:
+Your reputation changed by <function:attribute_impact:-5> points.
+
+Assume the Designer impact score is -5:
+attribute_impact uses the standard mapping (-5 becomes -50 points).
+
+Conversion:
+Your reputation changed by -50 points.",(recall: fast-follow)
+<function:weighted_pick:optA|wA;optB|wB;...>,"Weighted random selection across a semicolon-separated list of option|weight pairs. Returns the chosen option string (which may be non-numeric). Higher weights are proportionally more likely. Mirrors the classic Arson 85|10|4|1 odds.","Sentence with tag:
+The fire spread <function:weighted_pick:barely|85;quickly|10;out of control|4;across the whole block|1>.
+
+Assume the game draws (85/100 odds):
+barely
+
+Conversion:
+The fire spread barely.",(recall: fast-follow)
+<function:chance:PERCENT>,"Rolls a percentage chance and returns the string ""true"" if UnityEngine.Random.Range(0,100) is less than PERCENT, otherwise ""false"". PERCENT may be a literal, a {genesis.variable}, or a nested <function:scale:...> so the odds themselves can scale with data.","Sentence with tag (used as a filter/route value):
+caught = <function:chance:35>
+
+Assume the game rolls 42 (>= 35):
+the roll fails.
+
+Conversion:
+caught = false",(recall: fast-follow)
+<function:add:a:b:...>,"Adds all arguments together (variadic, one or more). Returns the integer sum. Each arg may be a literal, a {genesis.variable}, or a nested <function:...>.","Sentence with tag:
+Your film earned <function:add:40:30:20> points across three activities.
+
+Assume literal inputs 40, 30, 20:
+add sums them.
+
+Conversion:
+Your film earned 90 points across three activities.",(recall: fast-follow)
+<function:sub:a:b>,"Subtracts b from a (a - b) and returns the integer result. Each arg may be a literal, a {genesis.variable}, or a nested <function:...>.","Sentence with tag:
+You are <function:sub:100:37> points from a perfect score.
+
+Assume literal inputs 100, 37:
+sub computes 100 - 37.
+
+Conversion:
+You are 63 points from a perfect score.",(recall: fast-follow)
+<function:mul:a:b:...>,"Multiplies all arguments together (variadic, one or more). Returns the integer product. Each arg may be a literal, a {genesis.variable}, or a nested <function:...>.","Sentence with tag:
+The penalty came to <function:mul:15:2> points.
+
+Assume literal inputs 15, 2:
+mul computes 15 x 2.
+
+Conversion:
+The penalty came to 30 points.",(recall: fast-follow)
+<function:div:a:b>,"Integer division of a by b (a / b). If b is zero the tag fails soft and is left unchanged (never divides by zero). Each arg may be a literal, a {genesis.variable}, or a nested <function:...>.","Sentence with tag (FAS as a running sum over count):
+Your Film Activities Score is <function:div:225:3>.
+
+Assume literal inputs 225, 3:
+div computes 225 / 3.
+
+Conversion:
+Your Film Activities Score is 75.",(recall: fast-follow)
+<function:abs:a>,"Returns the absolute value of a (its magnitude, dropping any negative sign). The arg may be a literal, a {genesis.variable}, or a nested <function:...>.","Sentence with tag (distance from an ideal allocation):
+Your budget is off by <function:abs:<function:sub:55:40>> percent.
+
+Assume literal inputs 55, 40:
+sub gives 15, abs keeps it positive.
+
+Conversion:
+Your budget is off by 15 percent.",(recall: fast-follow)
+<function:avg:a:b:...>,"Returns the mean of all arguments (variadic), computed as round(sum / count). Each arg may be a literal, a {genesis.variable}, or a nested <function:...>.","Sentence with tag (Film Activities Score = mean of per-activity Choice Scores):
+Your Film Activities Score is <function:avg:75:90:60>.
+
+Assume literal inputs 75, 90, 60:
+avg computes round((75 + 90 + 60) / 3).
+
+Conversion:
+Your Film Activities Score is 75.",(recall: fast-follow)
+<function:max:a:b:...>,"Returns the largest of all arguments (variadic, two or more). Each arg may be a literal, a {genesis.variable}, or a nested <function:...>. Used for the Movie Director contract floor: max(attribute_floor, computed_offer).","Sentence with tag (offer floored at the attribute minimum):
+Your contract offer is <function:max:5000:3200> dollars.
+
+Assume literal inputs 5000, 3200:
+max keeps the larger value.
+
+Conversion:
+Your contract offer is 5000 dollars.",(recall: fast-follow)
+<function:min:a:b:...>,"Returns the smallest of all arguments (variadic, two or more). Each arg may be a literal, a {genesis.variable}, or a nested <function:...>. The symmetric twin of max, used to cap a computed value at a ceiling.","Sentence with tag (offer capped at the studio ceiling):
+Your contract offer is <function:min:5000:3200> dollars.
+
+Assume literal inputs 5000, 3200:
+min keeps the smaller value.
+
+Conversion:
+Your contract offer is 3200 dollars.",(recall: fast-follow)

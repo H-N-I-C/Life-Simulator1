@@ -1,49 +1,28 @@
-<div align="center">
-  <h1> Life-Simulator1 </h1>
-  <h3>A life simulator in Python inspired by "Bitlife - Life Simulator"</h3>
-</div>
+# BitLife — reconstructed from `com.wtfapps.apollo16` 3.26.1
 
-<p align="center">
-    <a href="https://github.com/fungamer2-2/Life-Simulator1/blob/main/LICENSE"><img src="https://img.shields.io/github/license/fungamer2-2/Life-Simulator1?style=flat-square&color=0d1117" alt="GitHub License"></a>
-    <a href="https://github.com/fungamer2-2/Life-Simulator1/issues"><img src="https://img.shields.io/github/issues/fungamer2-2/Life-Simulator1?color=0d1117&style=flat-square" alt="GitHub Issues"> 
-    <a href="https://github.com/fungamer2-2/Life-Simulator1/stargazers"><img src="https://img.shields.io/github/stars/fungamer2-2/Life-Simulator1?style=flat-square&color=0d1117" alt="GitHub Stars"></a>
-    <a href="https://github.com/fungamer2-2/Life-Simulator1/pulls"><img src="https://img.shields.io/github/issues-pr/fungamer2-2/Life-Simulator1?color=0d1117&style=flat-square" alt="GitHub Pull Requests"></a>
-</p>
+This repository contains the BitLife 3.26.1 (iOS) game recovered from the
+decrypted IPA, for private modification and a web (WebGL) build. Not for
+redistribution or sale.
 
-## 🔧 Issues
-If you face any problems while using the application, please open an issue [here](https://github.com/fungamer2-2/Life-Simulator1/issues)
+## Layout
 
-## 🖐️ Get in touch
-### You can join in on chatting with the team on our [discord server](https://discord.gg/xER8)
- 
-## 🤝 Contributing
-Contributions, feedback, and bug reports are welcome! Feel free to check out our [issues page](https://github.com/fungamer2-2/Life-Simulator1/issues) to find out what you could do! but before contrubuting make sure to check out [CONTRIBUTING.md](./CONTRIBUTING.md).
+- `bitlife/` — the reconstructed Unity project (**Unity 6000.3.9f1**).
+  Open `bitlife/` in Unity Hub; install the **WebGL Build Support** module
+  for browser builds.
+- `data/` — 1,082 gameplay data files (scenarios, careers, names, …)
+  decrypted from the app's TextAssets.
+- `deobfuscation/` — methodology, recovered encryption details, and the
+  reproducible scripts (`decrypt_assets.py`, `export_web_data.py`,
+  `strip_ads.py`, `reconstruct_unity.sh`).
 
-## Installation
+## Status
 
-1. Clone this repository:
-   ```sh
-   git clone https://github.com/fungamer2-2/Life-Simulator1.git
-   ```
-2. Install [Python](https://www.python.org/)
+- [x] IPA unpacked; Unity IL2CPP build identified (Unity 6000.3.9f1)
+- [x] Game-data encryption cracked (20-byte XOR key, two variants), 964/966 files decrypted
+- [x] Full IL2CPP decompilation with Cpp2IL — 100% of 90,870 methods recovered
+- [x] Unity project reconstructed with AssetRipper (scene, assets, full C# class tree)
+- [ ] Clean up obfuscated method bodies so `Assembly-CSharp` compiles
+- [ ] Strip ad/tracking SDKs (`deobfuscation/scripts/strip_ads.py`)
+- [ ] WebGL build
 
-## Usage
-
-Run [lifesim.py](lifesim.py) script:
-```sh
-python3 lifesim.py
-```
-
-## Translating
-
-`lifesim.pot` is a template for translations. <br />
-Copy `lifesim.pot` to a new file, fill in the translations, then upload it as `lifesim.po` in the `locale` folder.<br />
-The `.po` should be placed in the directory path `locale/[language code]/LC_MESSAGES`. <br />
-I will then convert it to a `.mo` file so it can be translated.
-
-NOTE: The text between the `{}` in strings is used for string formatting, and is not to be translated. Their translations are handled separately.
-
-Translation strings may be need to be updated as new strings are being added.
-## License
-
-Distributed under the MIT License. See [LICENSE](LICENSE) for more details.
+See `deobfuscation/README.md` for the complete technical write-up.

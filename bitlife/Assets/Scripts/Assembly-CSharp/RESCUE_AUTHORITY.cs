@@ -1,0 +1,6 @@
+public enum RESCUE_AUTHORITY
+{
+	POLICE = 1,
+	FIRE = 2,
+	AMBULANCE = 3
+}

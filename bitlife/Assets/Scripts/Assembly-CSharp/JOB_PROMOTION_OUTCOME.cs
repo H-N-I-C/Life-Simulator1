@@ -1,0 +1,6 @@
+public enum JOB_PROMOTION_OUTCOME
+{
+	NONE = 1,
+	PROMOTION = 2,
+	RAISE = 3
+}

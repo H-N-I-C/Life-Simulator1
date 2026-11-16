@@ -1,0 +1,7 @@
+public enum SCHOOL_CLIQUE_STATUS
+{
+	INACTIVE = 0,
+	ACTIVE = 1,
+	QUIT = 2,
+	ALIENATED = 3
+}

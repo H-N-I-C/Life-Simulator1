@@ -1,0 +1,16 @@
+# Genesis NPC Subtypes — variant definitions linked to parent entity types
+# Columns: npc_id,npc_subtype,subtype_weight,hero_relationship_type,hero_relationship_min,hero_relationship_max,death_scenario_id,standard_attributes,properties_binary,properties_string,properties_numeric,ageup_hero_relationship,ageup_standard_attributes,ageup_properties_numeric
+# npc_id: must match an EntityType in genesis_entity_defs.csv
+# subtype_weight: relative selection weight (higher = more likely)
+# standard_attributes: JSON {"att_name":{"min":X,"max":Y}, ...}
+# properties_binary: JSON {"key":{"weight_true":X,"weight_false":Y}, ...}
+# properties_string: JSON {"key":{"value":"...","weight":X}, ...}
+# properties_numeric: JSON {"key":{"min":X,"max":Y}, ...}
+# ageup_hero_relationship: JSON {"min":X,"max":Y} — annual hero relationship adjustment
+# ageup_standard_attributes: JSON {"att_name":{"min":X,"max":Y}, ...} — annual attribute adjustments
+# ageup_properties_numeric: JSON {"key":{"min":X,"max":Y}, ...} — annual numeric property adjustments
+npc_id,npc_subtype,subtype_weight,hero_relationship_type,hero_relationship_min,hero_relationship_max,death_scenario_id,standard_attributes,properties_binary,properties_string,properties_numeric,ageup_hero_relationship,ageup_standard_attributes,ageup_properties_numeric
+maid,maid.fullTime,70,employee,50,80,death_maid,"{""att_intelligence"":{""min"":30,""max"":70},""att_appearance"":{""min"":20,""max"":60}}",{},{},"{""salary"":{""min"":2000,""max"":5000}}","{""min"":-2,""max"":3}","{""att_intelligence"":{""min"":-1,""max"":2}}",{}
+maid,maid.partTime,30,employee,30,60,death_maid,"{""att_intelligence"":{""min"":20,""max"":50},""att_appearance"":{""min"":20,""max"":50}}",{},{},"{""salary"":{""min"":1000,""max"":2500}}","{""min"":-3,""max"":2}","{""att_intelligence"":{""min"":-1,""max"":1}}",{}
+fighter.opponentMaleWeak,fighter.opponentMaleWeak.level1,60,rival,-20,10,,"{""att_willpower"":{""min"":10,""max"":30},""att_discipline"":{""min"":5,""max"":25}}",{},{},"{""fighter_level"":{""min"":1,""max"":3}}",{},"{""att_willpower"":{""min"":-2,""max"":3},""att_discipline"":{""min"":-1,""max"":2}}","{""fighter_level"":{""min"":0,""max"":1}}"
+fighter.opponentMaleWeak,fighter.opponentMaleWeak.level2,40,rival,-30,0,,"{""att_willpower"":{""min"":20,""max"":50},""att_discipline"":{""min"":15,""max"":40}}",{},{},"{""fighter_level"":{""min"":3,""max"":5}}",{},"{""att_willpower"":{""min"":-1,""max"":4},""att_discipline"":{""min"":0,""max"":3}}","{""fighter_level"":{""min"":0,""max"":1}}"

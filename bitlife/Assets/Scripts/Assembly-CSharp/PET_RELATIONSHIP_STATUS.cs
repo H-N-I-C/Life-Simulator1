@@ -1,0 +1,12 @@
+public enum PET_RELATIONSHIP_STATUS
+{
+	NONE = 0,
+	FAMILY = 1,
+	OWNED = 2,
+	ESCAPED = 102,
+	RELEASED = 3,
+	SHELTERED = 4,
+	SOLD = 5,
+	REHOMED = 6,
+	STOLEN = 7
+}

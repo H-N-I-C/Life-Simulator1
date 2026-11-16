@@ -1,0 +1,6 @@
+public enum JOB_TERMINATION_TYPE
+{
+	RESIGNED = 1,
+	FIRED = 2,
+	RETIRED = 3
+}

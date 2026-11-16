@@ -1,0 +1,6 @@
+public enum MAFIA_EXTORTION_ACTION
+{
+	SHAKEDOWN = 0,
+	SCARE = 1,
+	KILL = 2
+}

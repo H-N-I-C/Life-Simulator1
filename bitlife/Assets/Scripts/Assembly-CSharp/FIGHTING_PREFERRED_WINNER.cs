@@ -1,0 +1,6 @@
+public enum FIGHTING_PREFERRED_WINNER
+{
+	NONE = 0,
+	HERO = 1,
+	NPC = 2
+}
