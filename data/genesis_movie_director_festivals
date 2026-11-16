@@ -1,0 +1,26 @@
+{
+  "ListID": "genesis_movie_director_festivals",
+  "Title": "FILM FESTIVALS",
+  "PresentationMode": "Normal",
+  "_note": "Released-film picker for festival submission; the ordinary Filmography list remains a read-only profile route.",
+  "Sections": [
+    {
+      "DataSource": "gfc:movie_director:filmography",
+      "TitleProperty": "title",
+      "SubtitleProperty": "genre",
+      "SecondLine": "Submit this release to the festival circuit",
+      "IconProperty": "genre_emoji",
+      "BarGraph": {
+        "Title": "Audience Reception",
+        "Value": "audience_reception_score"
+      },
+      "FallbackRoutes": [
+        {
+          "RouteType": "Scenario",
+          "ScenarioID": "scenario.movieDirector.maliceInBlunderland",
+          "ScenarioFile": "genesis_movie_director"
+        }
+      ]
+    }
+  ]
+}

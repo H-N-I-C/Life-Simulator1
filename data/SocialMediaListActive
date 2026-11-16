@@ -1,0 +1,117 @@
+{
+  "Parent": "Social Media",
+  "SimDataProvider": "SimPodcast",
+  "Items": [
+    {
+      "Title": "{PodcastName}",
+      "Subtitle": "{Followers} subscribers",
+      "Requirements": "{Active}=true",
+      "Order": 4,
+      "Icon": "{PodcastTypeIcon}",
+      "Scenario": null,
+      "Group": "",
+      "SubItems": {
+        "Group": "Podcast",
+        "Items": [
+          {
+            "Title": "{PodcastName} ({PodcastType})",
+            "Subtitle": "{Followers} subscribers",
+            "Requirements": null,
+            "Order": 0,
+            "Icon": "{PodcastTypeIcon}",
+            "Scenario": {
+              "ClassName": "ScenarioPodcastProfile",
+              "Parameters": []
+            },
+            "Group": null,
+            "SubItems": null
+          },
+          {
+            "Title": "Podcast Archive",
+            "Subtitle": "View your podcast's publications",
+            "Requirements": null,
+            "Order": 0,
+            "Icon": "file-cabinet",
+            "Scenario": null,
+            "Group": null,
+            "SubItems": 
+            {
+                "Title" : "Podcast Archive",
+                "InjectFromMethod": {
+                  "ClassName": "SimPodcastArchive",
+                  "MethodName": "GetListItems",
+                  "Parameters": null
+                }
+            }
+          },
+          {
+            "Title": "Delete",
+            "Subtitle": "Delete your podcast",
+            "Requirements": null,
+            "ConfirmationString": "Are you sure you want to delete your podcast '{PodcastName}'?",
+            "Order": 0,
+            "Icon": "trash-can",
+            "Scenario": {
+              "ClassName": "ScenarioDeletePodcast",
+              "Parameters": []
+            },
+            "Group": "Activities",
+            "SubItems": null
+          },
+          {
+            "Title": "Promote",
+            "Subtitle": "Promote a product",
+            "Requirements": null,
+            "Order": 0,
+            "Icon": "chart-up",
+            "Scenario": {
+              "ClassName": "ScenarioPodcastPromote",
+              "Parameters": []
+            },
+            "Group": "Activities",
+            "SubItems": null
+          },
+          {
+            "Title": "Live Recording",
+            "Subtitle": "Host a live recording of your podcast",
+            "Requirements": null,
+            "Order": 0,
+            "Icon": "headphones",
+            "Scenario": {
+              "ClassName": "ScenarioStartLiveBroadcast",
+              "Parameters": []
+            },
+            "Group": "Activities",
+            "SubItems": null
+          },
+          {
+            "Title": "Record Season",
+            "Subtitle": "Develop podcast content",
+            "Requirements": "{CanRecordSeason}=true",
+            "Order": 0,
+            "Icon": "mic-studio",
+            "Scenario": {
+              "ClassName": "ScenarioPodcastCreateSeason",
+              "Parameters": []
+            },
+            "Group": "Activities",
+            "SubItems": null
+          },
+          {
+            "Title": "Subscription Fee",
+            "Subtitle": "Adjust your subscription rates",
+            "Requirements": null,
+            "Order": 0,
+            "Icon": "money-flying",
+            "Scenario": {
+              "ClassName": "ScenarioPodcastChangeSubscriptionFee",
+              "Parameters": []
+            },
+            "Group": "Activities",
+            "SubItems": null
+          }
+        ]
+      }
+    }
+  ]
+}
