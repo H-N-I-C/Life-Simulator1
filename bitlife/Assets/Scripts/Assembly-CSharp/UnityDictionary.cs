@@ -78,14 +78,10 @@ public abstract class UnityDictionary<K, V> : IDictionary<K, V>, ICollection<Key
 
 	protected abstract List<UnityKeyValuePair<K, V>> KeyValuePairs { get; set; }
 
-	// C# has no syntax for parameterized property 'Item'.
-	public virtual V get_Item(K key)
+	public virtual V this[K key]
 	{
-		return default;
-	}
-
-	public virtual void set_Item(K key, V value)
-	{
+		get { return default; }
+		set { }
 	}
 
 	public int Count => 0;

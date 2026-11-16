@@ -187,7 +187,7 @@ namespace Game.Translation
 		}
 
 		[StructLayout((LayoutKind)3)]
-		private struct _003C_003Ec__DisplayClass25_0
+		internal struct _003C_003Ec__DisplayClass25_0
 		{
 			public List<string> targetList;
 		}

@@ -39,14 +39,10 @@ public class WeightedList<T> : IList<WeightedEntry<T>>, ICollection<WeightedEntr
 
 	private bool _dirty;
 
-	// C# has no syntax for parameterized property 'Item'.
-	public WeightedEntry<T> get_Item(int index)
+	public WeightedEntry<T> this[int index]
 	{
-		return null;
-	}
-
-	public void set_Item(int index, WeightedEntry<T> value)
-	{
+		get { return null; }
+		set { }
 	}
 
 	public int Count => 0;

@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using Backend;
 using BitLife.UI.Managers;
 using Game;
-using IO.Didomi.SDK.Events;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -666,7 +665,7 @@ public class GameManager : MonoBehaviour
 	{
 	}
 
-	private void DidomiError(object sender, ErrorEvent e)
+	private void DidomiError(object sender, object e)
 	{
 	}
 

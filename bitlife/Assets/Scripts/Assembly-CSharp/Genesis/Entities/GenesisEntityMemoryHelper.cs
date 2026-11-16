@@ -7,7 +7,7 @@ namespace Genesis.Entities
 	public static class GenesisEntityMemoryHelper
 	{
 		[StructLayout((LayoutKind)3)]
-		private struct _003C_003Ec__DisplayClass3_0
+		internal struct _003C_003Ec__DisplayClass3_0
 		{
 			public GenesisEntityTransientMemoryScope transientScope;
 

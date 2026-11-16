@@ -3286,7 +3286,7 @@ public class DataHub
 	}
 
 	[StructLayout((LayoutKind)3)]
-	private struct _003C_003Ec__DisplayClass2451_0
+	internal struct _003C_003Ec__DisplayClass2451_0
 	{
 		public string baseSubstance;
 

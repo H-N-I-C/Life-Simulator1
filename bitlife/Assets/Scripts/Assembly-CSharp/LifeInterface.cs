@@ -1711,7 +1711,7 @@ public class LifeInterface
 	}
 
 	[StructLayout((LayoutKind)3)]
-	private struct _003C_003Ec__DisplayClass214_0
+	internal struct _003C_003Ec__DisplayClass214_0
 	{
 		public List<(string, string)> fileList;
 
@@ -1788,7 +1788,7 @@ public class LifeInterface
 	}
 
 	[StructLayout((LayoutKind)3)]
-	private struct _003C_003Ec__DisplayClass303_0
+	internal struct _003C_003Ec__DisplayClass303_0
 	{
 		public SimOutdoor outdoorLifestyle;
 	}
@@ -1819,7 +1819,7 @@ public class LifeInterface
 	}
 
 	[StructLayout((LayoutKind)3)]
-	private struct _003C_003Ec__DisplayClass318_0
+	internal struct _003C_003Ec__DisplayClass318_0
 	{
 		public SimRacing racing;
 
@@ -1829,7 +1829,7 @@ public class LifeInterface
 	}
 
 	[StructLayout((LayoutKind)3)]
-	private struct _003C_003Ec__DisplayClass319_0
+	internal struct _003C_003Ec__DisplayClass319_0
 	{
 		public ArrayList listItems;
 

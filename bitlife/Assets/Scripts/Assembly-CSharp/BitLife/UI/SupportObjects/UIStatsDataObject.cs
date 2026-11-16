@@ -47,7 +47,7 @@ namespace BitLife.UI.SupportObjects
 			return null;
 		}
 
-		private void _003CGetMainStats_003Eg__Add_007C9_0(StatType type, float value, BAR_GRAPH_COLOR_SCHEME colorScheme, [Optional][DefaultParameterValue(0)] BOOST_ATTRIBUTE boostAttribute, ref _003C_003Ec__DisplayClass9_0 P_4)
+		private void _003CGetMainStats_003Eg__Add_007C9_0(StatType type, float value, BAR_GRAPH_COLOR_SCHEME colorScheme, [Optional] BOOST_ATTRIBUTE boostAttribute, ref _003C_003Ec__DisplayClass9_0 P_4)
 		{
 		}
 	}
