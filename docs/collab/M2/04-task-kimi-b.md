@@ -1,0 +1,12 @@
+# M2 task draft — Kimi B: complete browser gameplay UI
+
+Await Claude assignment. Read team/process and M2 spec/contract. Own web/**, play-web.sh, render.py and B tests only. Do not edit service/rules or D's QA runner. No commits/pushes. Flag cross-agent contract traps early.
+
+1. Start from A's api-examples.json and C's parity-matrix.md. Preserve reviewed M0/M1 behavior; do not postpone avatar art defects by calling M2 functional parity complete. Route palette changes to A.
+2. Build persistent mobile character summary and timeline with real Education & Work, Relationships, Activities/Health and Finances screens. Render real available actions with bounded inputs, eligibility, age limits and known costs. Hide unimplemented M3+ catalogs. Target real Person IDs everywhere, including deceased journal participants.
+3. Support the serializable multi-decision annual flow: visible turn progress, pending dialog, naming inputs, choice enabled/reason states, exact costs, revision-conflict refresh and retry-stable request IDs. Reload and duplicate tabs must not repeat years or rewards. Backend owns simulation; client never repairs money/state on its own.
+4. Wire actual school/work/student loans, healthcare/activities, romance/parenting/adoption and finances as each reviewed vertical stage lands. Keep creator JSON export and real creation compatible. Do not silently coerce unsupported identity fields; ask Claude/A for semantics.
+5. Finances shows gross/tax/living costs/debt service/pension, net delta, balance/debts and ledger. Label forecasts versus completed transactions. Show childhood funds/parental support honestly; do not imply salary exists before employment.
+6. Add completed-life/history and eligible-child continuation screens, preserving old-life access and portraits. Clearly disclose cash-only inheritance at this stage. Do not fabricate a family-tree/property system.
+7. Focused HTTP/UI tests in tests/test_web_*.py cover every inventory action family, schema validation, paid rejection, school/work transition, pending restart, baby naming, divorce branch selection, retirement and succession. Coordinate interactive assertions/screenshots with D. Accessibility: keyboard dialogs/focus, text alternatives, reduced motion and phone-width/long-name/debt labels.
+8. Report changes, inventory coverage, actual focused tests and remaining screens in kimi-b-report.md; hc send t7. Leave browser evidence generation/runner edits to D; Codex runs the full suite at review.

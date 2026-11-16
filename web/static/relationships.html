@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>People — Life Simulator</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>People</h1>
+  <nav>
+    <a href="/creator">Creator</a>
+    <a href="/gallery">Gallery</a>
+    <a href="/relationships" aria-current="page">People</a>
+  </nav>
+</header>
+<main>
+  <p style="color:#8a8f98;">Demo relationships page built from test fixtures —
+  each person is a shared "person chip" (avatar + name + role + relationship).</p>
+  <div id="people"></div>
+</main>
+<script type="module">
+import { personChip } from "/static/common.js";
+const res = await fetch("/api/people");
+const people = await res.json();
+const box = document.getElementById("people");
+if (!people.length) {
+  box.innerHTML = '<div class="card">No fixtures yet — ' +
+    'tests/fixtures/appearances/*.json will appear here.</div>';
+}
+for (const p of people) {
+  box.appendChild(personChip(p, { relationship: p.relationship ?? null }));
+}
+</script>
+</body>
+</html>

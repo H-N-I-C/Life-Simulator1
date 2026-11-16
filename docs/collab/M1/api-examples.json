@@ -1,0 +1,472 @@
+{
+  "description": "M1 API examples for the frozen application contract (docs/collab/M1/01-spec.md). Every example uses the same fictional game so IDs and revisions are internally consistent. All states match GameService.get_state() output exactly.",
+  "profile_example": {
+    "first_name": "Ada",
+    "last_name": "Nightingale",
+    "gender": "female",
+    "country": "Australia",
+    "appearance": {
+      "schema_version": 1,
+      "seed": 20261116,
+      "skin_tone": "skin_04",
+      "face_shape": "oval",
+      "eye_shape": "almond",
+      "eye_color": "brown_dark",
+      "brows": "soft",
+      "nose": "button",
+      "mouth": "smile",
+      "hair_texture": "curly",
+      "hair_color": "black",
+      "marks": [
+        "freckles"
+      ],
+      "hair_style": "afro_medium",
+      "facial_hair": "none",
+      "accessories": {
+        "glasses": "none",
+        "headwear": "none",
+        "earrings": "studs"
+      },
+      "outfit_style": "tee",
+      "outfit_color": "blue"
+    },
+    "seed": 12345
+  },
+  "new_game_request": {
+    "request_id": "req-create-001",
+    "profile": "see profile_example; request body is the profile fields plus request_id at the top level"
+  },
+  "new_game_response": {
+    "schema_version": 1,
+    "game_id": "g_5f2e91",
+    "revision": 1,
+    "status": "alive",
+    "player_id": "p_01",
+    "people": [
+      {
+        "id": "p_01",
+        "name": "Ada Nightingale",
+        "role": "player",
+        "age": 0,
+        "alive": true,
+        "appearance": "full Appearance dict, identical to the submitted profile.appearance (manual appearance wins)"
+      },
+      {
+        "id": "p_02",
+        "name": "Marla Nightingale",
+        "role": "mother",
+        "age": 31,
+        "alive": true,
+        "relationship": 97,
+        "appearance": "generated, inherited-consistent Appearance dict"
+      },
+      {
+        "id": "p_03",
+        "name": "Dev Nightingale",
+        "role": "father",
+        "age": 33,
+        "alive": true,
+        "relationship": 95,
+        "appearance": "generated Appearance dict"
+      }
+    ],
+    "stats": {
+      "happiness": 72,
+      "health": 88,
+      "smarts": 41,
+      "looks": 55
+    },
+    "money": 0,
+    "country": "Australia",
+    "journal": [
+      {
+        "id": "j_1",
+        "age": 0,
+        "kind": "birth",
+        "text": "Ada Nightingale was born in Australia.",
+        "person_ids": [
+          "p_01",
+          "p_02",
+          "p_03"
+        ],
+        "changes": {}
+      }
+    ],
+    "available_actions": [
+      {
+        "id": "age_up",
+        "label": "Age up"
+      },
+      {
+        "id": "spend_time",
+        "label": "Spend time with Marla",
+        "target_id": "p_02"
+      },
+      {
+        "id": "spend_time",
+        "label": "Spend time with Dev",
+        "target_id": "p_03"
+      }
+    ],
+    "pending_decision": null
+  },
+  "spend_time_request": {
+    "expected_revision": 1,
+    "request_id": "req-st-001",
+    "action": "spend_time",
+    "payload": {
+      "target_id": "p_02"
+    }
+  },
+  "age_up_response_revision_3": {
+    "note": "State after two successful age_up commands (revision 3). Only changed fields shown.",
+    "schema_version": 1,
+    "game_id": "g_5f2e91",
+    "revision": 3,
+    "status": "alive",
+    "player_id": "p_01",
+    "people": "same IDs p_01/p_02/p_03; ages 2/33/35; relationships updated",
+    "stats": {
+      "happiness": 70,
+      "health": 87,
+      "smarts": 42,
+      "looks": 56
+    },
+    "money": 0,
+    "country": "Australia",
+    "journal": [
+      {
+        "id": "j_1",
+        "age": 0,
+        "kind": "birth",
+        "text": "Ada Nightingale was born in Australia.",
+        "person_ids": [
+          "p_01",
+          "p_02",
+          "p_03"
+        ],
+        "changes": {}
+      },
+      {
+        "id": "j_2",
+        "age": 1,
+        "kind": "year",
+        "text": "Ada turned 1.",
+        "person_ids": [
+          "p_01"
+        ],
+        "changes": {
+          "happiness": -2,
+          "health": -1
+        }
+      },
+      {
+        "id": "j_3",
+        "age": 2,
+        "kind": "year",
+        "text": "Ada turned 2.",
+        "person_ids": [
+          "p_01"
+        ],
+        "changes": {
+          "happiness": 1,
+          "health": 1
+        }
+      }
+    ],
+    "available_actions": [
+      {
+        "id": "age_up",
+        "label": "Age up"
+      },
+      {
+        "id": "spend_time",
+        "label": "Spend time with Marla",
+        "target_id": "p_02"
+      },
+      {
+        "id": "spend_time",
+        "label": "Spend time with Dev",
+        "target_id": "p_03"
+      }
+    ],
+    "pending_decision": null
+  },
+  "pending_decision_response": {
+    "note": "An age_up that samples a contextual decision returns the advanced age plus pending_decision. The year's core effects are already applied; resolving applies only the option effects.",
+    "schema_version": 1,
+    "game_id": "g_5f2e91",
+    "revision": 4,
+    "status": "alive",
+    "player_id": "p_01",
+    "people": "ages 4/35/37",
+    "stats": {
+      "happiness": 70,
+      "health": 86,
+      "smarts": 43,
+      "looks": 56
+    },
+    "money": 0,
+    "country": "Australia",
+    "journal": [
+      {
+        "id": "j_1",
+        "age": 0,
+        "kind": "birth",
+        "text": "Ada Nightingale was born in Australia.",
+        "person_ids": [
+          "p_01",
+          "p_02",
+          "p_03"
+        ],
+        "changes": {}
+      },
+      {
+        "id": "j_4",
+        "age": 4,
+        "kind": "year",
+        "text": "Ada turned 4.",
+        "person_ids": [
+          "p_01"
+        ],
+        "changes": {
+          "health": -1
+        }
+      }
+    ],
+    "available_actions": [],
+    "pending_decision": {
+      "id": "d_1",
+      "title": "A new friend",
+      "text": "A kid from the neighbourhood invites Ada to play in the park.",
+      "person_ids": [],
+      "options": [
+        {
+          "id": "d_1_o1",
+          "label": "Go play",
+          "known_effects": [
+            "+happiness",
+            "+health"
+          ]
+        },
+        {
+          "id": "d_1_o2",
+          "label": "Stay home",
+          "known_effects": [
+            "+smarts"
+          ]
+        }
+      ]
+    }
+  },
+  "resolve_decision_request": {
+    "expected_revision": 4,
+    "request_id": "req-dec-001",
+    "action": "resolve_decision",
+    "payload": {
+      "decision_id": "d_1",
+      "option_id": "d_1_o1"
+    }
+  },
+  "resolve_decision_response": {
+    "note": "After resolving, pending_decision is null, revision 5, a journal entry of kind 'decision' records the outcome, and normal actions return.",
+    "schema_version": 1,
+    "game_id": "g_5f2e91",
+    "revision": 5,
+    "status": "alive",
+    "player_id": "p_01",
+    "people": "unchanged",
+    "stats": {
+      "happiness": 78,
+      "health": 89,
+      "smarts": 43,
+      "looks": 56
+    },
+    "money": 0,
+    "country": "Australia",
+    "journal": [
+      {
+        "id": "j_1",
+        "age": 0,
+        "kind": "birth",
+        "text": "Ada Nightingale was born in Australia.",
+        "person_ids": [
+          "p_01",
+          "p_02",
+          "p_03"
+        ],
+        "changes": {}
+      },
+      {
+        "id": "j_4",
+        "age": 4,
+        "kind": "year",
+        "text": "Ada turned 4.",
+        "person_ids": [
+          "p_01"
+        ],
+        "changes": {
+          "health": -1
+        }
+      },
+      {
+        "id": "j_5",
+        "age": 4,
+        "kind": "decision",
+        "text": "Ada went to the park with a new friend.",
+        "person_ids": [],
+        "changes": {
+          "happiness": 8,
+          "health": 3
+        }
+      }
+    ],
+    "available_actions": [
+      {
+        "id": "age_up",
+        "label": "Age up"
+      },
+      {
+        "id": "spend_time",
+        "label": "Spend time with Marla",
+        "target_id": "p_02"
+      },
+      {
+        "id": "spend_time",
+        "label": "Spend time with Dev",
+        "target_id": "p_03"
+      }
+    ],
+    "pending_decision": null
+  },
+  "death_response": {
+    "note": "From a separate near-end-of-life test game. status becomes 'dead', available_actions is empty, journal gains a 'death' entry, and the full history remains readable.",
+    "schema_version": 1,
+    "game_id": "g_elder7",
+    "revision": 62,
+    "status": "dead",
+    "player_id": "p_01",
+    "people": [
+      {
+        "id": "p_01",
+        "name": "Oma Rose",
+        "role": "player",
+        "age": 101,
+        "alive": false,
+        "appearance": "..."
+      }
+    ],
+    "stats": {
+      "happiness": 40,
+      "health": 0,
+      "smarts": 60,
+      "looks": 20
+    },
+    "money": 12400,
+    "country": "Australia",
+    "journal": [
+      {
+        "id": "j_1",
+        "age": 0,
+        "kind": "birth",
+        "text": "Oma Rose was born in Australia.",
+        "person_ids": [
+          "p_01"
+        ],
+        "changes": {}
+      },
+      {
+        "id": "j_62",
+        "age": 101,
+        "kind": "death",
+        "text": "Oma Rose passed away at the age of 101.",
+        "person_ids": [
+          "p_01"
+        ],
+        "changes": {}
+      }
+    ],
+    "available_actions": [],
+    "pending_decision": null
+  },
+  "list_games_response": {
+    "games": [
+      {
+        "game_id": "g_5f2e91",
+        "name": "Ada Nightingale",
+        "age": 4,
+        "status": "alive",
+        "revision": 5
+      },
+      {
+        "game_id": "g_elder7",
+        "name": "Oma Rose",
+        "age": 101,
+        "status": "dead",
+        "revision": 62
+      }
+    ]
+  },
+  "errors": {
+    "invalid_input_400": {
+      "error": {
+        "code": "invalid_input",
+        "message": "appearance.skin_tone is not a valid catalog ID"
+      }
+    },
+    "not_found_404": {
+      "error": {
+        "code": "not_found",
+        "message": "unknown game or target"
+      }
+    },
+    "stale_revision_409": {
+      "error": {
+        "code": "stale_revision",
+        "message": "expected_revision 3 does not match current revision 5"
+      }
+    },
+    "pending_decision_409": {
+      "error": {
+        "code": "pending_decision",
+        "message": "resolve the pending decision before other actions"
+      }
+    },
+    "replay_expired_409": {
+      "error": {
+        "code": "stale_revision",
+        "message": "request is older than the replay retention window"
+      }
+    },
+    "internal_500": {
+      "error": {
+        "code": "internal_error",
+        "message": "the operation failed; no changes were applied"
+      }
+    },
+    "conflict_409": {
+      "error": {
+        "code": "conflict",
+        "message": "request_id req-st-001 was already used with a different payload"
+      }
+    },
+    "not_allowed_409": {
+      "error": {
+        "code": "not_allowed",
+        "message": "you already spent time with this person this year"
+      }
+    },
+    "bad_option_400": {
+      "error": {
+        "code": "invalid_input",
+        "message": "unknown option"
+      }
+    }
+  },
+  "replay_semantics": {
+    "identical_replay": "same request_id + identical payload returns the original successful response byte-identical, without reapplying effects (also after server restart); the response carries no extra marker fields",
+    "conflicting_replay": "same request_id + different payload -> 409 replay_conflict",
+    "expired_replay": "request_ids are retained for the last 100 successful commands per game; older duplicates fail 409 instead of reapplying",
+    "order": "known replay is checked before the revision check"
+  }
+}

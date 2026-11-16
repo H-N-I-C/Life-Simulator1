@@ -1,6 +1,8 @@
 from random import randint
+import uuid
 
 from src.lifesim_lib.lifesim_lib import *
+from src.appearance.integration import ensure_appearance
 
 
 class Person:
@@ -18,6 +20,11 @@ class Person:
         self.smarts = smarts
         self.looks = looks
         self.teen_looks_inc = 0
+        # Immutable persisted PERSON identity (os.urandom-backed; never
+        # consumes gameplay RNG). Distinct from Player.ID, which is the
+        # legacy save-slot identifier. Legacy saves are backfilled on load.
+        self.person_id = str(uuid.uuid4())
+        self.appearance = ensure_appearance(self)
         self.update_name()
 
     def update_name(self):

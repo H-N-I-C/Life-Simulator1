@@ -1,0 +1,301 @@
+{
+  "description": "FROZEN M2 rule-boundary examples (A-owned). Shapes per 02-contract.md and the frozen phase map. C may ADD executable examples but must not change frozen shapes without Claude approval. Shapes freeze only after A+C sign-off and Claude approval.",
+  "rule_result_example": {
+    "_comment": "income phase, player account only; child accounts follow in later items of the same phase (see multi_account_example). Amounts are REAL values from C's annual_income_quote(30000, has_job=True, job_hours=40, retention=0.6): tax per SALARY_TAX_BRACKETS; net = gross - tax - expenses by construction. Continuation points at the NEXT phase (education) with item_cursor 0.",
+    "events": [
+      {
+        "kind": "income",
+        "text": "You earned $30,000 before tax this year.",
+        "template": null,
+        "person_ids": [
+          "<player person_id>"
+        ],
+        "changes": {},
+        "relationship_changes": {}
+      }
+    ],
+    "money_entries": [
+      {
+        "phase": "income",
+        "occurrence_id": "salary",
+        "leg": "gross",
+        "account_owner_id": "<player person_id>",
+        "category": "income",
+        "amount": 30000,
+        "description": "Annual gross pay"
+      },
+      {
+        "phase": "income",
+        "occurrence_id": "salary",
+        "leg": "tax",
+        "account_owner_id": "<player person_id>",
+        "category": "tax",
+        "amount": -3401,
+        "description": "Income tax"
+      },
+      {
+        "phase": "income",
+        "occurrence_id": "salary",
+        "leg": "expenses",
+        "account_owner_id": "<player person_id>",
+        "category": "expenses",
+        "amount": -10640,
+        "description": "Living expenses"
+      }
+    ],
+    "pending_decision": null,
+    "continuation": {
+      "phase_id": "education",
+      "item_cursor": 0
+    },
+    "finished_turn": false,
+    "_money_note": "amounts ILLUSTRATIVE until C's annual_income_quote lands with real tax brackets; executable fixture must assert gross - tax - expenses == net exactly"
+  },
+  "multi_account_example": {
+    "_comment": "income phase with TWO accounts: player and working child. Child income posts to the CHILD's account, not the household. Posting keys differ by account_id, so no collision.",
+    "events": [
+      {
+        "kind": "income",
+        "text": "Your child Kit earned $4,800 this year.",
+        "template": null,
+        "person_ids": [
+          "<child person_id>"
+        ],
+        "changes": {},
+        "relationship_changes": {}
+      }
+    ],
+    "money_entries": [
+      {
+        "phase": "income",
+        "occurrence_id": "child_net:kit",
+        "leg": "net",
+        "account_owner_id": "<child person_id>",
+        "category": "child_net",
+        "amount": 4800,
+        "description": "Child net income"
+      }
+    ],
+    "pending_decision": null,
+    "continuation": {
+      "phase_id": "income",
+      "item_cursor": 1,
+      "done": [
+        "<player person_id>"
+      ]
+    },
+    "finished_turn": false
+  },
+  "interrupted_after_one_account_example": {
+    "_comment": "income phase posted the player account, then the command failed/restarted. The persisted cursor resumes at item_cursor 1 (the child); the player posting is NOT repeated because its source_key is already posted.",
+    "persisted_cursor": {
+      "phase_id": "income",
+      "item_cursor": 1,
+      "done": [
+        "<player person_id>"
+      ]
+    },
+    "posted_keys": [
+      "t_000042:income:salary:<player person_id>:gross"
+    ],
+    "retry_behavior": "re-enter income phase at item_cursor 1; idempotent keys return original rows; no double credit"
+  },
+  "pending_choice_example": {
+    "_comment": "family_events phase offers a divorce choice; continuation points AFTER the current event via item_cursor. Two choices in one phase and per-entity markers prevent rerunning.",
+    "events": [
+      {
+        "kind": "event",
+        "text": "Your partner wants a divorce.",
+        "template": null,
+        "person_ids": [
+          "<partner person_id>"
+        ],
+        "changes": {},
+        "relationship_changes": {}
+      }
+    ],
+    "money_entries": [],
+    "pending_decision": {
+      "id": "d_7",
+      "kind": "partner_divorce",
+      "title": "Divorce",
+      "text": "Your partner wants a divorce. What will you do?",
+      "person_ids": [
+        "<partner person_id>"
+      ],
+      "options": [
+        {
+          "id": "o1",
+          "label": "Wish them well",
+          "known_effects": [
+            "divorce proceeds"
+          ],
+          "enabled": true,
+          "reason": null,
+          "inputs": [],
+          "_sampled": {
+            "divorce": true,
+            "settlement": -12000
+          }
+        }
+      ],
+      "continuation_after_resolve": {
+        "phase_id": "family_events",
+        "item_cursor": 3
+      }
+    },
+    "continuation": null,
+    "finished_turn": false
+  },
+  "two_choices_one_phase_example": {
+    "_comment": "family_events with a divorce (person A) then a child event (person B). Each stores its own sampled outcome and its own continuation; resolving the first resumes at the second, resolving the second resumes after the phase.",
+    "first_choice_continuation": {
+      "phase_id": "family_events",
+      "item_cursor": 3
+    },
+    "second_choice_continuation": {
+      "phase_id": "illness",
+      "item_cursor": 0
+    },
+    "completion_markers": {
+      "family_events": [
+        "divorce:<partner person_id>",
+        "child_event:<child person_id>"
+      ]
+    }
+  },
+  "terminal_transition_example": {
+    "_comment": "a fatal effect ends the turn immediately: only close phases run afterward",
+    "events": [
+      {
+        "kind": "death",
+        "text": "You died due to complications of cancer.",
+        "template": null,
+        "person_ids": [
+          "<player person_id>"
+        ],
+        "changes": {},
+        "relationship_changes": {}
+      }
+    ],
+    "money_entries": [],
+    "pending_decision": null,
+    "continuation": {
+      "phase_id": "year_close",
+      "item_cursor": 0
+    },
+    "finished_turn": true
+  },
+  "action_spec_example": {
+    "id": "study",
+    "label": "Study harder",
+    "category": "education",
+    "target_id": null,
+    "inputs": [],
+    "known_costs": [],
+    "limits": [
+      "once_per_year"
+    ]
+  },
+  "action_input_example": {
+    "_comment": "costs/eligibility from parity-matrix row 66: admission at age 17, NO application fee",
+    "id": "university_application",
+    "category": "education",
+    "trigger": "annual phase education at age 17",
+    "inputs": [
+      {
+        "id": "funding",
+        "type": "choice",
+        "label": "Funding",
+        "required": true,
+        "choices": [
+          "scholarship",
+          "student_loan",
+          "parents"
+        ]
+      }
+    ],
+    "known_costs": [],
+    "limits": [
+      "age_17",
+      "graduated_high_school"
+    ]
+  },
+  "naming_decision_example": {
+    "_comment": "birth naming: pending choice with a bounded text input; private sampled data stays server-side",
+    "pending_decision": {
+      "id": "d_9",
+      "kind": "baby_naming",
+      "title": "A baby girl!",
+      "text": "What will you name her?",
+      "person_ids": [
+        "<baby person_id>"
+      ],
+      "options": [
+        {
+          "id": "o1",
+          "label": "Choose a name",
+          "known_effects": [],
+          "enabled": true,
+          "reason": null,
+          "inputs": [
+            {
+              "id": "name",
+              "type": "text",
+              "label": "First name",
+              "required": true,
+              "min": 1,
+              "max": 40
+            }
+          ]
+        }
+      ],
+      "continuation_after_resolve": {
+        "phase_id": "family_events",
+        "item_cursor": 4
+      }
+    }
+  },
+  "context_example": {
+    "note": "Duck-typed fields C reads; built by A's src/game context factory. Never import GameService from rule code.",
+    "player": "<Player instance>",
+    "people_by_id": {
+      "<person_id>": "<Person>"
+    },
+    "annual_flags": {
+      "studied": false,
+      "spent_time": [
+        "<person_id>"
+      ]
+    },
+    "cursor": {
+      "phase_id": "family_events",
+      "item_cursor": 3
+    },
+    "turn_id": "t_000042",
+    "turn_snapshot": [
+      "<person_id>",
+      "<person_id>"
+    ],
+    "done_markers": {
+      "family_events": [
+        "divorce:<person_id>"
+      ]
+    },
+    "data": {
+      "version": 2
+    }
+  },
+  "ledger_row_example": {
+    "id": "le_1",
+    "source_key": "t_000042:income:salary:<player person_id>:gross",
+    "turn_id": "t_000042",
+    "age": 30,
+    "person_id": "<player person_id>",
+    "category": "income",
+    "amount": 30000,
+    "balance_after": 31250,
+    "description": "Annual gross salary",
+    "group_id": null
+  }
+}

@@ -45,12 +45,53 @@ class Child(Relationship):
         self.may_divorce = False
         self.adopted = adopted
         self.player = None
+        self._appearance_finalized = False
+        self.finalize_appearance()
+
+    def finalize_appearance(self):
+        """Settle the child's appearance once biological parents are known.
+
+        Idempotent: re-inherits only when a genuinely new parent is attached
+        during creation. Repeated finalize/set_parent calls with the same
+        parents, and parent re-attachment on loaded children, never change
+        an established appearance. Parent identity uses the immutable
+        persisted Person.person_id (never names, seeds or process-local id()).
+        """
+        import uuid as _uuid
+        from src.appearance.integration import ensure_appearance
+        if self.adopted:
+            self._appearance_finalized = True
+            self._finalized_parent_ids = []
+            return
+        parents = [p for p in (self.mother, self.father) if p is not None]
+        if not parents:
+            return
+        for parent in parents:
+            if not getattr(parent, "person_id", None):
+                parent.person_id = str(_uuid.uuid4())  # legacy backfill
+        current = {p.person_id for p in parents}
+        prev = getattr(self, "_finalized_parent_ids", None)
+        if self._appearance_finalized and prev is None:
+            # Established (e.g. loaded) child: record current parents and
+            # never reroll the existing appearance.
+            self._finalized_parent_ids = sorted(current)
+            return
+        if prev is not None and current <= set(prev):
+            return  # no new parent attached
+        ensure_appearance(self, self.mother, self.father)
+        self._finalized_parent_ids = sorted(current)
+        self._appearance_finalized = True
+
+    @staticmethod
+    def _parent_key(parent):
+        return getattr(parent, "ID", None)
         
     def set_parent(self, player):
     	if player.gender == Gender.Male:
     		self.father = player
     	else:
     		self.mother = player
+    	self.finalize_appearance()
 
     def name_accusative(self):
         if self.adopted:
@@ -124,7 +165,7 @@ class Child(Relationship):
             tax = calculate_tax(self.salary)
             income = self.salary - tax
             income *= random.uniform(0.4, 0.8)
-            self.money += round_stochastic(self.salary)
+            self.money += round_stochastic(income)
         can_get_job = self.salary == 0 and self.age >= 18 and self.is_in_uv == 0
         if can_get_job and randint(1, 3) == 1:
             attempts = randint(2, 7)

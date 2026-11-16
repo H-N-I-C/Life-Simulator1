@@ -1,0 +1,12 @@
+# M1 task — Kimi A: engine/application boundary
+
+Draft: await Claude assignment after M0 approval. Read ../00-PROCESS.md and 01-spec.md. Own only A's files in the spec; do not edit web, renderer, B tests or shared test bootstrap. No commits/pushes.
+
+1. FIRST publish `api-examples.json`: new-game state, pending decision, completed decision, death, list response and errors matching the frozen service contract. Notify B through `hc send t12` and Claude through `hc send t7`. Keep example IDs/revisions internally consistent.
+2. Remove import-time language prompts; expose explicit terminal setup preserving terminal startup. Resolve reached import cycles without monkeypatching input. Add a closed-stdin subprocess import check.
+3. Implement `src/game/` service, structured state/events/decisions and dedicated RNG. Reuse Player/Person/appearance; isolate the limited rule slice instead of invoking legacy interactive yearly methods. Implement real creation, parental interaction, yearly effects, six age-contextual decisions, pending resolution and basic death. Document exactly which legacy rules are extracted/deferred. Preserve chosen creator appearance and assign stable person IDs.
+4. Implement web-save envelope and service locking, revisions, durable request replay including creation, and atomic rollback on failed writes. Retain safe-save protections; reject unsafe IDs/symlinks and unsupported schema. Never modify terminal save slots. Keep engine/API input validation authoritative.
+5. Test with unittest and temporary directories: deterministic seeds and RNG isolation between games; no stdin/stdout dependency; character/parent avatars and IDs preserved; yearly interaction limits; exactly-once year/decision/replay across restart; stale/conflicting requests; invalid target/options and ranges; save-write failure rollback; unknown/corrupt schema; age/death and retained journal; M0 appearance regressions. Include children/relatives where relevant, not merely initial player fields.
+6. Write `kimi-a-report.md` with changed files, source-rule mapping, actual commands/results, how B initializes/calls the service, and remaining limitations. Send `hc send t7 "M1 A ready: docs/collab/M1/kimi-a-report.md"`, then await review.
+
+Coordinate before touching a file owned by M0 work or altering the frozen contract. Do not mask missing mechanics with broad exception handling or hardcoded fixture people.

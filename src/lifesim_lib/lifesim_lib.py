@@ -1,6 +1,8 @@
 from enum import Enum
 import math, os, random, pickle
 from sys import platform
+from pathlib import Path
+from src.lifesim_lib.safe_save import load_save
 
 from src.lifesim_lib.const import *
 from src.lifesim_lib.translation import lang, _
@@ -39,7 +41,8 @@ class TranslateMarker:
 
 
 def get_save_files():
-    return os.listdir(SAVE_PATH)
+    return sorted(p.name for p in Path(SAVE_PATH).glob("*.pickle")
+                  if p.is_file() and not p.is_symlink())
 
 
 def get_saves(saves=None):
@@ -47,8 +50,16 @@ def get_saves(saves=None):
         saves = get_save_files()
     players = []
     for filename in saves:
-        p = SAVE_PATH + "/" + filename
-        players.append(pickle.load(open(p, "rb")))
+        p = Path(SAVE_PATH) / filename
+        if p.is_symlink() or p.resolve().parent != Path(SAVE_PATH).resolve():
+            raise ValueError("Save must be inside game_saves")
+        with p.open("rb") as stream:
+            data = load_save(stream)
+        if not isinstance(data, dict):
+            raise ValueError("Invalid save data")
+        # Never trust a filesystem path supplied inside a save file.
+        data["save_path"] = str(p.resolve())
+        players.append(data)
     return players
 
 
@@ -299,10 +310,10 @@ def int_input_range(lo, hi):
 
 def int_input_range_optional(lo, hi):
     while True:
+        val = input()
+        if val == "":
+            return None
         try:
-            val = input()
-            if val is None:
-                return None
             val = int(val)
         except ValueError:
             print(_("Invalid input; try again."))

@@ -526,6 +526,10 @@ def main_menu(player):
 				print(_("You dropped out of school."))
 				if player.uv_years > 0:
 					player.uv_years = 0
+					# Student-loan policy: no retroactive tuition debt;
+					# drop the stale funding flag, keep existing debt.
+					if player.student_loan == 0:
+						player.chose_student_loan = False
 			else:
 				player.tried_to_drop_out = True
 				print(_("Your parents won't let you drop out of school."))

@@ -21,7 +21,8 @@ def start_menu():
             return Player.load(d)
     choice = choice_input(_("Random Life"), _("Custom Life"))
 
-    if choice == 2:
+    custom_life = choice == 2
+    if custom_life:
         print(_("Choose your gender:"))
         choice = choice_input(_("Male"), _("Female"))
         gender = Gender.Male if choice == 1 else Gender.Female
@@ -72,8 +73,6 @@ def start_menu():
                     else:
                         player.traits[trait] = ALL_TRAITS_DICT[trait]
             clear_screen()
-        player.after_trait_select()
-        return player
     else:
         player = Player()
     mother = player.parents["Mother"]
@@ -106,6 +105,7 @@ def start_menu():
                 age=sibling.age,
             )
         )
-    player.randomize_traits()
+    if not custom_life:
+        player.randomize_traits()
     player.after_trait_select()
     return player

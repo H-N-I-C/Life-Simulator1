@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Character Creator — Life Simulator</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>Character Creator</h1>
+  <nav>
+    <a href="/creator" aria-current="page">Creator</a>
+    <a href="/gallery">Gallery</a>
+    <a href="/relationships">People</a>
+  </nav>
+</header>
+<main>
+  <section class="card preview-wrap" aria-label="Preview">
+    <div id="preview" class="preview" aria-live="polite"></div>
+    <p class="row" style="justify-content:center; margin:8px 0 0;">
+      <strong id="ageLabel">Adult · 30</strong>
+    </p>
+    <label class="field" for="age">
+      Age preview
+      <input type="range" id="age" min="0" max="80" value="30">
+    </label>
+  </section>
+
+  <section class="card" aria-label="Identity">
+    <label class="field" for="name">Name
+      <input id="name" type="text" value="Alex Rivers" autocomplete="off">
+    </label>
+    <label class="field" for="gender">Gender
+      <select id="gender">
+        <option value="female">Female</option>
+        <option value="male" selected>Male</option>
+      </select>
+    </label>
+    <label class="field" for="country">Country
+      <select id="country"></select>
+    </label>
+  </section>
+
+  <section class="card">
+    <div class="row" style="margin-bottom:10px;">
+      <button class="primary" id="randomAll">🎲 Randomize all</button>
+      <button id="randomCat">Randomize category</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+    <label class="field" for="preset">Preset
+      <select id="preset"></select>
+    </label>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div id="options" class="swatches"></div>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <button class="primary" id="startBtn">Start life</button>
+      <button id="saveBtn">Export JSON</button>
+      <button id="printBtn">Print JSON</button>
+    </div>
+    <p id="startMsg" style="color:#a53b3b;font-weight:700;"></p>
+  </section>
+</main>
+<script type="module" src="/static/creator.js"></script>
+</body>
+</html>

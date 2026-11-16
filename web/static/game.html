@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Life — Life Simulator</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>Life</h1>
+  <nav>
+    <a href="/game" aria-current="page">Game</a>
+    <a href="/creator">Creator</a>
+    <a href="/gallery">Gallery</a>
+  </nav>
+</header>
+<main>
+  <div id="toast" class="toast" role="alert" hidden></div>
+
+  <!-- resume / new life -->
+  <section id="resumeView" hidden>
+    <div class="card">
+      <h2>Your lives</h2>
+      <div id="lifeList"><p>No lives yet.</p></div>
+      <div class="row" style="margin-top:10px;">
+        <a class="btnlink" href="/creator"><button class="primary">Start a new life</button></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- completed life / continuation -->
+  <section id="legacyView" hidden></section>
+
+  <!-- active game -->
+  <section id="gameView" hidden>
+    <div class="card" id="playerCard"></div>
+    <div class="card" id="turnCard" hidden></div>
+
+    <section id="screen-summary" class="screen" hidden>
+      <div class="card" id="timelineCard">
+        <h2>Timeline</h2>
+        <ol id="journalList" class="journal"></ol>
+      </div>
+    </section>
+
+    <section id="screen-education" class="screen" hidden>
+      <div class="card" id="educationCard"></div>
+      <div class="card"><h2>Education actions</h2><div id="actions-education" class="actionlist"></div></div>
+    </section>
+
+    <section id="screen-work" class="screen" hidden>
+      <div class="card" id="workCard"></div>
+      <div class="card"><h2>Work actions</h2><div id="actions-work" class="actionlist"></div></div>
+    </section>
+
+    <section id="screen-relationships" class="screen" hidden>
+      <div class="card"><h2>Family</h2><div id="familyList"></div></div>
+      <div class="card"><h2>Relationship actions</h2><div id="actions-relationships" class="actionlist"></div></div>
+    </section>
+
+    <section id="screen-activities" class="screen" hidden>
+      <div class="card" id="activitiesCard"></div>
+      <div class="card"><h2>Activities</h2><div id="actions-activities" class="actionlist"></div></div>
+      <div class="card"><h2>Health</h2><div id="healthCard"></div>
+        <div id="actions-health" class="actionlist"></div></div>
+    </section>
+
+    <section id="screen-finances" class="screen" hidden>
+      <div class="card" id="financesCard"></div>
+      <div class="card"><h2>Finance actions</h2><div id="actions-finances" class="actionlist"></div></div>
+    </section>
+
+    <div class="card">
+      <h2>General</h2>
+      <div class="row" id="actionList"></div>
+    </div>
+    <div class="row" style="margin-bottom:24px;">
+      <button id="backToLives">All lives</button>
+    </div>
+  </section>
+
+  <nav id="tabbar" class="tabbar" hidden aria-label="Game sections">
+    <button data-screen="summary" aria-current="page">Summary</button>
+    <button data-screen="education">Education</button>
+    <button data-screen="work">Work</button>
+    <button data-screen="relationships">Family</button>
+    <button data-screen="activities">Activities</button>
+    <button data-screen="finances">Finances</button>
+  </nav>
+</main>
+
+<!-- pending decision / action form modal -->
+<div id="modal" class="modal" hidden role="dialog" aria-modal="true"
+     aria-labelledby="modalTitle">
+  <div class="modal-box">
+    <h2 id="modalTitle"></h2>
+    <p id="modalText"></p>
+    <div id="modalPeople" class="row"></div>
+    <form id="modalForm"></form>
+    <div id="modalOptions" class="row"></div>
+    <div class="row" style="margin-top:12px;">
+      <button type="button" id="modalCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/static/game.js"></script>
+</body>
+</html>

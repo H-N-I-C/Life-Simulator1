@@ -57,7 +57,10 @@ class Partner(Relationship):
 
     def compatibility_check(self, other):
         if randint(1, 6) == 1:
-            k = other.karma if isinstance(other, Player) else 50
+            # Players carry karma; other relationship objects do not
+            k = getattr(other, "karma", 50)
+            if k is None:
+                k = 50
             return randint(1, 100) <= k
         c1 = other.looks - self.looks + 50
         c2 = other.smarts - self.smarts + 50
@@ -73,6 +76,3 @@ class Partner(Relationship):
 
     def name_accusative(self):
         return self.get_translated_type().lower() + ", " + self.firstname
-
-
-from src.people.classes.player import Player

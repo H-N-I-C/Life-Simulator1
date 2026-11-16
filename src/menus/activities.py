@@ -48,58 +48,11 @@ def activities_menu(player):
 				if player.has_trait("CHEERFUL"):
 					happy_gain += 5
 				sayings = [
-					"You played with your toys.",
-					"You had a lot of fun playing with your toys.",
+					_("You played with your toys."),
+					_("You had a lot of fun playing with your toys."),
 				]
 				if x_in_y(3, 5):
-					if player.age < 3:
-						sayings = [
-							_("You played with your toy wagon."),
-							_("You played with some of your balls."),
-							_("You raced around on your foot propelled bike."),
-							_("You played with your push-pull toy."),
-							_(
-								"You put toys in your wagon and pulled them around the living room."
-							),
-							_("You swung on your toddler swing."),
-							_("You slid on your toddler slide."),
-							_("You played with your stacking toys."),
-							_("You played with your nesting toys."),
-							_("You played with your shape sorter."),
-							_("You played with your pop-up toys."),
-							_("You played with your puzzle with knobs."),
-							_("You played with your blocks."),
-							_("You played in your sandbox."),
-							_("You played with your sandbox toys."),
-							_("You played in your wading pool."),
-							_("You played with your wading pool toys"),
-							_("You played with your bath toys."),
-							_(
-								"Your mum gave you a bath and you played with your bath toys."
-							),
-							_(
-								"Your dad gave you a bath and you played with your bath toys."
-							),
-							_("You played with your stuffed animals."),
-							_("You played with your dolls."),
-							_("You played with your play vehicles."),
-							_("You played with your toy kitchen equipment."),
-							_("You played with your toy kitchen gadgets."),
-							_("You played with your toy telephone."),
-							_("You played with your toy lawn mower."),
-							_("You played with your toy shopping cart."),
-							_("You played with your toy workbench."),
-							_("You played in your playhouse."),
-							_(
-								"You pretended to hold a meeting at your toy table and chairs with your stuffed animals."
-							),
-							_("You made a sausage out of clay."),
-							_("You made a a ball out of clay."),
-							_("You played with your playdough."),
-							_("You played with your toy guitar."),
-							_("You played with your toy piano."),
-						]
-					elif player.age < 6:
+					if player.age < 6:
 						sayings = [
 							_("You played with your toy wagon."),
 							_("You played with some of your balls."),
@@ -313,15 +266,7 @@ def activities_menu(player):
 				print(random.choice(sayings))
 				player.change_happiness(-randint(2, 4))
 			else:
-				if player.age < 3:
-					sayings = [
-						_("You decided to finger-paint."),
-						_("You decided to make something from mud!"),
-						_("You drew in your colouring book"),
-						_("You squished clay between your fingers."),
-						_("You drew with your large crayons."),
-					]
-				elif player.age < 6:
+				if player.age < 6:
 					sayings = [
 						_("You decided to draw."),
 						_("You decided to make something from clay!"),

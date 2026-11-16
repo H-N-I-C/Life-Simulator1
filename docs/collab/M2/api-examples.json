@@ -1,0 +1,400 @@
+{
+  "description": "FROZEN M2 API examples (A-owned, published for B/D). Extends M1 endpoints (docs/collab/M1/api-examples.json) \u2014 same revision/request_id/replay semantics, same error shapes. State sections per docs/collab/M2/02-contract.md; phase/cursor semantics per docs/collab/M2/phase-map.md v3. available_actions entries now carry category/inputs/known_costs/limits. Person ids are canonical person_id UUIDs.",
+  "profile_example": "unchanged from M1 (docs/collab/M1/api-examples.json)",
+  "new_state_sections": {
+    "education": {
+      "stage": "none | elementary | middle | high | university",
+      "enrolled": true,
+      "grades": 82,
+      "dropped_out": false,
+      "university_years_remaining": 0,
+      "graduated_high_school": true,
+      "loan": {
+        "principal": 0,
+        "remaining": 0,
+        "has_loan": false
+      }
+    },
+    "work": {
+      "employed": true,
+      "retired": false,
+      "job_label": "Generic job",
+      "hours": 40,
+      "salary": 40000,
+      "effective_annual_gross": 40000,
+      "pension": 0,
+      "performance": 55,
+      "stress": 30,
+      "years_worked": 3,
+      "can_retire": false
+    },
+    "health": {
+      "illnesses": [],
+      "treatments_available": []
+    },
+    "family": {
+      "parents": [
+        "<person_id>",
+        "<person_id>"
+      ],
+      "partner": null,
+      "children": [],
+      "siblings": []
+    },
+    "finances": {
+      "balance": 12500,
+      "debts": [
+        {
+          "kind": "student_loan",
+          "person_id": "<person_id>",
+          "remaining": 15000
+        }
+      ],
+      "annual_estimate": {
+        "gross": 40000,
+        "tax": 5800,
+        "expenses": 12000,
+        "net": 22200
+      },
+      "last_closed_turn": "t_000042",
+      "ledger": [
+        {
+          "id": "le_1",
+          "source_key": "t_000042:work_income:salary:<person_id>:gross",
+          "turn_id": "t_000042",
+          "age": 30,
+          "person_id": "<person_id>",
+          "category": "income",
+          "amount": 40000,
+          "balance_after": 52500,
+          "description": "Annual gross salary",
+          "group_id": null
+        }
+      ]
+    },
+    "generation": 1,
+    "completed_lives": [],
+    "turn": {
+      "turn_id": "t_000043",
+      "cursor": {
+        "phase_id": "year_start",
+        "item_cursor": 0
+      },
+      "pending": false
+    }
+  },
+  "available_actions_example": [
+    {
+      "id": "age_up",
+      "label": "Age up",
+      "category": "life",
+      "inputs": [],
+      "known_costs": [],
+      "limits": []
+    },
+    {
+      "id": "study",
+      "label": "Study harder",
+      "category": "education",
+      "inputs": [],
+      "known_costs": [],
+      "limits": [
+        "once_per_year"
+      ],
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "id": "find_job",
+      "label": "Find a job",
+      "category": "work",
+      "inputs": [],
+      "known_costs": [],
+      "limits": [
+        "unemployed",
+        "not_in_university"
+      ]
+    },
+    {
+      "id": "adjust_hours",
+      "label": "Adjust work hours",
+      "category": "work",
+      "target_id": null,
+      "inputs": [
+        {
+          "id": "hours",
+          "type": "number",
+          "label": "Hours per week",
+          "required": true,
+          "min": 20,
+          "max": 80
+        }
+      ],
+      "known_costs": [],
+      "limits": [
+        "employed"
+      ]
+    },
+    {
+      "id": "apply_university",
+      "label": "Apply to university",
+      "category": "education",
+      "inputs": [
+        {
+          "id": "funding",
+          "type": "choice",
+          "label": "Funding",
+          "required": true,
+          "choices": [
+            "scholarship",
+            "loan",
+            "parents"
+          ]
+        }
+      ],
+      "known_costs": [],
+      "limits": [
+        "age_17",
+        "graduated_high_school"
+      ]
+    }
+  ],
+  "disabled_action_example": {
+    "_comment": "used actions and ineligible actions are projected with enabled:false and a precise reason",
+    "id": "study",
+    "label": "Study harder",
+    "category": "education",
+    "inputs": [],
+    "known_costs": [],
+    "limits": [
+      "once_per_year"
+    ],
+    "enabled": false,
+    "reason": "already studied this year"
+  },
+  "pending_multiphase_example": {
+    "_comment": "family_events phase, divorce choice stored with pre-sampled outcomes; resolving advances the cursor within the phase, never reruns it",
+    "pending_decision": {
+      "id": "d_12",
+      "kind": "partner_divorce",
+      "title": "Divorce",
+      "text": "Your partner wants a divorce. What will you do?",
+      "person_ids": [
+        "<partner person_id>"
+      ],
+      "options": [
+        {
+          "id": "o1",
+          "label": "Wish them well",
+          "known_effects": [
+            "divorce proceeds"
+          ],
+          "enabled": true,
+          "reason": null,
+          "inputs": []
+        },
+        {
+          "id": "o2",
+          "label": "Beg them to stay",
+          "known_effects": [
+            "uncertain outcome"
+          ],
+          "enabled": true,
+          "reason": null,
+          "inputs": []
+        }
+      ],
+      "continuation_after_resolve": {
+        "phase_id": "family_events",
+        "item_cursor": 3
+      }
+    },
+    "turn": {
+      "turn_id": "t_000043",
+      "cursor": {
+        "phase_id": "family_events",
+        "item_cursor": 2
+      },
+      "pending": true
+    }
+  },
+  "pending_with_inputs_example": {
+    "_comment": "baby naming: bounded text input; private sampled data stays server-side",
+    "pending_decision": {
+      "id": "d_14",
+      "kind": "baby_naming",
+      "title": "A baby girl!",
+      "text": "What will you name her?",
+      "person_ids": [
+        "<baby person_id>"
+      ],
+      "options": [
+        {
+          "id": "o1",
+          "label": "Choose a name",
+          "known_effects": [],
+          "enabled": true,
+          "reason": null,
+          "inputs": [
+            {
+              "id": "name",
+              "type": "text",
+              "label": "First name",
+              "required": true,
+              "min": 1,
+              "max": 40
+            }
+          ]
+        }
+      ],
+      "continuation_after_resolve": {
+        "phase_id": "family_events",
+        "item_cursor": 4
+      }
+    }
+  },
+  "resolve_with_inputs_request": {
+    "expected_revision": 17,
+    "request_id": "req-name-001",
+    "action": "resolve_decision",
+    "payload": {
+      "decision_id": "d_14",
+      "option_id": "o1",
+      "inputs": {
+        "name": "Robin"
+      }
+    }
+  },
+  "paid_action_rejection_example": {
+    "_comment": "plastic surgery at insufficient funds: typed 409, state unchanged, no RNG consumed",
+    "request": {
+      "action": "plastic_surgery",
+      "payload": {
+        "target_id": "<surgeon index>",
+        "procedure": "nose"
+      }
+    },
+    "error": {
+      "code": "not_allowed",
+      "message": "this costs $4,500 and you have $1,200"
+    }
+  },
+  "work_income_turn_example": {
+    "_comment": "one committed age_up spans phases; journal year entry records ACTUAL deltas; ledger legs sum exactly: gross - tax - expenses == net",
+    "journal_entry": {
+      "id": "j_31",
+      "age": 31,
+      "kind": "year",
+      "text": "Alex turned 31.",
+      "person_ids": [
+        "<player person_id>"
+      ],
+      "changes": {
+        "happiness": -2,
+        "health": 1
+      }
+    },
+    "ledger_legs": [
+      {
+        "source_key": "t_000043:work_income:salary:<person_id>:gross",
+        "amount": 40000
+      },
+      {
+        "source_key": "t_000043:work_income:salary:<person_id>:tax",
+        "amount": -5800
+      },
+      {
+        "source_key": "t_000043:work_income:salary:<person_id>:expenses",
+        "amount": -12000
+      },
+      {
+        "source_key": "t_000043:work_income:salary:<person_id>:net",
+        "amount": 22200
+      },
+      {
+        "source_key": "t_000043:debt_service:student_loan:<person_id>:repay",
+        "amount": -2000
+      }
+    ],
+    "_invariant": "40000 - 5800 - 12000 == 22200 exactly; debt repayment is an additional posting, never pre-deducted; the deceased (deaths before work_income) are not paid \u2014 legacy parity"
+  },
+  "succession_example": {
+    "_comment": "M2c preview: continue as child keeps canonical person_id/appearance/name; generation increments; inherited cash is a balanced transfer (grouped legs), not a new income credit",
+    "completed_lives_entry": {
+      "generation": 1,
+      "person_id": "<parent person_id>",
+      "name": "Alex Rivers",
+      "age_at_death": 84,
+      "summary": {
+        "net_worth_at_death": 250000,
+        "children": 2
+      }
+    },
+    "transfer_legs": [
+      {
+        "source_key": "t_000100:succession:inheritance:<child person_id>:transfer",
+        "account_owner_id": "<child person_id>",
+        "category": "inheritance",
+        "amount": 125000,
+        "group_id": "succession_t_000100"
+      },
+      {
+        "source_key": "t_000100:succession:estate:<parent person_id>:transfer",
+        "account_owner_id": "<parent person_id>",
+        "category": "transfer",
+        "amount": -125000,
+        "group_id": "succession_t_000100"
+      }
+    ]
+  },
+  "errors": {
+    "invalid_input_400": {
+      "error": {
+        "code": "invalid_input",
+        "message": "hours must be an integer between 20 and 80"
+      }
+    },
+    "not_found_404": {
+      "error": {
+        "code": "not_found",
+        "message": "unknown game or target"
+      }
+    },
+    "stale_revision_409": {
+      "error": {
+        "code": "stale_revision",
+        "message": "expected_revision 5 does not match current revision 7"
+      }
+    },
+    "pending_decision_409": {
+      "error": {
+        "code": "pending_decision",
+        "message": "resolve the pending decision before other actions"
+      }
+    },
+    "conflict_409": {
+      "error": {
+        "code": "conflict",
+        "message": "request_id was already used with a different payload"
+      }
+    },
+    "not_allowed_409": {
+      "error": {
+        "code": "not_allowed",
+        "message": "this costs $4,500 and you have $1,200"
+      }
+    },
+    "internal_500": {
+      "error": {
+        "code": "internal_error",
+        "message": "the operation failed; no changes were applied"
+      }
+    }
+  },
+  "compatibility": {
+    "m1_endpoints": "unchanged: GET /api/games, POST /api/games, GET/POST /api/games/<id>(/actions)",
+    "m1_fields": "all M1 state fields remain supported; new sections are additive",
+    "replay": "unchanged semantics; replay checked before revision; creation replay returns original response",
+    "estimate_policy": "annual_estimate is a preview computed from current state; it is never posted and never sampled with gameplay RNG"
+  }
+}

@@ -9,11 +9,55 @@ from src.people.classes.person import Person
 from src.people.classes.sibling import Sibling
 from src.people.classes.partner import Partner
 from src.people.classes.child import Child
+from src.appearance import integration as _appearance_integration
+from src.appearance.integration import copy_appearance, migrate_appearances
+from src.appearance.generate import inherit_appearance
+
+
+def _gross_and_tax(salary, has_job, job_hours):
+	"""Gross yearly pay and tax for an explicit employment state.
+
+	Working accounts earn salary scaled by hours (overtime pays more);
+	retired accounts (has_job False) draw their pension, which is
+	independent of job_hours. Shared by the legacy breakdown and the M2
+	quote so there is exactly one formula.
+	"""
+	if salary <= 0:
+		return 0, 0
+	if has_job:
+		gross = salary * job_hours / 40
+	else:
+		gross = salary
+	return gross, calculate_tax(gross)
+
+
+def sample_expense_retention(rng):
+	"""Sample the after-tax living-expense retention factor once per
+	account/turn (legacy range U(0.4, 0.8)). The caller persists it."""
+	return rng.uniform(0.4, 0.8)
+
+
+def annual_income_quote(salary, has_job, job_hours, retention):
+	"""Deterministic integer pay quote for the M2 ledger.
+
+	`retention` is the already-sampled fraction of after-tax income kept
+	after living expenses (see sample_expense_retention). Returns
+	{"gross", "tax", "expenses", "net"} as ints with the identity
+	gross - tax - expenses == net (rounding residual is allocated to
+	expenses). Net is AFTER tax and living expenses, BEFORE debt service;
+	debt repayment posts separately in the debt_service phase.
+	"""
+	gross_f, tax = _gross_and_tax(salary, has_job, job_hours)
+	if gross_f <= 0:
+		return {"gross": 0, "tax": 0, "expenses": 0, "net": 0}
+	gross = round(gross_f)
+	net = round((gross_f - tax) * retention)
+	expenses = gross - tax - net
+	return {"gross": gross, "tax": tax, "expenses": expenses, "net": net}
 
 
 class Player(Person):
 	"""Base class for the player."""
-
 	def __init__(self, first=None, last=None, gender=None):
 		manual = first != None
 		gender = gender or Gender.random()
@@ -57,6 +101,11 @@ class Player(Person):
 				self.parents["Father"].generosity -= randint(0, abs(diff) // 2)
 
 		self.relations = [self.parents["Mother"], self.parents["Father"]]
+		self.appearance = inherit_appearance(
+			_appearance_integration._APP_RNG,
+			self.parents["Mother"].appearance,
+			self.parents["Father"].appearance,
+		)
 
 		self.karma = randint(0, 25) + randint(0, 25) + randint(0, 25) + randint(0, 25)
 		self.total_happiness = 0
@@ -149,21 +198,35 @@ class Player(Person):
 		self.parents = {}
 		if c.mother and type(c.mother) != Player:
 			mother = Parent(c.mother.lastname, c.mother.age, Gender.Female)
+			mother.firstname = c.mother.firstname
+			mother.appearance = copy_appearance(c.mother.appearance)
+			mother.person_id = c.mother.person_id  # canonical identity
+			mother.update_name()
 			mother.health = c.mother.health
 			mother.relationship = randint(90, 100) - randint(0, min(c.age, 50))
 			self.relations.append(mother)
 			self.parents["Mother"] = mother
 		if c.father and type(c.father) != Player:
 			father = Parent(c.father.lastname, c.father.age, Gender.Male)
+			father.firstname = c.father.firstname
+			father.appearance = copy_appearance(c.father.appearance)
+			father.person_id = c.father.person_id  # canonical identity
+			father.update_name()
 			father.health = c.father.health
 			father.relationship = randint(90, 100) - randint(0, min(c.age, 50))
 			self.relations.append(father)
 			self.parents["Father"] = father
 		if children:
 			for child in children:
+				if child is c:
+					continue  # The successor is not their own sibling
 				s = Sibling(
 					child.lastname, child.age, child.gender, child.smarts, child.looks
 				)
+				s.firstname = child.firstname
+				s.appearance = copy_appearance(child.appearance)
+				s.person_id = child.person_id  # canonical identity
+				s.update_name()
 				s.change_relationship(round_stochastic(random.gauss(0, 8)))
 				self.relations.append(s)
 		if c.partner:
@@ -173,6 +236,8 @@ class Player(Person):
 		self.firstname = c.firstname
 		self.lastname = c.lastname
 		self.update_name()
+		self.person_id = c.person_id  # the successor IS the same person
+		self.appearance = copy_appearance(c.appearance)  # Role change copies, never regenerates
 		self.age = c.age
 		self.gender = c.gender
 		if self.gender == Gender.Female:
@@ -285,6 +350,7 @@ class Player(Person):
 	def load(cls, d):
 		p = cls()
 		p.__dict__.update(d)
+		migrate_appearances(p)
 		return p
 
 	def change_happiness(self, amount):
@@ -652,6 +718,20 @@ class Player(Person):
 			self.times_asked_since_last_raise = 0
 			self.salary_years = []
 
+	def annual_income_breakdown(self):
+		"""Terminal-legacy pay calculation: (gross, tax, expenses, net) as
+		floats, sampling the living-expense factor from global random on
+		every call. New code (web/ledger) must NOT use this directly; use
+		`sample_expense_retention` once per account/turn, persist it, and
+		price with `annual_income_quote`, whose integer legs sum exactly.
+		"""
+		if self.salary <= 0:
+			return 0, 0, 0, 0
+		gross, tax = _gross_and_tax(self.salary, self.has_job,
+									self.job_hours)
+		net = (gross - tax) * random.uniform(0.4, 0.8)
+		return gross, tax, gross - tax - net, net
+
 	def lose_job(self):
 		if self.has_job:
 			self.has_job = False
@@ -781,11 +861,8 @@ class Player(Person):
 		if self.has_job:
 			self.years_worked += 1
 		if self.salary > 0:
-			money = self.salary * self.job_hours / 40
-			tax = calculate_tax(money)
-			income = self.salary - tax
-			income *= random.uniform(0.4, 0.8)  # Expenses
-			self.money += round_stochastic(income)
+			breakdown = self.annual_income_breakdown()
+			self.money += round_stochastic(breakdown[3])
 		if self.uv_years > 0:
 			self.uv_years -= 1
 			if self.uv_years == 0:
@@ -802,6 +879,13 @@ class Player(Person):
 						_("You were expelled from university after earning bad grades.")
 					)
 					self.change_happiness(-randint(30, 50))
+					self.uv_years = 0
+					self.grades = None
+					# Student-loan policy: tuition financed but not yet
+					# materialized as debt is not retroactively charged;
+					# clear the stale funding flag, keep any existing debt.
+					if self.student_loan == 0:
+						self.chose_student_loan = False
 		if self.student_loan > 0:
 			amount = min(randint(1000, 3000) for _ in range(3))
 			amount = min(amount, self.student_loan)
@@ -959,7 +1043,7 @@ class Player(Person):
 				print(_("Your {partner} wants a divorce.").format(partner=name))
 				print(_("What will you do?"))
 				him_her = self.partner.him_her()
-				choices = choice_input(
+				choice = choice_input(
 					_("Wish {him_her} well").format(him_her=him_her),
 					_("Beg {him_her} to stay").format(him_her=him_her),
 					_("Insult {him_her} one last time").format(him_her=him_her),
@@ -968,7 +1052,7 @@ class Player(Person):
 				if choice == 1:
 					print(
 						_("You honored {name}'s request for a divorce.").format(
-							name=self.parter.name
+							name=self.partner.name
 						)
 					)
 					self.divorce()
@@ -985,6 +1069,7 @@ class Player(Person):
 								he_she=he_she
 							)
 						)
+						self.divorce()
 					else:
 						print(
 							_("{he_she} decided to stay with you.").format(
@@ -992,7 +1077,6 @@ class Player(Person):
 							)
 						)
 						self.change_happiness(-randint(15, 22))
-						self.divorce()
 				elif choice == 3:
 					self.change_karma(-4)
 					he_she = self.partner.he_she()
