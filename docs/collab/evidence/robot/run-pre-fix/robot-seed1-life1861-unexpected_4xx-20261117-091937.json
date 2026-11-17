@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1861,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alvinia",
+    "last_name": "Welch",
+    "gender": "female",
+    "country": "India",
+    "seed": 195863081,
+    "request_id": "robot-1-1861-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 922294062,
+     "base": "person",
+     "skin_tone": "default",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "glasses",
+      "crown"
+     ],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_bfe75546b1",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r14813",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_bfe75546b1",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "f5376312-f547-4a88-9368-b7998e3f9fb4"
+   },
+   "request_id": "robot-1-r14814",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1862 --seed 1 --from-life 1861 --fail-fast"
+}

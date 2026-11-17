@@ -1,0 +1,131 @@
+{
+  "_status": "PROPOSAL (Kimi B, 2026-11-17). Revisioned, allowlisted character-editor protocol. In-play UI (NOT the dev scenario panel). Awaits Claude freeze with the other M2.5 contracts.",
+  "protocol_version": "editor-1.0.0-proposal",
+
+  "principles": [
+    "Typed allowlist only: no raw __dict__ / arbitrary JSON paths / set_flag.",
+    "Apply is immediate, atomic, revisioned (save revision bump) and journaled/audited with ACTUAL before/after values.",
+    "Editor omniscience is out-of-character: inspection never propagates knowledge to NPCs (C's observer records untouched).",
+    "Rename changes the display name only; person_id is identity and never changes.",
+    "Money edits are OMITTED (no ledger-adjustment command frozen yet).",
+    "The fixed 18+ rule, chronology, consent, parentage, RNG and pending samples are protected: editing them returns typed errors, never applies.",
+    "Individual changes never alias a shared profile: editing a person clones the affected values into that person's own record; save-local profile/jurisdiction edits create save-local overrides, not catalog mutations."
+  ],
+
+  "scopes": {
+    "person": "edit one person's allowed attributes (attraction_profile fields + culture_id)",
+    "personal_tenets": "edit one person's personal_tenet_overrides (dissent from their faith's public tenets)",
+    "faith_profile": "SAVE-LOCAL override of a faith's public tenet stances; applies to believers without a personal override; never mutates the catalog",
+    "jurisdiction": "SAVE-LOCAL override of a jurisdiction's recognition/consequence rules; reprojects current recognition only"
+  },
+
+  "commands": [
+    {
+      "name": "edit_person_attributes",
+      "scope": "person",
+      "fields": {
+        "orientation": {"type": "enum", "values": ["heterosexual", "homosexual", "bisexual", "asexual"]},
+        "openness": {"type": "float", "min": 0.0, "max": 1.0},
+        "jealousy": {"type": "float", "min": 0.0, "max": 1.0},
+        "monogamy_preference": {"type": "float", "min": 0.0, "max": 1.0},
+        "culture_id": {"type": "catalog_ref", "catalog": "cultures"}
+      },
+      "effects": "immediately reprojects future offer scores for this person; does NOT touch existing relationships/unities/consent"
+    },
+    {
+      "name": "edit_personal_tenets",
+      "scope": "personal_tenets",
+      "fields": {"tenet_overrides": {"type": "map", "key": "tenet_id of the person's faith", "value": {"type": "enum", "values": ["favoured", "neutral", "disfavoured"]}}},
+      "effects": "this person only; never other believers; cannot create consent or force acceptance"
+    },
+    {
+      "name": "edit_faith_profile",
+      "scope": "faith_profile",
+      "fields": {"tenet_stances": {"type": "map", "key": "tenet_id", "value": {"type": "enum", "values": ["favoured", "neutral", "disfavoured"]}}},
+      "effects": "creates/updates a save-local override (resolution_order in policy-catalogs.json); believers WITH personal overrides are unaffected; bumps policy_revision"
+    },
+    {
+      "name": "edit_jurisdiction",
+      "scope": "jurisdiction",
+      "fields": {
+        "recognition": {"type": "map", "key": "union_type (monogamous_civil|plural_civil|religious_only|customary|private)", "value": {"type": "enum", "values": ["recognized", "civil_only", "unrecognized", "forbidden"]}},
+        "consequences": {"type": "list", "item": "same shape as jurisdiction_presets[].consequences (typed; max_per_occurrence_key required)"}
+      },
+      "effects": "reprojects CURRENT recognition of affected unions (law_version bumps on the override; old unions keep their historical law_version); NEVER deletes relationships, rewrites past consent/discovery/birth outcomes, or retro-repeats penalties; bumps policy_revision"
+    },
+    {
+      "name": "rename_person",
+      "scope": "person",
+      "fields": {"first_name": {"type": "string", "min": 1, "max": 40}, "last_name": {"type": "string", "min": 1, "max": 40}},
+      "effects": "display name only; person_id, chronology, kinship and history unchanged (spec freeze fixture)"
+    }
+  ],
+
+  "protected_fields": {
+    "_rule": "any patch touching these fails with a typed error BEFORE anything applies",
+    "errors": {
+      "protected_field": ["age", "date_of_birth", "chronology", "maturity"],
+      "identity_locked": ["person_id"],
+      "consent_locked": ["consent", "acceptance", "relationship_score_set_to_force_union"],
+      "ancestry_locked": ["biological_parents", "parentage_edges", "birth_risk_outcomes"],
+      "rng_locked": ["seed", "rng_state", "sampled_outcomes", "pending_samples"],
+      "ledger_locked": ["money", "ledger_rows", "balances"]
+    }
+  },
+
+  "request_shape": {
+    "game_id": "string",
+    "expected_revision": "int (same optimistic concurrency as frozen M2 commands)",
+    "request_id": "string (same replay-ledger rules as frozen M2 commands)",
+    "commands": ["EditorCommand"],
+    "EditorCommand": {"name": "one of commands[].name", "scope": "one of scopes", "target_id": "person_id | faith_id | jurisdiction_id", "patch": "map of field->value, allowlisted per command"}
+  },
+
+  "preview_shape": {
+    "_route": "POST /api/games/<id>/editor/preview (proposed; A registers the shared endpoint)",
+    "response": {
+      "valid": "bool",
+      "errors": [{"command_index": 0, "code": "protected_field|invalid_scope|unknown_id|invalid_value|type_error", "field": "string", "allowed": "present for invalid_value"}],
+      "affected_people": ["person_id"],
+      "affected_unions": [{"union_id": "u_1", "current_recognition": "recognized", "projected_recognition": "unrecognized", "law_version": "1.0.0"}],
+      "policy_revision_delta": "int (how many policy_revision bumps apply would cause)",
+      "journal_preview": "human-readable before/after lines for the audit"
+    }
+  },
+
+  "apply_shape": {
+    "_route": "POST /api/games/<id>/editor/apply",
+    "response": {
+      "revision": "int (new save revision)",
+      "policy_revision": "int (new policy revision; unchanged if no policy data changed)",
+      "audit": ["EditorAuditEntry"],
+      "EditorAuditEntry": {"command": "string", "scope": "string", "target_id": "string", "before": "map", "after": "map", "turn": "int"}
+    },
+    "_storage": "audit entries are appended to the save envelope field `editor_audit` (REQUEST to A: reserve this field) and the in-world journal only where the change is diegetic (rename); scoring-relevant attribute edits are out-of-character and journal-quiet"
+  },
+
+  "pending_supersession": {
+    "_rule": "an apply that changes policy data while a related offer is pending atomically supersedes that offer and resumes its stored safe continuation, KEEPING consumed attempts/cooldowns and already-applied pre-effects; unrelated pending choices keep their stored samples untouched (spec 02-contracts §6). B does not implement the offer machinery — this is the exact hook B requests from A/C:",
+    "request_to_a_c": {
+      "hook": "on_policy_revision_bump(game_id, supersede_filter)",
+      "supersede_filter": {"interaction_kinds": ["propose_union", "propose_plural_union", "propose_courtship", "convert_request"], "affected_person_ids": ["person_id"], "affected_jurisdiction": "jurisdiction_id|null"},
+      "semantics": "A cancels/supersedes matching pending offers and resumes their safe continuation; attempts/cooldowns/pre-effects preserved; never a resample of a rejected offer"
+    }
+  },
+
+  "v3_effect_targets": {
+    "_for_c": "typed domain effects the v3 schema may call on B's domain (read-only or command-shaped; no raw setters)",
+    "convert_profile": {"args": ["person_id", "target_faith_id"], "validates": "typed; bumps policy-relevant caches; goes through the same supersession hook"},
+    "set_personal_tenet": {"args": ["person_id", "tenet_id", "stance"]},
+    "reproject_recognition": {"args": ["jurisdiction_id"]}
+  },
+
+  "ui_requirements": {
+    "_note": "B implements after freeze",
+    "distinct_from_dev_scenarios": true,
+    "preview_before_apply": true,
+    "protected_fields_shown_disabled_with_reason": true,
+    "keyboard_focus_phone_contrast": "per 00-SELF-CHECK UI row",
+    "portraits_required": true
+  }
+}

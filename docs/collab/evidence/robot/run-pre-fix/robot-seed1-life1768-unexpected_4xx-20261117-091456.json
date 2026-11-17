@@ -1,0 +1,185 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1768,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Archibold",
+    "last_name": "Puckett",
+    "gender": "male",
+    "country": "India",
+    "seed": 1301014895,
+    "request_id": "robot-1-1768-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1273881944,
+     "base": "man",
+     "skin_tone": "dark",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "earrings"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_9502c09d9f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13942",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_9502c09d9f",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r13943",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_9502c09d9f",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r13944",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_9502c09d9f",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r13945",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_9502c09d9f",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r13946",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_9502c09d9f",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r13947",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_9502c09d9f",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "ask_final"
+   },
+   "request_id": "robot-1-r13948",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_9502c09d9f",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_4",
+    "option_id": "cancel"
+   },
+   "request_id": "robot-1-r13949",
+   "expected_revision": 8
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_9502c09d9f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13950",
+   "expected_revision": 9
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_9502c09d9f",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_5",
+    "option_id": "d_5_bite"
+   },
+   "request_id": "robot-1-r13951",
+   "expected_revision": 10
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_9502c09d9f",
+   "action": "definitely_not_an_action",
+   "payload": {},
+   "request_id": "robot-1-r13952",
+   "expected_revision": 11
+  },
+  {
+   "n": 12,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown action\"}}"
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_9502c09d9f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13953",
+   "expected_revision": 11
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_9502c09d9f",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "8d75c064-0897-4f16-a7ff-405b04d33e26"
+   },
+   "request_id": "robot-1-r13954",
+   "expected_revision": 12
+  },
+  {
+   "n": 15,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1769 --seed 1 --from-life 1768 --fail-fast"
+}

@@ -1,0 +1,75 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1806,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Andrus",
+    "last_name": "Song",
+    "gender": "male",
+    "country": "Brazil",
+    "seed": 1358473719,
+    "request_id": "robot-1-1806-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_be72b67485",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r14277",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_be72b67485",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "ask_final"
+   },
+   "request_id": "robot-1-r14278",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_be72b67485",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "cancel"
+   },
+   "request_id": "robot-1-r14279",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_be72b67485",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "c4c7645c-a202-42c0-b6fd-aab679e49f9c"
+   },
+   "request_id": "robot-1-r14280",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1807 --seed 1 --from-life 1806 --fail-fast"
+}

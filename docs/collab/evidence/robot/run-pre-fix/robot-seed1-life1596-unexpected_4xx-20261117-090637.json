@@ -1,0 +1,63 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1596,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Ailyn",
+    "last_name": "Palmer",
+    "gender": "female",
+    "country": "Indonesia",
+    "seed": 1112658901,
+    "request_id": "robot-1-1596-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1569176993,
+     "base": "person",
+     "skin_tone": "light",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_e11954a500",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r12747",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_e11954a500",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "600991ab-95e8-4028-a7b5-7c8a72286a48"
+   },
+   "request_id": "robot-1-r12748",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1597 --seed 1 --from-life 1596 --fail-fast"
+}

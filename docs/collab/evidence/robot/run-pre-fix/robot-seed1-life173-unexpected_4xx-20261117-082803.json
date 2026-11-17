@@ -1,0 +1,80 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 173,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Andrus",
+    "last_name": "Cross",
+    "gender": "male",
+    "country": "Germany",
+    "seed": 249155189,
+    "request_id": "robot-1-173-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 395451823,
+     "base": "person",
+     "skin_tone": "light",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "crown"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_00083ec86d",
+   "action": "definitely_not_an_action",
+   "payload": {},
+   "request_id": "robot-1-r1621",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown action\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_00083ec86d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r1622",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_00083ec86d",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "0cb498c8-1045-400a-8512-ffc93c6e3c21"
+   },
+   "request_id": "robot-1-r1623",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 174 --seed 1 --from-life 173 --fail-fast"
+}

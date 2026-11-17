@@ -1,0 +1,75 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 780,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alys",
+    "last_name": "Palmer",
+    "gender": "female",
+    "country": "Brazil",
+    "seed": 982975294,
+    "request_id": "robot-1-780-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 693743553,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "white",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "flower",
+      "crown"
+     ],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_54adf5c25f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r5733",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_54adf5c25f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r5734",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_54adf5c25f",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "e4630298-dd5a-46c2-a8e9-1381c1812463"
+   },
+   "request_id": "robot-1-r5735",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 781 --seed 1 --from-life 780 --fail-fast"
+}

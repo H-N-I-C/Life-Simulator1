@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1954,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aline",
+    "last_name": "Wu",
+    "gender": "female",
+    "country": "Japan",
+    "seed": 169863784,
+    "request_id": "robot-1-1954-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 848946078,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "crown",
+      "cap"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_63dfbac58a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15539",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_63dfbac58a",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "22299e6a-9f10-4994-a5c4-51c1951b29b3"
+   },
+   "request_id": "robot-1-r15540",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1955 --seed 1 --from-life 1954 --fail-fast"
+}

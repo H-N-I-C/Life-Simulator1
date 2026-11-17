@@ -1,0 +1,94 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1972,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Armstrong",
+    "last_name": "Cowan",
+    "gender": "male",
+    "country": "Japan",
+    "seed": 1854556167,
+    "request_id": "robot-1-1972-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 596496534,
+     "base": "person",
+     "skin_tone": "medium-dark",
+     "hair": "red",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "cap"
+     ],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_8b59d26057",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15718",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_8b59d26057",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15719",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_8b59d26057",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15720",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_8b59d26057",
+   "action": "conversation",
+   "payload": {
+    "target_id": "3e51cba4-ff9c-4a93-9190-52f4d2712390"
+   },
+   "request_id": "robot-1-r15721",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_8b59d26057",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "fb7c6fa2-9d0f-4fd9-be41-88254f79ac3c"
+   },
+   "request_id": "robot-1-r15722",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1973 --seed 1 --from-life 1972 --fail-fast"
+}

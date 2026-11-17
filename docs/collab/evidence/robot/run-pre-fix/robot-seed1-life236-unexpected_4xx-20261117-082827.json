@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 236,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adair",
+    "last_name": "Chandler",
+    "gender": "male",
+    "country": "USA",
+    "seed": 1516787029,
+    "request_id": "robot-1-236-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 550317310,
+     "base": "person",
+     "skin_tone": "light",
+     "hair": "white",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "cap"
+     ],
+     "background": "bg_05",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_8f5aba0376",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r1987",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_8f5aba0376",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "4b0bad96-a523-46ea-9c52-1eb060b131e3"
+   },
+   "request_id": "robot-1-r1988",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 237 --seed 1 --from-life 236 --fail-fast"
+}

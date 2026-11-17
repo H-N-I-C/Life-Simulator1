@@ -33,10 +33,25 @@
 <p class="muted" style="font-size:12px;margin-top:18px;">Avatars: <a href="https://github.com/microsoft/fluentui-emoji">Microsoft Fluent UI Emoji</a>, MIT licence.</p>
 </main>
 <script type="module">
+import "/static/common.js";  // global error boundary + offline banner
 for (const kind of ["matrix", "hair", "extras", "looks", "skins", "ages"]) {
   const el = document.getElementById(kind);
+  el.innerHTML = '<p class="muted">Loading…</p>';
   fetch(`/api/grid/${kind}?size=128`).then(async (res) => {
-    el.innerHTML = await res.text();
+    if (!res.ok) throw new Error("grid " + kind + " failed (" + res.status + ")");
+    const html = await res.text();
+    el.innerHTML = html || '<p class="muted">Nothing to show here yet.</p>';
+  }).catch((err) => {
+    el.innerHTML = "";
+    const p = document.createElement("p");
+    p.className = "muted";
+    p.textContent = "Couldn't load this section — " + err.message;
+    const retry = document.createElement("button");
+    retry.className = "small";
+    retry.textContent = "Retry";
+    retry.addEventListener("click", () => location.reload());
+    el.appendChild(p);
+    el.appendChild(retry);
   });
 }
 </script>

@@ -1,0 +1,103 @@
+{
+  "schema_version": 3,
+  "events": [
+    {
+      "id": "par_first_steps",
+      "title": "First Steps",
+      "text": "{person:child} wobbled across the room without holding on to anything.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "toddler_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "celebrate",
+          "label": "Celebrate together",
+          "effects": {
+            "stats": {
+              "happiness": 3
+            },
+            "milestone": {
+              "child": "child",
+              "id": "first_steps"
+            }
+          },
+          "outcome_text": "The whole family cheered as my child beamed with pride."
+        },
+        {
+          "id": "quiet",
+          "label": "Smile and let it be",
+          "effects": {
+            "milestone": {
+              "child": "child",
+              "id": "first_steps"
+            }
+          },
+          "outcome_text": "Some moments are best kept small and close."
+        }
+      ],
+      "weight": 3
+    },
+    {
+      "id": "par_school_recital",
+      "title": "School Recital",
+      "text": "{person:child} has been practising for the school recital and hopes you'll be in the audience.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "school_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "attend",
+          "label": "Take the afternoon off and attend",
+          "effects": {
+            "stats": {
+              "happiness": 2
+            },
+            "relationship": 6,
+            "milestone": {
+              "child": "child",
+              "id": "school_recital"
+            }
+          },
+          "outcome_text": "I watched my child shine on stage."
+        },
+        {
+          "id": "busy",
+          "label": "Apologise — you can't make it",
+          "effects": {
+            "relationship": -4,
+            "milestone": {
+              "child": "child",
+              "id": "school_recital"
+            }
+          },
+          "outcome_text": "My child said it was fine. It wasn't."
+        }
+      ],
+      "weight": 2
+    }
+  ]
+}

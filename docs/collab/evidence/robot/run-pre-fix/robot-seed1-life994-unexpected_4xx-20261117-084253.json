@@ -1,0 +1,75 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 994,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Anatollo",
+    "last_name": "Kaplan",
+    "gender": "male",
+    "country": "France",
+    "seed": 78917896,
+    "request_id": "robot-1-994-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 2071221047,
+     "base": "man",
+     "skin_tone": "medium-dark",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_87db46e32b",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r7540",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_87db46e32b",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r7541",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_87db46e32b",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "e2e15ae6-1dfc-453d-90fb-e7f9b16b33f0"
+   },
+   "request_id": "robot-1-r7542",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 995 --seed 1 --from-life 994 --fail-fast"
+}

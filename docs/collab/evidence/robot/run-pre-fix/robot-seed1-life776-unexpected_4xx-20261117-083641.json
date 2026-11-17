@@ -1,0 +1,63 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 776,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alix",
+    "last_name": "Byrd",
+    "gender": "male",
+    "country": "Japan",
+    "seed": 1044904560,
+    "request_id": "robot-1-776-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 367328881,
+     "base": "person",
+     "skin_tone": "default",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_dec4b45fc4",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r5702",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_dec4b45fc4",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "0ed264c8-114f-4219-a6d7-47de1db0c2cf"
+   },
+   "request_id": "robot-1-r5703",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 777 --seed 1 --from-life 776 --fail-fast"
+}

@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 467,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Arvie",
+    "last_name": "Hewitt",
+    "gender": "male",
+    "country": "Germany",
+    "seed": 490350157,
+    "request_id": "robot-1-467-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 200163730,
+     "base": "woman",
+     "skin_tone": "dark",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "earrings",
+      "crown"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_eb72f80aa6",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3643",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_eb72f80aa6",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "eb25fc31-fa38-4c57-b9eb-e1325bdd83c1"
+   },
+   "request_id": "robot-1-r3644",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 468 --seed 1 --from-life 467 --fail-fast"
+}

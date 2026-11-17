@@ -1,0 +1,90 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1594,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Allianora",
+    "last_name": "Heller",
+    "gender": "female",
+    "country": "Nigeria",
+    "seed": 1537392646,
+    "request_id": "robot-1-1594-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 128448289,
+     "base": "woman",
+     "skin_tone": "default",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "cap",
+      "earrings"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_834ae34deb",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r12738",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_834ae34deb",
+   "action": "definitely_not_an_action",
+   "payload": {},
+   "request_id": "robot-1-r12739",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown action\"}}"
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_834ae34deb",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r12740",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_834ae34deb",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "168b09e5-2ca4-4d11-ad5e-eb0cf7436e0c"
+   },
+   "request_id": "robot-1-r12741",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1595 --seed 1 --from-life 1594 --fail-fast"
+}

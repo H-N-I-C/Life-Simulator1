@@ -1,0 +1,81 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 428,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Amber",
+    "last_name": "Petersen",
+    "gender": "female",
+    "country": "Australia",
+    "seed": 380283077,
+    "request_id": "robot-1-428-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 2002649369,
+     "base": "person",
+     "skin_tone": "medium-dark",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_b9a2cc3df7",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3344",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_b9a2cc3df7",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3345",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_b9a2cc3df7",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3346",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_b9a2cc3df7",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "7f4929bc-f762-4358-b4d6-0d73384a559f"
+   },
+   "request_id": "robot-1-r3347",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 429 --seed 1 --from-life 428 --fail-fast"
+}

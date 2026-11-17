@@ -1,0 +1,42 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 54,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aloysia",
+    "last_name": "Melton",
+    "gender": "female",
+    "country": "Japan",
+    "seed": 1798146465,
+    "request_id": "robot-1-54-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_e7c2697282",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "2a5d9977-526c-423e-9056-2caa06e939cc"
+   },
+   "request_id": "robot-1-r670",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 55 --seed 1 --from-life 54 --fail-fast"
+}

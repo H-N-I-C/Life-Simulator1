@@ -1,0 +1,108 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 322,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Anselm",
+    "last_name": "O'Donnell",
+    "gender": "male",
+    "country": "Nigeria",
+    "seed": 1423299024,
+    "request_id": "robot-1-322-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 930294459,
+     "base": "person",
+     "skin_tone": "medium-light",
+     "hair": "white",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_8f6ceff5ee",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2528",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_8f6ceff5ee",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2529",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_8f6ceff5ee",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2530",
+   "expected_revision": 2
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 2 does not match current revision 3\"}}"
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_8f6ceff5ee",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r2531",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_8f6ceff5ee",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r2532",
+   "expected_revision": 4
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_8f6ceff5ee",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "bd7f6f17-6d5b-43ad-b2b0-f5e96a643c5e"
+   },
+   "request_id": "robot-1-r2533",
+   "expected_revision": 5
+  },
+  {
+   "n": 8,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 323 --seed 1 --from-life 322 --fail-fast"
+}

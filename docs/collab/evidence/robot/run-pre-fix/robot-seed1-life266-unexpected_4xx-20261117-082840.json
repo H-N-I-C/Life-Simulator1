@@ -1,0 +1,72 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 266,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Albert",
+    "last_name": "McAllister",
+    "gender": "male",
+    "country": "Nigeria",
+    "seed": 2075933000,
+    "request_id": "robot-1-266-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_44ace54535",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2161",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_44ace54535",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2162",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_44ace54535",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_bite"
+   },
+   "request_id": "robot-1-r2163",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_44ace54535",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "38fc3013-470d-4e62-8732-802a0ad5e29c"
+   },
+   "request_id": "robot-1-r2164",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 267 --seed 1 --from-life 266 --fail-fast"
+}

@@ -1,0 +1,57 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 680,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Armando",
+    "last_name": "Starr",
+    "gender": "male",
+    "country": "Spain",
+    "seed": 1082747574,
+    "request_id": "robot-1-680-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_8b0c8b82e3",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r5171",
+   "expected_revision": 0
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 0 does not match current revision 1\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_8b0c8b82e3",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "a3fd2b97-12d6-474e-b81e-8a8a8e1d3a21"
+   },
+   "request_id": "robot-1-r5172",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 681 --seed 1 --from-life 680 --fail-fast"
+}

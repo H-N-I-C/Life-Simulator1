@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 388,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Abra",
+    "last_name": "Watts",
+    "gender": "female",
+    "country": "Australia",
+    "seed": 69177211,
+    "request_id": "robot-1-388-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1393774475,
+     "base": "woman",
+     "skin_tone": "default",
+     "hair": "default",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses",
+      "crown"
+     ],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_28492b1d01",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3138",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_28492b1d01",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "a0096291-84e9-41b5-8314-614244e8c0f0"
+   },
+   "request_id": "robot-1-r3139",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 389 --seed 1 --from-life 388 --fail-fast"
+}

@@ -1,0 +1,57 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1517,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aeriell",
+    "last_name": "Tilley",
+    "gender": "female",
+    "country": "Australia",
+    "seed": 1191924349,
+    "request_id": "robot-1-1517-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1659803343,
+     "base": "person",
+     "skin_tone": "light",
+     "hair": "white",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses",
+      "earrings"
+     ],
+     "background": "bg_05",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_ba81a5e1f6",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "50cba5cc-53fe-4cad-99a1-932aaf9d176c"
+   },
+   "request_id": "robot-1-r12081",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1518 --seed 1 --from-life 1517 --fail-fast"
+}

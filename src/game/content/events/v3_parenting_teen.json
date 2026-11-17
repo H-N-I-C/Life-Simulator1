@@ -1,0 +1,358 @@
+{
+  "schema_version": 3,
+  "events": [
+    {
+      "id": "par_teen_first_job",
+      "title": "First Job",
+      "text": "{person:child} wants to take a part-time job after school. They are glowing with plans.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "teen_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "encourage",
+          "label": "Encourage them completely",
+          "effects": {
+            "happiness": 3,
+            "relationship": 4
+          },
+          "outcome_text": "First paycheck. Unbearable pride on both sides."
+        },
+        {
+          "id": "negotiate",
+          "label": "Negotiate: school first, job second",
+          "effects": {
+            "relationship": 3,
+            "smarts": 1
+          },
+          "outcome_text": "We wrote a contract more thorough than most businesses manage."
+        },
+        {
+          "id": "forbid",
+          "label": "No. School is the job",
+          "effects": {
+            "relationship": -5,
+            "stress": 1
+          },
+          "outcome_text": "The glow went out like a switched-off lamp."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_teen_driving",
+      "title": "Learner's Permit",
+      "text": "{person:child} has the learner's permit booklet open on every surface of the house.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "teen_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "lessons",
+          "label": "Pay for proper lessons",
+          "effects": {
+            "money": -300,
+            "relationship": 5,
+            "happiness": 2
+          },
+          "outcome_text": "The instructor said they were a natural."
+        },
+        {
+          "id": "split",
+          "label": "They save half, you match half",
+          "effects": {
+            "money": -150,
+            "relationship": 4
+          },
+          "outcome_text": "Hard-earned lessons mean more, we both decided."
+        },
+        {
+          "id": "later",
+          "label": "Driving can wait",
+          "effects": {
+            "relationship": -3,
+            "happiness": -1
+          },
+          "outcome_text": "The booklet migrated sulkily to a shelf."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_teen_concert",
+      "title": "The Concert",
+      "text": "Everyone is going to the concert this weekend, according to {person:child}, and life will be ruined without it.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "teen_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "ticket",
+          "label": "Buy the ticket",
+          "effects": {
+            "money": -60,
+            "relationship": 5,
+            "happiness": 2
+          },
+          "outcome_text": "They came home hoarse and floating."
+        },
+        {
+          "id": "own",
+          "label": "They pay their own way",
+          "effects": {
+            "relationship": 2,
+            "happiness": 1
+          },
+          "outcome_text": "An extra shift, an earned ticket, visible pride."
+        },
+        {
+          "id": "no",
+          "label": "Absolutely not",
+          "effects": {
+            "relationship": -5,
+            "stress": 1
+          },
+          "outcome_text": "The weekend was quiet in a bad way."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_teen_gaming",
+      "title": "All-Night Raids",
+      "text": "{person:child}'s sleep schedule has been replaced by a raid schedule.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "teen_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "console",
+          "label": "Upgrade the setup — be the cool parent",
+          "effects": {
+            "money": -400,
+            "relationship": 6,
+            "happiness": 2
+          },
+          "outcome_text": "Legendary status achieved, apparently."
+        },
+        {
+          "id": "limits",
+          "label": "Enforce hard limits",
+          "effects": {
+            "relationship": -3,
+            "stress": 2,
+            "health": 1
+          },
+          "outcome_text": "The household alarm is now called 'the unplugging'."
+        },
+        {
+          "id": "nothing",
+          "label": "Choose your battles",
+          "effects": {
+            "stress": 1,
+            "relationship": 1
+          },
+          "outcome_text": "The raids continued. So did everything else, barely."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_teen_phone",
+      "title": "Everyone Has One",
+      "text": "{person:child} has entered the 'everyone has a phone except me' phase. Fact-checks are inconclusive.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "teen_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "new",
+          "label": "Get a new phone",
+          "effects": {
+            "money": -250,
+            "relationship": 5
+          },
+          "outcome_text": "The unboxing ceremony was extensively documented."
+        },
+        {
+          "id": "handdown",
+          "label": "Hand down your old one",
+          "effects": {
+            "relationship": 2,
+            "happiness": 1
+          },
+          "outcome_text": "A cracked screen is apparently a personality."
+        },
+        {
+          "id": "no",
+          "label": "Not until you can pay the bill",
+          "effects": {
+            "relationship": -3
+          },
+          "outcome_text": "They started a savings jar with dramatic flair."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_teen_college",
+      "title": "College Talks",
+      "text": "Serious conversations about the future have begun. {person:child} is waiting to hear what you think.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "teen_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "fund",
+          "label": "Promise to fund it fully",
+          "effects": {
+            "money": -500,
+            "relationship": 6,
+            "happiness": 3
+          },
+          "outcome_text": "A weight visibly lifted off young shoulders."
+        },
+        {
+          "id": "advise",
+          "label": "Advise local options, honestly",
+          "effects": {
+            "relationship": 3,
+            "smarts": 1
+          },
+          "outcome_text": "A spreadsheet was involved. They appreciated it."
+        },
+        {
+          "id": "their_call",
+          "label": "It's your life — your call",
+          "effects": {
+            "relationship": 2,
+            "happiness": 1
+          },
+          "outcome_text": "Freedom was given. It looked heavier than expected."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_teen_argument",
+      "title": "The Slammed Door",
+      "text": "Last night ended with a slammed door and words neither of you meant.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "teen_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "apologise",
+          "label": "Apologise first",
+          "effects": {
+            "relationship": 6,
+            "stress": -2
+          },
+          "outcome_text": "Turns out they had been rehearsing an apology too."
+        },
+        {
+          "id": "stand_firm",
+          "label": "Hold the line — you were right",
+          "effects": {
+            "relationship": -3,
+            "stress": 2
+          },
+          "outcome_text": "The rules held. The warmth took a week to return."
+        },
+        {
+          "id": "cool_down",
+          "label": "Let it cool down naturally",
+          "effects": {
+            "relationship": 1
+          },
+          "outcome_text": "Peace arrived quietly, over breakfast."
+        }
+      ],
+      "weight": 1
+    }
+  ]
+}

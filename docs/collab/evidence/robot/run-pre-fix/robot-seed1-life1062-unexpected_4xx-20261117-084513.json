@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1062,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Abdullah",
+    "last_name": "Hodge",
+    "gender": "male",
+    "country": "China",
+    "seed": 1803802543,
+    "request_id": "robot-1-1062-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 988222182,
+     "base": "person",
+     "skin_tone": "dark",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "cap",
+      "glasses"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_287b955f5d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8085",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_287b955f5d",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "3cd6801e-d867-41f3-9a07-c1a4eb79abbf"
+   },
+   "request_id": "robot-1-r8086",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1063 --seed 1 --from-life 1062 --fail-fast"
+}

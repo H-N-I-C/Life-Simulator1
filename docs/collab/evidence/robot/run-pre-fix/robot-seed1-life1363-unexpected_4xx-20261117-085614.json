@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1363,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alecia",
+    "last_name": "Goldman",
+    "gender": "female",
+    "country": "India",
+    "seed": 1462015860,
+    "request_id": "robot-1-1363-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1647699680,
+     "base": "woman",
+     "skin_tone": "light",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "crown",
+      "cap"
+     ],
+     "background": "bg_05",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_803ac74405",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11078",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_803ac74405",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "08b331dd-1ce5-43a2-b5d3-696eb344fc1a"
+   },
+   "request_id": "robot-1-r11079",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1364 --seed 1 --from-life 1363 --fail-fast"
+}

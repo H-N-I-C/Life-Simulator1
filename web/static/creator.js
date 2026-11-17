@@ -1,4 +1,5 @@
-import { loadCatalog, renderAvatar, rng, pick } from "./common.js";
+import { loadCatalog, renderAvatar, rng, pick, showCrashCard,
+         setErrorRetryHandler } from "./common.js";
 
 const TABS = [
   ["look", ["base"]],
@@ -9,7 +10,20 @@ const TABS = [
   ["background", ["background"]],
 ];
 
-const data = await loadCatalog();
+let data;
+try {
+  data = await loadCatalog();
+} catch (e) {
+  // The whole creator depends on the catalog: show the friendly card with
+  // a Retry that simply re-runs the page (all choices are rebuilt from
+  // the catalog, so nothing of value is lost).
+  setErrorRetryHandler(() => location.reload());
+  showCrashCard("Couldn't load the character catalog. " +
+                ((e && e.message) || ""));
+  // Halt module evaluation without an unhandled rejection (the card
+  // above is the UI): nothing below can run without the catalog.
+  await new Promise(() => {});
+}
 const cat = data.catalog;
 
 const DEFAULT_APP = JSON.parse(JSON.stringify(data.presets[0].appearance));

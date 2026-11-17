@@ -1,0 +1,185 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1488,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you already spent time with them this year\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Almeta",
+    "last_name": "Kane",
+    "gender": "female",
+    "country": "Canada",
+    "seed": 1452983230,
+    "request_id": "robot-1-1488-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1468301247,
+     "base": "man",
+     "skin_tone": "medium-dark",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_c1a7bc0374",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11832",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_c1a7bc0374",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11833",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_c1a7bc0374",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11834",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_c1a7bc0374",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11835",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_c1a7bc0374",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_o2"
+   },
+   "request_id": "robot-1-r11836",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_c1a7bc0374",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11837",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_c1a7bc0374",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11838",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_c1a7bc0374",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11839",
+   "expected_revision": 8
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_c1a7bc0374",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_o1"
+   },
+   "request_id": "robot-1-r11840",
+   "expected_revision": 9
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_c1a7bc0374",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11841",
+   "expected_revision": 9
+  },
+  {
+   "n": 11,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 9 does not match current revision 10\"}}"
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_c1a7bc0374",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "bf1c515c-4794-4d56-9c12-268819d0232e"
+   },
+   "request_id": "robot-1-r11842",
+   "expected_revision": 10
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_c1a7bc0374",
+   "action": "skip_school",
+   "payload": {},
+   "request_id": "robot-1-r11843",
+   "expected_revision": 11
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_c1a7bc0374",
+   "action": "study_harder",
+   "payload": {},
+   "request_id": "robot-1-r11844",
+   "expected_revision": 12
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_c1a7bc0374",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "bf1c515c-4794-4d56-9c12-268819d0232e"
+   },
+   "request_id": "robot-1-r11845",
+   "expected_revision": 13
+  },
+  {
+   "n": 16,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you already spent time with them this year\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1489 --seed 1 --from-life 1488 --fail-fast"
+}

@@ -1,0 +1,102 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 450,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aeriela",
+    "last_name": "Farrell",
+    "gender": "female",
+    "country": "China",
+    "seed": 1142664450,
+    "request_id": "robot-1-450-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1491431233,
+     "base": "woman",
+     "skin_tone": "light",
+     "hair": "white",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "crown",
+      "flower"
+     ],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_63b4beed9b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3530",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_63b4beed9b",
+   "action": "definitely_not_an_action",
+   "payload": {},
+   "request_id": "robot-1-r3531",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown action\"}}"
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_63b4beed9b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3532",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_63b4beed9b",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-1-r3533",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_63b4beed9b",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "642cf545-aff4-4c0f-8b2b-347744b4ce74"
+   },
+   "request_id": "robot-1-r3534",
+   "expected_revision": 4
+  },
+  {
+   "n": 7,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 451 --seed 1 --from-life 450 --fail-fast"
+}

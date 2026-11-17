@@ -1,0 +1,63 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1176,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adolpho",
+    "last_name": "Solomon",
+    "gender": "male",
+    "country": "Indonesia",
+    "seed": 522537870,
+    "request_id": "robot-1-1176-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_a0390d6851",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r9224",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_a0390d6851",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r9225",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_a0390d6851",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "a50a591c-7e63-401b-a473-42567982c44a"
+   },
+   "request_id": "robot-1-r9226",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1177 --seed 1 --from-life 1176 --fail-fast"
+}

@@ -1,0 +1,86 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 603,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Agneta",
+    "last_name": "Norman",
+    "gender": "female",
+    "country": "Japan",
+    "seed": 435398767,
+    "request_id": "robot-1-603-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 990337122,
+     "base": "woman",
+     "skin_tone": "default",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "flower"
+     ],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_0117490514",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r4571",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_0117490514",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r4572",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_0117490514",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-1-r4573",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_0117490514",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "1db6bb93-e2ec-4b97-bd15-587789d66f4f"
+   },
+   "request_id": "robot-1-r4574",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 604 --seed 1 --from-life 603 --fail-fast"
+}

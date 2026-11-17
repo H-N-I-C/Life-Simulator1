@@ -1,0 +1,57 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 424,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alphonse",
+    "last_name": "Atkins",
+    "gender": "male",
+    "country": "Australia",
+    "seed": 275057738,
+    "request_id": "robot-1-424-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_ce91fc47ec",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3337",
+   "expected_revision": 0
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 0 does not match current revision 1\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_ce91fc47ec",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "c215dcf0-12e4-4846-9a9e-c9609489f95f"
+   },
+   "request_id": "robot-1-r3338",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 425 --seed 1 --from-life 424 --fail-fast"
+}

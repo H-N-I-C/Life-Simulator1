@@ -32,6 +32,14 @@ from random import randint
 
 from src.appearance.model import Appearance
 from src.appearance import catalog
+from src.game.features.family_graph.graph import GraphError
+from src.game.features.family_graph import new_graph
+from src.game.features.relationship_policy.editor import new_policy_state
+import src.game.features.parenting.effects  # noqa: F401,E402  (registers v3 domain appliers + child predicates)
+import src.game.features.family_graph.predicates  # noqa: F401,E402  (graph-backed v3 role predicates)
+import src.game.features.knowledge.effects  # noqa: F401,E402  (knowledge v3 domain appliers)
+from src.game.features.parenting import new_parenting_state
+from src.game.features.weddings import new_weddings_state
 from src.lifesim_lib.lifesim_lib import Gender, clamp, round_stochastic
 from src.lifesim_lib.safe_save import load_save
 from src.people.classes.child import Child
@@ -140,6 +148,14 @@ class _GameRNG:
         return False
 
 
+def knowledge_journal_visible(env, entry):
+    """player_known/private journal filtering at serialization (frozen
+    reputation-knowledge.md §2)."""
+    from src.game.features.knowledge import journal_entry_visible
+    return journal_entry_visible(env, entry)
+
+
+
 class GameService:
     """Owns web games. All methods return plain JSON-compatible dicts."""
 
@@ -152,6 +168,9 @@ class GameService:
         os.makedirs(self.save_dir, exist_ok=True)
         self._creation_replay_limit = creation_replay_limit
         self._lock = threading.RLock()
+        # game_id -> human-readable notice for the NEXT state/command
+        # response (e.g. "recovered from backup"); consumed on read.
+        self._notices = {}
 
     # ------------------------------------------------------------- paths
 
@@ -231,10 +250,8 @@ class GameService:
             raise GameError(
                 "internal_error", "save data is invalid", 500) from e
 
-    def _load(self, game_id):
-        path = self._path(game_id)
-        if not os.path.isfile(path) or os.path.islink(path):
-            raise _not_found("unknown game")
+    def _read_save(self, path):
+        """Load + validate + migrate one envelope file."""
         try:
             with open(path, "rb") as f:
                 env = load_save(f)
@@ -255,6 +272,37 @@ class GameService:
         if dirty:
             env = self._migrate_envelope(env, version)
         self._validate_envelope(env)
+        # M2.5: backfill the frozen family-graph + editor-audit fields onto
+        # any save (old saves load unchanged, persist once)
+        from src.game.features.family_graph import normalize_envelope
+        if normalize_envelope(env):
+            dirty = True
+        if not isinstance(env.get("policy"), dict):
+            env["policy"] = new_policy_state()
+            dirty = True
+        from src.game.features.parenting import (
+            new_parenting_state, normalize_parenting, backfill_all)
+        if not isinstance(env.get("parenting"), dict):
+            env["parenting"] = new_parenting_state()
+            dirty = True
+        elif normalize_parenting(env):
+            dirty = True
+        from src.game.features.weddings import (
+            new_weddings_state, normalize_weddings)
+        if not isinstance(env.get("weddings"), dict):
+            env["weddings"] = new_weddings_state()
+            dirty = True
+        elif normalize_weddings(env):
+            dirty = True
+        from src.game.features.knowledge import (
+            new_knowledge_state, normalize_knowledge)
+        if not isinstance(env.get("knowledge"), dict):
+            env["knowledge"] = new_knowledge_state()
+            dirty = True
+        elif normalize_knowledge(env):
+            dirty = True
+        if backfill_all(env, self):
+            dirty = True
         # Backfill person identity/appearances before any projection;
         # persist once so repeated read-only loads are stable.
         from src.appearance.integration import ensure_appearance, ensure_person_id
@@ -272,7 +320,87 @@ class GameService:
                 dirty = True
         if dirty:
             self._save(env)
+        # stamp missing M2.5 policy profiles once (deterministic per
+        # person; a no-op after the first backfill)
+        profiles_map = env["policy"].setdefault("profiles", {})
+        for person in people:
+            if person.person_id not in profiles_map:
+                self.stamp_person_profile(env, person)
+                dirty = True
+        # M2 -> M2.5 family migration: a legacy single partner with an
+        # untouched graph migrates exactly once (one union, recorded
+        # parentage only, archive as ended edges)
+        if not env["graph"]["unions"] and not env["graph"]["relationships"] \
+                and getattr(env["player"], "partner", None) is not None:
+            from src.game.features.family_graph import migrate_v2
+            env["graph"] = migrate_v2(env)
+            dirty = True
+        # backfill graph parentage from legacy mother/father records once,
+        # so the family tree renders for current-format games too
+        if not env["graph"]["parentage"]:
+            everyone = list(people) + [
+                c for c in (getattr(env["player"], "children", None) or [])
+                if isinstance(c, Person)]
+            for person in everyone:
+                for attr in ("mother", "father"):
+                    par = getattr(person, attr, None)
+                    if par is None or not getattr(par, "person_id", None):
+                        continue
+                    if person.person_id == par.person_id:
+                        continue
+                    env["graph"]["parentage"].append({
+                        "child_id": person.person_id,
+                        "parent_id": par.person_id,
+                        "role": "biological",
+                        "source": "birth",
+                        "confidence": "assumed"})
+                    dirty = True
+                # legacy web games keep parents as Parent relations
+                for rel in getattr(person, "relations", None) or []:
+                    if isinstance(rel, Parent) and \
+                            person.person_id != rel.person_id and not any(
+                                e["child_id"] == person.person_id
+                                and e["parent_id"] == rel.person_id
+                                for e in env["graph"]["parentage"]):
+                        env["graph"]["parentage"].append({
+                            "child_id": person.person_id,
+                            "parent_id": rel.person_id,
+                            "role": "biological",
+                            "source": "birth",
+                            "confidence": "assumed"})
+                        dirty = True
+        if dirty:
+            self._save(env)
         return env
+
+    def _load(self, game_id):
+        """Load a game; fall back to the last-good backup when the primary
+        save is missing or corrupt, surfacing a one-shot notice."""
+        path = self._path(game_id)
+        if not os.path.isfile(path) or os.path.islink(path):
+            primary_err = _not_found("unknown game")
+        else:
+            primary_err = None
+        if primary_err is None:
+            try:
+                return self._read_save(path)
+            except GameError as e:
+                primary_err = e
+        bak = path + ".bak"
+        if os.path.isfile(bak) and not os.path.islink(bak):
+            try:
+                env = self._read_save(bak)
+            except GameError:
+                raise primary_err
+            self._notices[game_id] = (
+                "recovered your game from the last-good backup; the most "
+                "recent changes may have been lost")
+            try:
+                self._save(env)  # restore the primary from the backup
+            except GameError:
+                pass  # serve from memory; the primary stays broken
+            return env
+        raise primary_err
 
     @staticmethod
     def _validate_envelope(env):
@@ -380,12 +508,16 @@ class GameService:
                 "internal_error", "save data is invalid", 500) from e
 
     def _save(self, env):
-        """Atomic replace; raises on failure so callers roll back."""
+        """Atomic replace; raises on failure so callers roll back. Keeps the
+        previous good save as <id>.pickle.bak so a corrupt primary can be
+        recovered."""
         path = self._path(env["game_id"])
         try:
             fd, tmp = tempfile.mkstemp(dir=self.save_dir, suffix=".tmp")
             with os.fdopen(fd, "wb") as f:
                 pickle.dump(env, f)
+            if os.path.isfile(path) and not os.path.islink(path):
+                os.replace(path, path + ".bak")
             os.replace(tmp, path)
         except Exception as e:
             try:
@@ -476,6 +608,17 @@ class GameService:
         visit(player)
         return people
 
+    def _all_people(self, env):
+        """Everyone addressable by the graph: the living walk plus the
+        archived (deceased/ex) people history keeps referencing."""
+        people = {p.person_id: p for p in
+                  self._walk_people(env["player"])}
+        for person in env.get("archive", []):
+            if isinstance(person, Person) \
+                    and person.person_id not in people:
+                people[person.person_id] = person
+        return people
+
     def _ensure_ids(self, env):
         """Canonical identity mapping: the immutable persisted Person.person_id
         is the public API id (backfilled for legacy people)."""
@@ -563,6 +706,9 @@ class GameService:
 
         actions = []
         pending = env.get("pending")
+        from src.game.features.knowledge.core import pending_visible
+        if pending and not pending_visible(env, pending):
+            pending = None
         if env["status"] == "alive" and not pending:
             actions.append({"id": "age_up", "label": "Age up",
                             "category": "life", "inputs": [],
@@ -584,10 +730,27 @@ class GameService:
                         covered_targets.add(spec["target_id"])
             except Exception:
                 pass  # rule projection must never break state reads
-            spent = env["year_actions"].get("spend_time", [])
+            # Once-per-year state lives ONLY on the relation object
+            # (relation.spent_time, set by rule_actions.spend_time and reset
+            # by the yearly relation phase). env["year_actions"] is a legacy
+            # envelope field kept for old saves, not a source of truth —
+            # the advertised spec and dispatch read the same flag. The
+            # fallback fires only for a parent the rule projection failed
+            # to cover AND who is a real relation (dispatch refuses anyone
+            # outside player.relations, so advertising them would be a
+            # spec/dispatch disagreement).
+            relation_ids = {p.person_id for p in
+                            getattr(player, "relations", [])}
             for person in self._walk_people(player):
-                if isinstance(person, Parent) and person.person_id not in spent \
-                        and person.person_id not in covered_targets:
+                # Same eligibility the rule enforces in
+                # rule_actions.spend_time / _relationship_specs: never
+                # advertise what dispatch will refuse.
+                if player.age < 5 or getattr(person, "age", 0) < 5:
+                    continue
+                if isinstance(person, Parent) and not getattr(
+                        person, "spent_time", False) \
+                        and person.person_id not in covered_targets \
+                        and person.person_id in relation_ids:
                     actions.append({
                         "id": "spend_time",
                         "label": f"Spend time with {person.firstname}",
@@ -636,6 +799,13 @@ class GameService:
                 [player.person_id],
                 "options": options_out,
             }
+            # v3 additive fields (frozen event-schema-v3.md §6 / Claude
+            # decision 1): pass through untouched; resolve uses the
+            # envelope copy, the client only needs them read-only
+            for key in ("schema_dialect", "bindings", "interaction",
+                        "audience", "sampled", "policy_revision"):
+                if key in pending:
+                    pending_out[key] = pending[key]
 
         return {
             "schema_version": ENVELOPE_SCHEMA_VERSION,
@@ -654,7 +824,12 @@ class GameService:
             "country": env["country"],
             "journal": [dict(e, person_ids=list(e["person_ids"]),
                              changes=dict(e["changes"]))
-                        for e in env["journal"]],
+                        for e in env["journal"]
+                        # server-side player_known filter (frozen
+                        # reputation-knowledge.md §2, Claude decision 3):
+                        # private / not-player-known occurrences never
+                        # leave the server
+                        if knowledge_journal_visible(env, e)],
             "available_actions": actions,
             "pending_decision": pending_out,
             "education": self._education_view(player),
@@ -802,6 +977,9 @@ class GameService:
                 raise _not_found("unknown game")
             try:
                 os.unlink(path)
+                bak = path + ".bak"
+                if os.path.isfile(bak) and not os.path.islink(bak):
+                    os.unlink(bak)
             except OSError as e:
                 raise GameError(
                     "internal_error",
@@ -809,11 +987,328 @@ class GameService:
                     500) from e
             return {"deleted": True, "game_id": game_id}
 
+    # ------------------------------------------- M2.5 policy/editor adapter
+    # A owns: the envelope (policy/audit), person records (rename
+    # forwarding), the graph supersession hook. B owns the Editor engine
+    # (relationship_policy.editor) and the HTTP routes in web/server.py.
+
+    @staticmethod
+    def _profile_rng(env, person_id):
+        """Deterministic per (game, person). Profile generation is cosmetic
+        and deliberately NOT drawn from the gameplay RNG stream, so M2.5
+        stamping can never perturb life simulation draws (replay parity)."""
+        digest = hashlib.sha256(
+            ("profile:%s:%s" % (env["game_id"], person_id)).encode()
+        ).hexdigest()
+        return random.Random(int(digest[:16], 16))
+
+    def stamp_person_profile(self, env, person):
+        """Frozen attraction/policy profile for one person; called at
+        creation and whenever C's content adds a person (births, new
+        relations). Idempotent per person."""
+        from src.game.features.relationship_policy import profiles
+        from src.game.features.relationship_policy.catalog import \
+            load_catalog
+        profiles_map = env["policy"].setdefault("profiles", {})
+        pid = person.person_id
+        if pid not in profiles_map:
+            profiles_map[pid] = profiles.new_profile(
+                load_catalog(), self._profile_rng(env, pid))
+        return profiles_map[pid]
+
+    def _stamp_all_profiles(self, env):
+        for person in self._walk_people(env["player"]):
+            self.stamp_person_profile(env, person)
+
+    def get_policy_state(self, game_id):
+        """Envelope policy state (deep copy). B's route merges catalogs +
+        the people roster around this."""
+        with self._lock:
+            env = self._load(game_id)
+            return json.loads(json.dumps(env["policy"]))
+
+    def get_family_tree(self, game_id, focus_id=None, max_generations=3):
+        """Frozen family-tree projection + appearances for portrait
+        rendering (M0b renderer resolves them client-side). Secret edges
+        are hidden until C's observer-knowledge records decide what the
+        viewer knows (M2.5a ships no secrets)."""
+        from src.game.features import family_graph as fg
+        with self._lock:
+            env = self._load(game_id)
+            people = self._all_people(env)
+            for pid in env.get("dead_ids", []):
+                if pid in people:
+                    people[pid].alive = False
+            focus = focus_id or env["player"].person_id
+            if focus not in people:
+                raise _not_found("unknown person")
+            tree = fg.graph_tree(env["graph"], focus, people,
+                                 max_generations=max_generations,
+                                 known_relationship_ids=set())
+            appearances = {}
+            for node in tree["nodes"]:
+                person = people.get(node["person_id"])
+                app = getattr(person, "appearance", None)
+                if app is not None:
+                    appearances[node["person_id"]] = \
+                        app.to_dict() if hasattr(app, "to_dict") else None
+            return {"tree": tree, "appearances": appearances}
+
+    # ----------------------------------------- step 4: kinship + child health
+
+    def get_relatedness(self, game_id, a_id, b_id):
+        """Documented fictional biological relatedness (frozen bands).
+        Name/religion/orientation never enter the coefficient."""
+        from src.game.features import family_graph as fg
+        with self._lock:
+            env = self._load(game_id)
+            people = self._all_people(env)
+            for pid in (a_id, b_id):
+                if pid not in people:
+                    raise _not_found("unknown person")
+            return fg.graph_relatedness(env["graph"], a_id, b_id)
+
+    def record_conception(self, game_id, child_id, bio_mother_id,
+                          bio_father_id, request_id):
+        """Roll the bounded fictional child-health adjustment ONCE per
+        conception, with the game RNG, and persist it. Idempotent per
+        (child_id, request_id): a retried conception command returns the
+        stored outcome; adoption never routes here."""
+        from src.game.features import family_graph as fg
+        with self._lock:
+            if not isinstance(request_id, str) or not request_id:
+                raise _invalid("request_id must be a non-empty string")
+            env = self._load(game_id)
+            outcomes = env["graph"].setdefault("conception_outcomes", {})
+            key = "%s:%s" % (child_id, request_id)
+            if key in outcomes:
+                return json.loads(json.dumps(outcomes[key]))
+            people = self._all_people(env)
+            for pid in (bio_mother_id, bio_father_id):
+                person = people.get(pid)
+                if person is None:
+                    raise _not_found("unknown person")
+                if person.age < 18:
+                    raise _conflict("not_adult",
+                                    "both biological parents must be 18+")
+            with _GameRNG(self, env):
+                outcome = fg.sample_conception(env["graph"], bio_mother_id,
+                                               bio_father_id, random)
+            outcomes[key] = outcome
+            self._save(env)
+            return json.loads(json.dumps(outcome))
+
+    # ------------------------------------------- M2.5 weddings adapter
+
+    def wedding_command(self, game_id, expected_revision, request_id, op,
+                        args):
+        """Replay-safe wrapper for weddings ops (plan_wedding, renew_vows,
+        divorce_union). Same replay/revision envelope as graph_command;
+        every charge posts once through the ledger inside the op."""
+        from src.game.features.weddings import core as weddings
+        from src.game.features.family_graph.graph import GraphError
+        OPS = {"plan_wedding": weddings.plan_wedding,
+               "renew_vows": weddings.renew_vows,
+               "divorce_union": weddings.divorce_union}
+        with self._lock:
+            if not isinstance(request_id, str) or not request_id \
+                    or len(request_id) > 128:
+                raise _invalid("request_id must be a non-empty string")
+            if op not in OPS:
+                raise _invalid("unknown wedding op")
+            if not isinstance(args, dict):
+                raise _invalid("args must be an object")
+            env = self._load(game_id)
+            for entry in env["replay"]:
+                if entry["request_id"] == request_id:
+                    if (entry["action"] != "wedding:" + op
+                            or not self._same_payload(
+                                entry["payload"], args)):
+                        raise _conflict(
+                            "conflict",
+                            "request_id was already used with a different "
+                            "payload")
+                    return dict(entry["response"])
+            if expected_revision != env["revision"]:
+                raise _conflict(
+                    "stale_revision",
+                    f"expected_revision {expected_revision} does not match "
+                    f"current revision {env['revision']}")
+            op_args = dict(args)
+            op_args.setdefault("turn", env["revision"])
+            try:
+                result = OPS[op](env, self, **op_args)
+            except GraphError as e:
+                raise GameError(e.code, e.message, e.status) from e
+            for entry in result.get("journal") or []:
+                self._journal(env, entry["kind"], entry["text"],
+                              entry.get("person_ids", []))
+            env["revision"] += 1
+            state = {"revision": env["revision"], "result": result}
+            # replay stores the CALLER's args (no injected turn) so a
+            # retry compares byte-identically
+            self._record_replay(env, request_id, "wedding:" + op, args,
+                                state)
+            self._save(env)
+            return json.loads(json.dumps(state))
+
+    # -------------------------------------- step 6: typed graph transitions
+
+    def graph_command(self, game_id, expected_revision, request_id, op,
+                      args):
+        """Replay-safe wrapper around family_graph.transitions.OPS for
+        direct UI/feature use. B/C effect targets should call the OPS
+        inside their own command context instead (frozen §7); this wrapper
+        journals actual deltas, bumps the revision and persists."""
+        from src.game.features.family_graph import transitions
+        from src.game.features.family_graph.graph import GraphError
+        with self._lock:
+            if not isinstance(request_id, str) or not request_id \
+                    or len(request_id) > 128:
+                raise _invalid("request_id must be a non-empty string")
+            if op not in transitions.OPS:
+                raise _invalid("unknown graph op")
+            if not isinstance(args, dict):
+                raise _invalid("args must be an object")
+            env = self._load(game_id)
+            for entry in env["replay"]:
+                if entry["request_id"] == request_id:
+                    if (entry["action"] != "graph:" + op
+                            or not self._same_payload(
+                                entry["payload"], args)):
+                        raise _conflict(
+                            "conflict",
+                            "request_id was already used with a different "
+                            "payload")
+                    return dict(entry["response"])
+            if expected_revision != env["revision"]:
+                raise _conflict(
+                    "stale_revision",
+                    f"expected_revision {expected_revision} does not match "
+                    f"current revision {env['revision']}")
+            try:
+                result = transitions.OPS[op](env, **args)
+            except GraphError as e:
+                raise GameError(e.code, e.message, e.status) from e
+            for entry in result.get("journal") or []:
+                self._journal(env, entry["kind"], entry["text"],
+                              entry.get("person_ids", []))
+            env["revision"] += 1
+            state = {"revision": env["revision"], "result": result}
+            self._record_replay(env, request_id, "graph:" + op, args,
+                                state)
+            self._save(env)
+            return json.loads(json.dumps(state))
+
+
+
+    def _editor(self, env, hook=True):
+        from src.game.features.relationship_policy.editor import Editor
+        from src.game.features.family_graph.service_view import \
+            ServiceGraphView
+        supersession = (lambda flt: self._editor_supersede(env, flt)) \
+            if hook else None
+        return Editor(env["policy"], graph=ServiceGraphView(env),
+                      supersession_hook=supersession)
+
+    def _editor_supersede(self, env, flt):
+        """A's on_policy_revision_bump (frozen filter): supersede matching
+        pending offers, preserving attempts/cooldowns/pre-effects."""
+        from src.game.features import family_graph
+        jurisdictions = flt.get("affected_jurisdictions") or []
+        return family_graph.supersede_offers(
+            env["graph"],
+            interaction_kinds=["propose_courtship", "propose_union",
+                               "propose_plural_union", "convert_request"],
+            affected_person_ids=flt.get("affected_person_ids"),
+            affected_jurisdiction=jurisdictions[0]
+            if len(jurisdictions) == 1 else None)
+
+    def editor_preview(self, game_id, commands):
+        """Dry-run on a COPY of the policy state; the save is untouched."""
+        with self._lock:
+            if not isinstance(commands, list) or not commands:
+                raise _invalid("commands must be a non-empty list")
+            env = self._load(game_id)
+            editor = self._editor(env, hook=False)
+            editor.state = json.loads(json.dumps(env["policy"]))
+            return editor.preview(commands)
+
+    def editor_apply(self, game_id, expected_revision, request_id,
+                     commands):
+        """Frozen editor-protocol apply: replay-exact retries, revision
+        semantics, A-side rename forwarding + audit mirror + supersession
+        hook, envelope persisted once."""
+        with self._lock:
+            if not isinstance(request_id, str) or not request_id \
+                    or len(request_id) > 128:
+                raise _invalid("request_id must be a non-empty string")
+            if not isinstance(commands, list) or not commands:
+                raise _invalid("commands must be a non-empty list")
+            env = self._load(game_id)
+            # known replay answers before the revision check: retries,
+            # including across restarts, return the stored response
+            for entry in env["replay"]:
+                if entry["request_id"] == request_id:
+                    if (entry["action"] != "editor_apply"
+                            or not self._same_payload(
+                                entry["payload"], {"commands": commands})):
+                        raise _conflict(
+                            "conflict",
+                            "request_id was already used with a different "
+                            "payload")
+                    return dict(entry["response"])
+            if expected_revision != env["revision"]:
+                raise _conflict(
+                    "stale_revision",
+                    f"expected_revision {expected_revision} does not match "
+                    f"current revision {env['revision']}")
+            result = self._editor(env).apply(commands,
+                                             turn=env["revision"])
+            self._apply_editor_side_effects(env, result["audit"])
+            env["revision"] += 1
+            state = {"revision": env["revision"],
+                     "policy_revision": result["policy_revision"],
+                     "audit": result["audit"]}
+            self._record_replay(env, request_id, "editor_apply",
+                                {"commands": commands}, state)
+            self._save(env)
+            return json.loads(json.dumps(state))
+
+    def _apply_editor_side_effects(self, env, audit):
+        """A-owned effects of an applied editor batch: the envelope audit
+        mirror, rename forwarding to the person record (identity
+        untouched), and a diegetic journal entry for renames only
+        (scoring edits stay journal-quiet per the frozen protocol)."""
+        people = {p.person_id: p for p in self._walk_people(env["player"])}
+        for entry in audit:
+            env["editor_audit"].append(entry)
+            if entry.get("command") != "rename_person":
+                continue
+            person = people.get(entry.get("target_id"))
+            if person is None:
+                raise GameError("not_found", "unknown person", 404)
+            after = entry.get("after") or {}
+            if "first_name" in after:
+                person.firstname = after["first_name"]
+            if "last_name" in after:
+                person.lastname = after["last_name"]
+            if hasattr(person, "update_name"):
+                person.update_name()
+            self._journal(env, "editor",
+                          f"{person.name} is now called {person.name}.",
+                          [person.person_id])
+
+
     def get_state(self, game_id):
         with self._lock:
             env = self._load(game_id)
             self._ensure_ids(env)
-            return self._state(env)
+            state = self._state(env)
+            notice = self._notices.pop(game_id, None)
+            if notice:
+                state["notice"] = notice
+            return state
 
     @staticmethod
     def _validate_profile(profile):
@@ -966,6 +1461,11 @@ class GameService:
                 "next_journal_num": 1,
                 "next_decision_num": 1,
                 "replay": [],
+                "graph": new_graph(),
+                "editor_audit": [],
+                "policy": new_policy_state(),
+                "parenting": new_parenting_state(),
+                "weddings": new_weddings_state(),
                 "creation": {
                     "request_id": request_id,
                     "fingerprint": fingerprint,
@@ -986,6 +1486,11 @@ class GameService:
                 player.appearance = Appearance.from_dict(appearance)
             env["player"] = player
             self._ensure_ids(env)
+            # M2.5: stamp the frozen attraction/policy profile for every
+            # initial person. Profile draws use a DEDICATED deterministic
+            # rng (seeded per game+person) so cosmetic policy generation
+            # never perturbs the gameplay rng stream (M2 replay parity).
+            self._stamp_all_profiles(env)
             self._journal(
                 env, "birth",
                 f"{player.name} was born"
@@ -1104,6 +1609,9 @@ class GameService:
             state = self._execute(
                 env, expected_revision, request_id, action, payload)
             self._save(env)  # rollback = discard env; nothing else mutated
+            notice = self._notices.pop(game_id, None)
+            if notice:
+                state["notice"] = notice
             return state
 
     def _execute(self, env, expected_revision, request_id, action, payload):
@@ -1130,6 +1638,12 @@ class GameService:
                     f"expected_revision {expected_revision} does not match "
                     f"current revision {env['revision']}")
 
+            from src.game.features.knowledge.core import pending_visible
+            if env["pending"] and not pending_visible(env, env["pending"]):
+                # An old/private NPC offer is not a player decision. Cancel
+                # it without choosing an outcome or inventing consent; the
+                # saved cursor lets age_up continue the interrupted turn.
+                env["pending"] = None
             if env["pending"] and action not in (
                     "resolve_decision", "continue_as"):
                 raise _conflict(
@@ -1143,11 +1657,11 @@ class GameService:
                 if action == "age_up":
                     self._cmd_age_up(env)
                 elif action == "resolve_decision":
-                    self._cmd_resolve(env, payload)
+                    self._cmd_resolve(env, payload, request_id)
                 elif action == "continue_as":
                     self._cmd_continue_as(env, payload)
                 else:
-                    self._cmd_rule_action(env, action, payload)
+                    self._cmd_rule_action(env, action, payload, request_id)
 
             env["revision"] += 1
             state = self._state(env)
@@ -1161,7 +1675,10 @@ class GameService:
         player = env["player"]
         before = (player.happiness, player.health, player.smarts,
                   player.looks)
-        completed = coordinator.run_turn(env, self, random)
+        try:
+            completed = coordinator.run_turn(env, self, random)
+        except GraphError as exc:
+            raise GameError(exc.code, exc.message, exc.status) from exc
         if env["status"] != "dead":
             after = (player.happiness, player.health, player.smarts,
                      player.looks)
@@ -1178,71 +1695,7 @@ class GameService:
                 env["turn"] = {"cursor": {"phase_id": "year_start",
                                           "item_cursor": 0}}
 
-    def _cmd_spend_time(self, env, payload):
-        player = env["player"]
-        target_id = payload.get("target_id")
-        if not isinstance(target_id, str):
-            raise _invalid("target_id is required")
-        person = self._find_person(env, target_id)
-        if not isinstance(person, Parent):
-            raise _not_found("spend time is only available with parents")
-        if target_id in env["year_actions"]["spend_time"]:
-            raise _conflict("not_allowed",
-                            "you already spent time with this person this year")
-        env["year_actions"]["spend_time"].append(target_id)
-
-        # Legacy rule from src/menus/main.py "Spend time" (M1 subset). The
-        # journal records ACTUAL applied deltas (stats/relationship clamp at
-        # 0/100), measured before/after — never the sampled intent.
-        happy_before = player.happiness
-        rel_before = person.relationship
-        if person.relationship < 15:
-            player.change_happiness(-4)
-            changes = {}
-            delta = player.happiness - happy_before
-            if delta:
-                changes["happiness"] = delta
-            self._journal(
-                env, "spend_time",
-                f"{person.name} refused to see {player.firstname}.",
-                [player.person_id, target_id], changes)
-            return
-        enjoyment1 = max(randint(0, 70), randint(0, 70)) + randint(0, 30)
-        if player.has_trait("CHEERFUL"):
-            enjoyment1 = max(enjoyment1, randint(0, 100))
-        elif player.has_trait("GRUMPY"):
-            enjoyment1 = min(enjoyment1, randint(0, 100))
-        enjoyment2 = round(random.triangular(0, 100, person.relationship))
-        happy_gain = round_stochastic(enjoyment1 / 12)
-        rel_gain = round_stochastic(enjoyment2 / 12)
-        player.change_happiness(happy_gain)
-        person.change_relationship(rel_gain)
-        if player.has_trait("CHEERFUL"):
-            player.change_happiness(3)
-        if player.age <= 2:
-            stage = "baby"
-        elif player.age <= 12:
-            stage = "child"
-        elif player.age <= 17:
-            stage = "teen"
-        elif player.age <= 49:
-            stage = "adult"
-        else:
-            stage = "elder"
-        place = random.choice(SPEND_PLACES[stage])
-        changes = {}
-        happy_delta = player.happiness - happy_before
-        rel_delta = person.relationship - rel_before
-        if happy_delta:
-            changes["happiness"] = happy_delta
-        if rel_delta:
-            changes["relationship"] = rel_delta
-        self._journal(
-            env, "spend_time",
-            f"{player.firstname} spent time with {person.name} {place}.",
-            [player.person_id, target_id], changes)
-
-    def _cmd_resolve(self, env, payload):
+    def _cmd_resolve(self, env, payload, request_id):
         pending = env.get("pending")
         if pending is None:
             raise _conflict("no_pending_decision", "nothing to resolve")
@@ -1257,7 +1710,8 @@ class GameService:
             # rule-owned pending (M2): resolve through C's boundary with the
             # stored pre-sampled outcomes; never the M1 template path
             return self._resolve_rule_pending(env, pending, option_id,
-                                              payload.get("inputs"))
+                                              payload.get("inputs"),
+                                              request_id)
         player = env["player"]
         person_ids = list(pending["person_ids"])
         if option.get("_person_ids_extra"):
@@ -1484,6 +1938,14 @@ class GameService:
         env["dead_ids"] = [pid for pid in env.get("dead_ids", [])
                            if pid != successor.person_id]
         env["generation"] = instructions["generation"]
+        # M2.5: the primary-relationship projection follows the successor
+        primary = None
+        for rel in env["graph"]["relationships"]:
+            if rel["status"] == "active" \
+                    and successor.person_id in rel["person_ids"]:
+                primary = rel["relationship_id"]
+                break
+        env["graph"]["primary_relationship_id"] = primary
         self._journal(
             env, "succession",
             f"{successor.name} continues the family legacy "
@@ -1515,26 +1977,47 @@ class GameService:
             env["player"].partner = None
         if type(person).__name__ == "Child" and person in env["player"].children:
             env["player"].children.remove(person)
+        # M2.5 graph: end active edges, cancel the deceased's pending
+        # offers; history edges stay for the tree
+        from src.game.features.family_graph import apply_death
+        apply_death(env["graph"], pid, env.get("revision", 0))
         self._journal(env, "death",
                       death.get("announcement")
                       or f"{person.name} {death.get('cause', 'passed away')}.",
                       [pid])
 
-    def _cmd_rule_action(self, env, action, payload):
+    @staticmethod
+    def _per_command_entries(entries, request_id):
+        """Command-driven money postings are one occurrence per COMMAND,
+        not per turn: some actions can succeed several times within a
+        single year (ask_for_money grants), and a constant occurrence id
+        would reuse the posting key with different amounts (LedgerConflict
+        -> the typed 500 the robot found, crash_id e1b1a7e5326b). The
+        request_id suffix keeps each command unique while a retried command
+        never reposts: the replay log answers it before re-execution."""
+        if not entries:
+            return entries
+        return [dict(entry,
+                     occurrence_id="%s#%s" % (entry["occurrence_id"],
+                                              request_id))
+                for entry in entries]
+
+    def _cmd_rule_action(self, env, action, payload, request_id):
         from src.game.context import RuleContext
         from src.game import rule_adapter
         from src.menus import rule_actions
         ctx = RuleContext(env, self)
         try:
             result = rule_actions.apply_action(ctx, action, payload, random)
-        except rule_actions.RuleError as e:
-            status = 409 if e.code in ("not_allowed", "refused") \
+        except (rule_actions.RuleError, GraphError) as e:
+            status = 409 if e.code in ("not_allowed", "refused", "not_adult") \
                 else 404 if e.code == "not_found" else 400
             raise GameError(e.code, e.message, status)
         turn_id = env["turn"].get("turn_id", f"t_{env['revision'] + 1}")
         rule_adapter.post_money_entries(
             env, self, turn_id, env["player"].age,
-            result.get("money_entries"))
+            self._per_command_entries(result.get("money_entries"),
+                                      request_id))
         rule_adapter.journal_events(env, result.get("events"))
         if "pending_decision" in result:
             env["pending"] = result["pending_decision"]
@@ -1542,7 +2025,8 @@ class GameService:
                 env["pending"]["id"] = f"d_{env['next_decision_num']}"
                 env["next_decision_num"] += 1
 
-    def _resolve_rule_pending(self, env, pending, option_id, inputs):
+    def _resolve_rule_pending(self, env, pending, option_id, inputs,
+                              request_id):
         from src.game import coordinator
         from src.game import rule_adapter
         from src.game.context import RuleContext
@@ -1551,14 +2035,15 @@ class GameService:
         try:
             result = rule_actions.resolve_choice(
                 ctx, pending, option_id, inputs, random)
-        except rule_actions.RuleError as e:
-            status = 409 if e.code in ("not_allowed", "refused") \
+        except (rule_actions.RuleError, GraphError) as e:
+            status = 409 if e.code in ("not_allowed", "refused", "not_adult") \
                 else 404 if e.code == "not_found" else 400
             raise GameError(e.code, e.message, status)
         turn_id = env["turn"].get("turn_id", f"t_{env['revision'] + 1}")
         rule_adapter.post_money_entries(
             env, self, turn_id, env["player"].age,
-            result.get("money_entries"))
+            self._per_command_entries(result.get("money_entries"),
+                                      request_id))
         rule_adapter.journal_events(env, result.get("events"))
         for death in result.get("deaths") or []:
             self._apply_event_death(env, death)

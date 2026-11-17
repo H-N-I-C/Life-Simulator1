@@ -1,0 +1,63 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1394,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Anurag",
+    "last_name": "Byrd",
+    "gender": "male",
+    "country": "USA",
+    "seed": 67111453,
+    "request_id": "robot-1-1394-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1497144798,
+     "base": "woman",
+     "skin_tone": "light",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_d5f5cce01c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11286",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_d5f5cce01c",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "a1e2f1f5-d91a-4cf9-912a-15466b6ad12c"
+   },
+   "request_id": "robot-1-r11287",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1395 --seed 1 --from-life 1394 --fail-fast"
+}

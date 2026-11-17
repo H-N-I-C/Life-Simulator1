@@ -1,0 +1,54 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1973,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alanna",
+    "last_name": "Pittman",
+    "gender": "female",
+    "country": "Japan",
+    "seed": 604732164,
+    "request_id": "robot-1-1973-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 791617315,
+     "base": "woman",
+     "skin_tone": "dark",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_a44f2109bb",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "7f9932f5-3dd3-43c5-a22a-41947c8d0420"
+   },
+   "request_id": "robot-1-r15723",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1974 --seed 1 --from-life 1973 --fail-fast"
+}

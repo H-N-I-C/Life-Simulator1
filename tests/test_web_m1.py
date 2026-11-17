@@ -353,14 +353,15 @@ class TestActions(WebCase):
                       if p["id"] == got["player_id"])
         self.assertEqual(player["age"], 3)
         self.assertEqual(player["appearance"]["skin_tone"], "default")
-        # clear any pending decision sampled during the last year before
-        # aging on (event-rich turns commonly pause at a decision)
-        if got["pending_decision"]:
+        # clear any pending decisions sampled during the last year before
+        # aging on (event-rich turns commonly pause at a decision; A's
+        # parenting/drama phases may chain more than one)
+        while got["pending_decision"]:
             d = got["pending_decision"]
+            o = next(x for x in d["options"] if x.get("enabled", True))
             status, body = self.act(
                 got["game_id"], got["revision"], "resolve_decision",
-                {"decision_id": d["id"],
-                 "option_id": d["options"][0]["id"]})
+                {"decision_id": d["id"], "option_id": o["id"]})
             self.assertEqual(status, 200, body)
             got = body
         # pending-decision durability: no reroll on reload (replay still works)

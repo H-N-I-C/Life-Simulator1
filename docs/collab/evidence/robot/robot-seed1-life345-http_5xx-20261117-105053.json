@@ -1,0 +1,61 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 345,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "action 'resolve_decision' -> HTTP 500: {\"error\": \"internal\", \"crash_id\": \"161a52d998be\"}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alfonzo",
+    "last_name": "Watts",
+    "gender": "male",
+    "country": "Brazil",
+    "seed": 1108708259,
+    "request_id": "robot-1-345-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_032baa5a35",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r35993",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_032baa5a35",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r35994",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_032baa5a35",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_busy"
+   },
+   "request_id": "robot-1-r35995",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 500,
+   "body": "{\"error\": \"internal\", \"crash_id\": \"161a52d998be\"}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 346 --seed 1 --from-life 345 --fail-fast"
+}

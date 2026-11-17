@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1271,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adelle",
+    "last_name": "Sutton",
+    "gender": "female",
+    "country": "Canada",
+    "seed": 1267392048,
+    "request_id": "robot-1-1271-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 882595248,
+     "base": "woman",
+     "skin_tone": "light",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "earrings",
+      "cap"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_5fef583f65",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r10074",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_5fef583f65",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "0cb0ab82-f768-4afc-bdc4-f5b026e5644c"
+   },
+   "request_id": "robot-1-r10075",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1272 --seed 1 --from-life 1271 --fail-fast"
+}

@@ -1,0 +1,175 @@
+{
+  "schema_version": 3,
+  "_comment": "Every event in this file MUST fail validation. Each event violates at least the rule named in its id; tools/validate_v3_content.py must report all of them. Fixture for the unfrozen v3 draft (event-schema-v3.md).",
+  "events": [
+    {
+      "id": "invalid_v3.adult_gate-romantic_min_age_16",
+      "title": "Teen romance",
+      "text": "{person:actor} flirts with {person:target}.",
+      "interaction": {"kind": "flirt", "romantic": true},
+      "weight": 1,
+      "conditions": {"min_age": 16},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "target": {"kind": "person", "select": "predicate",
+                   "predicate": "any_minor"}
+      },
+      "choices": [
+        {"id": "a", "label": "A", "cost": {}, "effects": {}},
+        {"id": "b", "label": "B", "cost": {}, "effects": {}}
+      ]
+    },
+    {
+      "id": "invalid_v3.interaction.unknown_kind",
+      "title": "Unknown interaction",
+      "text": "x",
+      "interaction": {"kind": "serenade", "romantic": true},
+      "weight": 1,
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "target": {"kind": "person", "select": "predicate",
+                   "predicate": "adult_non_related_stranger"}
+      },
+      "choices": [
+        {"id": "a", "label": "A", "cost": {}, "effects": {}},
+        {"id": "b", "label": "B", "cost": {}, "effects": {}}
+      ]
+    },
+    {
+      "id": "invalid_v3.auto_romance",
+      "title": "Auto romance",
+      "text": "A romance fires automatically.",
+      "interaction": {"kind": "date", "romantic": true},
+      "auto": true,
+      "weight": 1,
+      "conditions": {"min_age": 18},
+      "roles": {"actor": {"kind": "person", "select": "player"}},
+      "effects": {}
+    },
+    {
+      "id": "invalid_v3.roles.unknown_kind",
+      "title": "Unknown role kind",
+      "text": "{person:actor} sees something.",
+      "interaction": {"kind": "date", "romantic": true},
+      "weight": 1,
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "target": {"kind": "ghost", "select": "predicate",
+                   "predicate": "someone"}
+      },
+      "choices": [
+        {"id": "a", "label": "A", "cost": {}, "effects": {}},
+        {"id": "b", "label": "B", "cost": {}, "effects": {}}
+      ]
+    },
+    {
+      "id": "invalid_v3.roles.predicate_without_name",
+      "title": "Predicate missing",
+      "text": "{person:actor} waits.",
+      "interaction": {"kind": "date", "romantic": true},
+      "weight": 1,
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "target": {"kind": "person", "select": "predicate"}
+      },
+      "choices": [
+        {"id": "a", "label": "A", "cost": {}, "effects": {}},
+        {"id": "b", "label": "B", "cost": {}, "effects": {}}
+      ]
+    },
+    {
+      "id": "invalid_v3.cond.unknown_kind",
+      "title": "Unknown condition",
+      "text": "{person:actor} wonders.",
+      "interaction": {"kind": "date", "romantic": true},
+      "weight": 1,
+      "conditions": {"min_age": 18,
+                     "requires": [{"kind": "moon_phase", "phase": "full"}]},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "target": {"kind": "person", "select": "predicate",
+                   "predicate": "adult_non_related_stranger"}
+      },
+      "choices": [
+        {"id": "a", "label": "A", "cost": {}, "effects": {}},
+        {"id": "b", "label": "B", "cost": {}, "effects": {}}
+      ]
+    },
+    {
+      "id": "invalid_v3.fx.raw_setter",
+      "title": "Raw setter",
+      "text": "{person:actor} is manipulated.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "weight": 1,
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "target": {"kind": "person", "select": "predicate",
+                   "predicate": "adult_existing_lover"}
+      },
+      "choices": [
+        {"id": "a", "label": "A", "cost": {},
+         "effects": {"set_consent": {"person": "target", "value": true}}},
+        {"id": "b", "label": "B", "cost": {}, "effects": {}}
+      ]
+    },
+    {
+      "id": "invalid_v3.softlock-no_free_exit",
+      "title": "No free exit",
+      "text": "{person:actor} must pay.",
+      "interaction": {"kind": "date", "romantic": true},
+      "weight": 1,
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "target": {"kind": "person", "select": "predicate",
+                   "predicate": "adult_non_related_stranger"}
+      },
+      "choices": [
+        {"id": "pay", "label": "Pay up", "cost": {"money": 100},
+         "effects": {"money": -100}},
+        {"id": "pay_more", "label": "Pay more", "cost": {"money": 200},
+         "effects": {"money": -200}}
+      ]
+    },
+    {
+      "id": "invalid_v3.fx.undeclared_role",
+      "title": "Effect on undeclared role",
+      "text": "{person:actor} reaches out.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "weight": 1,
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "target": {"kind": "person", "select": "predicate",
+                   "predicate": "adult_existing_lover"}
+      },
+      "choices": [
+        {"id": "a", "label": "A", "cost": {},
+         "effects": {"chemistry": {"between": ["actor", "ghost"],
+                                   "delta": 3}}},
+        {"id": "b", "label": "B", "cost": {}, "effects": {}}
+      ]
+    },
+    {
+      "id": "invalid_v3.template.undeclared_role",
+      "title": "Template ghost",
+      "text": "{person:actor} meets {person:matchmaker}.",
+      "interaction": {"kind": "date", "romantic": true},
+      "weight": 1,
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "target": {"kind": "person", "select": "predicate",
+                   "predicate": "adult_non_related_stranger"}
+      },
+      "choices": [
+        {"id": "a", "label": "A", "cost": {}, "effects": {}},
+        {"id": "b", "label": "B", "cost": {}, "effects": {}}
+      ]
+    }
+  ]
+}

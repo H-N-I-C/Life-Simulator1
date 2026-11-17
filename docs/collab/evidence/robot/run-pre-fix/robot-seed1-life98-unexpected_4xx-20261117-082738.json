@@ -1,0 +1,63 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 98,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alexandrina",
+    "last_name": "Willis",
+    "gender": "female",
+    "country": "Nigeria",
+    "seed": 916751983,
+    "request_id": "robot-1-98-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1051235372,
+     "base": "man",
+     "skin_tone": "light",
+     "hair": "white",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_06",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_42192cdfda",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r1020",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_42192cdfda",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "6637802c-236b-4346-b436-07f7f29d3184"
+   },
+   "request_id": "robot-1-r1021",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 99 --seed 1 --from-life 98 --fail-fast"
+}

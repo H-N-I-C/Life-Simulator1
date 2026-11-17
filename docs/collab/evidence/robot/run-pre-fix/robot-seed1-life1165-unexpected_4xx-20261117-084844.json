@@ -1,0 +1,84 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1165,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adrick",
+    "last_name": "Puckett",
+    "gender": "male",
+    "country": "Japan",
+    "seed": 775995957,
+    "request_id": "robot-1-1165-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_8ec14a0206",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r9018",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_8ec14a0206",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r9019",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_8ec14a0206",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r9020",
+   "expected_revision": 2
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 2 does not match current revision 3\"}}"
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_8ec14a0206",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r9021",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_8ec14a0206",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "93627567-5d3a-4b0b-9c48-8c82a12ec8e5"
+   },
+   "request_id": "robot-1-r9022",
+   "expected_revision": 4
+  },
+  {
+   "n": 7,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1166 --seed 1 --from-life 1165 --fail-fast"
+}

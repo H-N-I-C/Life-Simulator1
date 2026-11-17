@@ -1,4 +1,5 @@
-import { renderAvatar, miniPersonChip } from "./common.js";
+import { renderAvatar, miniPersonChip, setErrorRetryHandler,
+         hideCrashCard } from "./common.js";
 import { normalizeState, financeRows, journalPeople,
          ACTION_CATEGORIES, GENERAL_CATEGORIES } from "./adapter.js";
 
@@ -20,6 +21,10 @@ function setCurrentGameId(id) {
   else sessionStorage.removeItem("game_id");
 }
 
+
+const pageLoading = $("pageLoading");
+function setPageLoading(on) { pageLoading.hidden = !on; }
+
 function showToast(message, isError) {
   toast.textContent = message;
   toast.classList.toggle("error", !!isError);
@@ -29,6 +34,13 @@ function showToast(message, isError) {
 }
 
 async function api(path, options = {}) {
+  if (navigator.onLine === false) {
+    const err = new Error(
+      "You are offline — reconnect, then retry. Your save is safe.");
+    err.status = 0;
+    err.code = "offline";
+    throw err;
+  }
   const res = await fetch(path, options);
   let body = null;
   try { body = await res.json(); } catch (e) { /* non-JSON */ }
@@ -58,6 +70,7 @@ function esc(s) {
 
 async function showResume() {
   state = null;
+  setPageLoading(true);
   resumeView.hidden = false;
   gameView.hidden = true;
   legacyView.hidden = true;
@@ -66,6 +79,7 @@ async function showResume() {
   list.innerHTML = "<p>Loading…</p>";
   try {
     const data = await api("/api/games");
+    setPageLoading(false);
     if (!data.games.length) {
       list.innerHTML = "<p>No lives yet. Start one!</p>";
       return;
@@ -97,8 +111,22 @@ async function showResume() {
       list.appendChild(row);
     }
   } catch (err) {
+    setPageLoading(false);
     list.innerHTML = "";
-    showToast(err.message, true);
+    const card = document.createElement("div");
+    card.className = "card load-error";
+    const msg = document.createElement("p");
+    msg.innerHTML = "<b>Couldn't load your lives.</b>";
+    const detail = document.createElement("p");
+    detail.className = "muted";
+    detail.textContent = (err && err.message) || "Unknown error";
+    const retry = document.createElement("button");
+    retry.textContent = "Retry";
+    retry.addEventListener("click", showResume);
+    card.appendChild(msg);
+    card.appendChild(detail);
+    card.appendChild(retry);
+    list.appendChild(card);
   }
 }
 
@@ -123,6 +151,7 @@ for (const b of tabbar.querySelectorAll("button")) {
 /* ================= rendering ================= */
 
 function render() {
+  setPageLoading(false);
   const s = state;
   const player = s.player;
   resumeView.hidden = true;
@@ -303,6 +332,18 @@ function renderTimeline() {
     prevAge = g.age;
   }
   flushQuiet();
+  if (!groups.length && !state.journal.length) {
+    const li = document.createElement("li");
+    li.className = "jquiet";
+    li.textContent = "Nothing has happened yet — age up to live your " +
+      "first year.";
+    frag.appendChild(li);
+  } else if (!groups.length) {
+    const li = document.createElement("li");
+    li.className = "jquiet";
+    li.textContent = "A quiet life so far.";
+    frag.appendChild(li);
+  }
   j.appendChild(frag);
 }
 
@@ -450,7 +491,12 @@ function renderFamily() {
   renderFamilySection();
   const fam = $("familyList");
   fam.innerHTML = "";
-  for (const p of state.people.filter((p) => p.id !== state.playerId)) {
+  const others = state.people.filter((p) => p.id !== state.playerId);
+  if (!others.length) {
+    fam.innerHTML = '<p class="muted">No family or relationships yet.</p>';
+    return;
+  }
+  for (const p of others) {
     const chip = document.createElement("div");
     chip.className = "chip";
     const av = document.createElement("div");
@@ -634,6 +680,10 @@ function openActionModal(a) {
   submit.addEventListener("click", () => {
     try {
       const payload = collectInputs(doc);
+      // Duplicate-submit guard: one in-flight command per modal. The modal
+      // closes on success; on a validation error the button stays and is
+      // re-enabled.
+      submit.disabled = true;
       closeModal();
       sendAction(a.id, payload, a.targetId);
     } catch (err) {
@@ -708,6 +758,9 @@ function openDecisionModal() {
       try {
         const inputs = collectInputs({ ...doc,
                                        ...(opt._doc || {}) });
+        // Duplicate-submit guard: freeze every option while the one
+        // command is in flight (busy also gates it globally).
+        for (const x of box.querySelectorAll("button")) x.disabled = true;
         closeModal();
         resolveDecision(d.id, opt.id, inputs);
       } catch (err) {
@@ -885,7 +938,7 @@ function sendOperation(op) {
 
 async function loadGameKeepOp() {
   const gid = currentGameId();
-  if (!gid) { showResume(); return; }
+  if (!gid) { setPageLoading(false); showResume(); return; }
   try {
     const raw = await api("/api/games/" + encodeURIComponent(gid));
     state = normalizeState(raw);
@@ -911,6 +964,7 @@ function resolveDecision(decisionId, optionId, inputs) {
 /* ---------- legacy / continuation ---------- */
 
 function renderLegacy() {
+  setPageLoading(false);
   const s = state;
   gameView.hidden = true;
   resumeView.hidden = true;
@@ -952,7 +1006,12 @@ function renderLegacy() {
     const btn = document.createElement("button");
     btn.textContent = "Continue";
     const pid = c.person_id || c.id;
-    btn.addEventListener("click", () => continueAs(pid));
+    btn.addEventListener("click", () => {
+      // Duplicate-submit guard: freeze all Continue buttons; the retry-
+      // stable operation machinery makes the single attempt safe.
+      for (const x of list.querySelectorAll("button")) x.disabled = true;
+      continueAs(pid);
+    });
     row.appendChild(btn);
     list.appendChild(row);
     renderAvatar(av, c.appearance, c.age, 96);
@@ -971,10 +1030,10 @@ function renderLegacy() {
 }
 
 function continueAs(childId) {
-  if (busy) return;
-  busy = true;
-  const requestId = crypto.randomUUID();
-  attempt("continue_as", requestId, { target_id: childId }, 0);
+  // Same retry-stable path as every other command: persisted op, replay
+  // ledger, safe retry. (The old ad-hoc helper was not defined and would
+  // have crashed here.)
+  startOperation("continue_as", { target_id: childId });
 }
 
 /* ---------- loading ---------- */
@@ -992,6 +1051,7 @@ function consumeDeepLink() {
 
 async function loadGame() {
   consumeDeepLink();
+  setPageLoading(true);
   const gid = currentGameId();
   if (!gid) { showResume(); return; }
   try {
@@ -1008,14 +1068,104 @@ async function loadGame() {
     if (err.status === 404) {
       setCurrentGameId(null);
       showResume();
+      return;
     }
-    showToast(err.message, true);
+    showFatalLoadError(err);
   }
+}
+
+/* Full-view error state when the current game cannot be loaded: the page
+ * is never left half-broken, and both ways forward are explicit. */
+function showFatalLoadError(err) {
+  setPageLoading(false);
+  state = null;
+  gameView.hidden = true;
+  legacyView.hidden = true;
+  tabbar.hidden = true;
+  resumeView.hidden = false;
+  const list = $("lifeList");
+  list.innerHTML = "";
+  const card = document.createElement("div");
+  card.className = "card load-error";
+  const msg = document.createElement("p");
+  msg.innerHTML = "<b>Couldn't load this life.</b> Your save is safe on " +
+    "the server.";
+  const detail = document.createElement("p");
+  detail.className = "muted";
+  detail.textContent = (err && err.message) || "Unknown error";
+  const row = document.createElement("div");
+  row.className = "row";
+  const retry = document.createElement("button");
+  retry.className = "primary";
+  retry.textContent = "Retry";
+  retry.addEventListener("click", loadGame);
+  const all = document.createElement("button");
+  all.textContent = "All lives";
+  all.addEventListener("click", () => {
+    setCurrentGameId(null);
+    showResume();
+  });
+  row.appendChild(retry);
+  row.appendChild(all);
+  card.appendChild(msg);
+  card.appendChild(detail);
+  card.appendChild(row);
+  list.appendChild(card);
 }
 
 $("backToLives").addEventListener("click", () => {
   setCurrentGameId(null);
   showResume();
+});
+
+/* M2.5 in-play character editor (relationship_policy feature, B). Lazy
+ * import so the game page pays nothing when the panel stays closed. */
+let editorModule = null;
+$("editorToggle").addEventListener("click", async () => {
+  try {
+    if (!editorModule) {
+      editorModule = await import(
+        "/static/features/relationship_policy/editor.js");
+    }
+    editorModule.toggleEditor(state);
+  } catch (err) {
+    showToast("Editor failed to load.", true);
+  }
+});
+
+/* M2.5 family tree (family_graph feature, A's module; B owns the shell
+ * hook). Lazy-import and mount into a toggleable card. */
+let familyTreeModule = null;
+let familyTreeCard = null;
+$("familyTreeToggle").addEventListener("click", async () => {
+  try {
+    if (!familyTreeCard) {
+      familyTreeCard = document.createElement("section");
+      familyTreeCard.className = "card";
+      familyTreeCard.id = "familyTreeCard";
+      familyTreeCard.hidden = true;
+      $("actionList").parentElement.appendChild(familyTreeCard);
+    }
+    if (!familyTreeModule) {
+      familyTreeModule = await import(
+        "/static/features/family_graph/family_tree.js");
+    }
+    familyTreeCard.hidden = !familyTreeCard.hidden;
+    if (!familyTreeCard.hidden) {
+      await familyTreeModule.mountFamilyTree(familyTreeCard,
+                                             state.gameId);
+    }
+  } catch (err) {
+    showToast("Family tree failed to load.", true);
+  }
+});
+
+/* Global error boundary "Retry": re-render from the server's current
+ * state — always safe, never a mutation. Falls back to the lives list. */
+setErrorRetryHandler(() => {
+  hideCrashCard();
+  if (currentGameId()) loadGame();
+  else showResume();
 });
 
 loadGame();

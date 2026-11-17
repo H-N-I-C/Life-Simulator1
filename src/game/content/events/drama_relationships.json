@@ -1,0 +1,1088 @@
+{
+  "schema_version": 3,
+  "events": [
+    {
+      "id": "dra_jealous_glance",
+      "title": "The Glance",
+      "text": "At a party, {person:partner} noticed me noticing someone. The drive home is quiet.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "reassure",
+          "label": "Take their hand and reassure them",
+          "effects": {
+            "relationship": 6,
+            "stats": {
+              "happiness": 2
+            }
+          },
+          "outcome_text": "I told them they are my favourite view, and I meant it."
+        },
+        {
+          "id": "deflect",
+          "label": "Laugh it off",
+          "effects": {
+            "relationship": -2
+          },
+          "outcome_text": "The joke landed softly and died quickly."
+        },
+        {
+          "id": "spat",
+          "label": "Snap that they are being paranoid",
+          "effects": {
+            "relationship": -6,
+            "stats": {
+              "stress": 2
+            }
+          },
+          "outcome_text": "I said it too sharply, and we both heard it."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "dra_suspicious_text",
+      "title": "The Late Message",
+      "text": "{person:partner}'s phone lit up at midnight with a name I don't know and a flame emoji.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "ask",
+          "label": "Ask about it in the morning, calmly",
+          "effects": {
+            "relationship": 4,
+            "stats": {
+              "stress": 1
+            }
+          },
+          "outcome_text": "It was a colleague. I slept better for having asked."
+        },
+        {
+          "id": "peek",
+          "label": "Look through the phone while they shower",
+          "effects": {
+            "stats": {
+              "stress": -1,
+              "happiness": -2
+            }
+          },
+          "outcome_text": "I found nothing, and I hated myself a little for looking."
+        },
+        {
+          "id": "let_go",
+          "label": "Let it go",
+          "effects": {
+            "stats": {
+              "stress": 2
+            }
+          },
+          "outcome_text": "I said nothing, and the question kept me company all week."
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "dra_ex_resurfaces",
+      "title": "A Name From Before",
+      "text": "{person:ex} sent a friend request and a message: 'Saw your name today. Thought of you.'",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "ex": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_ex_lover_of_actor"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "reply",
+          "label": "Reply politely and close the door",
+          "effects": {
+            "stats": {
+              "happiness": 1
+            }
+          },
+          "outcome_text": "I wrote 'good to hear from you — take care' and left it there."
+        },
+        {
+          "id": "coffee",
+          "label": "Agree to catch up over coffee",
+          "effects": {
+            "relationship": -5,
+            "stats": {
+              "happiness": 2
+            }
+          },
+          "outcome_text": "The coffee was fine. The look on my face when I got home was not."
+        },
+        {
+          "id": "ignore",
+          "label": "Ignore it",
+          "effects": {},
+          "outcome_text": "Some doors stay closed for a reason."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "dra_caught_late",
+      "title": "Working Late",
+      "text": "I said I was working late. {person:partner} saw me across the café, laughing with {person:other}, before I saw them.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        },
+        "other": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_non_related_stranger"
+        }
+      },
+      "choices": [
+        {
+          "id": "truth",
+          "label": "Admit everything right there",
+          "effects": {
+            "relationship": -4,
+            "stats": {
+              "stress": -3,
+              "happiness": -1
+            },
+            "reveal_fact": {
+              "kind": "affair",
+              "about": [
+                "actor",
+                "other"
+              ],
+              "to": [
+                "partner"
+              ],
+              "reputation": [
+                {
+                  "person": "actor",
+                  "scope": "global",
+                  "delta": -6
+                }
+              ]
+            }
+          },
+          "outcome_text": "I said the true thing out loud, and the café got very quiet."
+        },
+        {
+          "id": "deny",
+          "label": "Deny and deflect",
+          "effects": {
+            "relationship": -8,
+            "stats": {
+              "stress": 4
+            },
+            "reveal_fact": {
+              "kind": "affair",
+              "about": [
+                "actor",
+                "other"
+              ],
+              "to": [
+                "partner"
+              ]
+            }
+          },
+          "outcome_text": "The lie came out fast. It did not fit well."
+        },
+        {
+          "id": "chase",
+          "label": "Follow them home and explain",
+          "effects": {
+            "relationship": -2,
+            "stats": {
+              "stress": 2
+            }
+          },
+          "outcome_text": "I chased the silence all the way home."
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "dra_nearly_caught",
+      "title": "The Close Call",
+      "text": "{person:partner} came home an hour early. I was not quite where I said I would be.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "half_true",
+          "label": "Offer a half-true version",
+          "effects": {
+            "stats": {
+              "stress": 2
+            }
+          },
+          "outcome_text": "I told the part that was true and skipped the rest."
+        },
+        {
+          "id": "change",
+          "label": "Change the subject fast",
+          "effects": {
+            "stats": {
+              "stress": 1,
+              "happiness": -1
+            }
+          },
+          "outcome_text": "The subject changed. My conscience did not."
+        },
+        {
+          "id": "come_clean",
+          "label": "Come clean, unprompted",
+          "effects": {
+            "relationship": -3,
+            "stats": {
+              "stress": -2
+            }
+          },
+          "outcome_text": "It was smaller than the fear of keeping it."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "dra_confess_temptation",
+      "title": "The Line I Didn't Cross",
+      "text": "Something almost happened last weekend. Nothing did, but it almost did, and it is sitting on my chest.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "confess",
+          "label": "Confess the almost",
+          "effects": {
+            "relationship": 3,
+            "stats": {
+              "stress": -2
+            }
+          },
+          "outcome_text": "I told them, and the telling made it smaller."
+        },
+        {
+          "id": "carry",
+          "label": "Carry it alone",
+          "effects": {
+            "stats": {
+              "stress": 4
+            }
+          },
+          "outcome_text": "I kept it. It kept me back."
+        },
+        {
+          "id": "joke",
+          "label": "Make it a joke that isn't a joke",
+          "effects": {
+            "relationship": -2
+          },
+          "outcome_text": "They laughed. I didn't."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "dra_partner_confesses",
+      "title": "I Need to Tell You Something",
+      "text": "{person:partner} sits down very carefully and says there was a kiss, once, at a conference, and it has been eating them alive.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "forgive",
+          "label": "Forgive, honestly",
+          "effects": {
+            "relationship": 8,
+            "stats": {
+              "happiness": 2
+            }
+          },
+          "outcome_text": "I forgave them, and some of the weight moved off us both."
+        },
+        {
+          "id": "space",
+          "label": "Ask for time and space",
+          "effects": {
+            "relationship": -3,
+            "stats": {
+              "stress": 2
+            }
+          },
+          "outcome_text": "I needed the guest room and three quiet days."
+        },
+        {
+          "id": "talk",
+          "label": "Talk all night until it makes sense",
+          "effects": {
+            "relationship": 2,
+            "stats": {
+              "stress": 1,
+              "happiness": 1
+            }
+          },
+          "outcome_text": "We talked until the kettle was empty twice."
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "dra_meddling_inlaw",
+      "title": "Helpful Comments",
+      "text": "{person:partner}'s mother has spent the entire dinner explaining how she would run my marriage.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "charm",
+          "label": "Charm offensive: wine and compliments",
+          "effects": {
+            "money": -40,
+            "relationship": 4,
+            "stats": {
+              "happiness": 1
+            }
+          },
+          "outcome_text": "I won the evening. It cost a bottle and most of my patience."
+        },
+        {
+          "id": "endure",
+          "label": "Smile and endure it",
+          "effects": {
+            "stats": {
+              "stress": 3
+            }
+          },
+          "outcome_text": "My smile held until the car park."
+        },
+        {
+          "id": "boundary",
+          "label": "Set a gentle boundary",
+          "effects": {
+            "relationship": -2,
+            "stats": {
+              "stress": -1
+            }
+          },
+          "outcome_text": "It was polite, firm, and the dessert course was frosty."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "dra_open_checkin",
+      "title": "How Are We, Really?",
+      "text": "{person:partner} suggests the check-in we promised each other: an honest talk about how our arrangement is working — no judgement, either way.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "honest",
+          "label": "Be completely honest, even the awkward parts",
+          "effects": {
+            "relationship": 7,
+            "stats": {
+              "happiness": 2
+            }
+          },
+          "outcome_text": "Consent kept honest is what makes us work, and I said so out loud."
+        },
+        {
+          "id": "recommit",
+          "label": "Suggest recommitting to just each other",
+          "effects": {
+            "relationship": 3,
+            "stats": {
+              "happiness": 1
+            }
+          },
+          "outcome_text": "We talked about closing the door, and either way, it was our choice."
+        },
+        {
+          "id": "postpone",
+          "label": "Not tonight — postpone the talk",
+          "effects": {
+            "relationship": -2,
+            "stats": {
+              "stress": 1
+            }
+          },
+          "outcome_text": "The talk waited. It did not disappear."
+        }
+      ],
+      "weight": 2,
+      "audience": {
+        "scope": "public",
+        "participants": [
+          "actor",
+          "partner"
+        ]
+      }
+    },
+    {
+      "id": "dra_phones_open",
+      "title": "Full Transparency?",
+      "text": "{person:partner} proposes a phones-open policy. Everything, anytime, nothing to hide.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "agree",
+          "label": "Agree — open books",
+          "effects": {
+            "relationship": 6
+          },
+          "outcome_text": "I handed over my passcode and felt lighter."
+        },
+        {
+          "id": "partial",
+          "label": "Share the important things, keep some privacy",
+          "effects": {
+            "relationship": 1
+          },
+          "outcome_text": "We drew a line we could both live behind."
+        },
+        {
+          "id": "refuse",
+          "label": "Refuse on principle",
+          "effects": {
+            "relationship": -4,
+            "stats": {
+              "stress": 1
+            }
+          },
+          "outcome_text": "Trust built from surveillance isn't trust, I said. They heard it."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "dra_public_argument",
+      "title": "In Front of Everyone",
+      "text": "A disagreement about nothing became an argument about everything, in the middle of the street.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "walk",
+          "label": "Suggest you both walk it off",
+          "effects": {
+            "stats": {
+              "stress": -2
+            },
+            "relationship": 1
+          },
+          "outcome_text": "Ten minutes apart saved the evening."
+        },
+        {
+          "id": "make_up",
+          "label": "Make up right there, deliberately",
+          "effects": {
+            "relationship": 5,
+            "stats": {
+              "happiness": 2
+            }
+          },
+          "outcome_text": "I apologised first, loudly, on the pavement, and meant it."
+        },
+        {
+          "id": "boil",
+          "label": "Let it boil over",
+          "effects": {
+            "relationship": -6,
+            "stats": {
+              "stress": 3
+            }
+          },
+          "outcome_text": "We gave the street a show neither of us wanted."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "dra_partner_jealous_friend",
+      "title": "Just a Friend",
+      "text": "{person:partner} has started asking pointed questions about my oldest friend.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "introduce",
+          "label": "Introduce them properly",
+          "effects": {
+            "relationship": 4,
+            "stats": {
+              "happiness": 1
+            }
+          },
+          "outcome_text": "They got along. The questions stopped."
+        },
+        {
+          "id": "reassure",
+          "label": "Reassure, patiently",
+          "effects": {
+            "relationship": 2
+          },
+          "outcome_text": "I explained the twenty-year history. They listened."
+        },
+        {
+          "id": "keep_separate",
+          "label": "Keep my friend and my partner apart",
+          "effects": {
+            "relationship": -3,
+            "stats": {
+              "stress": 2
+            }
+          },
+          "outcome_text": "Keeping the peace cost me a lunch I had wanted."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "dra_secret_pressure",
+      "title": "Go Public With Us?",
+      "text": "{person:lover} is tired of being a secret and asks, plainly, to be acknowledged.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "lover": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_secret_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "public",
+          "label": "Agree to go public",
+          "effects": {
+            "relationship": 6,
+            "stats": {
+              "happiness": 2,
+              "stress": 2
+            },
+            "reveal_fact": {
+              "kind": "secret_union",
+              "about": [
+                "actor",
+                "lover"
+              ],
+              "to": [
+                "lover"
+              ]
+            }
+          },
+          "outcome_text": "I held their hand where everyone could see. It felt like air."
+        },
+        {
+          "id": "later",
+          "label": "Ask for more time",
+          "effects": {
+            "relationship": -3,
+            "stats": {
+              "stress": 1
+            }
+          },
+          "outcome_text": "They said they understood. Their face said less."
+        },
+        {
+          "id": "end_it",
+          "label": "End the secrecy by ending it",
+          "effects": {
+            "relationship": -6,
+            "stats": {
+              "happiness": -2,
+              "stress": -1
+            },
+            "end_relationship": {
+              "between": [
+                "actor",
+                "lover"
+              ],
+              "how": "fade"
+            }
+          },
+          "outcome_text": "I let them go, and it was kinder than keeping them hidden."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "dra_gossip_work",
+      "title": "Around the Water Cooler",
+      "text": "A colleague 'heard things' about my marriage and would love to confirm the details.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        }
+      },
+      "choices": [
+        {
+          "id": "laugh",
+          "label": "Laugh it off gracefully",
+          "effects": {
+            "stats": {
+              "happiness": 1
+            },
+            "reputation": {
+              "person": "actor",
+              "scope": "global",
+              "delta": 2
+            }
+          },
+          "outcome_text": "I gave them nothing and kept my smile."
+        },
+        {
+          "id": "confront",
+          "label": "Shut it down, firmly",
+          "effects": {
+            "stats": {
+              "stress": 2
+            },
+            "reputation": {
+              "person": "actor",
+              "scope": "global",
+              "delta": -1
+            }
+          },
+          "outcome_text": "The water cooler went quiet for a week."
+        },
+        {
+          "id": "ignore",
+          "label": "Say nothing at all",
+          "effects": {},
+          "outcome_text": "Rumours starve fastest on a diet of silence."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "dra_gossip_spread",
+      "title": "It's Out There Somehow",
+      "text": "The thing I hoped would stay private is being whispered about at the market.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        }
+      },
+      "choices": [
+        {
+          "id": "own_it",
+          "label": "Own it with your chin up",
+          "effects": {
+            "stats": {
+              "stress": 2,
+              "happiness": 1
+            },
+            "reputation": {
+              "person": "actor",
+              "scope": "global",
+              "delta": 4
+            }
+          },
+          "outcome_text": "I confirmed the rumour myself and took its teeth."
+        },
+        {
+          "id": "deny",
+          "label": "Deny everything",
+          "effects": {
+            "stats": {
+              "stress": 3
+            },
+            "reputation": {
+              "person": "actor",
+              "scope": "global",
+              "delta": -3
+            }
+          },
+          "outcome_text": "Denial is a debt that comes due."
+        },
+        {
+          "id": "absent",
+          "label": "Be conspicuously above it",
+          "effects": {},
+          "outcome_text": "I bought my bread, held my head high, and left."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "dra_forgot_anniversary",
+      "title": "The Date I Forgot",
+      "text": "{person:partner} is being too kind about the date that I absolutely, completely forgot.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "grand",
+          "label": "Grand gesture, immediate",
+          "effects": {
+            "money": -300,
+            "relationship": 6,
+            "stats": {
+              "happiness": 2
+            }
+          },
+          "outcome_text": "Flowers, dinner, and a handwritten page. I will not forget again."
+        },
+        {
+          "id": "honest",
+          "label": "Apologise honestly, no props",
+          "effects": {
+            "relationship": 3
+          },
+          "outcome_text": "I said sorry like I meant it, which I did."
+        },
+        {
+          "id": "card",
+          "label": "A belated card and a joke",
+          "effects": {
+            "relationship": -2
+          },
+          "outcome_text": "The joke softened it. Only a little."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "dra_honeymoon_spat",
+      "title": "Paradise, With Receipts",
+      "text": "Day three of the trip and {person:partner} and I are arguing about what everything costs.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "splurge",
+          "label": "Throw the budget overboard",
+          "effects": {
+            "money": -400,
+            "relationship": 4,
+            "stats": {
+              "happiness": 3
+            }
+          },
+          "outcome_text": "The sunset cruise fixed what arithmetic broke."
+        },
+        {
+          "id": "budget",
+          "label": "Rebuild the budget together over breakfast",
+          "effects": {
+            "relationship": 2,
+            "stats": {
+              "smarts": 1
+            }
+          },
+          "outcome_text": "A spreadsheet saved the holiday."
+        },
+        {
+          "id": "sulk",
+          "label": "Sulk by the pool",
+          "effects": {
+            "relationship": -3,
+            "stats": {
+              "stress": 1
+            }
+          },
+          "outcome_text": "The pool was lovely. The silence wasn't."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "dra_poly_dinner",
+      "title": "One Table, Two Partners",
+      "text": "Tonight both {person:partner} and {person:lover} are at my table, and the atmosphere has a pulse.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_union_partner_of_actor"
+        },
+        "lover": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_secret_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "mediate",
+          "label": "Play thoughtful host all evening",
+          "effects": {
+            "stats": {
+              "stress": 3,
+              "happiness": 3
+            },
+            "relationship": 2
+          },
+          "outcome_text": "By dessert they were laughing at the same jokes. I exhaled."
+        },
+        {
+          "id": "favour",
+          "label": "Pay more attention to one of them",
+          "effects": {
+            "relationship": -5,
+            "stats": {
+              "stress": 2
+            }
+          },
+          "outcome_text": "I felt the temperature drop from across the table."
+        },
+        {
+          "id": "escape",
+          "label": "Retreat to the kitchen to 'check the oven'",
+          "effects": {
+            "stats": {
+              "stress": -1
+            },
+            "relationship": -2
+          },
+          "outcome_text": "The oven was fine. I checked it four times."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "dra_ex_wedding_invite",
+      "title": "The Invitation",
+      "text": "{person:ex} is getting married, and the invitation arrived addressed to both of us.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "ex": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_ex_lover_of_actor"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "together",
+          "label": "Attend together, hand in hand",
+          "effects": {
+            "relationship": 5,
+            "stats": {
+              "happiness": 2
+            }
+          },
+          "outcome_text": "I toasted their future and meant every word."
+        },
+        {
+          "id": "decline",
+          "label": "Decline gracefully",
+          "effects": {
+            "relationship": 2
+          },
+          "outcome_text": "A kind card and no complications."
+        },
+        {
+          "id": "alone",
+          "label": "Go alone 'for old times' sake'",
+          "effects": {
+            "relationship": -6,
+            "stats": {
+              "stress": 2
+            }
+          },
+          "outcome_text": "Old times' sake is a door best left shut."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "dra_rebuild_weekend",
+      "title": "Quiet Repair",
+      "text": "{person:partner} suggests a weekend away — no phones, no errands, just us, to remember why we chose this.",
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "partner": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_partner_or_lover_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "away",
+          "label": "Book the quiet cabin",
+          "effects": {
+            "money": -200,
+            "relationship": 6,
+            "stats": {
+              "happiness": 3
+            }
+          },
+          "outcome_text": "Two days of slow mornings put us back together."
+        },
+        {
+          "id": "home",
+          "label": "Do it at home: phones off, door locked",
+          "effects": {
+            "relationship": 4,
+            "stats": {
+              "happiness": 2
+            }
+          },
+          "outcome_text": "We stayed in like teenagers and talked until two."
+        },
+        {
+          "id": "busy",
+          "label": "Not this month — life is too loud",
+          "effects": {
+            "relationship": -4,
+            "stats": {
+              "stress": 2
+            }
+          },
+          "outcome_text": "The calendar won. We both lost."
+        }
+      ],
+      "weight": 1
+    }
+  ]
+}

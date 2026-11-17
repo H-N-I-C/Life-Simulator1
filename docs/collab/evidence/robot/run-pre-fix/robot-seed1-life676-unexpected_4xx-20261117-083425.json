@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 676,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Andrzej",
+    "last_name": "McLean",
+    "gender": "male",
+    "country": "Germany",
+    "seed": 1425821207,
+    "request_id": "robot-1-676-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 2106349571,
+     "base": "man",
+     "skin_tone": "light",
+     "hair": "white",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_fc5e03a5e4",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r5164",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_fc5e03a5e4",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "85bed9fd-6200-4061-80d2-7672d318a659"
+   },
+   "request_id": "robot-1-r5165",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 677 --seed 1 --from-life 676 --fail-fast"
+}

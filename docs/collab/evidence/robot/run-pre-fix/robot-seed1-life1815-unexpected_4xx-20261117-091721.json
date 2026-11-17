@@ -1,0 +1,78 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1815,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Abdulkarim",
+    "last_name": "Watkins",
+    "gender": "male",
+    "country": "India",
+    "seed": 1715103022,
+    "request_id": "robot-1-1815-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1872281236,
+     "base": "man",
+     "skin_tone": "medium-dark",
+     "hair": "white",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "glasses",
+      "earrings"
+     ],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_6e35d491a5",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r14321",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_6e35d491a5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r14322",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_6e35d491a5",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "30071f1d-9300-43f5-aeb2-5e5ab4c76a58"
+   },
+   "request_id": "robot-1-r14323",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1816 --seed 1 --from-life 1815 --fail-fast"
+}

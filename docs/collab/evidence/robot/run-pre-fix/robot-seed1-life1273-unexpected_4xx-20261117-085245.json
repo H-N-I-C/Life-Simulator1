@@ -1,0 +1,56 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1273,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Albatros",
+    "last_name": "Branch",
+    "gender": "male",
+    "country": "Germany",
+    "seed": 2120826590,
+    "request_id": "robot-1-1273-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1551870965,
+     "base": "woman",
+     "skin_tone": "dark",
+     "hair": "red",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "flower"
+     ],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_f04b30f746",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "76022567-6b26-4985-93cf-4e161fc6a32a"
+   },
+   "request_id": "robot-1-r10080",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1274 --seed 1 --from-life 1273 --fail-fast"
+}

@@ -1,0 +1,148 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 46,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'doctor' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adelind",
+    "last_name": "Pittman",
+    "gender": "female",
+    "country": "Japan",
+    "seed": 80006172,
+    "request_id": "robot-1-46-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 595261339,
+     "base": "man",
+     "skin_tone": "default",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_118d5f8e00",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r618",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_118d5f8e00",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r619",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_118d5f8e00",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-1-r620",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_118d5f8e00",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r621",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_118d5f8e00",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_ask"
+   },
+   "request_id": "robot-1-r622",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_118d5f8e00",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r623",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_118d5f8e00",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r624",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_118d5f8e00",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r625",
+   "expected_revision": 8
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_118d5f8e00",
+   "action": "study_harder",
+   "payload": {},
+   "request_id": "robot-1-r626",
+   "expected_revision": 9
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_118d5f8e00",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r627",
+   "expected_revision": 10
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_118d5f8e00",
+   "action": "doctor",
+   "payload": {},
+   "request_id": "robot-1-r628",
+   "expected_revision": 11
+  },
+  {
+   "n": 12,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 47 --seed 1 --from-life 46 --fail-fast"
+}

@@ -1,0 +1,102 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 828,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Allegra",
+    "last_name": "Golden",
+    "gender": "female",
+    "country": "India",
+    "seed": 750847665,
+    "request_id": "robot-1-828-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_e94d26c103",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r6234",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_e94d26c103",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r6235",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_e94d26c103",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-1-r6236",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_e94d26c103",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r6237",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_e94d26c103",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_eat"
+   },
+   "request_id": "robot-1-r6238",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_e94d26c103",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r6239",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_e94d26c103",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "d0125dcc-b58c-41f5-a9f6-74e4f0f3f489"
+   },
+   "request_id": "robot-1-r6240",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 829 --seed 1 --from-life 828 --fail-fast"
+}

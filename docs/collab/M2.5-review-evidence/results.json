@@ -1,0 +1,39 @@
+[
+  {
+    "step": "load newborn",
+    "status": 201,
+    "overflow": false
+  },
+  {
+    "step": "family tree",
+    "nodes": 3
+  },
+  {
+    "step": "first editor apply",
+    "status": "Policy revision 0."
+  },
+  {
+    "step": "second editor apply",
+    "status": "Apply failed: expected_revision 1 does not match current revision 2",
+    "overflow": false
+  },
+  {
+    "step": "first year",
+    "dialogs": [
+      "It's Out There Somehow",
+      "The thing I hoped would stay private is being whispered about at the market."
+    ],
+    "player": "Review Life\nAge 1 \u00b7 Australia\n$0\nHappiness\n78\nHealth\n79\nSmarts\n40\nLooks\n71"
+  },
+  {
+    "step": "errors",
+    "console": [],
+    "exceptions": [],
+    "requests": [
+      {
+        "url": "http://127.0.0.1:35427/api/games/g_c7a53913ef/editor/apply",
+        "error": "HTTP 409"
+      }
+    ]
+  }
+]

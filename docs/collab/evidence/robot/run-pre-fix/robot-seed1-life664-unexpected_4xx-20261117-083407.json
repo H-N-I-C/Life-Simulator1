@@ -1,0 +1,84 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 664,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Agnella",
+    "last_name": "Griffin",
+    "gender": "female",
+    "country": "Australia",
+    "seed": 1546188095,
+    "request_id": "robot-1-664-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1598677041,
+     "base": "man",
+     "skin_tone": "dark",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_0745caa289",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r5071",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_0745caa289",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r5072",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_0745caa289",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_bite"
+   },
+   "request_id": "robot-1-r5073",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_0745caa289",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "e4fddc1f-0dcc-4218-bfe1-13ed7157a165"
+   },
+   "request_id": "robot-1-r5074",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 665 --seed 1 --from-life 664 --fail-fast"
+}

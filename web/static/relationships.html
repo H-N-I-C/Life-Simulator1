@@ -19,20 +19,46 @@
 <main>
   <p style="color:#8a8f98;">Demo relationships page built from test fixtures —
   each person is a shared "person chip" (avatar + name + role + relationship).</p>
-  <div id="people"></div>
+  <div id="people"><p class="muted">Loading…</p></div>
 </main>
 <script type="module">
-import { personChip } from "/static/common.js";
-const res = await fetch("/api/people");
-const people = await res.json();
+import { personChip, setErrorRetryHandler, showCrashCard } from "/static/common.js";
 const box = document.getElementById("people");
-if (!people.length) {
-  box.innerHTML = '<div class="card">No fixtures yet — ' +
-    'tests/fixtures/appearances/*.json will appear here.</div>';
+async function loadPeople() {
+  box.innerHTML = '<p class="muted">Loading…</p>';
+  try {
+    const res = await fetch("/api/people");
+    if (!res.ok) throw new Error("request failed (" + res.status + ")");
+    const people = await res.json();
+    box.innerHTML = "";
+    if (!people.length) {
+      box.innerHTML = '<div class="card">No fixtures yet — ' +
+        'tests/fixtures/appearances/*.json will appear here.</div>';
+      return;
+    }
+    for (const p of people) {
+      box.appendChild(personChip(p, { relationship: p.relationship ?? null }));
+    }
+  } catch (err) {
+    box.innerHTML = "";
+    const card = document.createElement("div");
+    card.className = "card load-error";
+    const msg = document.createElement("p");
+    msg.innerHTML = "<b>Couldn't load the demo people.</b>";
+    const detail = document.createElement("p");
+    detail.className = "muted";
+    detail.textContent = err.message;
+    const retry = document.createElement("button");
+    retry.textContent = "Retry";
+    retry.addEventListener("click", loadPeople);
+    card.appendChild(msg);
+    card.appendChild(detail);
+    card.appendChild(retry);
+    box.appendChild(card);
+  }
 }
-for (const p of people) {
-  box.appendChild(personChip(p, { relationship: p.relationship ?? null }));
-}
+setErrorRetryHandler(loadPeople);
+loadPeople();
 </script>
 </body>
 </html>

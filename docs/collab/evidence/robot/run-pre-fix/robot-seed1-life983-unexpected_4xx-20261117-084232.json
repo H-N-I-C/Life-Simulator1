@@ -1,0 +1,96 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 983,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alleen",
+    "last_name": "Lucas",
+    "gender": "female",
+    "country": "Nigeria",
+    "seed": 716168172,
+    "request_id": "robot-1-983-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 132069597,
+     "base": "person",
+     "skin_tone": "medium-light",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "flower",
+      "cap"
+     ],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_cc6f91c144",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r7469",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_cc6f91c144",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r7470",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_cc6f91c144",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r7470",
+   "expected_revision": 2
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_cc6f91c144",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_tantrum"
+   },
+   "request_id": "robot-1-r7472",
+   "expected_revision": 3
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_cc6f91c144",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "2f54f6af-8d16-49b3-b37f-291b13c96024"
+   },
+   "request_id": "robot-1-r7473",
+   "expected_revision": 4
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 984 --seed 1 --from-life 983 --fail-fast"
+}

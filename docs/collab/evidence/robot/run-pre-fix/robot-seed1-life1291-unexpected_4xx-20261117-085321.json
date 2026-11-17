@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1291,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Allyn",
+    "last_name": "Hewitt",
+    "gender": "male",
+    "country": "Brazil",
+    "seed": 1826718784,
+    "request_id": "robot-1-1291-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1135169446,
+     "base": "woman",
+     "skin_tone": "dark",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "cap",
+      "earrings"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_0f4dabc2b0",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r10205",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_0f4dabc2b0",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "70d58778-5dea-404b-9965-6fbaf757d3ed"
+   },
+   "request_id": "robot-1-r10206",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1292 --seed 1 --from-life 1291 --fail-fast"
+}

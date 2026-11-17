@@ -151,10 +151,14 @@ class Player(Person):
 		self.social_media = None
 
 	def learn_trait(self, trait):
+		"""Learn a trait. Returns (learned, message, color); message is a
+		ready-to-show sentence (color may be None). The caller owns HOW it
+		is surfaced — print in the terminal menus, journal/return in
+		headless rules. Never print from here."""
 		if trait not in TRAITS_DICT:
-			return False
+			return False, None, None
 		if self.has_trait(trait):
-			return False
+			return False, None, None
 		conflicts = [
 			t
 			for t in self.traits.values()
@@ -167,19 +171,16 @@ class Player(Person):
 				color = "red"  # Losing a good trait is bad
 			elif removal.val < 0:
 				color = "green"  # Losing a bad trait is good
-			print_colored(
-				_("You lose the {trait!r} trait!").format(trait=removal.name), color
-			)
 			del self.traits[removal.id]
-		else:
-			data = ALL_TRAITS_DICT[trait]
-			data.get_color()
-			print_colored(
-				_("You have gained the {trait} trait!").format(trait=data.name),
-				data.get_color(),
-			)
-			self.traits[trait] = data
-		return True
+			return True, _(
+				"You lose the {trait!r} trait!"
+			).format(trait=removal.name), color
+		data = ALL_TRAITS_DICT[trait]
+		data.get_color()
+		self.traits[trait] = data
+		return True, _(
+			"You have gained the {trait} trait!"
+		).format(trait=data.name), data.get_color()
 		
 	def update_plastic_surgeon(self, index):
 		name = random_last_name()
@@ -277,6 +278,8 @@ class Player(Person):
 		return "Depression" in self.illnesses
 
 	def generate_child(self, other):
+		from src.game.features.family_graph.graph import assert_adult_romantic
+		assert_adult_romantic(self, other)
 		if self.gender == Gender.Male:
 			last = self.lastname
 		else:
@@ -809,6 +812,10 @@ class Player(Person):
 	
 	def calc_pension(self):
 		from statistics import mean
+		# No recorded pay years (mid-life crafted/succession states) means
+		# no pension basis — never let statistics.mean raise on empty data.
+		if not self.salary_years:
+			return 0
 		amount = mean(sorted(self.salary_years, reverse=True)[:5])
 		return round(amount * min(self.years_worked, 35) * 0.02) 
 	

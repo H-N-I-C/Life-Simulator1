@@ -1,0 +1,178 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1926,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you already spent time with them this year\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adam",
+    "last_name": "Raynor",
+    "gender": "male",
+    "country": "UK",
+    "seed": 1223379305,
+    "request_id": "robot-1-1926-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1267657947,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "red",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "glasses",
+      "flower"
+     ],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_99e10c2c7b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15354",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_99e10c2c7b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15355",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_99e10c2c7b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15356",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_99e10c2c7b",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_hide"
+   },
+   "request_id": "robot-1-r15357",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_99e10c2c7b",
+   "action": "play_toys",
+   "payload": {},
+   "request_id": "robot-1-r15358",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_99e10c2c7b",
+   "action": "conversation",
+   "payload": {
+    "target_id": "402d819c-7cf6-43d2-a6f2-2d06d8602a56"
+   },
+   "request_id": "robot-1-r15359",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_99e10c2c7b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15360",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_99e10c2c7b",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_sleep"
+   },
+   "request_id": "robot-1-r15361",
+   "expected_revision": 8
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_99e10c2c7b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15362",
+   "expected_revision": 9
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_99e10c2c7b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15363",
+   "expected_revision": 10
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_99e10c2c7b",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "d_3_trade"
+   },
+   "request_id": "robot-1-r15364",
+   "expected_revision": 11
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_99e10c2c7b",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "402d819c-7cf6-43d2-a6f2-2d06d8602a56"
+   },
+   "request_id": "robot-1-r15365",
+   "expected_revision": 12
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_99e10c2c7b",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "402d819c-7cf6-43d2-a6f2-2d06d8602a56"
+   },
+   "request_id": "robot-1-r15366",
+   "expected_revision": 13
+  },
+  {
+   "n": 14,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you already spent time with them this year\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1927 --seed 1 --from-life 1926 --fail-fast"
+}

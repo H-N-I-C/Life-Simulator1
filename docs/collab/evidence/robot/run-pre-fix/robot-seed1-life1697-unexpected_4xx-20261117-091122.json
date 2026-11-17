@@ -1,0 +1,90 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1697,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Allen",
+    "last_name": "Tilley",
+    "gender": "male",
+    "country": "Japan",
+    "seed": 268454604,
+    "request_id": "robot-1-1697-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_6c52928d37",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13306",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_6c52928d37",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13307",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_6c52928d37",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-1-r13308",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_6c52928d37",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13309",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_6c52928d37",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13310",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_6c52928d37",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "ce948d00-3111-4d84-b638-b96f0c474ec8"
+   },
+   "request_id": "robot-1-r13311",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1698 --seed 1 --from-life 1697 --fail-fast"
+}

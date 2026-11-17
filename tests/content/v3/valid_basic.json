@@ -1,0 +1,105 @@
+{
+  "schema_version": 3,
+  "_comment": "PROPOSAL fixture for the unfrozen v3 schema (docs/collab/M2.5/contracts/event-schema-v3.md). Must stay valid under tools/validate_v3_content.py after the freeze.",
+  "events": [
+    {
+      "id": "m25_first_date_offer",
+      "title": "A match wants to meet",
+      "text": "{person:target} from the app asks {name} out for coffee.",
+      "interaction": {"kind": "date", "romantic": true},
+      "weight": 5,
+      "conditions": {
+        "min_age": 18,
+        "all": [
+          {"kind": "min_stat", "stat": "happiness", "value": 10},
+          {"kind": "attraction_band", "person": "target", "lo": 20, "hi": 100}
+        ]
+      },
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "target": {"kind": "person", "select": "predicate",
+                   "predicate": "adult_non_related_stranger"},
+        "the_relationship": {"kind": "relationship", "select": "predicate",
+                             "predicate": "active_courtship"}
+      },
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Go on the date",
+          "cost": {},
+          "effects": {"chemistry": {"between": ["actor", "target"],
+                                    "delta": 5}}
+        },
+        {
+          "id": "decline",
+          "label": "Not tonight",
+          "cost": {},
+          "effects": {}
+        }
+      ]
+    },
+    {
+      "id": "m25_plural_proposal_offer",
+      "title": "A proposal, again",
+      "text": "{person:target} kneels with a ring, knowing {name} is already married.",
+      "interaction": {"kind": "propose_plural_union", "romantic": true},
+      "weight": 2,
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "target": {"kind": "person", "select": "predicate",
+                   "predicate": "adult_existing_lover"},
+        "the_union": {"kind": "union", "select": "predicate",
+                      "predicate": "projected_union"}
+      },
+      "audience": {"scope": "public", "participants": ["actor", "target"]},
+      "choices": [
+        {
+          "id": "propose",
+          "label": "Propose",
+          "cost": {"money": 500},
+          "effects": {
+            "money": -500,
+            "offer": {"interaction": "propose_plural_union", "to": "target",
+                      "as": "player"}
+          }
+        },
+        {
+          "id": "wait",
+          "label": "Wait for a better moment",
+          "cost": {},
+          "effects": {}
+        }
+      ]
+    },
+    {
+      "id": "m25_parenting_request",
+      "title": "A school request",
+      "text": "{person:child} needs help with a project.",
+      "interaction": {"kind": "parenting_request", "romantic": false},
+      "weight": 8,
+      "conditions": {"min_age": 6, "max_age": 70},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "child": {"kind": "person", "select": "predicate",
+                  "predicate": "dependent_child"}
+      },
+      "choices": [
+        {
+          "id": "help",
+          "label": "Help out",
+          "effects": {
+            "milestone": {"child": "child", "id": "project_helped",
+                          "record": {"subject": "science"}}
+          }
+        },
+        {
+          "id": "too_busy",
+          "label": "Too busy this week",
+          "cost": {},
+          "effects": {}
+        }
+      ]
+    }
+  ]
+}

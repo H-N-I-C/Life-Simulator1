@@ -1,0 +1,95 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 809,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Ali",
+    "last_name": "Reid",
+    "gender": "female",
+    "country": "USA",
+    "seed": 1491858132,
+    "request_id": "robot-1-809-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 497527012,
+     "base": "woman",
+     "skin_tone": "medium-light",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "flower"
+     ],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_66eaf31360",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r6117",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_66eaf31360",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r6118",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_66eaf31360",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_tantrum"
+   },
+   "request_id": "robot-1-r6119",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_66eaf31360",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r6120",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_66eaf31360",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "37dac9e4-af3d-47da-aeb0-c95ac29a2fc5"
+   },
+   "request_id": "robot-1-r6121",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 810 --seed 1 --from-life 809 --fail-fast"
+}

@@ -1,0 +1,63 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1365,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Art",
+    "last_name": "McLean",
+    "gender": "male",
+    "country": "UK",
+    "seed": 1005833519,
+    "request_id": "robot-1-1365-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 812142867,
+     "base": "woman",
+     "skin_tone": "medium-light",
+     "hair": "white",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_e2ac752165",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11081",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_e2ac752165",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "ea499b11-ec30-4880-ab6e-2af278ef5e91"
+   },
+   "request_id": "robot-1-r11082",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1366 --seed 1 --from-life 1365 --fail-fast"
+}

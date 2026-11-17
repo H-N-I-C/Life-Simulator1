@@ -1,0 +1,92 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1894,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Abbey",
+    "last_name": "Davis",
+    "gender": "male",
+    "country": "France",
+    "seed": 616407357,
+    "request_id": "robot-1-1894-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 518701148,
+     "base": "man",
+     "skin_tone": "default",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "flower"
+     ],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_ea81e9fe9c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15082",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_ea81e9fe9c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15083",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_ea81e9fe9c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15083",
+   "expected_revision": 2
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_ea81e9fe9c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15085",
+   "expected_revision": 3
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_ea81e9fe9c",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "76021855-acd0-477f-bf77-4f3103167c50"
+   },
+   "request_id": "robot-1-r15086",
+   "expected_revision": 4
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1895 --seed 1 --from-life 1894 --fail-fast"
+}

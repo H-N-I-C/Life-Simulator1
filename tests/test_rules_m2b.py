@@ -302,9 +302,13 @@ class HealthActivitiesTest(unittest.TestCase):
         p.last_plastic_surgery = p.age - 2  # too soon
         with self.assertRaises(ra.RuleError):
             ra.sample_plastic_surgery(p, random.Random(18))  # too soon
+        with self.assertRaises(ra.RuleError):
+            ra.sample_plastic_surgery(p, random.Random(18))  # cannot afford
         p.last_plastic_surgery = 10
+        p.money = 30000
         r = ra.sample_plastic_surgery(p, random.Random(18))
         pending = r["pending_decision"]
+        p.money = 100
         with self.assertRaises(ra.RuleError):
             ra.resolve_plastic_surgery(p, pending, "surgeon:0",
                                        random.Random(19))  # cannot afford
@@ -668,6 +672,10 @@ class LotteryTest(unittest.TestCase):
                                    random.Random(3))
         poor = adult(money=2)
         r = ra.sample_lottery(poor, random.Random(2))
+        # the broke see paid options disabled, and resolve still refuses
+        buy_one = next(o for o in r["pending_decision"]["options"]
+                       if o["id"] == "buy_one")
+        self.assertFalse(buy_one["enabled"])
         with self.assertRaises(ra.RuleError):
             ra.resolve_lottery(poor, r["pending_decision"], "buy_one",
                                {"numbers": [1, 2, 3, 4]}, random.Random(3))

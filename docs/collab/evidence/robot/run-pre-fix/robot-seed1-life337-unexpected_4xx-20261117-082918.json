@@ -1,0 +1,84 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 337,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Arvie",
+    "last_name": "Hardin",
+    "gender": "male",
+    "country": "India",
+    "seed": 637121966,
+    "request_id": "robot-1-337-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 710815340,
+     "base": "person",
+     "skin_tone": "default",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_dcc24625f6",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2673",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_dcc24625f6",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2674",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_dcc24625f6",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-1-r2675",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_dcc24625f6",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "7f21f8a4-d5db-459b-ac50-19b5a51c2232"
+   },
+   "request_id": "robot-1-r2676",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 338 --seed 1 --from-life 337 --fail-fast"
+}

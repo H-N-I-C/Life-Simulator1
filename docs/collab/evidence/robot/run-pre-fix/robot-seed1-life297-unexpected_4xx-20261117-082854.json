@@ -1,0 +1,86 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 297,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Andrej",
+    "last_name": "Kaplan",
+    "gender": "male",
+    "country": "India",
+    "seed": 1733243457,
+    "request_id": "robot-1-297-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 412944900,
+     "base": "man",
+     "skin_tone": "default",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses"
+     ],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_67baadb80f",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r2367",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_67baadb80f",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r2368",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_67baadb80f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2369",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_67baadb80f",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "3492033c-f7b0-4f30-936a-9c912345c248"
+   },
+   "request_id": "robot-1-r2370",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 298 --seed 1 --from-life 297 --fail-fast"
+}

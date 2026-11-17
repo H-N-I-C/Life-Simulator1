@@ -1,0 +1,98 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 3,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alec",
+    "last_name": "Hatcher",
+    "gender": "male",
+    "country": "China",
+    "seed": 987530750,
+    "request_id": "robot-1-3-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_85924b3397",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r43",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_85924b3397",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r44",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_85924b3397",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r45",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_85924b3397",
+   "action": "conversation",
+   "payload": {
+    "target_id": "963417e6-862d-4547-bdba-4448b8873899"
+   },
+   "request_id": "robot-1-r46",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_85924b3397",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r47",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_85924b3397",
+   "action": "play_toys",
+   "payload": {},
+   "request_id": "robot-1-r48",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_85924b3397",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "ebcafa69-97d2-4735-8353-3a8c212b0992"
+   },
+   "request_id": "robot-1-r49",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 4 --seed 1 --from-life 3 --fail-fast"
+}

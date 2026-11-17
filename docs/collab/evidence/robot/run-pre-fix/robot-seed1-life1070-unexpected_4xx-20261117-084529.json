@@ -1,0 +1,140 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1070,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'doctor' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adora",
+    "last_name": "Powers",
+    "gender": "female",
+    "country": "India",
+    "seed": 291045025,
+    "request_id": "robot-1-1070-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 796216443,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "crown"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_15f8735909",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8153",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_15f8735909",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8154",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_15f8735909",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8155",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_15f8735909",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_eat"
+   },
+   "request_id": "robot-1-r8156",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_15f8735909",
+   "action": "conversation",
+   "payload": {
+    "target_id": "875386a5-c025-4af7-8bb1-87b1ea931253"
+   },
+   "request_id": "robot-1-r8157",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_15f8735909",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8158",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_15f8735909",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8159",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_15f8735909",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8160",
+   "expected_revision": 8
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_15f8735909",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8161",
+   "expected_revision": 9
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_15f8735909",
+   "action": "doctor",
+   "payload": {},
+   "request_id": "robot-1-r8162",
+   "expected_revision": 10
+  },
+  {
+   "n": 11,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1071 --seed 1 --from-life 1070 --fail-fast"
+}

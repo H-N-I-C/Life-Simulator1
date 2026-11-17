@@ -17,7 +17,8 @@ from src.game import rule_adapter
 PHASE_ORDER = [
     "year_start", "relations_age", "player_stats", "mortality",
     "work_income", "education", "debt_service", "family_events",
-    "illness", "annual_events", "decision_offer", "year_close",
+    "parenting_events", "drama_events", "illness", "annual_events",
+    "decision_offer", "year_close",
 ]
 
 RULE_PHASES = ("work_income", "education", "debt_service",
@@ -34,6 +35,11 @@ def _year_start(env, ctx, service, rng):
     # once-per-year actions and dating never become available again
     player.reset_already_did()
     env["year_actions"] = {"spend_time": []}
+    # M2.5 weddings: wedding anniversaries (1/5/10...) journal once each
+    from src.game.features.weddings import anniversary_check
+    for entry in anniversary_check(env, service):
+        service._journal(env, entry["kind"], entry["text"],
+                         entry.get("person_ids", []))
     env["turn"]["snapshot"] = [
         r.person_id for r in player.relations
         if r.person_id not in env.get("dead_ids", [])]
@@ -194,7 +200,8 @@ def _decision_offer(env, ctx, service, rng):
                 occurrence=f"{queued['id']}:auto",
                 person_ids=bundle.get("_person_ids_extra") or [],
                 journal_kind="death" if bundle["terminal"] else "event",
-                outcome_text=text.format(name=player.firstname))
+                outcome_text=text.format(name=player.firstname),
+                audience=queued.get("audience") or "public")
             env["used_decisions"].append(queued["id"])
             if bundle["terminal"]:
                 env["status"] = "dead"
@@ -267,7 +274,9 @@ def _decision_offer(env, ctx, service, rng):
                 occurrence=f"{ev['id']}:pre",
                 person_ids=pending.get("_pre_person_ids_extra") or [],
                 journal_kind="event",
-                outcome_text=pending["text"])
+                outcome_text=pending["text"],
+                audience=pending.get("audience") or "public",
+                fact_id=pending.get("fact_id"))
             pending["pre_applied"] = True
         return {"events": [], "money_entries": [],
                 "pending_decision": pending,
@@ -310,6 +319,12 @@ _DEFAULT_IMPLS = {
     "relations_age": _relations_age,
     "player_stats": _player_stats,
     "mortality": _mortality_phase,
+    "parenting_events": lambda env, ctx, service, rng: __import__(
+        "src.game.features.parenting.engine", fromlist=["engine"]
+    ).advance_parenting_phase(env, ctx, service, rng),
+    "drama_events": lambda env, ctx, service, rng: __import__(
+        "src.game.features.knowledge.engine", fromlist=["engine"]
+    ).advance_drama_phase(env, ctx, service, rng),
     "decision_offer": _decision_offer,
     "year_close": _year_close,
 }
@@ -375,6 +390,10 @@ def run_turn(env, service, rng):
             result.get("money_entries"))
         rule_adapter.journal_events(env, result.get("events"))
         finished = rule_adapter.apply_cursor_update(env, result)
+        from src.game.features.knowledge.core import pending_visible
+        if env.get("pending") and not pending_visible(env, env["pending"]):
+            # Never ask the player to choose a private NPC outcome.
+            env["pending"] = None
         if env.get("pending") and "id" not in env["pending"]:
             env["pending"]["id"] = f"d_{env['next_decision_num']}"
             env["next_decision_num"] += 1

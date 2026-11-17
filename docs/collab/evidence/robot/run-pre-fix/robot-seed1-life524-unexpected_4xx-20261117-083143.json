@@ -1,0 +1,87 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 524,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Andreas",
+    "last_name": "Morse",
+    "gender": "male",
+    "country": "UK",
+    "seed": 1741640294,
+    "request_id": "robot-1-524-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 2023236661,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "crown",
+      "cap"
+     ],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_a5d42bc245",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3966",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_a5d42bc245",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3967",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_a5d42bc245",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_bite"
+   },
+   "request_id": "robot-1-r3968",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_a5d42bc245",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "02770fd5-b6f0-43e2-b79b-5f6db7fe546f"
+   },
+   "request_id": "robot-1-r3969",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 525 --seed 1 --from-life 524 --fail-fast"
+}

@@ -216,7 +216,8 @@ class Child(Relationship):
                                 self.partner_desire = cap
                     self.partner = None
                 elif (
-                    self.partner.status < 2
+                    self.age >= 18 and self.partner.age >= 18
+                    and self.partner.status < 2
                     and self.partner.years_together >= randint(3, 7)
                     and one_in(5)
                 ):
@@ -226,6 +227,8 @@ class Child(Relationship):
                         )
                     )
                     self.partner.change_relationship(randint(10, 45))
+                    from src.game.features.family_graph.graph import assert_adult_romantic
+                    assert_adult_romantic(self, self.partner)
                     self.partner.status = 2
                     self.may_divorce = one_in(2)
         else:

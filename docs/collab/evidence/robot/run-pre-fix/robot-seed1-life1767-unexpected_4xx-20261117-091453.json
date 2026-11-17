@@ -1,0 +1,168 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1767,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alysia",
+    "last_name": "Chung",
+    "gender": "female",
+    "country": "USA",
+    "seed": 1167243378,
+    "request_id": "robot-1-1767-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 693580457,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "white",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "cap"
+     ],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_9c33c37344",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13930",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_9c33c37344",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13930",
+   "expected_revision": 1
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_9c33c37344",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r13932",
+   "expected_revision": 2
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_9c33c37344",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "ask_final"
+   },
+   "request_id": "robot-1-r13933",
+   "expected_revision": 3
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_9c33c37344",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "cancel"
+   },
+   "request_id": "robot-1-r13934",
+   "expected_revision": 4
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_9c33c37344",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13935",
+   "expected_revision": 5
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_9c33c37344",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "d_3_bite"
+   },
+   "request_id": "robot-1-r13936",
+   "expected_revision": 6
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_9c33c37344",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13937",
+   "expected_revision": 7
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_9c33c37344",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13938",
+   "expected_revision": 8
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_9c33c37344",
+   "action": "conversation",
+   "payload": {
+    "target_id": "ef2f53a9-3947-409c-a258-3fbda125c13a"
+   },
+   "request_id": "robot-1-r13939",
+   "expected_revision": 9
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_9c33c37344",
+   "action": "conversation",
+   "payload": {
+    "target_id": "ef2f53a9-3947-409c-a258-3fbda125c13a"
+   },
+   "request_id": "robot-1-r13939",
+   "expected_revision": 9
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_9c33c37344",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "afa1ed33-d6f1-475f-9461-33754bf0b01b"
+   },
+   "request_id": "robot-1-r13941",
+   "expected_revision": 10
+  },
+  {
+   "n": 13,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1768 --seed 1 --from-life 1767 --fail-fast"
+}

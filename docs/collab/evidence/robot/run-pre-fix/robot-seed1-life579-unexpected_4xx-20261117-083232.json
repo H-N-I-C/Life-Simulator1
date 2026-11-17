@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 579,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Arnold",
+    "last_name": "Barr",
+    "gender": "male",
+    "country": "Japan",
+    "seed": 272345545,
+    "request_id": "robot-1-579-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1355734805,
+     "base": "person",
+     "skin_tone": "medium-light",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "cap"
+     ],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_ccd12d2644",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r4415",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_ccd12d2644",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "b020ddb8-84ea-47f6-b0b1-45a75cce5bad"
+   },
+   "request_id": "robot-1-r4416",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 580 --seed 1 --from-life 579 --fail-fast"
+}

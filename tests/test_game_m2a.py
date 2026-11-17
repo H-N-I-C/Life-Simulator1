@@ -1214,9 +1214,13 @@ class NaturalMortalityTests(unittest.TestCase):
             st = svc.new_game(dict(PROFILE, seed=seed), f"m{seed}")
             sess = Session(svc, st["game_id"])
             died = False
-            for i in range(75):
+            for i in range(300):
                 st = sess.state()
                 if st["status"] == "dead":
+                    break
+                current_age = next(p["age"] for p in st["people"]
+                                   if p["id"] == st["player_id"])
+                if current_age >= 75:
                     break
                 if st["pending_decision"]:
                     d = st["pending_decision"]

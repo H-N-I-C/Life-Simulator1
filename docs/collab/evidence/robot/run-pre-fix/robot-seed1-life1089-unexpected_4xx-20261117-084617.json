@@ -1,0 +1,108 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1089,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Amalea",
+    "last_name": "McAllister",
+    "gender": "female",
+    "country": "Canada",
+    "seed": 486940915,
+    "request_id": "robot-1-1089-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_a122a5282a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8353",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_a122a5282a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8354",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_a122a5282a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-1-r8355",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_a122a5282a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-1-r8355",
+   "expected_revision": 3
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_a122a5282a",
+   "action": "definitely_not_an_action",
+   "payload": {},
+   "request_id": "robot-1-r8357",
+   "expected_revision": 4
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown action\"}}"
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_a122a5282a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8358",
+   "expected_revision": 4
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_a122a5282a",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "526c6746-a8d6-42bf-80b1-a813e1ccfaf5"
+   },
+   "request_id": "robot-1-r8359",
+   "expected_revision": 5
+  },
+  {
+   "n": 9,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1090 --seed 1 --from-life 1089 --fail-fast"
+}

@@ -1,0 +1,221 @@
+{
+  "description": "M2.5 family-graph fixtures (Kimi A, Phase 1 proposal). Executable input->expected-output records for freeze review and D's cross-contract validation. Person/edge ids are stable example ids, not real save ids.",
+
+  "blended_family_state": {
+    "comment": "The freeze/migration fixture family from 02-contracts.md §8: two spouses, former spouse, adopted child, unknown parent, biological ancestry. One envelope, all ids canonical person ids.",
+    "persons": [
+      {"person_id": "p-player", "name": "Riley Fox", "age": 34, "living": true, "is_adult": true},
+      {"person_id": "p-jordan", "name": "Jordan Fox", "age": 33, "living": true, "is_adult": true},
+      {"person_id": "p-sam", "name": "Sam Reyes", "age": 36, "living": true, "is_adult": true},
+      {"person_id": "p-lee", "name": "Lee Fox", "age": 8, "living": true, "is_adult": false},
+      {"person_id": "p-morgan", "name": "Morgan Voss", "age": 40, "living": true, "is_adult": true, "lineage": "unknown"},
+      {"person_id": "p-ruth", "name": "Ruth Voss", "age": 5, "living": true, "is_adult": false},
+      {"person_id": "p-ezra", "name": "Ezra Voss", "age": 64, "living": false, "is_adult": true}
+    ],
+    "graph": {
+      "schema_version": 1,
+      "relationships": [
+        {"relationship_id": "rel-rj", "person_ids": ["p-player", "p-jordan"], "kind": "committed", "satisfaction": 78, "trust": 81, "chemistry": 64, "exclusivity": {"agreement": "negotiated"}, "visibility": "public", "start_turn": 40, "end_turn": null, "status": "active"},
+        {"relationship_id": "rel-rs", "person_ids": ["p-player", "p-sam"], "kind": "lover", "satisfaction": 55, "trust": 40, "chemistry": 71, "exclusivity": {"agreement": "open"}, "visibility": "secret", "start_turn": 52, "end_turn": null, "status": "active"},
+        {"relationship_id": "rel-rm", "person_ids": ["p-player", "p-morgan"], "kind": "committed", "satisfaction": 30, "trust": 20, "chemistry": 50, "exclusivity": {"agreement": "exclusive"}, "visibility": "public", "start_turn": 10, "end_turn": 22, "status": "ended"}
+      ],
+      "unions": [
+        {"union_id": "uni-rj", "person_ids": ["p-player", "p-jordan"], "kind": "marriage", "status": "active", "recognition": {"status": "recognized", "jurisdiction_id": "jur-aurora-bay", "law_version": 3, "basis": "ceremony"}, "ceremony": {"held": true, "turn": 41, "venue_id": "ven-botanical"}, "prenup": null, "start_turn": 40, "end_turn": null},
+        {"union_id": "uni-rm", "person_ids": ["p-player", "p-morgan"], "kind": "marriage", "status": "divorced", "recognition": {"status": "recognized", "jurisdiction_id": "jur-aurora-bay", "law_version": 1, "basis": "ceremony"}, "ceremony": {"held": true, "turn": 11, "venue_id": null}, "prenup": {"asset": "cash", "amount": 20000, "terms_id": "pre-standard"}, "start_turn": 10, "end_turn": 22}
+      ],
+      "parentage": [
+        {"child_id": "p-lee", "parent_id": "p-player", "role": "biological", "source": "birth", "confidence": "certain"},
+        {"child_id": "p-lee", "parent_id": "p-jordan", "role": "adoptive", "source": "adoption", "confidence": "certain"},
+        {"child_id": "p-player", "parent_id": "p-ezra", "role": "biological", "source": "birth", "confidence": "certain"},
+        {"child_id": "p-ruth", "parent_id": "p-morgan", "role": "biological", "source": "birth", "confidence": "certain"},
+        {"child_id": "p-ruth", "parent_id": "p-sam", "role": "social", "source": "recorded", "confidence": "assumed"}
+      ],
+      "households": [
+        {"household_id": "hh-1", "resident_ids": ["p-player", "p-jordan", "p-lee"], "dependent_ids": ["p-lee"], "guardians": {"p-lee": ["p-player", "p-jordan"]}, "support_obligations": [{"from_id": "p-morgan", "to_id": "p-ruth", "kind": "child_support", "amount": 3000, "union_id": "uni-rm", "until_turn": null}]}
+      ],
+      "offers": [],
+      "primary_relationship_id": "rel-rj",
+      "conception_outcomes": {}
+    }
+  },
+
+  "queries": [
+    {
+      "query": "graph_relatedness(p-player, p-lee)",
+      "expected": {"category": "parent_child", "biological_paths": 1, "coefficient_band": "0.25"}
+    },
+    {
+      "query": "graph_relatedness(p-jordan, p-lee)",
+      "expected": {"category": "unrelated", "biological_paths": 0, "coefficient_band": "0"}
+    },
+    {
+      "query": "graph_relatedness(p-ruth, p-sam)",
+      "expected": {"category": "unrelated", "biological_paths": 0, "coefficient_band": "0"},
+      "comment": "social parentage alone adds no genetic risk"
+    },
+    {
+      "query": "graph_relatedness(p-player, p-ruth)",
+      "expected": {"category": "unrelated", "biological_paths": 0, "coefficient_band": "0"},
+      "comment": "former spouse's child from another partner: no link through a dissolved union"
+    },
+    {
+      "query": "graph_relatedness(p-lee, p-ezra)",
+      "expected": {"category": "grandparent_grandchild", "biological_paths": 1, "coefficient_band": "0.125"}
+    },
+    {
+      "query": "graph_relatedness(p-lee, p-morgan)",
+      "expected": {"category": "unknown", "biological_paths": null, "coefficient_band": "unknown"},
+      "comment": "unknown ancestry carries uncertainty, not a fake coefficient"
+    },
+    {
+      "query": "graph_union_memberships(p-player)",
+      "expected": [
+        {"union_id": "uni-rj", "kind": "marriage", "status": "active", "recognition": {"status": "recognized", "jurisdiction_id": "jur-aurora-bay", "law_version": 3, "basis": "ceremony"}},
+        {"union_id": "uni-rm", "kind": "marriage", "status": "divorced", "recognition": {"status": "recognized", "jurisdiction_id": "jur-aurora-bay", "law_version": 1, "basis": "ceremony"}}
+      ]
+    },
+    {
+      "query": "graph_tree(p-player, max_generations=3)",
+      "expected": {
+        "focus_id": "p-player",
+        "nodes": [
+          {"person_id": "p-player", "name": "Riley Fox", "age": 34, "living": true, "portrait_ref": null, "flags": []},
+          {"person_id": "p-jordan", "name": "Jordan Fox", "age": 33, "living": true, "portrait_ref": null, "flags": []},
+          {"person_id": "p-lee", "name": "Lee Fox", "age": 8, "living": true, "portrait_ref": null, "flags": ["adoptive_parent_edge"]},
+          {"person_id": "p-ezra", "name": "Ezra Voss", "age": 64, "living": false, "portrait_ref": null, "flags": ["deceased"]},
+          {"person_id": "p-morgan", "name": "Morgan Voss", "age": 40, "living": true, "portrait_ref": null, "flags": ["ex"]}
+        ],
+        "edges": [
+          {"from_id": "p-player", "to_id": "p-jordan", "kind": "union", "flags": ["active"]},
+          {"from_id": "p-player", "to_id": "p-morgan", "kind": "union", "flags": ["dissolved"]},
+          {"from_id": "p-player", "to_id": "p-lee", "kind": "parentage", "flags": ["biological"]},
+          {"from_id": "p-jordan", "to_id": "p-lee", "kind": "parentage", "flags": ["adoptive"]},
+          {"from_id": "p-ezra", "to_id": "p-player", "kind": "parentage", "flags": ["biological"]}
+        ]
+      },
+      "comment": "ex partner, deceased grandparent and adoptive edge all render with flags; secret lover rel-rs is NOT in the default public tree projection (C's visibility rules)"
+    }
+  ],
+
+  "transitions": [
+    {
+      "call": "graph_start_relationship(p-player, p-sam, kind=lover, sampled={satisfaction: 55, trust: 40, chemistry: 71})",
+      "expected": {"ok": true, "ids": {"relationship_id": "rel-rs"}, "journal": [{"kind": "relationship", "text_contains": "Sam Reyes"}], "ledger_requests": []}
+    },
+    {
+      "call": "graph_form_union(p-player, p-sam, kind=marriage, recognition={status: 'forbidden', jurisdiction_id: 'jur-aurora-bay', law_version: 3, basis: 'ceremony'}, prenup=null, ceremony={held: false})",
+      "expected": {"ok": true, "ids": {"union_id": "uni-rs"}, "journal": [{"kind": "union", "text_contains": "married"}]},
+      "comment": "forbidden but attemptable: edge exists with recognition=forbidden; consequences come from B/C, the graph never blocks it"
+    },
+    {
+      "call": "graph_end_union(union_id=uni-rs, how=divorce)",
+      "expected": {"ok": true, "ids": {"union_id": "uni-rs"}, "delta": {"status": "divorced", "other_unions_untouched": ["uni-rj"]}},
+      "comment": "selected-edge termination: uni-rj and its children are untouched"
+    },
+    {
+      "call": "graph_add_parentage(child=p-ruth, parent=p-sam, role=biological, source=birth, confidence=certain)",
+      "expected": {"ok": true, "ids": {}},
+      "comment": "valid: records a later-confirmed biological link; changes future relatedness queries, never rewrites history"
+    }
+  ],
+
+  "guard_and_error_cases": [
+    {
+      "call": "graph_start_relationship(p-lee, p-ruth, kind=lover)",
+      "expected_error": {"code": "not_adult", "status": 409},
+      "comment": "fixed rule: both participants naturally 18+; age/DOB/law/tenet/editor/content cannot lower this"
+    },
+    {
+      "call": "graph_resolve_offer(offer where target turned 17 since creation, option=accept)",
+      "expected_error": {"code": "not_adult", "status": 409},
+      "comment": "adult-ness revalidated at resolution, not only creation"
+    },
+    {
+      "call": "graph_start_relationship(p-player, p-player, kind=lover)",
+      "expected_error": {"code": "graph_error", "status": 400, "message_contains": "self"}
+    },
+    {
+      "call": "graph_add_parentage(child=p-lee, parent=p-lee, role=biological)",
+      "expected_error": {"code": "graph_error", "status": 400, "message_contains": "cycle"}
+    },
+    {
+      "call": "graph_add_parentage(child=p-player, parent=p-ezra, role=biological, source=birth)",
+      "expected_error": {"code": "graph_error", "status": 409, "message_contains": "duplicate"},
+      "comment": "edge already exists in blended_family_state"
+    },
+    {
+      "call": "graph_form_union(p-player, p-nope, ...)",
+      "expected_error": {"code": "not_found", "status": 404}
+    },
+    {
+      "call": "graph_update_relationship(rel-rs, {satisfaction: 250})",
+      "expected_error": {"code": "invalid_input", "status": 400},
+      "comment": "bounded ints 0..100"
+    }
+  ],
+
+  "offer_envelope_example": {
+    "comment": "A owns the envelope; C owns bindings/sampled_outcomes content. policy_revision is stamped from B's domain at creation.",
+    "offer": {
+      "offer_id": "off-001",
+      "initiator_id": "p-player",
+      "target_id": "p-sam",
+      "interaction_kind": "propose_union",
+      "romantic": true,
+      "relationship_id": "rel-rs",
+      "union_id": null,
+      "creation_turn": 52,
+      "expiry_turn": 54,
+      "policy_revision": 7,
+      "bindings": {"<v3 binding block, C-owned opaque versioned data>": null},
+      "sampled_outcomes": {},
+      "status": "pending",
+      "attempt": {"count": 1, "cooldown_until_turn": 0}
+    }
+  },
+
+  "conception_example": {
+    "call": "graph_sample_conception(bio_mother=p-morgan, bio_father=p-nope-partner)",
+    "setup": "two biological parents with coefficient_band '<0.015' (unrelated)",
+    "expected": {"ok": true, "coefficient_band": "<0.015", "adjustment": "sampled once and persisted in conception_outcomes[child_id]", "roll": "<bounded fictional draw, calibration frozen with Claude>"},
+    "non_goals": ["no draw for adoption", "no deterministic illness for every related-parent child", "name/religion/orientation never enter the coefficient"]
+  },
+
+  "migration_v2_example": {
+    "comment": "v2 save -> v2.5 graph. Exactly one union from the old single partner; no invented history.",
+    "v2_input": {
+      "player": {"person_id": "p-player", "partner": {"person_id": "p-jordan", "marital_status": "married", "name": "Jordan Fox"}, "children": [{"person_id": "p-lee", "mother_id": "p-player", "father_id": "p-jordan"}], "pregnancy": null},
+      "archive": [{"person_id": "p-morgan", "name": "Morgan Voss", "status": "ex_partner"}],
+      "pending": [{"kind": "v2_partner_choice", "target_id": "p-jordan", "stored_outcome": {"money": -500}}]
+    },
+    "expected_graph": {
+      "relationships": [{"relationship_id": "<new>", "person_ids": ["p-player", "p-jordan"], "kind": "committed", "status": "active", "start_turn": null}],
+      "unions": [{"union_id": "<new>", "person_ids": ["p-player", "p-jordan"], "kind": "marriage", "status": "active", "recognition": "<neutral default profile of the save's jurisdiction>"}],
+      "parentage": [
+        {"child_id": "p-lee", "parent_id": "p-player", "role": "biological"},
+        {"child_id": "p-lee", "parent_id": "p-jordan", "role": "biological", "comment": "from recorded pregnancy/conception parentage, never inferred from current partner"}
+      ],
+      "archive_edges": [{"person_ids": ["p-player", "p-morgan"], "kind": "committed", "status": "ended"}],
+      "pending": [{"kind": "v2_partner_choice", "target_id": "p-jordan", "stored_outcome": {"money": -500}, "resolution": "binds the legacy person p-jordan at resolve; a v2 choice can never target a spouse selected after it was stored"}],
+      "primary_relationship_id": "<the new active rel id>",
+      "preserved": ["person ids", "cash/ledger", "archive", "pending stored outcomes"]
+    },
+    "forbidden": ["inventing affairs or extra spouses", "overwriting plural graph from old partner helpers", "rerolling stored outcomes", "per-load random belief assignment"]
+  },
+
+  "editor_interaction_examples": [
+    {
+      "call": "editor apply: rename p-jordan -> 'Jordan Vale'",
+      "expected": {"ok": true, "identity_unchanged": ["p-jordan"], "editor_audit_entry": {"actor": "editor", "scope": "person", "command": "rename"}}
+    },
+    {
+      "call": "editor apply: set age/birth of p-lee to 18",
+      "expected_error": {"code": "protected_field", "status": 400},
+      "comment": "chronology, person_id, parentage, consent, RNG, pending and ledger fields are not editable"
+    },
+    {
+      "call": "editor apply while offer off-001 pending: jurisdiction law change that affects it",
+      "expected": {"offer_off-001": {"status": "superseded", "attempt_preserved": true, "continuation_resumed": true}, "unrelated_pending": "untouched"}
+    }
+  ]
+}

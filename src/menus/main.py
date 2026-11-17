@@ -12,6 +12,16 @@ from src.people.classes.partner import Partner
 from src.people.classes.child import Child
 from src.menus.activities import activities_menu
 
+
+def _adult_romance(player, partner):
+	from src.game.features.family_graph.graph import GraphError, assert_adult_romantic
+	try:
+		assert_adult_romantic(player, partner)
+		return True
+	except GraphError as exc:
+		print(exc.message)
+		return False
+
 def main_menu(player):
 	print()
 	display_data(_("Your name"), player.name)
@@ -334,6 +344,8 @@ def main_menu(player):
 						)
 						player.change_happiness(-randint(2, 6))
 			elif choice == _("Have a baby"):
+				if not _adult_romance(player, relation):
+					return main_menu(player)
 				already_pregnant = player.partner.is_pregnant if player.gender == Gender.Male else player.is_pregnant
 				if already_pregnant:
 					rel = player.partner.name_accusative()
@@ -411,6 +423,8 @@ def main_menu(player):
 					)
 					player.lose_partner()
 			elif choice == _("Propose"):
+				if not _adult_romance(player, relation):
+					return main_menu(player)
 				partner = player.partner
 				name = partner.name_accusative()
 				if (
@@ -444,6 +458,8 @@ def main_menu(player):
 					player.partner.status = 0
 					player.partner.change_relationship(-15)
 			elif choice == _("Plan the wedding"):
+				if not _adult_romance(player, relation):
+					return main_menu(player)
 				locations = {
 					TranslateMarker("golf course"): 15300,
 					TranslateMarker("vineyard"): 15300,
@@ -486,6 +502,8 @@ def main_menu(player):
 					)
 					player.divorce()
 			elif choice == _("Renew Vows"):
+				if not _adult_romance(player, relation):
+					return main_menu(player)
 				partner = relation.name_accusative()
 				if relation.asked_renew_vows or player.age - relation.last_renew_vows < 10 or relation.relationship < randint(40, 70):
 					print(_("Your {partner} doesn't want to renew your wedding vows.").format(partner=partner))
@@ -511,7 +529,9 @@ def main_menu(player):
 				player.change_grades(randint(5, 7 + (100 - player.grades) // 5))
 				player.change_smarts(randint(0, 2) + (player.has_trait("NERD")))
 				if x_in_y(player.smarts, 2000):
-					player.learn_trait("NERD")
+					learned, trait_msg, trait_color = player.learn_trait("NERD")
+					if trait_msg:
+						print_colored(trait_msg, trait_color)
 				player.studied = True
 		if choice == 3:
 			can_drop_out = player.smarts < randint(8, 12) + randint(0, 13)

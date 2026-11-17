@@ -1,0 +1,74 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1615,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Augusto",
+    "last_name": "Clapp",
+    "gender": "male",
+    "country": "Brazil",
+    "seed": 1350633010,
+    "request_id": "robot-1-1615-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 755331245,
+     "base": "person",
+     "skin_tone": "medium-dark",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "crown"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_fda4749510",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r12853",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_fda4749510",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r12854",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_fda4749510",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "e29ee481-658a-4a90-b208-7779a00cd48d"
+   },
+   "request_id": "robot-1-r12855",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1616 --seed 1 --from-life 1615 --fail-fast"
+}

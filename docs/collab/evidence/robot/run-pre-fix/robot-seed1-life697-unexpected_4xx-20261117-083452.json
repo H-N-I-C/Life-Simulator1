@@ -1,0 +1,54 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 697,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Antin",
+    "last_name": "Stevenson",
+    "gender": "male",
+    "country": "Brazil",
+    "seed": 280582569,
+    "request_id": "robot-1-697-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 151794993,
+     "base": "person",
+     "skin_tone": "light",
+     "hair": "default",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_4582ac1e0b",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "8b972f8b-2ce0-4b01-a27e-4ed5b13ac653"
+   },
+   "request_id": "robot-1-r5322",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 698 --seed 1 --from-life 697 --fail-fast"
+}

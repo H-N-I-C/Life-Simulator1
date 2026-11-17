@@ -1,0 +1,42 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 654,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Archibold",
+    "last_name": "Bender",
+    "gender": "male",
+    "country": "UK",
+    "seed": 866670823,
+    "request_id": "robot-1-654-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_fb3c6cb3eb",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "1ba5c4b0-437e-4370-9e03-94046c92ef80"
+   },
+   "request_id": "robot-1-r4973",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 655 --seed 1 --from-life 654 --fail-fast"
+}

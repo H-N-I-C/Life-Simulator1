@@ -1,0 +1,63 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 387,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Ajay",
+    "last_name": "Dougherty",
+    "gender": "male",
+    "country": "Australia",
+    "seed": 493917565,
+    "request_id": "robot-1-387-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 723984691,
+     "base": "woman",
+     "skin_tone": "medium-dark",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_751f7c374d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3136",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_751f7c374d",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "65fefcc9-f5a2-4ab1-927b-1881c41fb343"
+   },
+   "request_id": "robot-1-r3137",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 388 --seed 1 --from-life 387 --fail-fast"
+}

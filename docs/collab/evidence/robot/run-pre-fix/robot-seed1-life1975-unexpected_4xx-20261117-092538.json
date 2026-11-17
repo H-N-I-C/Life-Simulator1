@@ -1,0 +1,72 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1975,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Allison",
+    "last_name": "Hobbs",
+    "gender": "female",
+    "country": "Australia",
+    "seed": 1670128837,
+    "request_id": "robot-1-1975-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 524968019,
+     "base": "person",
+     "skin_tone": "medium-dark",
+     "hair": "white",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_786883960f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15725",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_786883960f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15726",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_786883960f",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "5e47bf3c-6be7-43b0-80da-14fb08b2e2a5"
+   },
+   "request_id": "robot-1-r15727",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1976 --seed 1 --from-life 1975 --fail-fast"
+}

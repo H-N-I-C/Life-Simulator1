@@ -9,7 +9,11 @@ What it does:
      requests and horizontal overflow, and saves a screenshot.
   3. Runs the data-driven flows in tests/browser/flows.py (creator
      keyboard/export checks and the M1 life flow).
-  4. Writes docs/collab/evidence/browser/report.md + screenshots.
+  4. Runs the robot player (tools/robot_player.quick_check) against the
+     same server: ROBOT_LIVES random lives (default 200, seed 7). Hard
+     failures (5xx, invariant breaks, soft-locks) FAIL the gate; typed
+     4xx eligibility mismatches are reported as WARN.
+  5. Writes docs/collab/evidence/browser/report.md + screenshots.
 
 Exit code is non-zero if any check failed.
 """
@@ -30,10 +34,13 @@ if ROOT not in sys.path:
 import web.server as server  # noqa: E402
 from tools.cdp_client import CHROMIUM, launch_chrome  # noqa: E402
 from tests.browser.flows import FLOWS  # noqa: E402
+from tools.robot_player import quick_check as robot_quick  # noqa: E402
 
 EVIDENCE = os.path.join(ROOT, "docs", "collab", "evidence", "browser")
 PAGES = ["/creator", "/gallery", "/game", "/relationships"]
 VIEWPORTS = [(390, 844), (1280, 800)]
+ROBOT_LIVES = 200
+ROBOT_SEED = 7
 
 
 def _dig(obj, dotted):
@@ -1438,6 +1445,39 @@ def main():
                 runner.check_page(path, w, h)
         for flow in FLOWS:
             runner.run_flow(flow)
+        # Robot player quick mode against the same server: gate on 5xx /
+        # invariant breaks / soft-locks; eligibility mismatches are WARN.
+        print("robot quick mode: %d lives, seed %d ..."
+              % (ROBOT_LIVES, ROBOT_SEED), flush=True)
+        robot_dir = os.path.join(EVIDENCE, "robot")
+        hard, findings, stats = robot_quick(
+            "http://127.0.0.1:%d" % port, lives=ROBOT_LIVES,
+            seed=ROBOT_SEED, evidence_dir=robot_dir)
+        if hard:
+            for life, kind, path in hard[:5]:
+                runner.record("robot", "robot-quick life %d: %s"
+                              % (life, kind), False, path)
+            runner.results.append(("robot", "robot-quick (%d lives)"
+                                   % ROBOT_LIVES, False,
+                                   "%d hard failure(s): %s"
+                                   % (len(hard), "; ".join(
+                                       "%s@%d" % (k, l) for l, k, _ in
+                                       hard[:5])), "FAIL"))
+        elif findings:
+            runner.results.append(("robot", "robot-quick (%d lives)"
+                                   % ROBOT_LIVES, True,
+                                   "%d eligibility finding(s), 0 hard; "
+                                   "%d commands/%d decisions; first: %s"
+                                   % (len(findings), stats["commands"],
+                                      stats["decisions"], findings[0][2]),
+                                   "WARN"))
+        else:
+            runner.results.append(("robot", "robot-quick (%d lives)"
+                                   % ROBOT_LIVES, True,
+                                   "0 hard failures, 0 findings; %d "
+                                   "commands/%d decisions"
+                                   % (stats["commands"], stats["decisions"]),
+                                   "PASS"))
         fails, required_pending = write_report(EVIDENCE, runner.results,
                                                DEFERRED_PENDING)
         n = lambda st: len([r for r in runner.results if r[4] == st])

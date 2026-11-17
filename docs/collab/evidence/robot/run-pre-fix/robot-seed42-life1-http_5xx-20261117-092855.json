@@ -1,0 +1,195 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 42,
+ "life_index": 1,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "action 'ask_for_money' -> HTTP 500: {\"error\": \"internal\", \"crash_id\": \"e1b1a7e5326b\"}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adiana",
+    "last_name": "Watts",
+    "gender": "female",
+    "country": "UK",
+    "seed": 1570217679,
+    "request_id": "robot-42-1-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1268075862,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "crown"
+     ],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_4270e854eb",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-42-r23",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_4270e854eb",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-42-r24",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_4270e854eb",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-42-r25",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_4270e854eb",
+   "action": "conversation",
+   "payload": {
+    "target_id": "5ce29072-ebf3-473a-a93f-777b577e93a7"
+   },
+   "request_id": "robot-42-r26",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_4270e854eb",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-42-r27",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_4270e854eb",
+   "action": "doctor",
+   "payload": {},
+   "request_id": "robot-42-r28",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_4270e854eb",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "back",
+    "inputs": null
+   },
+   "request_id": "robot-42-r29",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_4270e854eb",
+   "action": "conversation",
+   "payload": {
+    "target_id": "ea406f83-5075-4aee-9634-d8594292fa8f"
+   },
+   "request_id": "robot-42-r30",
+   "expected_revision": 8
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_4270e854eb",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-42-r31",
+   "expected_revision": 9
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_4270e854eb",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_watch"
+   },
+   "request_id": "robot-42-r32",
+   "expected_revision": 10
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_4270e854eb",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-42-r33",
+   "expected_revision": 11
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_4270e854eb",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-42-r34",
+   "expected_revision": 12
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_4270e854eb",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-42-r35",
+   "expected_revision": 13
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_4270e854eb",
+   "action": "ask_for_money",
+   "payload": {
+    "target_id": "5ce29072-ebf3-473a-a93f-777b577e93a7"
+   },
+   "request_id": "robot-42-r36",
+   "expected_revision": 14
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_4270e854eb",
+   "action": "ask_for_money",
+   "payload": {
+    "target_id": "ea406f83-5075-4aee-9634-d8594292fa8f"
+   },
+   "request_id": "robot-42-r37",
+   "expected_revision": 15
+  },
+  {
+   "n": 16,
+   "kind": "error",
+   "status": 500,
+   "body": "{\"error\": \"internal\", \"crash_id\": \"e1b1a7e5326b\"}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 2 --seed 42 --from-life 1 --fail-fast"
+}

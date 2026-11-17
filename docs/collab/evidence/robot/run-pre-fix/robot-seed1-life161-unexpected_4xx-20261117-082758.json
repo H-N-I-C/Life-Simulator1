@@ -1,0 +1,74 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 161,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Allianora",
+    "last_name": "Palmer",
+    "gender": "female",
+    "country": "China",
+    "seed": 2016927903,
+    "request_id": "robot-1-161-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1508518057,
+     "base": "person",
+     "skin_tone": "medium-light",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "earrings"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_ce92fb731f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r1483",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_ce92fb731f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r1483",
+   "expected_revision": 1
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_ce92fb731f",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "4d7ae303-a5f6-4b77-ac07-2bc9e2edb1d7"
+   },
+   "request_id": "robot-1-r1485",
+   "expected_revision": 2
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 162 --seed 1 --from-life 161 --fail-fast"
+}

@@ -5,3 +5,4 @@
 - A (small): add dev scenario 'wealthy_40' (rich adult, for kidnapping/ransom row 69) through real transitions or a seeded lottery win; tell D
 - B: the intermittent /api/avatar.png failure on the creator page (D's flake)
 - A (after the fix round, small): a dev-only 'force_event' hook (only with --dev; scenario or command option) that offers a named event on the next decision_offer, so D can prove rare events (kidnapping row 69). Tell D.
+- Codex: THOROUGH M2.5 evaluation when M2.5 is finished (gate in docs/collab/M2.5/01-spec.md)

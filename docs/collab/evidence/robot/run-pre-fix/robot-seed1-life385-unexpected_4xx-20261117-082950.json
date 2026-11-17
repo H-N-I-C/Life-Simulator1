@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 385,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alanah",
+    "last_name": "Moore",
+    "gender": "female",
+    "country": "Indonesia",
+    "seed": 427114247,
+    "request_id": "robot-1-385-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 212392298,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "earrings"
+     ],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_944c03a57d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3133",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_944c03a57d",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "c0541436-23ab-42ce-99b8-286a2f76c378"
+   },
+   "request_id": "robot-1-r3134",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 386 --seed 1 --from-life 385 --fail-fast"
+}

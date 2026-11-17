@@ -1,0 +1,383 @@
+{
+  "_status": "PROPOSAL (Kimi B, 2026-11-17). Awaits Claude freeze with the other M2.5 contracts. All faiths/cultures/jurisdictions are FICTIONAL game presets; nothing here asserts anything about real laws, faiths or people. Orientation/belief/culture defaults are never inferred from names, gender or complexion.",
+  "catalog_version": "policy-1.0.0",
+  "description": "Save-local, versioned policy catalogs: fictional faith profiles (public tenets), cultures, jurisdiction law presets, and the personal attraction/preference profile schema. Presets are a per-save BASELINE: the editor or content may create save-local overrides without mutating the catalog; a later catalog/content update must not silently erase save-local edits (baseline+override+version, spec 02-contracts.md §3).",
+  "save_local_semantics": {
+    "resolution_order": "save_local_override (if present) -> catalog preset (by id+version) -> built-in neutral default",
+    "content_update_rule": "updating catalog data bumps catalog_version; existing saves keep their resolved profiles unless the player opts in; no silent erase",
+    "neutral_default": "any unknown/missing id resolves to the neutral default in `defaults.neutral_profile`; unknown/missing tenet stance resolves to `neutral`"
+  },
+  "union_recognition_shape": {
+    "_owner": "A owns the union edge; A accepted this sub-shape and B ADOPTS A's exact values (graph-contract.md §3.2)",
+    "status": "recognized | civil_only | unrecognized | forbidden",
+    "jurisdiction_id": "string, references jurisdiction_presets[].id or a save-local override id",
+    "law_version": "int, per-jurisdiction save-local revision in force when the union was formed or last reprojected (bumps on editor jurisdiction edits; separate from the catalog semver)",
+    "basis": "ceremony | registration | common_law",
+    "_notes": "Recognition is projected state, not a ban: a forbidden/unrecognized union still exists as an edge and carries social/legal consequences. Editor law edits reproject CURRENT recognition only; they never rewrite historical law_version on old unions."
+  },
+  "faiths": [
+    {
+      "id": "faith_luminarian",
+      "label": "Luminarian",
+      "version": "1.0.0",
+      "tenets": [
+        {
+          "id": "plural_unions",
+          "label": "Plural unions",
+          "stance": "neutral",
+          "scope": "public"
+        },
+        {
+          "id": "same_gender_unions",
+          "label": "Same-gender unions",
+          "stance": "favoured",
+          "scope": "public"
+        },
+        {
+          "id": "interfaith_unions",
+          "label": "Interfaith unions",
+          "stance": "neutral",
+          "scope": "public"
+        },
+        {
+          "id": "conversion_out",
+          "label": "Leaving the faith",
+          "stance": "disfavoured",
+          "scope": "public"
+        },
+        {
+          "id": "large_age_gap",
+          "label": "Large age gaps",
+          "stance": "neutral",
+          "scope": "public"
+        },
+        {
+          "id": "divorce",
+          "label": "Divorce",
+          "stance": "disfavoured",
+          "scope": "public"
+        }
+      ]
+    },
+    {
+      "id": "faith_tidebound",
+      "label": "Tidebound",
+      "version": "1.0.0",
+      "tenets": [
+        {
+          "id": "plural_unions",
+          "stance": "favoured",
+          "scope": "public"
+        },
+        {
+          "id": "same_gender_unions",
+          "stance": "favoured",
+          "scope": "public"
+        },
+        {
+          "id": "interfaith_unions",
+          "stance": "disfavoured",
+          "scope": "public"
+        },
+        {
+          "id": "conversion_out",
+          "stance": "disfavoured",
+          "scope": "public"
+        },
+        {
+          "id": "large_age_gap",
+          "stance": "neutral",
+          "scope": "public"
+        },
+        {
+          "id": "divorce",
+          "stance": "neutral",
+          "scope": "public"
+        }
+      ]
+    },
+    {
+      "id": "faith_ancestorist",
+      "label": "Ancestorist",
+      "version": "1.0.0",
+      "tenets": [
+        {
+          "id": "plural_unions",
+          "stance": "disfavoured",
+          "scope": "public"
+        },
+        {
+          "id": "same_gender_unions",
+          "stance": "neutral",
+          "scope": "public"
+        },
+        {
+          "id": "interfaith_unions",
+          "stance": "disfavoured",
+          "scope": "public"
+        },
+        {
+          "id": "conversion_out",
+          "stance": "disfavoured",
+          "scope": "public"
+        },
+        {
+          "id": "large_age_gap",
+          "stance": "disfavoured",
+          "scope": "public"
+        },
+        {
+          "id": "divorce",
+          "stance": "disfavoured",
+          "scope": "public"
+        }
+      ]
+    },
+    {
+      "id": "faith_unaffiliated",
+      "label": "Unaffiliated",
+      "version": "1.0.0",
+      "tenets": [
+        {
+          "id": "plural_unions",
+          "stance": "neutral",
+          "scope": "public"
+        },
+        {
+          "id": "same_gender_unions",
+          "stance": "neutral",
+          "scope": "public"
+        },
+        {
+          "id": "interfaith_unions",
+          "stance": "neutral",
+          "scope": "public"
+        },
+        {
+          "id": "conversion_out",
+          "stance": "neutral",
+          "scope": "public"
+        },
+        {
+          "id": "large_age_gap",
+          "stance": "neutral",
+          "scope": "public"
+        },
+        {
+          "id": "divorce",
+          "stance": "neutral",
+          "scope": "public"
+        }
+      ]
+    }
+  ],
+  "_tenet_rule": "Public tenet stances are FAVOURS/DISFAVOURS (soft score contributions in [-10, +10]); they never ban an adult consensual attempt. A person's PRIVATE stance may differ from their faith's public tenet (personal overrides, editor-protocol.json).",
+  "cultures": [
+    {
+      "id": "culture_meridian",
+      "label": "Meridian",
+      "version": "1.0.0",
+      "modifiers": {
+        "openness_default": 0.5,
+        "jealousy_default": 0.4,
+        "monogamy_preference_default": 0.5,
+        "plural_unions_social_stance": "neutral",
+        "interfaith_social_stance": "neutral",
+        "divorce_social_stance": "neutral"
+      }
+    },
+    {
+      "id": "culture_veldan",
+      "label": "Veldan",
+      "version": "1.0.0",
+      "modifiers": {
+        "openness_default": 0.35,
+        "jealousy_default": 0.55,
+        "monogamy_preference_default": 0.7,
+        "plural_unions_social_stance": "disfavoured",
+        "interfaith_social_stance": "neutral",
+        "divorce_social_stance": "disfavoured"
+      }
+    },
+    {
+      "id": "culture_saraki",
+      "label": "Saraki",
+      "version": "1.0.0",
+      "modifiers": {
+        "openness_default": 0.6,
+        "jealousy_default": 0.35,
+        "monogamy_preference_default": 0.4,
+        "plural_unions_social_stance": "favoured",
+        "interfaith_social_stance": "disfavoured",
+        "divorce_social_stance": "neutral"
+      }
+    }
+  ],
+  "_culture_rule": "Culture presets only set DEFAULTS for newly generated NPCs and the neutral baseline; individuals always carry their own profile values. Social stances are soft score contributions in [-8, +8], never gates.",
+  "jurisdiction_presets": [
+    {
+      "id": "jur_riverlands",
+      "label": "Riverlands (fictional preset)",
+      "version": "1.0.0",
+      "recognition": {
+        "monogamous_civil": "recognized",
+        "plural_civil": "unrecognized",
+        "religious_only": "recognized",
+        "customary": "unrecognized",
+        "private": "unrecognized"
+      },
+      "consequences": [
+        {
+          "trigger": "ceremony_of_unrecognized_union",
+          "effect": "civil_fine",
+          "ledger_category": "legal",
+          "amount": {
+            "randint": [
+              500,
+              2000
+            ]
+          },
+          "max_per_occurrence_key": "union_id"
+        },
+        {
+          "trigger": "unrecognized_union_public",
+          "effect": "reputation_scandal",
+          "scope": "community",
+          "magnitude": -10
+        }
+      ]
+    },
+    {
+      "id": "jur_highland_compact",
+      "label": "Highland Compact (fictional preset)",
+      "version": "1.0.0",
+      "recognition": {
+        "monogamous_civil": "recognized",
+        "plural_civil": "recognized",
+        "religious_only": "recognized",
+        "customary": "recognized",
+        "private": "unrecognized"
+      },
+      "consequences": [
+        {
+          "trigger": "ceremony_of_unrecognized_union",
+          "effect": "civil_fine",
+          "ledger_category": "legal",
+          "amount": {
+            "randint": [
+              200,
+              800
+            ]
+          },
+          "max_per_occurrence_key": "union_id"
+        }
+      ]
+    },
+    {
+      "id": "jur_port_authority",
+      "label": "Port Authority (fictional preset)",
+      "version": "1.0.0",
+      "recognition": {
+        "monogamous_civil": "recognized",
+        "plural_civil": "forbidden",
+        "religious_only": "unrecognized",
+        "customary": "unrecognized",
+        "private": "unrecognized"
+      },
+      "consequences": [
+        {
+          "trigger": "ceremony_of_unrecognized_union",
+          "effect": "civil_fine",
+          "ledger_category": "legal",
+          "amount": {
+            "randint": [
+              1000,
+              5000
+            ]
+          },
+          "max_per_occurrence_key": "union_id"
+        },
+        {
+          "trigger": "void_union_cohabiting",
+          "effect": "reputation_scandal",
+          "scope": "community",
+          "magnitude": -15
+        }
+      ]
+    },
+    {
+      "id": "jur_metropolis_charter",
+      "label": "Metropolis Charter (fictional preset)",
+      "version": "1.0.0",
+      "recognition": {
+        "monogamous_civil": "recognized",
+        "plural_civil": "recognized",
+        "religious_only": "recognized",
+        "customary": "recognized",
+        "private": "recognized"
+      },
+      "consequences": []
+    }
+  ],
+  "_law_rules": [
+    "Illegal/unrecognized/void unions REMAIN ATTEMPTABLE (spec fixed rule). Recognition only changes social/legal consequences, never eligibility.",
+    "Ledger references use frozen M2 ledger categories/occurrence keys (A confirms exact category names at freeze).",
+    "max_per_occurrence_key dedupes repeated automatic penalties per union.",
+    "No preset sets any age below 18 or touches consent."
+  ],
+  "attraction_profile": {
+    "_description": "Personal, per-person profile. These are SOFT MODIFIERS: they shift acceptance scores and NPC choice, they never create eligibility or consent.",
+    "fields": {
+      "orientation": {
+        "type": "enum",
+        "values": [
+          "heterosexual",
+          "homosexual",
+          "bisexual",
+          "asexual"
+        ],
+        "default_rule": "random draw at person creation from the passed-in seeded RNG; NEVER inferred from name, gender or appearance"
+      },
+      "openness": {
+        "type": "float",
+        "min": 0.0,
+        "max": 1.0,
+        "default": "culture openness_default or 0.5"
+      },
+      "jealousy": {
+        "type": "float",
+        "min": 0.0,
+        "max": 1.0,
+        "default": "culture jealousy_default or 0.4"
+      },
+      "monogamy_preference": {
+        "type": "float",
+        "min": 0.0,
+        "max": 1.0,
+        "default": "culture monogamy_preference_default or 0.5"
+      },
+      "attraction_to_initiator": {
+        "type": "float",
+        "min": 0.0,
+        "max": 1.0,
+        "default": "developed through interaction (chemistry), not set at creation"
+      }
+    },
+    "personal_tenet_overrides": {
+      "type": "map tenet_id -> stance",
+      "stance": "favoured | neutral | disfavoured",
+      "default": "person's faith public tenet",
+      "note": "personal dissent may differ from public tenets; a personal override applies to THIS person only, never to all believers"
+    }
+  },
+  "defaults": {
+    "neutral_profile": {
+      "faith_id": "faith_unaffiliated",
+      "culture_id": "culture_meridian",
+      "orientation": null,
+      "openness": 0.5,
+      "jealousy": 0.4,
+      "monogamy_preference": 0.5
+    }
+  }
+}

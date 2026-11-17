@@ -1,0 +1,42 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 143,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adah",
+    "last_name": "Cross",
+    "gender": "female",
+    "country": "Germany",
+    "seed": 198283714,
+    "request_id": "robot-1-143-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_d1019e27f2",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "fb00f9ab-ba48-4c05-aaf5-b11dfa9af0ad"
+   },
+   "request_id": "robot-1-r1354",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 144 --seed 1 --from-life 143 --fail-fast"
+}

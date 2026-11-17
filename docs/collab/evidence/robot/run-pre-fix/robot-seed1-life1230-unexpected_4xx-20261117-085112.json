@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1230,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Abbott",
+    "last_name": "Lloyd",
+    "gender": "male",
+    "country": "India",
+    "seed": 1469039441,
+    "request_id": "robot-1-1230-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1783753197,
+     "base": "woman",
+     "skin_tone": "medium-light",
+     "hair": "white",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "earrings"
+     ],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_1ba19e46a3",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r9774",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_1ba19e46a3",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "5488148d-0e2b-4a12-bc7a-28b08897b7e1"
+   },
+   "request_id": "robot-1-r9775",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1231 --seed 1 --from-life 1230 --fail-fast"
+}

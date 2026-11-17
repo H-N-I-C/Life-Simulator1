@@ -1,0 +1,86 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1602,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adiana",
+    "last_name": "Graham",
+    "gender": "female",
+    "country": "Indonesia",
+    "seed": 1105260753,
+    "request_id": "robot-1-1602-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 68954297,
+     "base": "man",
+     "skin_tone": "medium",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "glasses"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_ec713f0add",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r12764",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_ec713f0add",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r12765",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_ec713f0add",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r12766",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_ec713f0add",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "845ad8a9-77a8-4666-b525-23159ce6bf72"
+   },
+   "request_id": "robot-1-r12767",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1603 --seed 1 --from-life 1602 --fail-fast"
+}

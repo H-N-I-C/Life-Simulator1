@@ -1,0 +1,52 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 335,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "action 'resolve_decision' -> HTTP 500: {\"error\": \"internal\", \"crash_id\": \"27430ddc89e0\"}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Ailey",
+    "last_name": "Chandler",
+    "gender": "female",
+    "country": "Canada",
+    "seed": 499698610,
+    "request_id": "robot-1-335-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_8fbfe82ad8",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r35831",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_8fbfe82ad8",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_attend"
+   },
+   "request_id": "robot-1-r35832",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 500,
+   "body": "{\"error\": \"internal\", \"crash_id\": \"27430ddc89e0\"}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 336 --seed 1 --from-life 335 --fail-fast"
+}

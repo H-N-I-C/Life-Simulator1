@@ -1,0 +1,72 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1023,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Anatole",
+    "last_name": "Floyd",
+    "gender": "male",
+    "country": "Japan",
+    "seed": 1435003636,
+    "request_id": "robot-1-1023-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_896b712b4f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r7772",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_896b712b4f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r7773",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_896b712b4f",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-1-r7774",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_896b712b4f",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "d81d6301-6707-486b-ad2e-a4925cd7deef"
+   },
+   "request_id": "robot-1-r7775",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1024 --seed 1 --from-life 1023 --fail-fast"
+}

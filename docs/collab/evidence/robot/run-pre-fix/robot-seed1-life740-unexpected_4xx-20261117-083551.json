@@ -1,0 +1,63 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 740,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "August",
+    "last_name": "Baker",
+    "gender": "male",
+    "country": "China",
+    "seed": 1820037104,
+    "request_id": "robot-1-740-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1834895363,
+     "base": "man",
+     "skin_tone": "medium-dark",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_4434ab1f0c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r5471",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_4434ab1f0c",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "707281e7-b8e0-40eb-887c-946299af8a88"
+   },
+   "request_id": "robot-1-r5472",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 741 --seed 1 --from-life 740 --fail-fast"
+}

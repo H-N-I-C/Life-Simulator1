@@ -436,7 +436,8 @@ def resolve_retirement_choice(player, pending, option_id, rng):
     _check(option_id in [o["id"] for o in pending.get("options", [])],
            "invalid_input", "unknown option")
     events = []
-    sampled = pending.get("sampled", {})
+    sampled = pending.get("sampled") or {}
+    _check("pension" in sampled, "invalid_input", "missing stored pension")
     if sampled.get("applied"):
         return _result(events=events,
                        continuation={"phase_id": "education",
@@ -614,13 +615,16 @@ def resolve_university_application(player, pending, option_id, rng):
         return _result(events=events,
                        continuation={"phase_id": "debt_service",
                                      "item_cursor": 0})
+    sampled = pending.get("sampled") or {}
+    _check(isinstance(sampled.get("funding_options"), list),
+           "invalid_input", "missing stored funding options")
     funding_pending = {
         "kind": "university_funding",
         "title": "University",
         "text": ("Your application to university was accepted! How would "
                  "you like to pay for your college tuition?"),
-        "options": pending["sampled"]["funding_options"],
-        "sampled": pending["sampled"],
+        "options": sampled["funding_options"],
+        "sampled": sampled,
     }
     return _result(events=events, pending_decision=funding_pending,
                    continuation={"phase_id": "debt_service",
@@ -635,8 +639,12 @@ def resolve_university_funding(player, pending, option_id, rng):
     _check(option_id in available, "invalid_input",
            "unknown or no-longer-available option")
     sampled = pending["sampled"]
-    outcome = sampled["funding_outcomes"][option_id]
-    happy_delta = sampled["funding_effects"][option_id]
+    outcomes = sampled.get("funding_outcomes") or {}
+    effects = sampled.get("funding_effects") or {}
+    _check(option_id in outcomes and option_id in effects,
+           "invalid_input", "no stored outcome for this option")
+    outcome = outcomes[option_id]
+    happy_delta = effects[option_id]
     events = []
     if happy_delta:
         before_happy = player.happiness
@@ -725,7 +733,21 @@ def _work_action_specs(player):
     return specs
 
 
-def _activity_specs(p):
+def _dating_target_available(context):
+    """True when the dating-app predicate would bind someone right now —
+    action_specs and dispatch must agree (no 'enabled but refused')."""
+    env = getattr(context, "_env", None)
+    if env is None:
+        return True  # plain-player projection without an envelope
+    from src.game.events import PREDICATES
+    try:
+        return PREDICATES["adult_non_related_stranger"](
+            _player(context).person_id, context) is not None
+    except Exception:
+        return False
+
+
+def _activity_specs(p, context=None):
     specs = []
     if 3 <= p.age < 13:
         specs.append({"id": "play_toys", "category": "activities",
@@ -748,7 +770,10 @@ def _activity_specs(p):
              "label": "Meditate", "enabled": not p.meditated,
              "reason": None, "limits": ["once per year"]},
             {"id": "gym", "category": "activities", "label": "Gym",
-             "enabled": not p.worked_out, "reason": None,
+             "enabled": not p.worked_out and p.health >= 10,
+             "reason": "already worked out this year" if p.worked_out
+                       else ("you are too sick to work out"
+                             if p.health < 10 else None),
              "limits": ["once per year"]},
             {"id": "library", "category": "activities", "label": "Library",
              "enabled": not p.visited_library, "reason": None,
@@ -757,29 +782,47 @@ def _activity_specs(p):
              "label": "Read a Book", "enabled": True, "reason": None,
              "limits": []},
         ])
+    in_school = p.is_in_school()
     if p.age >= 4:
+        can_see_doctor = not in_school
         specs.append({"id": "doctor", "category": "health",
                       "label": "Doctor",
                       "known_costs": ([{"label": "Consultation fee",
                                         "amount": 100}] if p.age >= 18
                                       else []),
-                      "enabled": True, "reason": None, "limits": []})
-    if p.age >= 18:
+                      "enabled": can_see_doctor,
+                      "reason": None if can_see_doctor
+                                else "not while enrolled in school",
+                      "limits": []})
+    if p.age >= 18 and not in_school:
+        can_pay_witch = p.money >= 50  # minimum fee
         specs.extend([
             {"id": "witch_doctor", "category": "health",
-             "label": "Witch Doctor", "enabled": True, "reason": None,
-             "limits": []},
-            {"id": "plastic_surgery", "category": "health",
-             "label": "Plastic Surgery",
-             "enabled": p.age - p.last_plastic_surgery >= 6,
-             "reason": None if p.age - p.last_plastic_surgery >= 6
-             else "wait a few years",
-             "known_costs": [{"label": "Plastic surgery", "amount": 25000}],
+             "label": "Witch Doctor", "enabled": can_pay_witch,
+             "reason": None if can_pay_witch else
+                       f"the treatment costs at least $50 and you have "
+                       f"${p.money:,}",
              "limits": []},
         ])
-    if 21 <= p.age <= 70 and len(p.children) < 5:
+        surgery_ok = p.age - p.last_plastic_surgery >= 6
+        surgery_afford = p.money >= 25000
+        surgery_enabled = surgery_ok and surgery_afford
+        specs.append({"id": "plastic_surgery", "category": "health",
+                      "label": "Plastic Surgery",
+                      "enabled": surgery_enabled,
+                      "reason": None if surgery_enabled else
+                                "wait a few years" if not surgery_ok else
+                                f"plastic surgery costs $25,000 and you "
+                                f"have ${p.money:,}",
+                      "known_costs": [{"label": "Plastic surgery", "amount": 25000}],
+                      "limits": []})
+    if 21 <= p.age <= 70 and len(p.children) < 5 and not in_school:
+        can_adopt = p.money >= 10000  # minimum adoption cost
         specs.append({"id": "adoption", "category": "family",
-                      "label": "Adoption", "enabled": True, "reason": None,
+                      "label": "Adoption", "enabled": can_adopt,
+                      "reason": None if can_adopt else
+                                f"adoption costs at least $10,000 and you "
+                                f"have ${p.money:,}",
                       "limits": []})
     specs.append({"id": "surrender", "category": "life",
                   "label": "Surrender this life", "enabled": True,
@@ -789,6 +832,15 @@ def _activity_specs(p):
                       "label": "Play the lottery",
                       "known_costs": [{"label": "Ticket", "amount": 4}],
                       "enabled": True, "reason": None, "limits": []})
+        if not in_school:
+            available = _dating_target_available(context) \
+                if context is not None else True
+            specs.append({"id": "dating_app", "category": "relationships",
+                          "label": "Dating app",
+                          "enabled": available,
+                          "reason": None if available else
+                                    "no eligible adults around right now",
+                          "limits": []})
     return specs
 
 
@@ -799,22 +851,38 @@ def _relationship_specs(p):
         if rel.age >= 5 and p.age >= 5:
             specs.append({**base, "id": "spend_time",
                           "category": "relationships", "label": "Spend time",
-                          "enabled": not rel.spent_time, "reason": None,
+                          "enabled": not rel.spent_time,
+                          "reason": None if not rel.spent_time
+                                    else "already spent time with them this "
+                                         "year",
                           "limits": ["once per year per person"]})
         if p.age >= 3 and rel.age >= 5:
             specs.append({**base, "id": "conversation",
                           "category": "relationships",
                           "label": "Have a conversation", "enabled": True,
                           "reason": None, "limits": []})
-        if p.age >= 6:
+        if p.age >= 6 and rel.age >= 5:
             specs.append({**base, "id": "compliment",
                           "category": "relationships", "label": "Compliment",
                           "enabled": not rel.was_complimented,
-                          "reason": None, "limits": ["once per year"]})
+                          "reason": None if not rel.was_complimented
+                                    else "already complimented them this year",
+                          "limits": ["once per year"]})
             specs.append({**base, "id": "insult", "category": "relationships",
                           "label": "Insult", "enabled": True,
                           "reason": None, "limits": []})
+        from src.people.classes.parent import Parent
+        if p.age >= 6 and isinstance(rel, Parent):
+            specs.append({**base, "id": "ask_for_money",
+                          "category": "relationships",
+                          "label": "Ask for money", "enabled": True,
+                          "reason": None, "limits": []})
     return specs
+
+
+def _currently_pregnant(p):
+    return bool(p.is_pregnant or (p.partner is not None
+                                  and p.partner.is_pregnant))
 
 
 def action_specs(context):
@@ -822,9 +890,10 @@ def action_specs(context):
     predicate drives both this projection and the dispatcher. Pure read."""
     p = _player(context)
     if p.is_in_school():
-        return _school_action_specs(p) + _activity_specs(p)
+        return (_school_action_specs(p) + _relationship_specs(p)
+                + _activity_specs(p, context))
     specs = (_work_action_specs(p) + _relationship_specs(p)
-             + _activity_specs(p))
+             + _activity_specs(p, context))
     if p.age >= 18 and p.marital_status == 0 and p.date_options > 0:
         specs.append({"id": "find_partner", "category": "relationships",
                       "label": "Find a Partner", "enabled": True,
@@ -832,16 +901,21 @@ def action_specs(context):
     if p.partner is not None:
         base = {"target_id": _pid(p.partner), "target_label": p.partner.name}
         specs.append({**base, "id": "try_for_baby", "category": "family",
-                      "label": "Have a baby", "enabled": True,
-                      "reason": None, "limits": []})
+                      "label": "Have a baby",
+                      "enabled": not _currently_pregnant(p),
+                      "reason": None if not _currently_pregnant(p)
+                                else "already pregnant",
+                      "limits": []})
         if p.partner.status == 0:
             specs.append({**base, "id": "propose", "category": "relationships",
                           "label": "Propose", "enabled": True,
                           "reason": None, "limits": []})
+        if p.partner.status < 2:
+            # Legacy main.py offers "Break up" for dating AND engaged.
             specs.append({**base, "id": "break_up",
                           "category": "relationships", "label": "Break up",
                           "enabled": True, "reason": None, "limits": []})
-        elif p.partner.status == 1:
+        if p.partner.status == 1:
             specs.append({**base, "id": "plan_wedding",
                           "category": "relationships",
                           "label": "Plan the wedding", "enabled": True,
@@ -850,7 +924,7 @@ def action_specs(context):
                           "category": "relationships",
                           "label": "Call off the engagement",
                           "enabled": True, "reason": None, "limits": []})
-        else:
+        if p.partner.status == 2:
             specs.append({**base, "id": "divorce", "category": "relationships",
                           "label": "Divorce", "enabled": True,
                           "reason": None, "limits": []})
@@ -859,6 +933,11 @@ def action_specs(context):
                           "enabled": not p.partner.asked_renew_vows
                           and p.age - p.partner.last_renew_vows >= 10,
                           "reason": None, "limits": []})
+    if p.partner is not None and min(p.age, p.partner.age) < 18:
+        for spec in specs:
+            if spec["id"] in ("try_for_baby", "propose", "plan_wedding", "renew_vows"):
+                spec["enabled"] = False
+                spec["reason"] = "both participants must be 18 or older"
     return specs
 
 
@@ -893,6 +972,30 @@ def _require_int(payload, key, lo, hi):
     return value
 
 
+def _guard_romance(player, partner=None):
+    from src.game.features.family_graph.graph import (
+        GraphError, assert_adult_romantic)
+    try:
+        assert_adult_romantic(player, partner if partner is not None else player)
+    except GraphError as exc:
+        raise RuleError(exc.code, exc.message) from exc
+
+
+def _guard_pending_romance(context, player, pending):
+    from src.game.features.family_graph.graph import (
+        GraphError, assert_interaction_adults)
+    people = getattr(context, "people_by_id", {})
+    bound = [player] + [people[pid] for role, pid in (pending.get("bindings") or {}).items()
+                        if role != "witness" and pid in people]
+    try:
+        assert_interaction_adults(pending.get("interaction"), bound or [player])
+    except GraphError as exc:
+        raise RuleError(exc.code, exc.message) from exc
+    if any((o.get("_structural") or {}).get("gain_partner")
+           for o in pending.get("options", [])):
+        _guard_romance(player, pending.get("sampled_partner"))
+
+
 def apply_action(context, action_id, payload, rng):
     """Validate and apply one menu action; returns a RuleResult.
 
@@ -902,6 +1005,8 @@ def apply_action(context, action_id, payload, rng):
     p = _player(context)
     _check(isinstance(payload, dict), "invalid_input",
            "payload must be an object")
+    _check(not (p.is_in_school() and action_id in _SCHOOL_BLOCKED_ACTIONS),
+           "not_allowed", "not while enrolled in school")
     if action_id == "find_job":
         _check(p.age >= 18, "not_allowed", "you are too young to work")
         _check(not p.has_job, "not_allowed", "you already have a job")
@@ -940,6 +1045,8 @@ def apply_action(context, action_id, payload, rng):
         _check(target is not None, "invalid_input",
                "target_id is required")
         return _PARENT_ACTIONS[action_id](p, target, rng)
+    if action_id in _CONTEXT_SELF_ACTIONS:
+        return _CONTEXT_SELF_ACTIONS[action_id](context, p, payload, rng)
     if action_id in _SELF_ACTIONS:
         return _SELF_ACTIONS[action_id](p, rng)
     fn = _ACTIONS.get(action_id)
@@ -978,9 +1085,10 @@ def resolve_choice(context, pending, option_id, inputs, rng):
         _check(option_id in options, "invalid_input", "unknown option")
         if option_id == "walk_away":
             return _result(events=[_event("work", "I walked away.", p)])
-        sampled = pending["sampled"]
+        sampled = pending.get("sampled") or {}
+        _check("success" in sampled, "invalid_input", "missing stored outcome")
         before_happy = p.happiness
-        p.change_happiness(sampled["happiness_delta"])
+        p.change_happiness(sampled.get("happiness_delta", 0))
         changes = {"happiness": p.happiness - before_happy}
         if sampled["success"]:
             p.get_job(sampled["salary"])
@@ -1162,6 +1270,8 @@ def sample_conversation(player, relation, rng):
     outcomes are sampled now."""
     _require_relation(player, relation)
     _check(player.age >= 3, "not_allowed", "you are too young")
+    _check(relation.age >= 5, "not_allowed",
+           "they are too young to have a conversation with")
     _check(relation.relationship >= 25, "refused",
            "Your %s isn't interested in having a conversation with you."
            % _rel_name(relation))
@@ -1211,12 +1321,17 @@ def resolve_argument(player, pending, option_id, rng):
     options = [o["id"] for o in pending.get("options", [])]
     _check(option_id in options, "invalid_input", "unknown option")
     fx = pending["sampled"][option_id]
+    # Tolerant access: sample_conversation's "insult" outcome stores no
+    # "happiness" key, and legacy/saved pendings may miss any of these —
+    # a missing key is a zero delta, never a KeyError -> 500 (crash_id
+    # 62a309a1e51b).
     events = []
-    player.change_karma(fx["karma"])
-    if fx["happiness"]:
+    if fx.get("karma"):
+        player.change_karma(fx["karma"])
+    if fx.get("happiness"):
         player.change_happiness(fx["happiness"])
     target_id = pending.get("sampled_target_id")
-    if fx["relationship"] and target_id:
+    if fx.get("relationship") and target_id:
         target = _find_person(_Ctx(player), target_id)
         target.change_relationship(fx["relationship"])
     label = {"apologize": "I apologized.",
@@ -1257,6 +1372,7 @@ def ask_for_money(player, parent, rng):
     _check(isinstance(parent, Parent), "not_allowed",
            "you can only ask your parents for money")
     _require_relation(player, parent)
+    _check(player.age >= 6, "not_allowed", "you are too young")
     if parent.asked_for_money >= 3:
         before = _stat_snapshot(parent, ("relationship",))
         parent.change_relationship(-rng.randint(5, 10))
@@ -1305,6 +1421,8 @@ def compliment(player, relation, rng):
     matches dispatch (documented policy note in the M2 report)."""
     _require_relation(player, relation)
     _check(player.age >= 6, "not_allowed", "you are too young")
+    _check(relation.age >= 5, "not_allowed",
+           "they are too young to compliment")
     _check(not relation.was_complimented, "not_allowed",
            "you already complimented them this year")
     gen = lambda: rng.randint(0, 50) + rng.randint(0, 50)
@@ -1353,6 +1471,8 @@ def insult(player, relation, rng):
     """main.py 'Insult': rel/karma loss; counter-insult or attack branch."""
     _require_relation(player, relation)
     _check(player.age >= 6, "not_allowed", "you are too young")
+    _check(relation.age >= 5, "not_allowed",
+           "they are too young to insult")
     from src.people.classes.sibling import Sibling
     from src.people.classes.partner import Partner
     before_r = _stat_snapshot(relation, ("relationship",))
@@ -1400,6 +1520,7 @@ def sample_try_for_baby(player, rng):
     """main.py 'Have a baby': gates; fertility draw; a pregnancy yields a
     stored keep/abort decision. The partner-overrule draw u is sampled once
     and both branches compare against it (deterministic per choice)."""
+    _guard_romance(player, player.partner)
     partner = player.partner
     _check(partner is not None, "not_allowed", "you have no partner")
     _check(partner in player.relations, "not_allowed",
@@ -1442,7 +1563,10 @@ def resolve_pregnancy(player, pending, option_id, rng):
     _check(option_id in options, "invalid_input", "unknown option")
     sampled = pending["sampled"]
     partner = player.partner
-    overruled = sampled["overrule_u"] < sampled["overrule_chance"][option_id]
+    chances = sampled.get("overrule_chance") or {}
+    _check(option_id in chances, "invalid_input",
+           "no stored outcome for this option")
+    overruled = sampled["overrule_u"] < chances[option_id]
     events = []
     is_pregnant = True
     if option_id == "keep":
@@ -1500,6 +1624,7 @@ def break_up(player):
 
 def propose(player, rng):
     """main.py 'Propose': years/craziness, one-shot, relationship gate."""
+    _guard_romance(player, player.partner)
     partner = player.partner
     _check(partner is not None, "not_allowed", "you have no partner")
     _check(partner.status == 0, "not_allowed",
@@ -1556,6 +1681,7 @@ def call_off_engagement(player):
 def sample_wedding_plan(player, rng):
     """main.py 'Plan the wedding': 4 sampled venues; per-venue sub-choice
     do/edit/cancel is modeled as options on the stored decision."""
+    _guard_romance(player, player.partner)
     partner = player.partner
     _check(partner is not None and partner.status == 1, "not_allowed",
            "you are not engaged")
@@ -1566,6 +1692,11 @@ def sample_wedding_plan(player, rng):
         "text": "Choose a location:",
         "options": [{"id": f"venue:{v}",
                      "label": f"{v} (${WEDDING_VENUES[v]:,})",
+                     "enabled": player.money >= WEDDING_VENUES[v],
+                     "reason": None
+                     if player.money >= WEDDING_VENUES[v] else
+                     f"this venue costs ${WEDDING_VENUES[v]:,} and you have "
+                     f"${player.money:,}",
                      "known_costs": [{"label": v,
                                       "amount": WEDDING_VENUES[v]}]}
                     for v in venues] + [{"id": "cancel", "label": "Cancel"}],
@@ -1574,6 +1705,7 @@ def sample_wedding_plan(player, rng):
 
 
 def resolve_wedding_plan(player, pending, option_id, rng):
+    _guard_romance(player, player.partner)
     options = [o["id"] for o in pending.get("options", [])]
     _check(option_id in options, "invalid_input", "unknown option")
     partner = player.partner
@@ -1631,6 +1763,7 @@ def divorce_partner(player, rng):
 
 def renew_vows(player, rng):
     """main.py 'Renew Vows': 10-year spacing, once, relationship gate."""
+    _guard_romance(player, player.partner)
     partner = player.partner
     _check(partner is not None and partner.status == 2, "not_allowed",
            "you are not married")
@@ -1759,6 +1892,7 @@ def listen_to_music(player, rng):
 def sample_find_partner(player, rng):
     """activities.py 'Find a Partner': the match and the compatibility
     outcome are sampled now; date_options is consumed at offer time."""
+    _guard_romance(player)
     _check(player.age >= 18, "not_allowed", "you are too young")
     _check(player.marital_status == 0, "not_allowed",
            "you are already in a relationship")
@@ -1780,6 +1914,7 @@ def sample_find_partner(player, rng):
 
 
 def resolve_date_offer(player, pending, option_id, rng):
+    _guard_romance(player, pending.get("sampled_partner"))
     options = [o["id"] for o in pending.get("options", [])]
     _check(option_id in options, "invalid_input", "unknown option")
     partner = pending.get("sampled_partner")
@@ -1847,6 +1982,10 @@ def sample_doctor_visit(player, rng):
     options = [{"id": "back", "label": "Back"}] + [
         {"id": f"treat:{name}",
          "label": f"Treat {name}",
+         "enabled": not fee or player.money >= fee,
+         "reason": None if (not fee or player.money >= fee) else
+                   f"the consultation costs ${fee} and you have "
+                   f"${player.money:,}",
          "known_costs": ([{"label": "Consultation fee", "amount": fee}]
                          if fee else [])}
         for name in illnesses]
@@ -1877,7 +2016,8 @@ def resolve_doctor_visit(player, pending, option_id, rng):
     events = []
     before = _stat_snapshot(player, ("health", "happiness"))
     if cured:
-        health_gain, happy_gain = pending["sampled"]["gains"][illness]
+        health_gain, happy_gain = pending["sampled"]["gains"].get(
+            illness, (3, 3))
         player.change_health(health_gain)
         if happy_gain:
             player.change_happiness(happy_gain)
@@ -1910,6 +2050,10 @@ def sample_witch_doctor(player, rng):
     outcome resolves as a terminal transition (A performs the death)."""
     _check(player.age >= 18, "not_allowed", "you are too young")
     fee = rng.randint(50, 100)
+    # Gate on the $50 minimum (what action_specs advertises); the drawn fee
+    # still gates the pending's "take" option and resolve re-checks.
+    _check(player.money >= 50, "not_allowed",
+           f"the treatment costs at least $50 and you have ${player.money:,}")
     health_mod = player.witch_doctor_health + rng.gauss(0, 2)
     if player.health >= 60:
         health_mod -= (player.health - 60) / 10
@@ -1926,7 +2070,11 @@ def sample_witch_doctor(player, rng):
         "kind": "witch_doctor",
         "title": "Witch Doctor",
         "text": f"The witch doctor offers a \"special\" treatment. Cost: {fee}",
-        "options": [{"id": "take", "label": "Take it"},
+        "options": [{"id": "take", "label": "Take it",
+                     "enabled": player.money >= fee,
+                     "reason": None if player.money >= fee else
+                               f"the treatment costs ${fee} and you have "
+                               f"${player.money:,}"},
                     {"id": "refuse", "label": "Refuse"}],
         "sampled": {"fee": fee, "health_mod": health_mod,
                     "witch_doctor_delta": wd_delta, "cure": cure,
@@ -2089,6 +2237,7 @@ def sample_read_book(player, rng):
     """activities.py 'Read a Book' collapsed to one action (Claude-approved):
     5 sampled age-eligible books; per-book outcome pre-sampled."""
     available = [b for b in BOOKS if player.age >= b[3]]
+    _check(player.age >= 12, "not_allowed", "you are too young")
     _check(available, "not_allowed", "no books available for your age")
     selection = rng.sample(available, min(len(available), 5))
     per_book = {}
@@ -2142,14 +2291,16 @@ def resolve_book_choice(player, pending, option_id, rng):
         return _result(events=[_event("activity", "I put the book back.",
                                       player)])
     title = option_id.split(":", 1)[1]
-    fx = pending["sampled"]["per_book"][title]
+    per_book = (pending.get("sampled") or {}).get("per_book") or {}
+    fx = per_book.get(title)
+    _check(fx is not None, "invalid_input", "unknown book outcome")
     before = _stat_snapshot(player, ("happiness", "smarts"))
     stress0 = player.stress
-    player.change_happiness(fx["h_amount"])
-    player.change_smarts(fx["s_amount"])
-    if fx["stress_relief"]:
+    player.change_happiness(fx.get("h_amount", 0))
+    player.change_smarts(fx.get("s_amount", 0))
+    if fx.get("stress_relief"):
         player.change_stress(fx["stress_relief"])
-    for trait in fx["learn"]:
+    for trait in fx.get("learn") or []:
         player.learn_trait(trait)
     changes = _changes(before, _stat_snapshot(player, ("happiness", "smarts")),
                        ("happiness", "smarts"))
@@ -2167,6 +2318,8 @@ def sample_plastic_surgery(player, rng):
     _check(player.age >= 18, "not_allowed", "you are too young")
     _check(player.age - player.last_plastic_surgery >= 6, "not_allowed",
            "please wait a while before getting another plastic surgery")
+    _check(player.money >= 25000, "not_allowed",
+           f"plastic surgery costs $25,000 and you have ${player.money:,}")
     per_surgeon = []
     for name, reputation in player.plastic_surgeons:
         botched = _one_in(rng, 5) and not _x_in_y(rng, reputation, 100)
@@ -2196,6 +2349,10 @@ def sample_plastic_surgery(player, rng):
         "text": "Which plastic surgeon would you like to visit? (Cost: $25000)",
         "options": [{"id": f"surgeon:{i}",
                      "label": f"Dr. {player.plastic_surgeons[i][0]}",
+                     "enabled": player.money >= 25000,
+                     "reason": None if player.money >= 25000 else
+                               f"plastic surgery costs $25,000 and you have "
+                               f"${player.money:,}",
                      "known_costs": [{"label": "Plastic surgery",
                                       "amount": 25000}]}
                     for i in range(len(player.plastic_surgeons))]
@@ -2210,10 +2367,14 @@ def resolve_plastic_surgery(player, pending, option_id, rng):
     if option_id == "cancel":
         return _result(events=[_event("health", "I decided against "
                                       "plastic surgery.", player)])
-    idx = int(option_id.split(":", 1)[1])
+    raw_idx = option_id.split(":", 1)[1]
+    _check(raw_idx.isdigit(), "invalid_input", "unknown surgeon")
+    idx = int(raw_idx)
+    per_surgeon = (pending.get("sampled") or {}).get("per_surgeon") or []
+    _check(0 <= idx < len(per_surgeon), "invalid_input", "unknown surgeon")
+    sampled = per_surgeon[idx]
     _check(player.money >= 25000, "not_allowed",
            f"plastic surgery costs $25,000 and you have ${player.money:,}")
-    sampled = pending["sampled"]["per_surgeon"][idx]
     money = [_money("health", "plastic_surgery", "cost", player, "medical",
                     -25000, "Plastic surgery")]
     events = []
@@ -2265,6 +2426,10 @@ def sample_adoption(player, rng):
     looks = rng.randint(0, 50) + rng.randint(0, 50)
     age = rng.randint(1, 17)
     cost = rng.randint(10000, 30000)
+    # Gate on the $10,000 minimum (what action_specs advertises); the drawn
+    # cost still gates the pending's "adopt" option and resolve re-checks.
+    _check(player.money >= 10000, "not_allowed",
+           f"adoption costs at least $10,000 and you have ${player.money:,}")
     # legacy: the child starts with a random last name; the rename decision
     # offers to change it to match the player's.
     child = Child(random_name(gender), random_last_name(), gender, smarts,
@@ -2276,6 +2441,10 @@ def sample_adoption(player, rng):
         "text": f"You have an opportunity to adopt {child.name}, "
                 f"a {age}-year-old {'boy' if gender == Gender.Male else 'girl'}.",
         "options": [{"id": "adopt", "label": "Adopt",
+                     "enabled": player.money >= cost,
+                     "reason": None if player.money >= cost else
+                               f"adoption costs ${cost:,} and you have "
+                               f"${player.money:,}",
                      "known_costs": [{"label": "Adoption cost",
                                       "amount": cost}]},
                     {"id": "decline", "label": "Decline"}],
@@ -2293,7 +2462,11 @@ def resolve_adoption_offer(player, pending, option_id, rng):
                                       "adoption.", player)])
     child = pending.get("sampled_child")
     _check(child is not None, "invalid_input", "missing sampled child")
-    cost = pending["sampled"]["cost"]
+    sampled = pending.get("sampled") or {}
+    cost = sampled.get("cost")
+    _check(isinstance(cost, (int, float)) and not isinstance(cost, bool)
+           and cost >= 0, "invalid_input", "missing adoption cost")
+    cost = int(cost)
     _check(player.money >= cost, "not_allowed",
            f"adoption costs ${cost:,} and you have ${player.money:,}")
     money = [_money("family_events", "adoption", "cost", player, "other",
@@ -2369,6 +2542,17 @@ _OFFER_ACTIONS = {
     "adoption": sample_adoption,
 }
 
+# Partner lifecycle actions are unreachable from the legacy school menu
+# (main.py shows the school menu instead of the partner menus), and the
+# service never advertises them while enrolled — so dispatch refuses them
+# too. Relationship upkeep (spend time etc.) stays available: the service
+# projection offers parent spend_time at any age >= 5 (M1-frozen).
+_SCHOOL_BLOCKED_ACTIONS = {
+    "try_for_baby", "break_up", "propose", "call_off_engagement",
+    "plan_wedding", "divorce", "renew_vows", "find_partner",
+    "dating_app",
+}
+
 
 # ===================================================== MORTALITY (phase 4)
 # A detects deaths (death_check / sudden); C's sample_relation_death turns
@@ -2425,7 +2609,11 @@ def sample_relation_death(player, relation, rng, sudden=False):
             and _x_in_y(rng, relation.generosity, 100):
         avg = 100000 * (relation.money / 100) ** 2
         lo = max(avg * relation.generosity / 200, 1)
-        inheritance = _round_stochastic(rng, _randexpo(rng, lo, avg))
+        # _randexpo divides by (avg - lo): a broke parent's avg can be 0
+        # (<= lo), which crashed with ZeroDivisionError or drew a negative
+        # "inheritance". Clamp the mean above lo so the draw stays positive.
+        avg = max(avg, lo + 1)
+        inheritance = max(1, _round_stochastic(rng, _randexpo(rng, lo, avg)))
         money.append(_money("mortality", "inheritance", "transfer", player,
                             "inheritance", inheritance,
                             f"Inherited from {relation.name}"))
@@ -2453,8 +2641,10 @@ def resolve_funeral_choice(player, pending, option_id, rng):
     _check(option_id in options, "invalid_input", "unknown option")
     fx = pending["sampled"][option_id]
     before = _stat_snapshot(player, ("happiness", "karma"))
-    player.change_happiness(fx["happiness"])
-    player.change_karma(fx["karma"])
+    # .get: a stored outcome missing a key means a zero delta, never a
+    # KeyError -> 500 (same crash class as resolve_argument).
+    player.change_happiness(fx.get("happiness", 0))
+    player.change_karma(fx.get("karma", 0))
     label = ("I attended the funeral." if option_id == "attend"
              else "I didn't attend the funeral.")
     return _result(events=[_event("death", label, player,
@@ -2483,88 +2673,11 @@ def _relation_phrase(target, player):
         return f'My sibling {first} and I'
     return f'{first} and I'
 
-def _resolve_event_pending(context, player, pending, option_id, rng):
-    """Resolve a loader-generated event pending (flat _effects + optional
-    _structural). Applies stats/relationships directly, money via ledger
-    entries (A posts), structural effects via the matching rule helpers,
-    terminal outcomes as finished_turn -> year_close. Never rerolls:
-    everything was pre-sampled at offer creation."""
-    option = next((o for o in pending.get("options", [])
-                   if o["id"] == option_id), None)
-    _check(option is not None, "invalid_input", "unknown option")
-    _check(option.get("enabled", True), "not_allowed",
-           option.get("reason") or "this option is not available")
-    events = []
-    money = []
-    deaths = []
-    # #4: event pre-effects are sampled at offer creation and normally
-    # applied by A's serve-time applier (which sets pre_applied). Apply
-    # here only when they were never applied (legacy/saved pendings).
-    if pending.get("pre_effects") and not pending.get("pre_applied"):
-        pre_fx = dict(pending["pre_effects"])
-        for pid in (pending.get("_pre_person_ids_extra") or []):
-            if pid not in person_ids:
-                person_ids.append(pid)
-        pre_structural = {}
-        for key in ("lose_partner", "divorce", "gain_partner",
-                    "partner_death", "terminal"):
-            if key in pre_fx:
-                pre_structural[key] = pre_fx.pop(key)
-        for key, amount in pre_fx.items():
-            if key == "money" and amount:
-                money.append(_money(
-                    "decision_offer", f"{pending['event_id']}:pre", "main",
-                    player, "other", amount,
-                    f"{pending.get('title', 'Event')} (before the choice)"))
-            elif key == "relationship":
-                for target in targets:
-                    target.change_relationship(amount)
-            elif key in STAT_NAMES:
-                getattr(player, f"change_{key}")(amount)
-        structural_pre = pre_structural
-    else:
-        structural_pre = {}
-    fx = dict(option.get("_effects", {}))
-    before = _stat_snapshot(player, tuple(STAT_NAMES))
-    money_before = player.money
-
-    person_ids = list(pending.get("person_ids", []))
-    if option.get("_person_ids_extra"):
-        person_ids += [i for i in option["_person_ids_extra"]
-                       if i not in person_ids]
-    targets = []
-    for pid in person_ids:
-        try:
-            targets.append(_find_person(context, pid))
-        except RuleError:
-            pass
-    targets = [t for t in targets if hasattr(t, "change_relationship")]
-
-    structural = dict(structural_pre)
-    structural.update(option.get("_structural") or {})
-    for key, amount in fx.items():
-        if key == "money":
-            if amount:
-                money.append(_money(
-                    "decision_offer", f"{pending['event_id']}:{option_id}",
-                    "main", player, "other", amount,
-                    f"{pending.get('title', 'Event')}: {option['label']}"))
-        elif key == "relationship":
-            for target in targets:
-                before_r = target.relationship
-                target.change_relationship(amount)
-                delta_r = target.relationship - before_r
-                if abs(delta_r) >= 5:
-                    closer = delta_r > 0
-                    events.append(_event(
-                        "decision",
-                        f"{_relation_phrase(target, player)} "
-                        f"{'grew closer' if closer else 'drifted apart'} "
-                        f"this year.", target,
-                        {"relationship": delta_r}))
-        elif key in STAT_NAMES:
-            getattr(player, f"change_{key}")(amount)
-
+def _apply_structural(context, player, pending, structural, events, money,
+                      deaths, rng):
+    """The v2.1 structural effect set, shared by both pending dialects.
+    Mutates events/money/deaths lists in place; returns the (possibly
+    extended) structural dict."""
     if structural.get("lose_partner") and player.partner is not None:
         player.lose_partner()
     if structural.get("divorce"):
@@ -2598,9 +2711,101 @@ def _resolve_event_pending(context, player, pending, option_id, rng):
         stored = pending.get("sampled_partner")
         _check(stored is not None, "not_found",
                "no stored partner for this offer")
+        _guard_romance(player, stored)
         player.partner = stored
         if stored not in player.relations:
             player.relations.append(stored)
+    return structural
+
+
+def _resolve_event_pending(context, player, pending, option_id, rng):
+    """Resolve a loader-generated event pending (flat _effects + optional
+    _structural). Applies stats/relationships directly, money via ledger
+    entries (A posts), structural effects via the matching rule helpers,
+    terminal outcomes as finished_turn -> year_close. Never rerolls:
+    everything was pre-sampled at offer creation."""
+    _guard_pending_romance(context, player, pending)
+    if pending.get("schema_dialect") == "v3":
+        return _resolve_event_v3(context, player, pending, option_id, rng)
+    option = next((o for o in pending.get("options", [])
+                   if o["id"] == option_id), None)
+    _check(option is not None, "invalid_input", "unknown option")
+    _check(option.get("enabled", True), "not_allowed",
+           option.get("reason") or "this option is not available")
+    _check(isinstance(pending.get("event_id"), str) and pending["event_id"],
+           "invalid_input", "missing event id")
+    events = []
+    money = []
+    deaths = []
+    person_ids = list(pending.get("person_ids", []))
+    for pid in (pending.get("_pre_person_ids_extra") or []):
+        if pid not in person_ids:
+            person_ids.append(pid)
+    if option.get("_person_ids_extra"):
+        person_ids += [i for i in option["_person_ids_extra"]
+                       if i not in person_ids]
+    targets = []
+    for pid in person_ids:
+        try:
+            targets.append(_find_person(context, pid))
+        except RuleError:
+            pass
+    targets = [t for t in targets if hasattr(t, "change_relationship")]
+    # #4: event pre-effects are sampled at offer creation and normally
+    # applied by A's serve-time applier (which sets pre_applied). Apply
+    # here only when they were never applied (legacy/saved pendings).
+    if pending.get("pre_effects") and not pending.get("pre_applied"):
+        pre_fx = dict(pending["pre_effects"])
+        pre_structural = {}
+        for key in ("lose_partner", "divorce", "gain_partner",
+                    "partner_death", "terminal"):
+            if key in pre_fx:
+                pre_structural[key] = pre_fx.pop(key)
+        for key, amount in pre_fx.items():
+            if key == "money" and amount:
+                money.append(_money(
+                    "decision_offer", f"{pending['event_id']}:pre", "main",
+                    player, "other", amount,
+                    f"{pending.get('title', 'Event')} (before the choice)"))
+            elif key == "relationship":
+                for target in targets:
+                    target.change_relationship(amount)
+            elif key in STAT_NAMES:
+                getattr(player, f"change_{key}")(amount)
+        structural_pre = pre_structural
+    else:
+        structural_pre = {}
+    fx = dict(option.get("_effects", {}))
+    before = _stat_snapshot(player, tuple(STAT_NAMES))
+    money_before = player.money
+
+    structural = dict(structural_pre)
+    structural.update(option.get("_structural") or {})
+    for key, amount in fx.items():
+        if key == "money":
+            if amount:
+                money.append(_money(
+                    "decision_offer", f"{pending['event_id']}:{option_id}",
+                    "main", player, "other", amount,
+                    f"{pending.get('title', 'Event')}: {option['label']}"))
+        elif key == "relationship":
+            for target in targets:
+                before_r = target.relationship
+                target.change_relationship(amount)
+                delta_r = target.relationship - before_r
+                if abs(delta_r) >= 5:
+                    closer = delta_r > 0
+                    events.append(_event(
+                        "decision",
+                        f"{_relation_phrase(target, player)} "
+                        f"{'grew closer' if closer else 'drifted apart'} "
+                        f"this year.", target,
+                        {"relationship": delta_r}))
+        elif key in STAT_NAMES:
+            getattr(player, f"change_{key}")(amount)
+
+    structural = _apply_structural(context, player, pending, structural,
+                                   events, money, deaths, rng)
 
     changes = _changes(before, _stat_snapshot(player, tuple(STAT_NAMES)),
                        STAT_NAMES)
@@ -2620,12 +2825,277 @@ def _resolve_event_pending(context, player, pending, option_id, rng):
         finished_turn=finished, deaths=deaths)
 
 
+# ------------------------------------------------------- v3 (M2.5) resolve
+# Domain-effect appliers for v3 typed effects (frozen event-schema-v3.md
+# §4). A (graph transitions) and B (policy commands) register the
+# authoritative appliers when their domains land; C's knowledge effects
+# register with the knowledge layer (M2.5 step 3). Signature:
+#   applier(context, player, bindings, value, rng)
+#     -> (events, money_entries)
+_DOMAIN_EFFECTS = {}
+
+
+def register_domain_effect(name, applier):
+    _DOMAIN_EFFECTS[name] = applier
+
+
+def _render_v3_outcome(template, player, bindings, context):
+    """Render a v3 outcome template: {name} -> player firstname,
+    {person:role} -> the BOUND person's name (stored bindings, never a
+    re-pick). Unresolvable refs keep their placeholder text instead of
+    raising (A's parenting gap: .format(name=...) crashed on {person:})."""
+    import re as _re
+    out = template.replace("{name}", player.firstname)
+    if "{person:" not in out:
+        return out
+
+    def sub(match):
+        bound = bindings.get(match.group(1))
+        if bound is None:
+            return match.group(0)
+        try:
+            person = _find_person(context, bound)
+        except RuleError:
+            return match.group(0)
+        name = getattr(person, "name", None)
+        return name if name else match.group(0)
+
+    prev = None
+    while prev != out:
+        prev = out
+        out = _re.sub(r"\{person:(\w+)\}", sub, out)
+    return out
+
+
+def _resolve_event_v3(context, player, pending, option_id, rng):
+    """Resolve a v3 pending (frozen event-schema-v3.md §6/§7).
+
+    Stale bindings never crash and never silently re-pick: an unresolvable
+    bound person resolves to a safe explicit cancellation ('The moment has
+    passed.'), preserving attempt usage. Domain effects are validated
+    against the registry BEFORE anything mutates (no partial application);
+    an unregistered domain API is a typed error, not a 500."""
+    _guard_pending_romance(context, player, pending)
+    option = next((o for o in pending.get("options", [])
+                   if o["id"] == option_id), None)
+    _check(option is not None, "invalid_input", "unknown option")
+    _check(option.get("enabled", True), "not_allowed",
+           option.get("reason") or "this option is not available")
+    _check(isinstance(pending.get("event_id"), str) and pending["event_id"],
+           "invalid_input", "missing event id")
+
+    # 1. Revalidate every bound person id (chronology/membership guard
+    # for romantic offers lives in A's graph; here we only need the
+    # person to still exist in the walkable graph).
+    bindings = pending.get("bindings") or {}
+    stale = False
+    for pid in bindings.values():
+        if pid is None:
+            continue
+        try:
+            _find_person(context, pid)
+        except RuleError:
+            stale = True
+    if stale:
+        return _result(events=[_event(
+            "decision", "The moment has passed.", player)])
+
+    # 2. Domain effects must all be applicable before anything mutates.
+    domain = dict(option.get("_domain") or {})
+    for key in domain:
+        _check(key in _DOMAIN_EFFECTS, "not_available",
+               f"domain effect {key!r} is not available in this engine yet")
+
+    events = []
+    money = []
+    deaths = []
+    person_ids = [pid for pid in bindings.values() if pid is not None]
+    for pid in (pending.get("_pre_person_ids_extra") or []):
+        if pid not in person_ids:
+            person_ids.append(pid)
+    if option.get("_person_ids_extra"):
+        person_ids += [i for i in option["_person_ids_extra"]
+                       if i not in person_ids]
+    targets = []
+    for pid in person_ids:
+        try:
+            targets.append(_find_person(context, pid))
+        except RuleError:
+            pass
+    targets = [t for t in targets if hasattr(t, "change_relationship")]
+
+    if pending.get("pre_effects") and not pending.get("pre_applied"):
+        for key, amount in dict(pending["pre_effects"]).items():
+            if key == "money" and amount:
+                money.append(_money(
+                    "decision_offer", f"{pending['event_id']}:pre", "main",
+                    player, "other", amount,
+                    f"{pending.get('title', 'Event')} (before the choice)"))
+            elif key == "relationship":
+                for target in targets:
+                    target.change_relationship(amount)
+            elif key in STAT_NAMES:
+                getattr(player, f"change_{key}")(amount)
+
+    before = _stat_snapshot(player, tuple(STAT_NAMES))
+    fx = dict(option.get("_effects", {}))
+    for key, amount in fx.items():
+        if key == "money":
+            if amount:
+                money.append(_money(
+                    "decision_offer", f"{pending['event_id']}:{option_id}",
+                    "main", player, "other", amount,
+                    f"{pending.get('title', 'Event')}: {option['label']}"))
+        elif key == "relationship":
+            for target in targets:
+                before_r = target.relationship
+                target.change_relationship(amount)
+                delta_r = target.relationship - before_r
+                if abs(delta_r) >= 5:
+                    closer = delta_r > 0
+                    events.append(_event(
+                        "decision",
+                        f"{_relation_phrase(target, player)} "
+                        f"{'grew closer' if closer else 'drifted apart'} "
+                        f"this year.", target, {"relationship": delta_r}))
+        elif key in STAT_NAMES:
+            getattr(player, f"change_{key}")(amount)
+
+    structural = dict(option.get("_structural") or {})
+    structural = _apply_structural(context, player, pending, structural,
+                                   events, money, deaths, rng)
+
+    for key, value in domain.items():
+        applier = _DOMAIN_EFFECTS[key]
+        kwargs = {}
+        if "occurrence_id" in inspect.signature(applier).parameters:
+            kwargs["occurrence_id"] = f"{pending['id']}:{key}"
+        evs, mon = applier(context, player, bindings, value, rng, **kwargs)
+        events.extend(evs or [])
+        money.extend(mon or [])
+
+    changes = _changes(before, _stat_snapshot(player, tuple(STAT_NAMES)),
+                       STAT_NAMES)
+    outcome_text = _render_v3_outcome(option.get("_outcome", ""),
+                                      player, bindings, context)
+    events.append(_event("decision", outcome_text or
+                         pending.get("title", "Event"), player, changes))
+    finished = bool(structural.get("terminal"))
+    if finished:
+        events.append(_event("death", outcome_text or "You died.", player))
+    # Tag every emitted event with the audience/fact so A's journal
+    # filter (knowledge_journal_visible) can apply the frozen §2 rule at
+    # serialization. A player_known occurrence the player experienced
+    # firsthand needs no fact record — it is public to them.
+    audience = (pending.get("audience") or {}).get("scope", "public")
+    fact_id = pending.get("fact_id")
+    if audience == "player_known" and not fact_id:
+        audience = "public"
+    for entry in events:
+        entry["audience"] = audience
+        if fact_id:
+            entry["fact_id"] = fact_id
+    return _result(
+        events=events, money_entries=money,
+        pending_decision=structural.get("_funeral_pending"),
+        continuation={"phase_id": "year_close", "item_cursor": 0}
+        if finished else None,
+        finished_turn=finished, deaths=deaths)
+
+
 STAT_NAMES = ("happiness", "health", "smarts", "looks", "karma", "stress")
 
 
+# ============================================================ M2.5 DATING
+# Dating-app offers (frozen event-schema-v3.md + policy-evaluator.md):
+# the app picks an adult stranger (A's registered graph predicate), B's
+# evaluator scores hard-validity + acceptance, and THIS path draws
+# accept/refuse ONCE with the seeded rng, storing the draw in the
+# pending. Resolve applies stored data only; a stored refusal replaces
+# the accept outcome text (no conditional logic in the resolver). Graph
+# edge creation on acceptance is A's "offer" domain applier.
+
+DATING_APP_EVENT = {
+    "id": "m25_dating_app_date",
+    "title": "A match wants to meet",
+    "text": "{person:target} from the app asks {name} out for coffee.",
+    "interaction": {"kind": "date", "romantic": True},
+    "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "target": {"kind": "person", "select": "predicate",
+                   "predicate": "adult_non_related_stranger"},
+    },
+    "choices": [
+        {"id": "accept", "label": "Go on the date", "cost": {},
+         "effects": {"stats": {"happiness": {"randint": [5, 12]}},
+                     "chemistry": {"between": ["actor", "target"],
+                                   "delta": {"randint": [3, 8]}},
+                     "offer": {"interaction": "propose_courtship",
+                               "to": "target", "as": "npc"}},
+         "outcome_text": "We had a lovely evening."},
+        {"id": "decline", "label": "Not tonight", "cost": {},
+         "effects": {}, "outcome_text": "I swiped away."},
+    ],
+    "audience": {"scope": "player_known", "participants": ["actor",
+                                                           "target"]},
+}
+
+
+def sample_dating_app(context, player, payload, rng):
+    """Create a dating-app date offer: bind target, score with B's
+    evaluator, draw accept/refuse once, store everything in the pending."""
+    from src.game.events import EventEngine, PREDICATES
+    env = getattr(context, "_env", None)
+    _check(env is not None, "invalid_input",
+           "the dating app needs the game service context")
+    target_id = PREDICATES["adult_non_related_stranger"](
+        player.person_id, context)
+    _check(target_id is not None, "not_found",
+           "no eligible adults around right now")
+    from src.game.features.family_graph.service_view import (
+        ServiceGraphView, ServicePolicyView)
+    from src.game.features.relationship_policy.evaluator import (
+        evaluate_offer)
+    graph = ServiceGraphView(env)
+    policy = ServicePolicyView(env)
+    scored = evaluate_offer("date", player.person_id, target_id, graph,
+                            policy, env.get("policy_revision", 0))
+    _check(scored.get("hard", {}).get("ok"), "not_allowed",
+           "this match is not possible right now")
+    p_refuse = float((scored.get("refusal") or {}).get("p_refuse", 0.0))
+    p_refuse = min(max(p_refuse, 0.0), 1.0)
+    accepted = rng.random() >= p_refuse
+    pending = EventEngine.instantiate3(
+        DATING_APP_EVENT, 0, rng, context, prebound={"target": target_id})
+    sampled = dict(pending.get("sampled") or {})
+    sampled["accepted"] = accepted
+    sampled["score"] = scored.get("score")
+    pending["sampled"] = sampled
+    reasons = scored.get("reasons") or []
+    if reasons:
+        from src.game.features.knowledge.drama import filter_reasons
+        pending["reasons"] = filter_reasons(env, reasons)
+    if not accepted:
+        # Stored refusal: the accept option's effects are replaced by the
+        # refusal outcome, sampled once here and never rerolled.
+        for option in pending["options"]:
+            if option["id"].endswith("_accept"):
+                option["_effects"] = {}
+                option["_domain"] = None
+                option["_outcome"] = (
+                    "I got stood up — they never replied.")
+    return _result(pending_decision=pending)
+
+
+# Self actions that need the duck-typed rule CONTEXT (not just the
+# player): offer creation binds and scores against the envelope.
+_CONTEXT_SELF_ACTIONS = {
+    "dating_app": sample_dating_app,
+}
+
+
 # register in resolve_choice dispatch
-_RESOLVER_KINDS = {
-    "argument": resolve_argument,
+_RESOLVER_KINDS = {    "argument": resolve_argument,
     "pregnancy": resolve_pregnancy,
     "wedding_plan": resolve_wedding_plan,
     "date_offer": resolve_date_offer,
@@ -2842,10 +3312,12 @@ def child_social_year(child, rng):
                         if child.partner_desire < cap:
                             child.partner_desire = cap
                 child.partner = None
-            elif (child.partner.status < 2
+            elif (child.age >= 18 and child.partner.age >= 18
+                    and child.partner.status < 2
                     and child.partner.years_together
                     >= rng.randint(3, 7) and _one_in(rng, 5)):
                 child.partner.change_relationship(rng.randint(10, 45))
+                _guard_romance(child, child.partner)
                 child.partner.status = 2
                 child.may_divorce = _one_in(rng, 2)
     elif child.age >= 18 and rng.randint(1, 700) <= child.partner_desire:
@@ -2853,6 +3325,7 @@ def child_social_year(child, rng):
                        _round_stochastic(rng, child.partner_desire / 8))
         for _ in range(max(0, attempts)):
             partner = child.generate_partner()
+            _guard_romance(child, partner)
             if partner.compatibility_check(child):
                 child.partner = partner
                 child.change_happiness(rng.randint(5, 20))
@@ -3243,6 +3716,9 @@ def sample_lottery(player, rng):
     and the next jackpot are sampled NOW (stored private); guesses arrive
     as bounded inputs at resolve."""
     _check(player.age >= 18, "not_allowed", "you are too young")
+    # Affordability gates the paid OPTIONS in the pending (and resolve
+    # re-checks); the action itself stays available so a broke player can
+    # walk away — frozen M1 behavior (test_game_m2a lottery flow).
     winning = sorted(rng.sample(range(1, 21), 4))
     next_jackpot = _round_stochastic(rng, _randexpo(rng, 100000, 1000000))
     return _result(pending_decision={
@@ -3253,11 +3729,17 @@ def sample_lottery(player, rng):
                 f"(1-20, unique).",
         "options": [
             {"id": "buy_one", "label": "Buy a ticket ($4)",
+             "enabled": player.money >= 4,
+             "reason": None if player.money >= 4 else
+                       f"a ticket costs $4 and you have ${player.money:,}",
              "known_costs": [{"label": "Ticket", "amount": 4}],
              "inputs": [{"id": "numbers", "type": "numbers", "count": 4,
                          "min": 1, "max": 20, "unique": True,
                          "label": "Your numbers", "required": True}]},
             {"id": "buy_ten", "label": "Buy 10 tickets ($40)",
+             "enabled": player.money >= 40,
+             "reason": None if player.money >= 40 else
+                       f"10 tickets cost $40 and you have ${player.money:,}",
              "known_costs": [{"label": "Tickets", "amount": 40}],
              "inputs": [{"id": "numbers", "type": "numbers", "count": 4,
                          "min": 1, "max": 20, "unique": True,
@@ -3303,7 +3785,9 @@ def resolve_lottery(player, pending, option_id, inputs, rng):
         if option_id == "buy_ten" else 4
     _check(player.money >= cost, "not_allowed",
            f" tickets cost ${cost} and you have ${player.money}")
-    sampled = pending["sampled"]
+    sampled = pending.get("sampled") or {}
+    _check(isinstance(sampled.get("winning"), list), "invalid_input",
+           "missing stored winning numbers")
     money = [_money("annual_events", "lottery", "tickets", player,
                     "activity", -cost, "Lottery tickets")]
     events = []

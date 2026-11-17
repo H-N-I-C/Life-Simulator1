@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 449,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adele",
+    "last_name": "Glover",
+    "gender": "female",
+    "country": "Spain",
+    "seed": 401732874,
+    "request_id": "robot-1-449-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 2043070628,
+     "base": "woman",
+     "skin_tone": "medium",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "cap"
+     ],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_a582020bf3",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3528",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_a582020bf3",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "85e37ba4-b39d-4d78-b443-68f4a1a8079a"
+   },
+   "request_id": "robot-1-r3529",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 450 --seed 1 --from-life 449 --fail-fast"
+}

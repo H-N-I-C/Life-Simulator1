@@ -1,0 +1,63 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 831,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Antone",
+    "last_name": "Cain",
+    "gender": "male",
+    "country": "Brazil",
+    "seed": 1568717360,
+    "request_id": "robot-1-831-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 829940662,
+     "base": "person",
+     "skin_tone": "default",
+     "hair": "white",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_33892b2faf",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r6251",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_33892b2faf",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "2208aad4-e51d-4341-8fab-c0186e1364a5"
+   },
+   "request_id": "robot-1-r6252",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 832 --seed 1 --from-life 831 --fail-fast"
+}

@@ -1,0 +1,78 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1495,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Angus",
+    "last_name": "May",
+    "gender": "male",
+    "country": "Nigeria",
+    "seed": 60360848,
+    "request_id": "robot-1-1495-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 2021474476,
+     "base": "woman",
+     "skin_tone": "light",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "earrings",
+      "glasses"
+     ],
+     "background": "bg_06",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_cb52c9408c",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r11875",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_cb52c9408c",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r11876",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_cb52c9408c",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "84e6b3c1-af55-4fd7-8141-8fdb865c5a71"
+   },
+   "request_id": "robot-1-r11877",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1496 --seed 1 --from-life 1495 --fail-fast"
+}

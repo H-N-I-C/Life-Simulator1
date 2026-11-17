@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 706,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alleen",
+    "last_name": "Jones",
+    "gender": "female",
+    "country": "India",
+    "seed": 815870099,
+    "request_id": "robot-1-706-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1398850914,
+     "base": "man",
+     "skin_tone": "medium-dark",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "cap"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_a62ef903a2",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r5357",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_a62ef903a2",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "f1ee7137-0cb3-4bfc-b1ff-cb4a26010c20"
+   },
+   "request_id": "robot-1-r5358",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 707 --seed 1 --from-life 706 --fail-fast"
+}

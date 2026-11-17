@@ -1,0 +1,75 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1276,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Ada",
+    "last_name": "Baker",
+    "gender": "female",
+    "country": "Nigeria",
+    "seed": 2134831087,
+    "request_id": "robot-1-1276-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1846784867,
+     "base": "man",
+     "skin_tone": "medium",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "earrings",
+      "cap"
+     ],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_1a6351e73b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r10106",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_1a6351e73b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r10107",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_1a6351e73b",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "17fa3fd2-553c-4e4e-80e2-c9c4c98bd246"
+   },
+   "request_id": "robot-1-r10108",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1277 --seed 1 --from-life 1276 --fail-fast"
+}

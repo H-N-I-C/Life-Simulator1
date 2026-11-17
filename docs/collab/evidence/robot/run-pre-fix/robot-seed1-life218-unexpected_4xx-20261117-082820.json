@@ -1,0 +1,72 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 218,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alicia",
+    "last_name": "Olsen",
+    "gender": "female",
+    "country": "Brazil",
+    "seed": 1404415221,
+    "request_id": "robot-1-218-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1496427956,
+     "base": "man",
+     "skin_tone": "medium-dark",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_aa9b04c3cf",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r1899",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_aa9b04c3cf",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r1900",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_aa9b04c3cf",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "988be745-595c-43f7-ae3d-ca13f1722871"
+   },
+   "request_id": "robot-1-r1901",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 219 --seed 1 --from-life 218 --fail-fast"
+}

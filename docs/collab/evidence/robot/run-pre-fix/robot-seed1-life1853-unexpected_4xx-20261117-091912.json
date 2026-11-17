@@ -1,0 +1,114 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1853,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'doctor' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alfonse",
+    "last_name": "Hodge",
+    "gender": "male",
+    "country": "UK",
+    "seed": 773764085,
+    "request_id": "robot-1-1853-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_0a98f8c74e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r14690",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_0a98f8c74e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r14691",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_0a98f8c74e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r14692",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_0a98f8c74e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r14693",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_0a98f8c74e",
+   "action": "conversation",
+   "payload": {
+    "target_id": "cae47a61-cc38-40eb-9cb1-56a0ad54216d"
+   },
+   "request_id": "robot-1-r14694",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_0a98f8c74e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r14695",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_0a98f8c74e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r14696",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_0a98f8c74e",
+   "action": "arts_and_crafts",
+   "payload": {},
+   "request_id": "robot-1-r14697",
+   "expected_revision": 8
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_0a98f8c74e",
+   "action": "doctor",
+   "payload": {},
+   "request_id": "robot-1-r14698",
+   "expected_revision": 9
+  },
+  {
+   "n": 10,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1854 --seed 1 --from-life 1853 --fail-fast"
+}

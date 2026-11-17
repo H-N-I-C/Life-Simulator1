@@ -1,0 +1,84 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 95,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adriana",
+    "last_name": "Reid",
+    "gender": "female",
+    "country": "USA",
+    "seed": 1798782517,
+    "request_id": "robot-1-95-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 94969496,
+     "base": "woman",
+     "skin_tone": "light",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "flower",
+      "cap"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_aea4ba6322",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r992",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_aea4ba6322",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r993",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_aea4ba6322",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r994",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_aea4ba6322",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "229bc46b-d0f4-47f9-ad02-e7da37bc90a4"
+   },
+   "request_id": "robot-1-r995",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 96 --seed 1 --from-life 95 --fail-fast"
+}

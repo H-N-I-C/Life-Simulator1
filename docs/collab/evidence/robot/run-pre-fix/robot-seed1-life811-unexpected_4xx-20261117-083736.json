@@ -1,0 +1,74 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 811,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alexandrina",
+    "last_name": "O'Brien",
+    "gender": "female",
+    "country": "Brazil",
+    "seed": 905273297,
+    "request_id": "robot-1-811-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1982259802,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "crown"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_2d7bc8b53e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r6124",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_2d7bc8b53e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r6125",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_2d7bc8b53e",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "0e6b7abc-bb4c-4e8b-9a6d-a92ee6abda6b"
+   },
+   "request_id": "robot-1-r6126",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 812 --seed 1 --from-life 811 --fail-fast"
+}

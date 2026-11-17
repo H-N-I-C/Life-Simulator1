@@ -1,0 +1,74 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 300,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adria",
+    "last_name": "Lane",
+    "gender": "female",
+    "country": "Nigeria",
+    "seed": 781639671,
+    "request_id": "robot-1-300-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 275069896,
+     "base": "person",
+     "skin_tone": "default",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "cap"
+     ],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_02e15e6ef6",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2406",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_02e15e6ef6",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2407",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_02e15e6ef6",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "a9a7ca90-b73f-49c2-931c-ede62efe577a"
+   },
+   "request_id": "robot-1-r2408",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 301 --seed 1 --from-life 300 --fail-fast"
+}

@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 415,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alister",
+    "last_name": "Jennings",
+    "gender": "male",
+    "country": "Nigeria",
+    "seed": 95636037,
+    "request_id": "robot-1-415-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 2044359588,
+     "base": "man",
+     "skin_tone": "default",
+     "hair": "white",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "glasses",
+      "cap"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_978ec8d8eb",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3303",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_978ec8d8eb",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "cd612b00-7a9b-4219-b13d-42b5fe1f2f22"
+   },
+   "request_id": "robot-1-r3304",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 416 --seed 1 --from-life 415 --fail-fast"
+}

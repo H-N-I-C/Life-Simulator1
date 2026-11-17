@@ -348,6 +348,21 @@ class FixRoundServiceLevelTests(unittest.TestCase):
         ],
     }
 
+    def _reach_independent_offer(self, svc, gid, state):
+        # New drama phases may legitimately interrupt before the annual
+        # oracle under test. Resolve them; retain all original assertions
+        # about the two independent events and their exact deltas.
+        for i in range(20):
+            pending = state["pending_decision"]
+            if pending and pending.get("event_id") == "probe_kidnap_choice":
+                return state
+            self.assertIsNotNone(pending, "annual probe never became reachable")
+            option = next(o for o in pending["options"] if o.get("enabled", True))
+            state = svc.command(gid, state["revision"], f"settle-before-probe-{i}",
+                                "resolve_decision", {"decision_id": pending["id"],
+                                                     "option_id": option["id"]})
+        self.fail("pending chain did not reach the annual probe")
+
     def _two_event_year(self):
         import random as _random
         from src.game import events as event_mod
@@ -372,6 +387,7 @@ class FixRoundServiceLevelTests(unittest.TestCase):
         svc, gid, happy0, real_load, event_mod = self._two_event_year()
         try:
             st = svc.command(gid, 1, "y1", "age_up", {})
+            st = self._reach_independent_offer(svc, gid, st)
         finally:
             event_mod.load_event_files = real_load
         self.assertEqual(st["status"], "alive")
@@ -412,6 +428,7 @@ class FixRoundServiceLevelTests(unittest.TestCase):
         svc, gid, happy0, real_load, event_mod = self._two_event_year()
         try:
             st = svc.command(gid, 1, "y1", "age_up", {})
+            st = self._reach_independent_offer(svc, gid, st)
         finally:
             event_mod.load_event_files = real_load
         d = st["pending_decision"]

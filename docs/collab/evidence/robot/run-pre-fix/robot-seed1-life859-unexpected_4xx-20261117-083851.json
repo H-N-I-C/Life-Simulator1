@@ -1,0 +1,57 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 859,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alyson",
+    "last_name": "Pickett",
+    "gender": "female",
+    "country": "Canada",
+    "seed": 1402093051,
+    "request_id": "robot-1-859-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 6738742,
+     "base": "woman",
+     "skin_tone": "medium",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "crown",
+      "glasses"
+     ],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_17591048fc",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "19d63699-8e57-42ad-84e3-2144fdcbd05b"
+   },
+   "request_id": "robot-1-r6423",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 860 --seed 1 --from-life 859 --fail-fast"
+}

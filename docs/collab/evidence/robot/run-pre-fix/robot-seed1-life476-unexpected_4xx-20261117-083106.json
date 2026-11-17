@@ -1,0 +1,42 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 476,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Allie",
+    "last_name": "Clapp",
+    "gender": "female",
+    "country": "Japan",
+    "seed": 705359352,
+    "request_id": "robot-1-476-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_7c37606516",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "65a6e618-d418-4801-8a1a-fa5f8b6eb4d0"
+   },
+   "request_id": "robot-1-r3692",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 477 --seed 1 --from-life 476 --fail-fast"
+}

@@ -1,0 +1,180 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 2,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'doctor' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Angelo",
+    "last_name": "Solomon",
+    "gender": "male",
+    "country": "Canada",
+    "seed": 1049387630,
+    "request_id": "robot-1-2-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 439463099,
+     "base": "person",
+     "skin_tone": "medium-light",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_06",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_c7d2f1008c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r29",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_c7d2f1008c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r30",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_c7d2f1008c",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r31",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_c7d2f1008c",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r32",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_c7d2f1008c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r33",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_c7d2f1008c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r34",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_c7d2f1008c",
+   "action": "conversation",
+   "payload": {
+    "target_id": "d458e730-81ea-4edd-94d3-7c9e2be55b12"
+   },
+   "request_id": "robot-1-r35",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_c7d2f1008c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r36",
+   "expected_revision": 8
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_c7d2f1008c",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_sail"
+   },
+   "request_id": "robot-1-r37",
+   "expected_revision": 9
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_c7d2f1008c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r38",
+   "expected_revision": 10
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_c7d2f1008c",
+   "action": "arts_and_crafts",
+   "payload": {},
+   "request_id": "robot-1-r39",
+   "expected_revision": 11
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_c7d2f1008c",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r40",
+   "expected_revision": 12
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_c7d2f1008c",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r41",
+   "expected_revision": 13
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_c7d2f1008c",
+   "action": "doctor",
+   "payload": {},
+   "request_id": "robot-1-r42",
+   "expected_revision": 14
+  },
+  {
+   "n": 15,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 3 --seed 1 --from-life 2 --fail-fast"
+}

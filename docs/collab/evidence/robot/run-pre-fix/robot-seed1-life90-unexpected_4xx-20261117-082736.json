@@ -1,0 +1,86 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 90,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Archibold",
+    "last_name": "Morse",
+    "gender": "male",
+    "country": "USA",
+    "seed": 721405817,
+    "request_id": "robot-1-90-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1308996529,
+     "base": "man",
+     "skin_tone": "default",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "cap"
+     ],
+     "background": "bg_05",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_559aa03fb9",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r961",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_559aa03fb9",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r962",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_559aa03fb9",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-1-r963",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_559aa03fb9",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "95b74eb6-7d70-4606-9a00-fe06ede0f0c2"
+   },
+   "request_id": "robot-1-r964",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 91 --seed 1 --from-life 90 --fail-fast"
+}

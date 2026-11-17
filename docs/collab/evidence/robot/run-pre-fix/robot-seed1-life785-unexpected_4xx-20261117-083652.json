@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 785,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alyce",
+    "last_name": "Tilley",
+    "gender": "female",
+    "country": "Germany",
+    "seed": 1419477351,
+    "request_id": "robot-1-785-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1010589683,
+     "base": "person",
+     "skin_tone": "medium-light",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "earrings"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_9d5852bd78",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r5816",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_9d5852bd78",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "56ad6e1b-9106-429d-81fd-dac8ba50e67b"
+   },
+   "request_id": "robot-1-r5817",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 786 --seed 1 --from-life 785 --fail-fast"
+}

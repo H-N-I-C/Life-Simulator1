@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1108,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Ambrose",
+    "last_name": "Branch",
+    "gender": "male",
+    "country": "Nigeria",
+    "seed": 2115603991,
+    "request_id": "robot-1-1108-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 391328173,
+     "base": "man",
+     "skin_tone": "medium",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "earrings",
+      "cap"
+     ],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_6fc25a6c7e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8499",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_6fc25a6c7e",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "68f8ae62-c755-4d68-8f07-d98e891b7996"
+   },
+   "request_id": "robot-1-r8500",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1109 --seed 1 --from-life 1108 --fail-fast"
+}

@@ -1,0 +1,208 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 646,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "action 'ask_for_money' -> HTTP 500: {\"error\": \"internal\", \"crash_id\": \"c87610775dc7\"}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aleta",
+    "last_name": "Fischer",
+    "gender": "female",
+    "country": "Brazil",
+    "seed": 658685372,
+    "request_id": "robot-1-646-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1431361459,
+     "base": "person",
+     "skin_tone": "dark",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "flower"
+     ],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r66604",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r66605",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r66606",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_later"
+   },
+   "request_id": "robot-1-r66607",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r66608",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r66609",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r66610",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_4",
+    "option_id": "d_4_carpool",
+    "inputs": null
+   },
+   "request_id": "robot-1-r66611",
+   "expected_revision": 8
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r66612",
+   "expected_revision": 9
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "conversation",
+   "payload": {
+    "target_id": "f917b75d-3aaa-4f50-bffb-6f89b242e324"
+   },
+   "request_id": "robot-1-r66613",
+   "expected_revision": 10
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r66614",
+   "expected_revision": 11
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r66615",
+   "expected_revision": 12
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r66616",
+   "expected_revision": 13
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "ask_for_money",
+   "payload": {
+    "target_id": "09be3ff2-2ad8-46d9-ac42-3ce211c5e3e9"
+   },
+   "request_id": "robot-1-r66617",
+   "expected_revision": 14
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "skip_school",
+   "payload": {},
+   "request_id": "robot-1-r66618",
+   "expected_revision": 15
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_30b4feac39",
+   "action": "ask_for_money",
+   "payload": {
+    "target_id": "f917b75d-3aaa-4f50-bffb-6f89b242e324"
+   },
+   "request_id": "robot-1-r66619",
+   "expected_revision": 16
+  },
+  {
+   "n": 17,
+   "kind": "error",
+   "status": 500,
+   "body": "{\"error\": \"internal\", \"crash_id\": \"c87610775dc7\"}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 647 --seed 1 --from-life 646 --fail-fast"
+}

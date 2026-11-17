@@ -1,0 +1,183 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 271,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'doctor' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alyda",
+    "last_name": "Burch",
+    "gender": "female",
+    "country": "Indonesia",
+    "seed": 1572888764,
+    "request_id": "robot-1-271-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1848157083,
+     "base": "woman",
+     "skin_tone": "default",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_05",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_8312aa4324",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2186",
+   "expected_revision": 0
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 0 does not match current revision 1\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_8312aa4324",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2187",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_8312aa4324",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2188",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_8312aa4324",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_tantrum"
+   },
+   "request_id": "robot-1-r2189",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_8312aa4324",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2190",
+   "expected_revision": 4
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_8312aa4324",
+   "action": "definitely_not_an_action",
+   "payload": {},
+   "request_id": "robot-1-r2191",
+   "expected_revision": 5
+  },
+  {
+   "n": 8,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown action\"}}"
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_8312aa4324",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2192",
+   "expected_revision": 5
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_8312aa4324",
+   "action": "conversation",
+   "payload": {
+    "target_id": "5a76d060-70c7-4076-87c9-c3dac28dbf89"
+   },
+   "request_id": "robot-1-r2193",
+   "expected_revision": 6
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_8312aa4324",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2194",
+   "expected_revision": 7
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_8312aa4324",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2195",
+   "expected_revision": 8
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_8312aa4324",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2196",
+   "expected_revision": 9
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_8312aa4324",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r2197",
+   "expected_revision": 9
+  },
+  {
+   "n": 15,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 9 does not match current revision 10\"}}"
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_8312aa4324",
+   "action": "doctor",
+   "payload": {},
+   "request_id": "robot-1-r2198",
+   "expected_revision": 10
+  },
+  {
+   "n": 17,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 272 --seed 1 --from-life 271 --fail-fast"
+}

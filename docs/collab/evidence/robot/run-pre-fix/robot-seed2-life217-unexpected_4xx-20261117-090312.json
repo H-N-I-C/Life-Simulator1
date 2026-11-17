@@ -1,0 +1,218 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 2,
+ "life_index": 217,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'doctor' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aeriel",
+    "last_name": "Singer",
+    "gender": "female",
+    "country": "Spain",
+    "seed": 1430616463,
+    "request_id": "robot-2-217-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "definitely_not_an_action",
+   "payload": {},
+   "request_id": "robot-2-r22822",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown action\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-2-r22823",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-2-r22823",
+   "expected_revision": 1
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-2-r22825",
+   "expected_revision": 2
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_tantrum"
+   },
+   "request_id": "robot-2-r22826",
+   "expected_revision": 3
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-2-r22827",
+   "expected_revision": 4
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-2-r22828",
+   "expected_revision": 5
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-2-r22829",
+   "expected_revision": 6
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_o2",
+    "inputs": null
+   },
+   "request_id": "robot-2-r22830",
+   "expected_revision": 7
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-2-r22831",
+   "expected_revision": 8
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "d_3_release"
+   },
+   "request_id": "robot-2-r22832",
+   "expected_revision": 9
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-2-r22833",
+   "expected_revision": 10
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-2-r22834",
+   "expected_revision": 11
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-2-r22835",
+   "expected_revision": 12
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-2-r22836",
+   "expected_revision": 13
+  },
+  {
+   "n": 17,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-2-r22837",
+   "expected_revision": 14
+  },
+  {
+   "n": 18,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-2-r22838",
+   "expected_revision": 15
+  },
+  {
+   "n": 19,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-2-r22839",
+   "expected_revision": 16
+  },
+  {
+   "n": 20,
+   "kind": "command",
+   "game_id": "g_de483e098d",
+   "action": "doctor",
+   "payload": {},
+   "request_id": "robot-2-r22840",
+   "expected_revision": 17
+  },
+  {
+   "n": 21,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 218 --seed 2 --from-life 217 --fail-fast"
+}

@@ -1,0 +1,137 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 19,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Amalea",
+    "last_name": "Petersen",
+    "gender": "female",
+    "country": "Brazil",
+    "seed": 977252576,
+    "request_id": "robot-1-19-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1067977176,
+     "base": "woman",
+     "skin_tone": "medium-light",
+     "hair": "default",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses"
+     ],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_dbb065154d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r166",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_dbb065154d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r167",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_dbb065154d",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_bite"
+   },
+   "request_id": "robot-1-r168",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_dbb065154d",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_bite"
+   },
+   "request_id": "robot-1-r168",
+   "expected_revision": 3
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_dbb065154d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r170",
+   "expected_revision": 4
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_dbb065154d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r171",
+   "expected_revision": 5
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_dbb065154d",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_o1"
+   },
+   "request_id": "robot-1-r172",
+   "expected_revision": 6
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_dbb065154d",
+   "action": "play_toys",
+   "payload": {},
+   "request_id": "robot-1-r173",
+   "expected_revision": 7
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_dbb065154d",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "5af86910-31fa-47ca-9d1a-0da50f155d5d"
+   },
+   "request_id": "robot-1-r174",
+   "expected_revision": 8
+  },
+  {
+   "n": 10,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 20 --seed 1 --from-life 19 --fail-fast"
+}

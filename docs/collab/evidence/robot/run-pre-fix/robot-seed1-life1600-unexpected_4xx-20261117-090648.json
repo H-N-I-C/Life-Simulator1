@@ -1,0 +1,87 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1600,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aharon",
+    "last_name": "Kinney",
+    "gender": "male",
+    "country": "China",
+    "seed": 730800371,
+    "request_id": "robot-1-1600-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1756157762,
+     "base": "person",
+     "skin_tone": "default",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "glasses",
+      "flower"
+     ],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_e7d95a99d5",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r12759",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_e7d95a99d5",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r12760",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_e7d95a99d5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_bite"
+   },
+   "request_id": "robot-1-r12761",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_e7d95a99d5",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "4ebbafa9-9f18-4f38-a40f-04e6d40853ad"
+   },
+   "request_id": "robot-1-r12762",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1601 --seed 1 --from-life 1600 --fail-fast"
+}

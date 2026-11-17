@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 981,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aleen",
+    "last_name": "Sutton",
+    "gender": "female",
+    "country": "Australia",
+    "seed": 600678349,
+    "request_id": "robot-1-981-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 224255918,
+     "base": "woman",
+     "skin_tone": "medium-light",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "flower"
+     ],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_0ef17f0418",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r7464",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_0ef17f0418",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "e74248b9-dfa5-400d-91c8-d6723790e85b"
+   },
+   "request_id": "robot-1-r7465",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 982 --seed 1 --from-life 981 --fail-fast"
+}

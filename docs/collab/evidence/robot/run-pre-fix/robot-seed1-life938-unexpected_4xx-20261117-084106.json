@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 938,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alton",
+    "last_name": "Snyder",
+    "gender": "male",
+    "country": "Spain",
+    "seed": 212257928,
+    "request_id": "robot-1-938-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1684860904,
+     "base": "woman",
+     "skin_tone": "medium",
+     "hair": "default",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "earrings",
+      "glasses"
+     ],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_4057421f8d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r7031",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_4057421f8d",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "a0a4a6e0-a480-4f91-b212-e3a5531faf55"
+   },
+   "request_id": "robot-1-r7032",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 939 --seed 1 --from-life 938 --fail-fast"
+}

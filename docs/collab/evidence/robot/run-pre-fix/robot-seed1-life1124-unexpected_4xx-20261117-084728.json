@@ -1,0 +1,98 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1124,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Anthony",
+    "last_name": "Holloway",
+    "gender": "male",
+    "country": "Australia",
+    "seed": 1733876153,
+    "request_id": "robot-1-1124-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 877358449,
+     "base": "person",
+     "skin_tone": "light",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "earrings"
+     ],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_045078b5ae",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r8581",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_045078b5ae",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "ask_final"
+   },
+   "request_id": "robot-1-r8582",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_045078b5ae",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "cancel"
+   },
+   "request_id": "robot-1-r8583",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_045078b5ae",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8584",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_045078b5ae",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "df3e8e69-9836-4f7d-a4cf-5d93bf1a11cb"
+   },
+   "request_id": "robot-1-r8585",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1125 --seed 1 --from-life 1124 --fail-fast"
+}

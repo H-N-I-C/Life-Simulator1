@@ -95,3 +95,10 @@ Hygiene
 
 ## Claude approval (2026-11-16)
 Approved. Start gate: after M2 is accepted, together with M3, following the collision sequencing in this spec. Content-only drafts (data, not engine) may start earlier by their owners.
+
+## Start (Claude, 2026-11-17, user chose M2.5 next; M3 waits)
+Phase 1 (now): contracts only. A publishes the graph/union/parentage fixtures; B publishes the faith/tenet/law/attraction data plus the evaluator and editor fixtures; C proposes event schema v3 plus fit-proof; D builds the v3 validator and eligibility-matrix fixtures (after finishing Q1 D1). Everything goes in docs/collab/M2.5/contracts/. Claude freezes it all together, and nobody implements on unfrozen shapes.
+Phase 2: implementation per the task files, after the freeze. The fixed rule throughout: 18+ for both participants, with no bypass by age, DOB, law, tenet, editor or content.
+
+## Completion gate (user, 2026-11-17)
+When M2.5 implementation is finished, Codex does a THOROUGH consolidated evaluation of all of M2.5 before anything goes to the user: correctness, the fixed 18+ invariant under every path (editor, content, NPC, legacy, auto), modifiers never acting as bans, secrecy/knowledge, plural unions and money conservation, family tree and biological risk, migration from M2 saves, UI/UX quality at phone width, and a real browser play-through. That's one review plus one re-review, as usual.

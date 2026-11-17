@@ -33,6 +33,9 @@ def journal_events(env, events, person_ids_prefix=()):
             "person_ids": list(event.get("person_ids", ())),
             "changes": dict(event.get("changes", {})),
         }
+        for key in ("audience", "fact_id"):
+            if key in event:
+                entry[key] = event[key]
         rel = event.get("relationship_changes") or {}
         if rel:
             entry["relationship_changes"] = dict(rel)
@@ -63,7 +66,7 @@ def apply_cursor_update(env, rule_result):
 
 def apply_effects_bundle(env, service, player, effects, occurrence,
                          person_ids=None, journal_kind="event",
-                         outcome_text="", rng=None):
+                         outcome_text="", rng=None, audience="public", fact_id=None):
     """Shared COMPLETE effect applier for automatic and selected outcomes.
     Handles every declared key (stats incl stress/karma/performance,
     money via the single ledger, per-person relationship, illnesses,
@@ -138,5 +141,7 @@ def apply_effects_bundle(env, service, player, effects, occurrence,
             "text": outcome_text,
             "person_ids": [player.person_id] + person_ids,
             "changes": changes,
+            "audience": audience,
+            "fact_id": fact_id,
         }])
     return changes

@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 708,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aida",
+    "last_name": "Willis",
+    "gender": "female",
+    "country": "USA",
+    "seed": 492797870,
+    "request_id": "robot-1-708-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 25609614,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "crown"
+     ],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_0e3c697500",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r5361",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_0e3c697500",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "4dbc133f-e922-4f66-b5c1-39eb0bba5194"
+   },
+   "request_id": "robot-1-r5362",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 709 --seed 1 --from-life 708 --fail-fast"
+}

@@ -1,0 +1,73 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1901,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Ag",
+    "last_name": "Rich",
+    "gender": "female",
+    "country": "Spain",
+    "seed": 831386722,
+    "request_id": "robot-1-1901-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_0dd96879d6",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15131",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_0dd96879d6",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15132",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_0dd96879d6",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm",
+    "inputs": null
+   },
+   "request_id": "robot-1-r15133",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_0dd96879d6",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "67f6e524-eb8e-45ea-95c7-a3e7df505814"
+   },
+   "request_id": "robot-1-r15134",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1902 --seed 1 --from-life 1901 --fail-fast"
+}

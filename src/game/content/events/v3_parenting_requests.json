@@ -1,0 +1,206 @@
+{
+  "schema_version": 3,
+  "events": [
+    {
+      "id": "par_child_money_request",
+      "title": "Can I Have Some Money?",
+      "text": "{person:child} has been saving up for something and asks whether you can help with the last bit of money.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "school_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "give",
+          "label": "Give the money",
+          "effects": {
+            "relationship": 5,
+            "milestone": {
+              "child": "child",
+              "id": "money_request",
+              "record": {
+                "given": 50
+              }
+            },
+            "money": -50
+          },
+          "outcome_text": "My child promised to spend it wisely."
+        },
+        {
+          "id": "decline",
+          "label": "Not this time",
+          "effects": {
+            "relationship": -2,
+            "milestone": {
+              "child": "child",
+              "id": "money_request",
+              "record": {
+                "given": 0
+              }
+            }
+          },
+          "outcome_text": "My child shrugged and wandered off."
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "par_teen_trouble",
+      "title": "Called Into School",
+      "text": "The school rang: {person:child} was caught skipping class with friends.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "teen_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "talk",
+          "label": "Sit down and talk it through",
+          "effects": {
+            "relationship": 4,
+            "milestone": {
+              "child": "child",
+              "id": "teen_trouble",
+              "record": {
+                "response": "talk"
+              }
+            }
+          },
+          "outcome_text": "It wasn't easy, but my child opened up."
+        },
+        {
+          "id": "ground",
+          "label": "Ground them for a month",
+          "effects": {
+            "relationship": -6,
+            "stats": {
+              "stress": 2
+            },
+            "milestone": {
+              "child": "child",
+              "id": "teen_trouble",
+              "record": {
+                "response": "grounded"
+              }
+            }
+          },
+          "outcome_text": "The house was very quiet for a while."
+        },
+        {
+          "id": "let_go",
+          "label": "Let it slide",
+          "effects": {
+            "relationship": 1,
+            "milestone": {
+              "child": "child",
+              "id": "teen_trouble",
+              "record": {
+                "response": "ignored"
+              }
+            }
+          },
+          "outcome_text": "I decided some lessons have to be learned alone."
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "par_family_holiday",
+      "title": "Family Holiday?",
+      "text": "{person:child} has been dropping hints about a family holiday all year.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "dependent_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "big_trip",
+          "label": "Book the big trip",
+          "effects": {
+            "stats": {
+              "happiness": 8
+            },
+            "milestone": {
+              "child": "child",
+              "id": "family_holiday",
+              "record": {
+                "kind": "big"
+              }
+            },
+            "money": -1200
+          },
+          "outcome_text": "The photos from that trip would last a lifetime."
+        },
+        {
+          "id": "road_trip",
+          "label": "A modest road trip",
+          "effects": {
+            "stats": {
+              "happiness": 4
+            },
+            "milestone": {
+              "child": "child",
+              "id": "family_holiday",
+              "record": {
+                "kind": "road"
+              }
+            },
+            "money": -200
+          },
+          "outcome_text": "Simple, close, and genuinely fun."
+        },
+        {
+          "id": "stay_home",
+          "label": "Stay home together",
+          "effects": {
+            "stats": {
+              "happiness": 1
+            },
+            "milestone": {
+              "child": "child",
+              "id": "family_holiday",
+              "record": {
+                "kind": "home"
+              }
+            }
+          },
+          "outcome_text": "A quiet year. Maybe next one."
+        }
+      ],
+      "weight": 1
+    }
+  ]
+}

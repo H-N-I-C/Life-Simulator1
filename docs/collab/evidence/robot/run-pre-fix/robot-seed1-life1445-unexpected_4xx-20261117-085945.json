@@ -1,0 +1,81 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1445,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aeriell",
+    "last_name": "Watkins",
+    "gender": "female",
+    "country": "Germany",
+    "seed": 1501156404,
+    "request_id": "robot-1-1445-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 803564260,
+     "base": "woman",
+     "skin_tone": "light",
+     "hair": "white",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_3aa6a77f99",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11632",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_3aa6a77f99",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11633",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_3aa6a77f99",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11634",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_3aa6a77f99",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "534f9f1f-cc7f-42e3-9efd-86eb876b0f90"
+   },
+   "request_id": "robot-1-r11635",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1446 --seed 1 --from-life 1445 --fail-fast"
+}

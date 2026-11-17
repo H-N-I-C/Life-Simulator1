@@ -1,0 +1,67 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 352,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "action 'resolve_decision' -> HTTP 500: {\"error\": \"internal\", \"crash_id\": \"78e8e94d2a33\"}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Allyce",
+    "last_name": "Farrell",
+    "gender": "female",
+    "country": "Germany",
+    "seed": 489725760,
+    "request_id": "robot-1-352-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 2092832435,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "glasses",
+      "crown"
+     ],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_45d115a38c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r36095",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_45d115a38c",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_busy"
+   },
+   "request_id": "robot-1-r36096",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 500,
+   "body": "{\"error\": \"internal\", \"crash_id\": \"78e8e94d2a33\"}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 353 --seed 1 --from-life 352 --fail-fast"
+}

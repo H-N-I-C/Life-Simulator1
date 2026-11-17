@@ -1,0 +1,75 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 59,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adnan",
+    "last_name": "Chen",
+    "gender": "male",
+    "country": "China",
+    "seed": 737694891,
+    "request_id": "robot-1-59-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1746432127,
+     "base": "woman",
+     "skin_tone": "medium-light",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "flower",
+      "earrings"
+     ],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_df91282255",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r688",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_df91282255",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r689",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_df91282255",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "8ab0bc47-aca0-4246-b75a-df8d849e023d"
+   },
+   "request_id": "robot-1-r690",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 60 --seed 1 --from-life 59 --fail-fast"
+}

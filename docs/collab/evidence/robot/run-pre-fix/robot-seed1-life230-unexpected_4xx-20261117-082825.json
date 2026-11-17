@@ -1,0 +1,71 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 230,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Ailee",
+    "last_name": "Cassidy",
+    "gender": "female",
+    "country": "Spain",
+    "seed": 636434669,
+    "request_id": "robot-1-230-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1534329353,
+     "base": "man",
+     "skin_tone": "default",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "cap"
+     ],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_53e133334e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r1939",
+   "expected_revision": 0
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 0 does not match current revision 1\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_53e133334e",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "a65cdcb9-e023-4911-b799-088f5fcc9d6d"
+   },
+   "request_id": "robot-1-r1940",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 231 --seed 1 --from-life 230 --fail-fast"
+}

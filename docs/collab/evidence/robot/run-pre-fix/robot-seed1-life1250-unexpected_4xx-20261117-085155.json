@@ -1,0 +1,81 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1250,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aaron",
+    "last_name": "Wilkerson",
+    "gender": "male",
+    "country": "India",
+    "seed": 1687078783,
+    "request_id": "robot-1-1250-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 637297354,
+     "base": "man",
+     "skin_tone": "dark",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_1ba2fb4648",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r9844",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_1ba2fb4648",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r9845",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_1ba2fb4648",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r9846",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_1ba2fb4648",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "0c39a19c-dc85-41b6-b8fa-0f6cf0bbaa06"
+   },
+   "request_id": "robot-1-r9847",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1251 --seed 1 --from-life 1250 --fail-fast"
+}

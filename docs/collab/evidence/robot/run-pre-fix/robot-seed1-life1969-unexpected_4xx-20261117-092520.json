@@ -1,0 +1,193 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1969,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'doctor' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Abdullah",
+    "last_name": "Norman",
+    "gender": "male",
+    "country": "USA",
+    "seed": 1329945057,
+    "request_id": "robot-1-1969-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15694",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r15695",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r15696",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15697",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15698",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_search"
+   },
+   "request_id": "robot-1-r15699",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15700",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "d_3_watch"
+   },
+   "request_id": "robot-1-r15701",
+   "expected_revision": 8
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15702",
+   "expected_revision": 9
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_4",
+    "option_id": "d_4_sleep"
+   },
+   "request_id": "robot-1-r15703",
+   "expected_revision": 10
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15704",
+   "expected_revision": 11
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_5",
+    "option_id": "d_5_o1"
+   },
+   "request_id": "robot-1-r15705",
+   "expected_revision": 12
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_5",
+    "option_id": "d_5_o1"
+   },
+   "request_id": "robot-1-r15705",
+   "expected_revision": 12
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15707",
+   "expected_revision": 13
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15708",
+   "expected_revision": 14
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_cd78c84000",
+   "action": "doctor",
+   "payload": {},
+   "request_id": "robot-1-r15709",
+   "expected_revision": 15
+  },
+  {
+   "n": 17,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1970 --seed 1 --from-life 1969 --fail-fast"
+}

@@ -1,0 +1,57 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 462,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adorne",
+    "last_name": "Wilkerson",
+    "gender": "female",
+    "country": "Spain",
+    "seed": 717681336,
+    "request_id": "robot-1-462-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 54085076,
+     "base": "person",
+     "skin_tone": "medium-dark",
+     "hair": "red",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "crown",
+      "cap"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_9cb3fb0a12",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "58b015f7-edfc-4655-b8b2-680e7eb99787"
+   },
+   "request_id": "robot-1-r3589",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 463 --seed 1 --from-life 462 --fail-fast"
+}

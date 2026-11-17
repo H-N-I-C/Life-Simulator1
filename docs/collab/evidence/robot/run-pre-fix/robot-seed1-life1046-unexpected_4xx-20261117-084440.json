@@ -1,0 +1,57 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1046,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Amos",
+    "last_name": "Whitehead",
+    "gender": "male",
+    "country": "Nigeria",
+    "seed": 1921013115,
+    "request_id": "robot-1-1046-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1572203116,
+     "base": "person",
+     "skin_tone": "default",
+     "hair": "white",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "flower",
+      "glasses"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_3b2c3250a0",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "6e4a6e98-5056-475e-9fc4-0d1f0767534f"
+   },
+   "request_id": "robot-1-r7971",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1047 --seed 1 --from-life 1046 --fail-fast"
+}

@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 618,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Augustine",
+    "last_name": "Watts",
+    "gender": "male",
+    "country": "Germany",
+    "seed": 1044706800,
+    "request_id": "robot-1-618-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1549328615,
+     "base": "man",
+     "skin_tone": "medium",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "crown"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_ab3131e05c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r4694",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_ab3131e05c",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "e3cd4af4-7df2-4380-a24b-ac0a801c11f3"
+   },
+   "request_id": "robot-1-r4695",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 619 --seed 1 --from-life 618 --fail-fast"
+}

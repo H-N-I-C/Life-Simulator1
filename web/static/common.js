@@ -148,6 +148,175 @@ export function miniPersonChip(person, size = 28) {
   return chip;
 }
 
+/* ================= B1: global error boundary =================
+ * Every uncaught error / unhandled rejection is reported to
+ * POST /api/client-error (fire-and-forget; failures are swallowed) and
+ * surfaces a friendly card instead of leaving a broken page.
+ *
+ * FROZEN report shape (A1, docs/collab/q1-a1-report.md):
+ *   POST /api/client-error, JSON {kind, message, stack?, url?, game_id?}
+ *   — all strings; message required. We map type -> kind, page -> url,
+ *   and fold source/lineno/colno into the stack string. No extra fields
+ *   without agreement with A. Not a mutation: no request_id. */
+
+const CLIENT_ERROR_URL = "/api/client-error";
+const MAX_REPORTS = 20;
+let reportCount = 0;
+const lastReportAt = new Map();
+let errorRetryHandler = null;
+let crashCard = null;
+
+/* Pages register what "Retry" should do (e.g. reload game state).
+ * Default: reload the page, which always returns to a good state. */
+export function setErrorRetryHandler(fn) { errorRetryHandler = fn; }
+
+export function reportClientError(detail) {
+  if (reportCount >= MAX_REPORTS) return;
+  const message = String((detail && detail.message) || "unknown error")
+    .slice(0, 500);
+  const now = Date.now();
+  // Dedupe bursts of the identical error (e.g. per-frame loop).
+  if (now - (lastReportAt.get(message) || 0) < 5000) return;
+  lastReportAt.set(message, now);
+  reportCount++;
+  // Fold position info into the stack string (frozen shape has no
+  // source/lineno/colno fields).
+  const stackParts = [];
+  if (detail && detail.source) {
+    stackParts.push("at " + detail.source + ":" +
+                    ((detail.lineno != null) ? detail.lineno : 0) + ":" +
+                    ((detail.colno != null) ? detail.colno : 0));
+  }
+  if (detail && detail.stack) stackParts.push(String(detail.stack));
+  const payload = { kind: (detail && detail.type) || "error",
+                    message: message };
+  if (stackParts.length) payload.stack = stackParts.join("\n");
+  try {
+    payload.url = location.pathname;
+  } catch (e) { /* location unavailable */ }
+  try {
+    const gid = sessionStorage.getItem("game_id");
+    if (gid) payload.game_id = String(gid);
+  } catch (e) { /* storage unavailable */ }
+  const body = JSON.stringify(payload);
+  try {
+    fetch(CLIENT_ERROR_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body,
+      keepalive: true,
+    }).catch(() => { /* endpoint absent or offline — never cascade */ });
+  } catch (e) {
+    try {
+      navigator.sendBeacon && navigator.sendBeacon(CLIENT_ERROR_URL,
+        new Blob([body], { type: "application/json" }));
+    } catch (e2) { /* ignore */ }
+  }
+}
+
+/* Friendly full-page card shown when something uncaught happens.
+ * Reassures the player their save is intact and offers a way forward. */
+export function showCrashCard(message) {
+  if (!document.body) return;
+  if (crashCard && crashCard.isConnected) {
+    const msg = crashCard.querySelector(".crash-detail");
+    if (msg && message) msg.textContent = String(message);
+    return;
+  }
+  const overlay = document.createElement("div");
+  overlay.className = "crash-overlay";
+  overlay.setAttribute("role", "alertdialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-labelledby", "crashTitle");
+  const card = document.createElement("div");
+  card.className = "crash-card";
+  const title = document.createElement("h2");
+  title.id = "crashTitle";
+  title.textContent = "Something went wrong";
+  const body = document.createElement("p");
+  body.textContent = "Something went wrong. Your save is safe.";
+  const detail = document.createElement("p");
+  detail.className = "muted crash-detail";
+  detail.textContent = message ? String(message) : "";
+  const row = document.createElement("div");
+  row.className = "row";
+  const retry = document.createElement("button");
+  retry.className = "primary";
+  retry.textContent = "Retry";
+  retry.addEventListener("click", () => {
+    hideCrashCard();
+    if (errorRetryHandler) {
+      try { errorRetryHandler(); return; } catch (e) { /* fall through */ }
+    }
+    location.reload();
+  });
+  const reload = document.createElement("button");
+  reload.textContent = "Reload";
+  reload.addEventListener("click", () => location.reload());
+  row.appendChild(retry);
+  row.appendChild(reload);
+  card.appendChild(title);
+  card.appendChild(body);
+  card.appendChild(detail);
+  card.appendChild(row);
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+  crashCard = overlay;
+  retry.focus();
+}
+
+export function hideCrashCard() {
+  if (crashCard && crashCard.isConnected) crashCard.remove();
+  crashCard = null;
+}
+
+function installErrorBoundary() {
+  window.addEventListener("error", (e) => {
+    reportClientError({
+      type: "error",
+      message: e.message,
+      stack: e.error && e.error.stack,
+      source: e.filename,
+      lineno: e.lineno,
+      colno: e.colno,
+    });
+    showCrashCard(e.message || "Unexpected error");
+  });
+  window.addEventListener("unhandledrejection", (e) => {
+    const r = e.reason;
+    reportClientError({
+      type: "unhandledrejection",
+      message: (r && r.message) || String(r),
+      stack: r && r.stack,
+    });
+    showCrashCard((r && r.message) || String(r));
+  });
+}
+installErrorBoundary();
+
+/* ---- offline banner: visible on every page whenever the connection
+ * drops, so a failing action is never a mystery. ---- */
+function updateOfflineBanner() {
+  let b = document.getElementById("offlineBanner");
+  if (navigator.onLine !== false) {
+    if (b) b.hidden = true;
+    return;
+  }
+  if (!b) {
+    b = document.createElement("div");
+    b.id = "offlineBanner";
+    b.className = "offline-banner";
+    b.setAttribute("role", "status");
+    b.textContent = "You are offline. Your saves are stored on this " +
+      "device — the game will respond again when the connection returns.";
+    document.body.prepend(b);
+  }
+  b.hidden = false;
+}
+window.addEventListener("online", updateOfflineBanner);
+window.addEventListener("offline", updateOfflineBanner);
+updateOfflineBanner();
+
 /* Simple seeded RNG (mulberry32) for randomize. */
 export function rng(seed) {
   let a = seed >>> 0;

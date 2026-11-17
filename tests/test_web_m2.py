@@ -758,3 +758,28 @@ class TestSuccessionFlow(WebCase):
         status, err = self.act(st, "continue_as", {"target_id": "nope"})
         self.assertEqual(status, 404)
         self.assertEqual(err["error"]["code"], "not_found")
+
+
+class M25EditorUiStaticTests(WebCase):
+    """M2.5 step-3: editor UI assets are served and wired (endpoints are
+    A's registration; these pin the client side)."""
+
+    def test_editor_module_served_with_frozen_routes(self):
+        status, body = self.req(
+            "GET", "/static/features/relationship_policy/editor.js")
+        self.assertEqual(status, 200)
+        body = body.decode("utf-8")
+        self.assertIn("/editor/preview", body)
+        self.assertIn("/editor/apply", body)
+        self.assertIn("expected_revision", body)
+        self.assertIn("request_id", body)
+
+    def test_game_page_wires_editor_toggle(self):
+        status, body = self.req("GET", "/game")
+        self.assertEqual(status, 200)
+        self.assertIn('id="editorToggle"', body.decode("utf-8"))
+        status, js = self.req("GET", "/static/game.js")
+        self.assertEqual(status, 200)
+        js = js.decode("utf-8")
+        self.assertIn("relationship_policy/editor.js", js)
+        self.assertIn("editorToggle", js)

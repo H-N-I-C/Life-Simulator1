@@ -1,0 +1,57 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1749,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Andri",
+    "last_name": "Locklear",
+    "gender": "male",
+    "country": "USA",
+    "seed": 146684524,
+    "request_id": "robot-1-1749-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 926521011,
+     "base": "person",
+     "skin_tone": "default",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "glasses",
+      "earrings"
+     ],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_4203ffec91",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "710765d4-e7e4-490b-85fd-e58df854c048"
+   },
+   "request_id": "robot-1-r13784",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1750 --seed 1 --from-life 1749 --fail-fast"
+}

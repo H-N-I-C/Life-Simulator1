@@ -1,0 +1,80 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 427,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adelina",
+    "last_name": "Proctor",
+    "gender": "female",
+    "country": "Indonesia",
+    "seed": 1206715058,
+    "request_id": "robot-1-427-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1152795548,
+     "base": "woman",
+     "skin_tone": "medium-light",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses"
+     ],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_16fea0487c",
+   "action": "definitely_not_an_action",
+   "payload": {},
+   "request_id": "robot-1-r3341",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown action\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_16fea0487c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3342",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_16fea0487c",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "60a9cdf7-af08-47c2-bca1-134d8b46ca29"
+   },
+   "request_id": "robot-1-r3343",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 428 --seed 1 --from-life 427 --fail-fast"
+}

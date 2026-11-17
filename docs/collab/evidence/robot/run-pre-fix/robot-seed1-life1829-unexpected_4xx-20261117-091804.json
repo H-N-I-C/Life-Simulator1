@@ -1,0 +1,51 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1829,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adolpho",
+    "last_name": "Hawkins",
+    "gender": "male",
+    "country": "Indonesia",
+    "seed": 613218042,
+    "request_id": "robot-1-1829-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_bf95d2b197",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r14530",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_bf95d2b197",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "96274b3d-9503-4569-8588-08f873557531"
+   },
+   "request_id": "robot-1-r14531",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1830 --seed 1 --from-life 1829 --fail-fast"
+}

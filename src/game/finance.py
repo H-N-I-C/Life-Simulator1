@@ -45,7 +45,7 @@ class Ledger:
     def balance(self, owner_id):
         if owner_id not in self._env["balances"]:
             person = self._resolver(owner_id)
-            self._env["balances"][owner_id] = person.money if person else 0
+            self._env["balances"][owner_id] = getattr(person, "money", 0) if person else 0
         return self._env["balances"][owner_id]
 
     def _default_resolver(self, owner_id):

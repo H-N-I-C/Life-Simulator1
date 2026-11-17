@@ -1,0 +1,42 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1729,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Albrecht",
+    "last_name": "Pittman",
+    "gender": "male",
+    "country": "Spain",
+    "seed": 1385062523,
+    "request_id": "robot-1-1729-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_f278122868",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "0eeba631-82ae-4654-9da5-4ca4b36e6717"
+   },
+   "request_id": "robot-1-r13544",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1730 --seed 1 --from-life 1729 --fail-fast"
+}

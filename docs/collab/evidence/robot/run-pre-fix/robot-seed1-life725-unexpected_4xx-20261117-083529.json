@@ -1,0 +1,86 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 725,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adiana",
+    "last_name": "McNeill",
+    "gender": "female",
+    "country": "Germany",
+    "seed": 914576213,
+    "request_id": "robot-1-725-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 321925944,
+     "base": "woman",
+     "skin_tone": "dark",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses"
+     ],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_83128def9a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r5430",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_83128def9a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r5431",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_83128def9a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_bite"
+   },
+   "request_id": "robot-1-r5432",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_83128def9a",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "20e93088-dad1-4b63-9c33-592aa89ec56a"
+   },
+   "request_id": "robot-1-r5433",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 726 --seed 1 --from-life 725 --fail-fast"
+}

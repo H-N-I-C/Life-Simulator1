@@ -1,0 +1,420 @@
+{
+  "_status": "PROPOSAL (Kimi C, 2026-11-17). Fit-proof records for event-schema-v3.md + reputation-knowledge.md. Executable: each record is input -> expected loader/domain validation result. D's v3 validator and C's loader tests consume these verbatim after Claude freezes.",
+  "schema_version": "3.0-draft",
+
+  "valid_events": [
+    {
+      "_name": "first_date_with_refusal_outcome",
+      "event": {
+        "schema_version": 3,
+        "events": [{
+          "id": "m25_first_date_offer",
+          "title": "A match wants to meet",
+          "text": "{person:target} from the app asks {name} out for coffee.",
+          "interaction": {"kind": "date", "romantic": true},
+          "roles": {
+            "actor": {"kind": "person", "select": "player"},
+            "target": {"kind": "person", "select": "predicate",
+                       "predicate": "adult_non_related_stranger"}
+          },
+          "conditions": {"all": [
+            {"kind": "min_stat", "stat": "happiness", "value": 10},
+            {"kind": "attraction_band", "person": "target", "lo": 20, "hi": 100}
+          ]},
+          "choices": [
+            {"id": "accept", "label": "Go on the date", "cost": {},
+             "effects": {"stats": {"happiness": {"randint": [5, 12]}},
+                         "chemistry": {"between": ["actor", "target"],
+                                       "delta": {"randint": [3, 8]}},
+                         "offer": {"interaction": "propose_courtship",
+                                   "to": "target", "as": "npc"}},
+             "outcome_text": "We had a lovely evening."},
+            {"id": "decline", "label": "Not tonight", "cost": {},
+             "effects": {}, "outcome_text": "I swiped away."}
+          ],
+          "audience": {"scope": "player_known", "participants": ["actor", "target"]}
+        }]
+      },
+      "expected": {"validate": "ok", "guard": "adult_guard_applies_at_offer_and_resolve",
+                   "notes": "decline is the free exit; refusal outcome may be stored via evaluator p_refuse"}
+    },
+    {
+      "_name": "second_spouse_proposal",
+      "event": {
+        "schema_version": 3,
+        "events": [{
+          "id": "m25_plural_proposal_offer",
+          "title": "A proposal, again",
+          "text": "{person:target} kneels with a ring, knowing {name} is already married.",
+          "interaction": {"kind": "propose_plural_union", "romantic": true},
+          "roles": {
+            "actor": {"kind": "person", "select": "player"},
+            "target": {"kind": "person", "select": "predicate",
+                       "predicate": "adult_existing_lover"}
+          },
+          "conditions": {"all": [
+            {"kind": "union_state", "a": "actor", "b": "target",
+             "status": ["active"], "kind_any": ["marriage"]},
+            {"kind": "expectation", "a": "actor", "b": "target",
+             "agreement": "negotiated"}
+          ]},
+          "choices": [
+            {"id": "accept", "label": "Accept the proposal", "cost": {},
+             "effects": {"offer": {"interaction": "respond", "accept": true}},
+             "outcome_text": "I said yes — to both of my partners."},
+            {"id": "decline", "label": "I can't", "cost": {},
+             "effects": {}, "outcome_text": "We stayed what we are."}
+          ],
+          "audience": {"scope": "private", "participants": ["actor", "target"]}
+        }]
+      },
+      "expected": {"validate": "ok", "notes": "targets the BOUND lover, never 'current spouse'; recognition consequences previewed by B's evaluator"}
+    },
+    {
+      "_name": "selected_union_divorce",
+      "event": {
+        "schema_version": 3,
+        "events": [{
+          "id": "m25_selected_divorce",
+          "title": "The marriage is over",
+          "text": "{name} and {person:spouse_a} have grown apart. The lawyer asks which marriage to dissolve.",
+          "interaction": {"kind": "repair_attempt", "romantic": true},
+          "roles": {
+            "actor": {"kind": "person", "select": "player"},
+            "spouse_a": {"kind": "person", "select": "predicate",
+                         "predicate": "adult_union_partner_of_actor"},
+            "the_union": {"kind": "union", "select": "predicate",
+                          "predicate": "active_union_between_actor_and_spouse_a"}
+          },
+          "choices": [
+            {"id": "divorce_this_one", "label": "File for divorce",
+             "cost": {"money": 1000},
+             "effects": {"end_union": {"union_role": "the_union",
+                                       "how": "divorce"}},
+             "outcome_text": "One marriage ended. The rest of my family continues."},
+            {"id": "stay", "label": "Stay married", "cost": {},
+             "effects": {}, "outcome_text": "We chose to try again."}
+          ],
+          "audience": {"scope": "public", "participants": ["actor", "spouse_a"]}
+        }]
+      },
+      "expected": {"validate": "ok", "notes": "end_union names the union ROLE; other unions untouched; children never deleted"}
+    },
+    {
+      "_name": "one_witness_discovery",
+      "event": {
+        "schema_version": 3,
+        "events": [{
+          "id": "m25_affair_discovery",
+          "title": "Seen at the restaurant",
+          "text": "{person:witness} spotted {name} with {person:lover}.",
+          "interaction": {"kind": "flirt", "romantic": true},
+          "roles": {
+            "actor": {"kind": "person", "select": "player"},
+            "lover": {"kind": "person", "select": "predicate",
+                      "predicate": "adult_secret_lover_of_actor"},
+            "witness": {"kind": "person", "select": "predicate",
+                        "predicate": "adult_acquaintance", "optional": true}
+          },
+          "conditions": {"all": [
+            {"kind": "known_fact", "observer": "witness",
+             "fact_kind": "affair", "confidence_at_least": 1.0},
+            {"kind": "expectation", "a": "actor", "b": "witness",
+             "agreement": "exclusive"}
+          ]},
+          "choices": [
+            {"id": "deny", "label": "Deny everything", "cost": {},
+             "effects": {"reputation": {"person": "actor", "scope": "global",
+                                        "delta": {"randint": [-8, -2]}}},
+             "outcome_text": "They pretended to believe me."},
+            {"id": "confess", "label": "Confess", "cost": {},
+             "effects": {"reputation": {"person": "actor", "scope": "global",
+                                        "delta": {"randint": [-4, 4]}},
+                         "chemistry": {"between": ["actor", "witness"],
+                                       "delta": {"randint": [-6, 2]}}},
+             "outcome_text": "The truth is out."}
+          ],
+          "audience": {"scope": "player_known",
+                       "participants": ["actor", "lover", "witness"]}
+        }]
+      },
+      "expected": {"validate": "ok", "notes": "reputation posts once per (fact, observer, jurisdiction, occurrence); witness learned via the discovery occurrence that minted the fact"}
+    },
+    {
+      "_name": "conversion_reaction",
+      "event": {
+        "schema_version": 3,
+        "events": [{
+          "id": "m25_conversion_reaction",
+          "title": "The congregation notices",
+          "text": "{person:elder} heard that {name} joined another faith.",
+          "interaction": {"kind": "convert_request", "romantic": false},
+          "roles": {
+            "actor": {"kind": "person", "select": "player"},
+            "elder": {"kind": "person", "select": "predicate",
+                      "predicate": "adult_same_household"}
+          },
+          "conditions": {"all": [
+            {"kind": "tenet_stance", "person": "elder",
+             "tenet_id": "conversion_out", "stance": "disfavoured"},
+            {"kind": "known_fact", "observer": "elder",
+             "fact_kind": "conversion", "confidence_at_least": 0.9}
+          ]},
+          "choices": [
+            {"id": "reassure", "label": "Reassure them", "cost": {},
+             "effects": {"chemistry": {"between": ["actor", "elder"],
+                                       "delta": {"randint": [0, 5]}}},
+             "outcome_text": "We talked it through."},
+            {"id": "distance", "label": "Keep my distance", "cost": {},
+             "effects": {"reputation": {"person": "actor",
+                                        "scope": "jur_default",
+                                        "delta": {"randint": [-5, -1]}}},
+             "outcome_text": "Some doors closed quietly."}
+          ],
+          "audience": {"scope": "public", "participants": ["actor", "elder"]}
+        }]
+      },
+      "expected": {"validate": "ok", "notes": "social, not romantic: romantic=false skips the adult guard but the elder predicate is adult anyway; reads B's tenet stance read-only"}
+    },
+    {
+      "_name": "wedding_occurrence",
+      "event": {
+        "schema_version": 3,
+        "events": [{
+          "id": "m25_wedding_day",
+          "title": "The wedding day",
+          "text": "{name} and {person:spouse} are ready to make it official.",
+          "interaction": {"kind": "propose_union", "romantic": true},
+          "roles": {
+            "actor": {"kind": "person", "select": "player"},
+            "spouse": {"kind": "person", "select": "predicate",
+                       "predicate": "adult_engaged_to_actor"}
+          },
+          "choices": [
+            {"id": "simple", "label": "A simple ceremony", "cost": {"money": 255},
+             "effects": {"stats": {"happiness": {"randint": [10, 16]}}},
+             "outcome_text": "Married, quietly and happily."},
+            {"id": "grand", "label": "A grand wedding", "cost": {"money": 15300},
+             "effects": {"stats": {"happiness": {"randint": [14, 22]}},
+                         "reputation": {"person": "actor", "scope": "global",
+                                        "delta": {"randint": [2, 8]}}},
+             "outcome_text": "The whole town talked about it for weeks."},
+            {"id": "elope", "label": "Elope at the courthouse", "cost": {"money": 51},
+             "effects": {"stats": {"happiness": {"randint": [8, 14]}}},
+             "outcome_text": "Just us, a witness, and the sea."},
+            {"id": "postpone", "label": "Not today", "cost": {},
+             "effects": {},
+             "outcome_text": "We kept the engagement and postponed the day."}
+          ],
+          "audience": {"scope": "public", "participants": ["actor", "spouse"]}
+        }]
+      },
+      "expected": {"validate": "ok", "notes": "postpone is the legal free exit (soft-lock rule); money posts once per paid choice, gate-only at resolve; the public union fact is recorded by A's graph_form_union transition on acceptance (visibility set there), not by an undeclared effect role"}
+    },
+    {
+      "_name": "nonromantic_parenting_request",
+      "event": {
+        "schema_version": 3,
+        "events": [{
+          "id": "m25_teen_trouble_request",
+          "title": "A knock at the door",
+          "text": "{person:teen} was caught skipping class. The school wants a parent to come in.",
+          "interaction": {"kind": "parenting_request", "romantic": false},
+          "roles": {
+            "actor": {"kind": "person", "select": "player"},
+            "teen": {"kind": "person", "select": "predicate",
+                     "predicate": "dependent_child_age_13_17"}
+          },
+          "conditions": {"all": [
+            {"kind": "milestone", "child": "teen", "id": "started_high_school"}
+          ]},
+          "choices": [
+            {"id": "go_in", "label": "Go to the school", "cost": {},
+             "effects": {"chemistry": {"between": ["actor", "teen"],
+                                       "delta": {"randint": [1, 6]}},
+                         "milestone": {"child": "teen", "id": "school_met",
+                                       "record": {"outcome": "supported"}}},
+             "outcome_text": "We talked on the way home."},
+            {"id": "let_it_go", "label": "Let their other parent handle it", "cost": {},
+             "effects": {"chemistry": {"between": ["actor", "teen"],
+                                       "delta": {"randint": [-5, 0]}}},
+             "outcome_text": "They noticed I didn't come."}
+          ],
+          "audience": {"scope": "public", "participants": ["actor", "teen"]}
+        }]
+      },
+      "expected": {"validate": "ok", "notes": "romantic=false: no adult guard on the teen (correct — this is ordinary parenting), child effects/costs post once per child"}
+    }
+  ],
+
+  "invalid_events": [
+    {
+      "_name": "minor_target_romantic_event",
+      "event": {"schema_version": 3, "events": [{
+        "id": "m25_bad_teen_date", "title": "Bad", "text": "x",
+        "interaction": {"kind": "date", "romantic": true},
+        "roles": {"actor": {"kind": "person", "select": "player"},
+                  "target": {"kind": "person", "select": "predicate",
+                             "predicate": "any_minor"}},
+        "conditions": {"min_age": 16},
+        "choices": [
+          {"id": "a", "label": "A", "cost": {}, "effects": {},
+           "outcome_text": "x"},
+          {"id": "b", "label": "B", "cost": {}, "effects": {},
+           "outcome_text": "x"}
+        ]}]},
+      "expected": {"validate": "fail",
+                   "error": "romantic interaction with conditions.min_age < 18 (fixed rule: content cannot make a minor eligible)"}
+    },
+    {
+      "_name": "unknown_role_reference",
+      "event": {"schema_version": 3, "events": [{
+        "id": "m25_bad_unknown_role", "title": "Bad", "text": "{person:ghost}",
+        "interaction": {"kind": "flirt", "romantic": true},
+        "roles": {"actor": {"kind": "person", "select": "player"}},
+        "choices": [
+          {"id": "a", "label": "A", "cost": {}, "effects": {},
+           "outcome_text": "x"},
+          {"id": "b", "label": "B", "cost": {}, "effects": {},
+           "outcome_text": "x"}
+        ]}]},
+      "expected": {"validate": "fail",
+                   "error": "text/effects reference role 'ghost' which is not declared in roles"}
+    },
+    {
+      "_name": "missing_edge_at_resolve",
+      "record": {
+        "_description": "A stored v3 pending whose bound union was dissolved by a later selected-divorce before this pending resolved.",
+        "pending": {
+          "schema_dialect": "v3", "event_id": "m25_anniversary_plan",
+          "kind": "m25_anniversary_plan",
+          "roles": {"actor": "pid-a", "spouse": "pid-b",
+                    "the_union": "uni-gone"},
+          "options": [{"id": "d_0_celebrate", "label": "Celebrate",
+                       "_effects": {"stats": {"happiness": 5}}}],
+          "sampled": {}, "policy_revision": 3
+        },
+        "action": {"option_id": "d_0_celebrate"}
+      },
+      "expected": {"resolve": "safe_cancellation",
+                   "journal": "The moment has passed.",
+                   "attempt_usage": "preserved"}
+    },
+    {
+      "_name": "no_free_exit_soft_lock",
+      "event": {"schema_version": 3, "events": [{
+        "id": "m25_bad_all_paid", "title": "Bad", "text": "x",
+        "interaction": {"kind": "date", "romantic": true},
+        "roles": {"actor": {"kind": "person", "select": "player"},
+                  "target": {"kind": "person", "select": "predicate",
+                             "predicate": "adult_non_related_stranger"}},
+        "choices": [
+          {"id": "a", "label": "A", "cost": {"money": 100},
+           "effects": {}, "outcome_text": "x"},
+          {"id": "b", "label": "B", "cost": {"money": 200},
+           "effects": {}, "outcome_text": "x"}
+        ]}]},
+      "expected": {"validate": "fail",
+                   "error": "no free option (soft-lock rule); a $0 player must have a legal move"}
+    }
+  ],
+
+  "v2_compatibility_fixtures": [
+    {
+      "_name": "v2_pending_binds_intended_partner",
+      "record": {
+        "pending": {
+          "schema_dialect": "v2", "kind": "date_offer",
+          "sampled_partner_id": "pid-old-love",
+          "sampled_partner": {"person_id": "pid-old-love"},
+          "sampled": {"compatible": true},
+          "options": [{"id": "ask_out"}, {"id": "decline"}]
+        },
+        "scenario": "player re-married after the offer was stored; resolve ask_out",
+        "action": {"option_id": "ask_out"}
+      },
+      "expected": {"resolve": "applies_to_pid-old-love_only",
+                   "never": "the newly selected spouse",
+                   "journal": "refers to pid-old-love"}
+    },
+    {
+      "_name": "v2_pending_unmappable_stale_context",
+      "record": {
+        "pending": {
+          "schema_dialect": "v2", "kind": "partner_kidnapping",
+          "person_ids": ["pid-archived-no-mapping"],
+          "options": [{"id": "d_0_pay_ransom", "_effects": {"money": -1000}}]
+        },
+        "action": {"option_id": "d_0_pay_ransom"}
+      },
+      "expected": {"resolve": "safe_cancellation",
+                   "journal": "explicit cancellation, no random target, no reroll"}
+    },
+    {
+      "_name": "v2_and_v3_files_coexist",
+      "record": {
+        "files": ["src/game/content/events/dating_offer.json (v2)",
+                  "src/game/content/events/v3/m25_first_date.json (v3)"],
+        "action": "load both directories in one loader pass"
+      },
+      "expected": {"load": "both_valid", "saved_v2_pending": "resolves_in_v2_dialect",
+                   "saved_v3_pending": "resolves_in_v3_dialect"}
+    }
+  ],
+
+  "knowledge_fixtures": [
+    {
+      "_name": "uninformed_npc_cannot_react",
+      "record": {
+        "facts": [{"fact_id": "fact-1", "kind": "affair",
+                   "subject_ids": ["pid-a", "pid-b"], "created_turn": 10}],
+        "knowledge": [],
+        "query": {"condition": {"kind": "known_fact", "observer": "pid-c",
+                                "fact_kind": "affair"},
+                  "for_event": "m25_affair_discovery"}
+      },
+      "expected": {"eligible": false,
+                   "reason": "no knowledge record: engine-true fact is not NPC knowledge"}
+    },
+    {
+      "_name": "witness_knowledge_record_created_once",
+      "record": {
+        "facts": [{"fact_id": "fact-2", "kind": "affair",
+                   "subject_ids": ["pid-a", "pid-b"], "created_turn": 10}],
+        "knowledge": [{"observer_id": "pid-w", "fact_id": "fact-2",
+                       "learned_turn": 10, "source": "witnessed",
+                       "confidence": 1.0}],
+        "query": {"condition": {"kind": "known_fact", "observer": "pid-w",
+                                "fact_kind": "affair", "confidence_at_least": 1.0}}
+      },
+      "expected": {"eligible": true, "reputation_postings": "once per (fact, observer, scope, occurrence)"}
+    },
+    {
+      "_name": "reason_visibility_filtering",
+      "record": {
+        "reasons_in": [
+          {"code": "reputation", "contribution": -8,
+           "label_key": "reason.reputation"},
+          {"code": "faith_tenets", "contribution": -6,
+           "label_key": "reason.faith_tenets"}
+        ],
+        "player_knowledge": ["fact-reputation-source"],
+        "tenet_visibility": {"faith_tenets": "public"}
+      },
+      "expected": {"reasons_out": ["faith_tenets"],
+                   "filtered": ["reputation"],
+                   "scoring": "unchanged; filter is display-only"}
+    },
+    {
+      "_name": "forgiveness_repairs_not_erases",
+      "record": {
+        "action": "forgive(fact-1, by_id=pid-c)",
+        "prior": {"fact-1": {"ended_turn": null},
+                  "relationship_trust": 20}
+      },
+      "expected": {"fact": "ended_turn set, history retained",
+                   "trust": "increased via A's bounded patch",
+                   "knowledge_records": "retained (the NPC still knows)"}
+    }
+  ]
+}

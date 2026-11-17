@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 150,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Amory",
+    "last_name": "Moon",
+    "gender": "male",
+    "country": "Spain",
+    "seed": 623140626,
+    "request_id": "robot-1-150-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 540560721,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "crown",
+      "glasses"
+     ],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_02bd2d0434",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r1389",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_02bd2d0434",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "1d39db29-b2b2-4d8d-9840-410a7cd2bb55"
+   },
+   "request_id": "robot-1-r1390",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 151 --seed 1 --from-life 150 --fail-fast"
+}

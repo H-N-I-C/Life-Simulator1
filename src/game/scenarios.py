@@ -118,6 +118,8 @@ def age_up_safe(svc, game_id, st, i):
 
 def _resolve_first_sess(sess, i, prefer=None):
     d = sess.state()["pending_decision"]
+    if d.get("kind") == "retirement_offer" and prefer is None:
+        prefer = ("keep_working",)
     options = list(d["options"])
     if prefer:
         options.sort(key=lambda o: 0 if any(
@@ -431,6 +433,8 @@ def drive_scenario(svc, game_id, scenario_id):
             while st["pending_decision"]:
                 sess.st = _resolve_first_sess(sess, i)
                 st = sess.state()
+            if spec["employ"] and not st["work"]["employed"]:
+                continue  # a final pending may have ended the job
             st = _apply_setup_hook_sess(sess, spec, i)
             sess.save()
             return st

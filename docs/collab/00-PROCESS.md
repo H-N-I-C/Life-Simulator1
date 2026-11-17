@@ -30,4 +30,8 @@ Speed-up rules (user-approved, 2026-11-16)
 6. Scenario starts: a dev-only "start as…" panel (valid states, not bare age edits) so the user can test features in minutes (A service + B UI, M2a).
 7. Git: once M1 passes, work moves to per-agent branches with small commits; Claude merges after checks.
 
-HALT AFTER M2 (user, 2026-11-16): once M2 is finalised (Codex review plus any fix round passed), ALL agents stop. No M3 or M2.5 work, drafts included, until the user has tested M2 and Claude has committed. Until then, work only on M2 fixes and polish.
+HALT AFTER M2: lifted by the user on 2026-11-17 for quality sprint Q1 (docs/collab/Q1-quality-sprint.md). M2.5/M3 stay paused until Q1 is done.
+
+Branch guard (2026-11-17): before starting any task, run `git branch --show-current`. It must print `dev`. If it doesn't, STOP and tell Claude. Never check out other branches yourself, and never work on the `test` branch.
+
+Messaging limit (user, 2026-11-17): agents don't message each other for routine coordination. Put open questions in the relevant README's 'Open items' list; Claude reviews and routes them in batches. Direct agent-to-agent messages are only for genuine blockers.

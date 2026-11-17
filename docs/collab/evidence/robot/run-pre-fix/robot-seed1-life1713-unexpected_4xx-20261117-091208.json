@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1713,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Arthur",
+    "last_name": "Holloway",
+    "gender": "male",
+    "country": "India",
+    "seed": 45421857,
+    "request_id": "robot-1-1713-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 329655930,
+     "base": "man",
+     "skin_tone": "dark",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "earrings"
+     ],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_3e1e0512cf",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13416",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_3e1e0512cf",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "86fb4312-5dc5-48c4-8416-9abde31b6794"
+   },
+   "request_id": "robot-1-r13417",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1714 --seed 1 --from-life 1713 --fail-fast"
+}

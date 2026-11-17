@@ -1,0 +1,90 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1885,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alvinia",
+    "last_name": "Stone",
+    "gender": "female",
+    "country": "Indonesia",
+    "seed": 1838986128,
+    "request_id": "robot-1-1885-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1473589111,
+     "base": "woman",
+     "skin_tone": "dark",
+     "hair": "white",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses",
+      "flower"
+     ],
+     "background": "bg_06",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_cea8e1369c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15006",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_cea8e1369c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15007",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_cea8e1369c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15008",
+   "expected_revision": 2
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 2 does not match current revision 3\"}}"
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_cea8e1369c",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "4269c132-c411-40f4-ab15-e7334b143088"
+   },
+   "request_id": "robot-1-r15009",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1886 --seed 1 --from-life 1885 --fail-fast"
+}

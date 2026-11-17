@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 120,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Abbey",
+    "last_name": "Connolly",
+    "gender": "female",
+    "country": "India",
+    "seed": 1892815315,
+    "request_id": "robot-1-120-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1207195936,
+     "base": "man",
+     "skin_tone": "light",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "crown"
+     ],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_65f7a598ca",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r1277",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_65f7a598ca",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "2aa92228-4601-478a-ae55-2bec51fb0e75"
+   },
+   "request_id": "robot-1-r1278",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 121 --seed 1 --from-life 120 --fail-fast"
+}

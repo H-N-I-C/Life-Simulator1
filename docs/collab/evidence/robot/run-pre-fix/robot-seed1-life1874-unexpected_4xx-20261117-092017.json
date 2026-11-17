@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1874,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alameda",
+    "last_name": "Bowden",
+    "gender": "female",
+    "country": "USA",
+    "seed": 2020381402,
+    "request_id": "robot-1-1874-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1390137621,
+     "base": "man",
+     "skin_tone": "medium-dark",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "crown",
+      "flower"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_2ca6e21f0e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r14932",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_2ca6e21f0e",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "77423d1b-b9f9-48eb-952c-c434fa1fbdd7"
+   },
+   "request_id": "robot-1-r14933",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1875 --seed 1 --from-life 1874 --fail-fast"
+}

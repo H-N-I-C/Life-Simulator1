@@ -1,0 +1,143 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1775,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Amargo",
+    "last_name": "Brady",
+    "gender": "female",
+    "country": "France",
+    "seed": 1049961317,
+    "request_id": "robot-1-1775-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 649777949,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "flower"
+     ],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_925e2a11e3",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13977",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_925e2a11e3",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r13978",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_925e2a11e3",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "ask_final"
+   },
+   "request_id": "robot-1-r13979",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_925e2a11e3",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "cancel"
+   },
+   "request_id": "robot-1-r13980",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_925e2a11e3",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13981",
+   "expected_revision": 4
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 4 does not match current revision 5\"}}"
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_925e2a11e3",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13982",
+   "expected_revision": 5
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_925e2a11e3",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r13983",
+   "expected_revision": 6
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_925e2a11e3",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "d_3_hide"
+   },
+   "request_id": "robot-1-r13984",
+   "expected_revision": 7
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_925e2a11e3",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "b5e9575f-3c36-4d38-b6ea-febf78a80b7e"
+   },
+   "request_id": "robot-1-r13985",
+   "expected_revision": 8
+  },
+  {
+   "n": 11,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1776 --seed 1 --from-life 1775 --fail-fast"
+}

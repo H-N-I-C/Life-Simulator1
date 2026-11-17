@@ -541,7 +541,9 @@ def activities_menu(player):
 						print(_("You have achieved a deeper awareness of yourself."))
 						display_bar(_("Karma"), player.karma)
 						if player.times_meditated > 0 and x_in_y(2, 5) and not x_in_y(player.stress, 100):
-							player.learn_trait("MEDITATOR")
+							learned, trait_msg, trait_color = player.learn_trait("MEDITATOR")
+							if trait_msg:
+								print_colored(trait_msg, trait_color)
 					if player.has_trait("CHEERFUL"):
 						player.change_happiness(4)
 					player.meditated = True
@@ -595,9 +597,13 @@ def activities_menu(player):
 					if one_in(48) and random.random() < 0.95**player.times_visited_library:
 						can_learn_nerd = not player.has_trait("NERD")
 						if can_learn_nerd and x_in_y(player.smarts, 200):
-							player.learn_trait("NERD")
+							learned, trait_msg, trait_color = player.learn_trait("NERD")
+							if trait_msg:
+								print_colored(trait_msg, trait_color)
 						else:
-							player.learn_trait("BOOK_LOVER")
+							learned, trait_msg, trait_color = player.learn_trait("BOOK_LOVER")
+							if trait_msg:
+								print_colored(trait_msg, trait_color)
 					player.visited_library = True
 			elif choice == _("Read a Book"):
 				#print(_("Coming soon!"))
@@ -649,7 +655,9 @@ def activities_menu(player):
 									if x_in_y(math.sqrt(happy_amount), 100):
 										learn.append("BOOK_LOVER")
 									if learn:
-										player.learn_trait(random.choice(learn))
+										learned, trait_msg, trait_color = player.learn_trait(random.choice(learn))
+										if trait_msg:
+											print_colored(trait_msg, trait_color)
 									press_enter()
 									h_amount = math.ceil(random.uniform(0.8, 1) * happy_amount * (1 - player.happiness/100))
 									s_amount = math.ceil(random.uniform(0.8, 1) * smarts_amount * (1 - player.smarts/100))

@@ -53,6 +53,8 @@ class Person:
         self.teen_looks_inc = val
 
     def generate_partner(self):
+        from src.game.features.family_graph.graph import assert_adult_romantic
+        assert_adult_romantic(self, self)
         from src.people.classes.partner import Partner
 
         m = self.age // 6
@@ -70,6 +72,7 @@ class Person:
         )
         while p.death_check():
             p.age -= randint(1, 5)
+        assert_adult_romantic(self, p)
         return p
 
     def death_check(self):

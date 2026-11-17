@@ -1,0 +1,57 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1847,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Archon",
+    "last_name": "Hall",
+    "gender": "male",
+    "country": "Japan",
+    "seed": 387731550,
+    "request_id": "robot-1-1847-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 941654286,
+     "base": "woman",
+     "skin_tone": "light",
+     "hair": "red",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "cap",
+      "crown"
+     ],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_a823bf8a3a",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "ecab975e-be5f-45a9-89b5-360c90d344ed"
+   },
+   "request_id": "robot-1-r14675",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1848 --seed 1 --from-life 1847 --fail-fast"
+}

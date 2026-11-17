@@ -1,0 +1,63 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 446,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Andrew",
+    "last_name": "Sparks",
+    "gender": "male",
+    "country": "USA",
+    "seed": 1064332908,
+    "request_id": "robot-1-446-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 839568767,
+     "base": "person",
+     "skin_tone": "medium-light",
+     "hair": "red",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_74343bae74",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3467",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_74343bae74",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "7cb9f098-e8ab-482e-a88b-7d62a6c2d2ca"
+   },
+   "request_id": "robot-1-r3468",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 447 --seed 1 --from-life 446 --fail-fast"
+}

@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1506,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Abbot",
+    "last_name": "Lamb",
+    "gender": "male",
+    "country": "Germany",
+    "seed": 449388663,
+    "request_id": "robot-1-1506-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 10459537,
+     "base": "person",
+     "skin_tone": "medium-dark",
+     "hair": "white",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "earrings",
+      "flower"
+     ],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_c246565493",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11970",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_c246565493",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "ba95fbb2-f7ae-44fe-9b49-fc9eb6f55344"
+   },
+   "request_id": "robot-1-r11971",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1507 --seed 1 --from-life 1506 --fail-fast"
+}

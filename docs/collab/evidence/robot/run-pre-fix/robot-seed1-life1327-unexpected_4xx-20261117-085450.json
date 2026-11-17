@@ -1,0 +1,92 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1327,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Amalie",
+    "last_name": "Norman",
+    "gender": "female",
+    "country": "China",
+    "seed": 1419421417,
+    "request_id": "robot-1-1327-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1382843417,
+     "base": "woman",
+     "skin_tone": "medium",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "earrings"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_5dfcfc17bb",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r10739",
+   "expected_revision": 0
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 0 does not match current revision 1\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_5dfcfc17bb",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r10740",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_5dfcfc17bb",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r10741",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_5dfcfc17bb",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "dd2330f4-eb19-45eb-9769-7a8ed0b1bf5d"
+   },
+   "request_id": "robot-1-r10742",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1328 --seed 1 --from-life 1327 --fail-fast"
+}

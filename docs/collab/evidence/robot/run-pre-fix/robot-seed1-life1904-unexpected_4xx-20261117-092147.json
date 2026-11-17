@@ -1,0 +1,72 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1904,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adena",
+    "last_name": "Holloway",
+    "gender": "female",
+    "country": "USA",
+    "seed": 901474900,
+    "request_id": "robot-1-1904-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_73927effc8",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15138",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_73927effc8",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15139",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_73927effc8",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_tantrum"
+   },
+   "request_id": "robot-1-r15140",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_73927effc8",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "92e7b38c-8f5e-4c50-99f4-c2c0cae9aa0d"
+   },
+   "request_id": "robot-1-r15141",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1905 --seed 1 --from-life 1904 --fail-fast"
+}

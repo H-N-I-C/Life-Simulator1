@@ -1,0 +1,42 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 350,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adrea",
+    "last_name": "Lamb",
+    "gender": "female",
+    "country": "China",
+    "seed": 888638627,
+    "request_id": "robot-1-350-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_837400d0ff",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "cdf0d1d0-7ca5-47ea-b78a-e44c39305319"
+   },
+   "request_id": "robot-1-r2768",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 351 --seed 1 --from-life 350 --fail-fast"
+}

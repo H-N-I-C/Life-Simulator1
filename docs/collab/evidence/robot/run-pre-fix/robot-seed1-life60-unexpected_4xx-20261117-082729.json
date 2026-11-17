@@ -1,0 +1,96 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 60,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Ashley",
+    "last_name": "Wu",
+    "gender": "male",
+    "country": "Canada",
+    "seed": 724271245,
+    "request_id": "robot-1-60-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 153906895,
+     "base": "man",
+     "skin_tone": "dark",
+     "hair": "default",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_96da568ea3",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r691",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_96da568ea3",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r692",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_96da568ea3",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "ask_final"
+   },
+   "request_id": "robot-1-r693",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_96da568ea3",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "cancel"
+   },
+   "request_id": "robot-1-r694",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_96da568ea3",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "0cee80b1-71cb-45a8-9f44-457588678ef9"
+   },
+   "request_id": "robot-1-r695",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 61 --seed 1 --from-life 60 --fail-fast"
+}

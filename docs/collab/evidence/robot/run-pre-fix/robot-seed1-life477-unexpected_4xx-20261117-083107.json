@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 477,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aggi",
+    "last_name": "Powers",
+    "gender": "female",
+    "country": "Nigeria",
+    "seed": 1005210357,
+    "request_id": "robot-1-477-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 480719470,
+     "base": "man",
+     "skin_tone": "default",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "cap",
+      "earrings"
+     ],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_2edad435ad",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3693",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_2edad435ad",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "e2891615-0188-4508-9f42-2885c88afa7d"
+   },
+   "request_id": "robot-1-r3694",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 478 --seed 1 --from-life 477 --fail-fast"
+}

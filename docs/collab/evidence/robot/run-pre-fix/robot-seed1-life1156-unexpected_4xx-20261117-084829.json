@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1156,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Amandie",
+    "last_name": "Nichols",
+    "gender": "female",
+    "country": "India",
+    "seed": 430958216,
+    "request_id": "robot-1-1156-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 551465365,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "flower",
+      "earrings"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_0976fb8b12",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8956",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_0976fb8b12",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "bd7b3ef8-a76f-43fb-9474-4264974d2141"
+   },
+   "request_id": "robot-1-r8957",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1157 --seed 1 --from-life 1156 --fail-fast"
+}

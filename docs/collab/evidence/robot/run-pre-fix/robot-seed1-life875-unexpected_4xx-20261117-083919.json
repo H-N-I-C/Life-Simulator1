@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 875,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aub",
+    "last_name": "Woodard",
+    "gender": "male",
+    "country": "Germany",
+    "seed": 681394020,
+    "request_id": "robot-1-875-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 673901361,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "white",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "crown",
+      "flower"
+     ],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_6d6dceab72",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r6551",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_6d6dceab72",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "0355e1c3-3716-490c-b250-64256b8d4bfc"
+   },
+   "request_id": "robot-1-r6552",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 876 --seed 1 --from-life 875 --fail-fast"
+}

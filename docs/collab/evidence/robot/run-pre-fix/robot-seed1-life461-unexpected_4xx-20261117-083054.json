@@ -1,0 +1,72 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 461,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Abigale",
+    "last_name": "Hewitt",
+    "gender": "female",
+    "country": "Indonesia",
+    "seed": 1136422932,
+    "request_id": "robot-1-461-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 427840920,
+     "base": "woman",
+     "skin_tone": "medium-dark",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_489d866a06",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3586",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_489d866a06",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3587",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_489d866a06",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "58061b35-bc9c-487b-ad78-e1d9820c5101"
+   },
+   "request_id": "robot-1-r3588",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 462 --seed 1 --from-life 461 --fail-fast"
+}

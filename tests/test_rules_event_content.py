@@ -49,10 +49,12 @@ def load_events():
     events = {}
     for path in sorted(glob.glob(os.path.join(CONTENT_DIR, "*.json"))):
         data = json.load(open(path))
-        assert data.get("schema_version") == 2, path
+        # v2 and v3 files coexist (M2.5); each validates against its own
+        # schema (checked separately in test_rules_v3_loader).
+        assert data.get("schema_version", 2) in (2, 3), path
         for event in data["events"]:
             assert event["id"] not in events, event["id"]
-            events[event["id"]] = (event, path)
+            events[event["id"]] = (event, path, data.get("schema_version", 2))
     return events
 
 
@@ -67,7 +69,9 @@ class SchemaConformanceTest(unittest.TestCase):
                           event_id)
 
     def test_structure_and_soft_lock(self):
-        for event_id, (event, path) in self.events.items():
+        for event_id, (event, path, sv) in self.events.items():
+            if sv == 3:
+                continue  # v3 structure is validated by validate_event3
             for key in ("id", "title", "text", "category", "weight",
                         "conditions"):
                 self.assertIn(key, event, (event_id, key))
@@ -100,7 +104,7 @@ class SchemaConformanceTest(unittest.TestCase):
 
     def test_no_ambient_money_double_posting(self):
         # cost gates only; effects.money is the single posting (P6)
-        for event_id, (event, path) in self.events.items():
+        for event_id, (event, path, _sv) in self.events.items():
             if event.get("auto"):
                 continue
             for choice in event["choices"]:
@@ -116,14 +120,14 @@ class OracleMatchTest(unittest.TestCase):
 
     def test_occurrence_probabilities(self):
         for event_id, spec in ORACLE.items():
-            event, _ = self.events[ORACLE_TO_CONTENT[event_id]]
+            event, _, _ = self.events[ORACLE_TO_CONTENT[event_id]]
             want = spec["occurrence"]["n"]
             self.assertEqual(event.get("chance_n"), want,
                              f"{event_id} occurrence {event.get('chance_n')}"
                              f" != {want}")
 
     def test_lightning_branch_weights(self):
-        event, _ = self.events["lightning_strike"]
+        event, _, _ = self.events["lightning_strike"]
         self.assertTrue(event.get("auto"))
         weights = [o.get("weight", 1) for o in event["outcomes"]]
         self.assertEqual(weights, [5, 4, 1])  # 1/2, 2/5, death 1/10
@@ -133,7 +137,7 @@ class OracleMatchTest(unittest.TestCase):
     def test_breakup_and_divorce_ranges(self):
         for event_id, pre_key in (("partner_breakup_offer", None),
                                   ("partner_divorce_offer", None)):
-            event, _ = self.events[event_id]
+            event, _, _ = self.events[event_id]
             lo, hi = delta_range(event["effects"]["stats"]["happiness"])
             self.assertEqual((lo, hi), (-18, -15), event_id)
             ids = [c["id"] for c in event["choices"]]
@@ -149,7 +153,7 @@ class OracleMatchTest(unittest.TestCase):
                 self.assertEqual(money.get("sign"), -1)
 
     def test_kidnapping_ransom_and_rates(self):
-        event, _ = self.events["partner_kidnapping"]
+        event, _, _ = self.events["partner_kidnapping"]
         self.assertEqual(event["sampled_at_offer"]["ransom"]["money_pct"],
                          [0.2, 0.8])
         pay = event["choices"][0]
@@ -165,7 +169,7 @@ class OracleMatchTest(unittest.TestCase):
         self.assertEqual(nothing["effects"]["partner_death"], "presumed dead")
 
     def test_dating_and_vaccination(self):
-        dating, _ = self.events["dating_offer"]
+        dating, _, _ = self.events["dating_offer"]
         self.assertIn({"kind": "no_partner"},
                       dating["conditions"]["requires"])
         accept = dating["choices"][0]
@@ -175,7 +179,7 @@ class OracleMatchTest(unittest.TestCase):
             accept["branches"]["then"]["effects"]["stats"]["happiness"])
         self.assertEqual((lo, hi), (12, 20))
 
-        vacc, _ = self.events["vaccination_age2"]
+        vacc, _, _ = self.events["vaccination_age2"]
         self.assertEqual(vacc["conditions"]["min_age"], 2)
         self.assertEqual(vacc["conditions"]["max_age"], 2)
         bite = vacc["choices"][2]
@@ -186,7 +190,7 @@ class OracleMatchTest(unittest.TestCase):
         self.assertEqual(bite["effects"]["relationship"]["role"], "mother")
 
     def test_thanatophobia_ranges(self):
-        event, _ = self.events["thanatophobia_worry"]
+        event, _, _ = self.events["thanatophobia_worry"]
         self.assertTrue(event.get("auto"))
         stats = event["effects"]["stats"]
         self.assertEqual(delta_range(stats["happiness"]), (-6, -4))

@@ -9,10 +9,12 @@ otherwise the TEMPORARY web/stub_service.py (remove before acceptance).
 
 import html
 import json
+import logging
 import os
 import sys
 import threading
 import uuid
+from logging.handlers import RotatingFileHandler
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
@@ -32,8 +34,32 @@ STATIC = os.path.join(ROOT, "web", "static")
 AVATAR_STATIC = os.path.join(STATIC, "avatars")
 FIXTURES = os.path.join(ROOT, "tests", "fixtures", "appearances")
 SAVE_DIR = os.path.join(ROOT, "game_saves", "web")
+LOG_DIR = os.path.join(ROOT, "logs")
+SERVER_LOG = os.path.join(LOG_DIR, "server.log")
 
 BODY_MAX = 65536  # bounded request bodies
+
+_LOGGER = logging.getLogger("lifesim.web")
+
+
+def _ensure_logging(log_path=SERVER_LOG):
+    """Rotating server log (tracebacks + request summaries + crash ids).
+    Idempotent; only adds a handler for paths not already handled."""
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+    for h in _LOGGER.handlers:
+        if isinstance(h, RotatingFileHandler) \
+                and os.path.abspath(h.baseFilename) == os.path.abspath(log_path):
+            return
+    handler = RotatingFileHandler(log_path, maxBytes=1_000_000,
+                                  backupCount=3, encoding="utf-8")
+    handler.setFormatter(logging.Formatter(
+        "%(asctime)s %(levelname)s %(message)s"))
+    _LOGGER.addHandler(handler)
+    _LOGGER.setLevel(logging.INFO)
+
+
+def _crash_id():
+    return uuid.uuid4().hex[:12]
 
 AGES = [1, 8, 15, 30, 70]
 AGE_LABELS = {1: "Baby", 8: "Child", 15: "Teen", 30: "Adult", 70: "Elder"}
@@ -263,6 +289,22 @@ class Handler(BaseHTTPRequestHandler):
     def _error(self, code, message, status):
         self._json({"error": {"code": code, "message": message}}, status)
 
+    def _report_crash(self, exc):
+        """Log traceback + request summary with a crash id, then answer a
+        typed 500. Safe to call when nothing has been sent yet."""
+        crash_id = _crash_id()
+        request_id = getattr(self, "_current_request_id", None)
+        _LOGGER.error(
+            "crash id=%s method=%s path=%s request_id=%s client=%s: %r",
+            crash_id, self.command, self.path, request_id,
+            self.client_address[0] if self.client_address else "?",
+            exc, exc_info=True)
+        try:
+            self._json({"error": "internal", "crash_id": crash_id}, 500)
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+        return crash_id
+
     def _read_json_body(self):
         raw_length = self.headers.get("Content-Length")
         if raw_length is None:
@@ -295,6 +337,13 @@ class Handler(BaseHTTPRequestHandler):
 
     # -- routing -----------------------------------------------------------
     def do_GET(self):
+        try:
+            self._handle_get()
+        except Exception as exc:
+            # Connection-level fault after routing started: still log it.
+            self._report_crash(exc)
+
+    def _handle_get(self):
         parsed = urlparse(self.path)
         path = parsed.path
         qs = parse_qs(parsed.query)
@@ -374,6 +423,9 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"service": SERVICE_SOURCE,
                         "dev": bool(getattr(self.server, "dev_mode", False))})
             return
+        if path == "/api/health":
+            self._json({"status": "ok", "service": SERVICE_SOURCE})
+            return
         if path == "/api/scenarios":
             # dev-only scenario starts; hidden in normal play
             if not getattr(self.server, "dev_mode", False):
@@ -410,8 +462,31 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(_enriched_list_payload(self.server.service))
             except GameError as exc:
                 self._error(exc.code, exc.message, exc.status)
-            except Exception:
-                self._error("internal_error", "unexpected server error", 500)
+            except Exception as exc:
+                self._report_crash(exc)
+            return
+        if path.startswith("/api/games/") and \
+                path.endswith("/family-tree"):
+            game_id = path[len("/api/games/"):-len("/family-tree")]
+            focus = qs.get("focus", [None])[0]
+            try:
+                self._json(self.server.service.get_family_tree(
+                    game_id, focus_id=focus))
+            except GameError as exc:
+                self._error(exc.code, exc.message, exc.status)
+            except Exception as exc:
+                self._report_crash(exc)
+            return
+        if path.startswith("/api/games/") and \
+                path.endswith("/policy-state"):
+            game_id = path[len("/api/games/"):-len("/policy-state")]
+            try:
+                self._json(_policy_state_payload(self.server.service,
+                                                 game_id))
+            except GameError as exc:
+                self._error(exc.code, exc.message, exc.status)
+            except Exception as exc:
+                self._report_crash(exc)
             return
         if path.startswith("/api/games/"):
             game_id = path[len("/api/games/"):]
@@ -422,14 +497,15 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(self.server.service.get_state(game_id))
             except GameError as exc:
                 self._error(exc.code, exc.message, exc.status)
-            except Exception:
-                self._error("internal_error", "unexpected server error", 500)
+            except Exception as exc:
+                self._report_crash(exc)
             return
         self._send("not found", code=404)
 
     def do_POST(self):
         parsed = urlparse(self.path)
         path = parsed.path
+        self._current_request_id = None
         if not self._origin_ok():
             self._error("forbidden", "origin or host not allowed", 403)
             return
@@ -456,12 +532,37 @@ class Handler(BaseHTTPRequestHandler):
                                        key["file"]), "rb") as f:
                     self._send(f.read(), "image/png")
                 return
+            if path == "/api/client-error":
+                # B1's global error boundary reports here. Shape (frozen by
+                # A1): {kind, message, stack?, url?, game_id?} — all strings;
+                # kind in {"error", "unhandledrejection"}.
+                payload = self._read_json_body()
+                if not isinstance(payload.get("message"), str) \
+                        or not payload["message"]:
+                    raise GameError("invalid_input", "message is required",
+                                    400)
+                for optional in ("kind", "stack", "url", "game_id"):
+                    if optional in payload \
+                            and not isinstance(payload[optional], str):
+                        raise GameError(
+                            "invalid_input", "%s must be a string" % optional,
+                            400)
+                _LOGGER.error(
+                    "client-error kind=%s url=%s game_id=%s message=%s stack=%s",
+                    (payload.get("kind") or "error")[:64],
+                    (payload.get("url") or "")[:256],
+                    (payload.get("game_id") or "")[:64],
+                    payload["message"][:2000],
+                    (payload.get("stack") or "")[:4000])
+                self._json({"ok": True})
+                return
             if path == "/api/games":
                 payload = self._read_json_body()
                 profile = {k: payload.get(k) for k in (
                     "first_name", "last_name", "gender", "country",
                     "appearance", "seed", "scenario")}
                 request_id = self._require_request_id(payload)
+                self._current_request_id = request_id
                 state = self.server.service.new_game(profile, request_id)
                 self._json(state, 201)
                 return
@@ -469,6 +570,7 @@ class Handler(BaseHTTPRequestHandler):
                 game_id = path[len("/api/games/"):-len("/actions")]
                 payload = self._read_json_body()
                 request_id = self._require_request_id(payload)
+                self._current_request_id = request_id
                 expected = payload.get("expected_revision")
                 if not isinstance(expected, int):
                     raise GameError("invalid_input",
@@ -488,13 +590,42 @@ class Handler(BaseHTTPRequestHandler):
                     game_id, expected, request_id, action, body)
                 self._json(state)
                 return
+            for suffix, handler in (
+                    ("/editor/preview", "_editor_preview"),
+                    ("/editor/apply", "_editor_apply")):
+                if path.startswith("/api/games/") and path.endswith(suffix):
+                    game_id = path[len("/api/games/"):-len(suffix)]
+                    payload = self._read_json_body()
+                    getattr(self, handler)(game_id, payload)
+                    return
             self._send("not found", code=404)
         except GameError as exc:
             self._error(exc.code, exc.message, exc.status)
-        except Exception:
+        except Exception as exc:
             # All deliberate validation raises GameError; anything else is
-            # a server fault — no traceback/path exposure.
-            self._error("internal_error", "unexpected server error", 500)
+            # a server fault: log a crash id (traceback stays server-side).
+            self._report_crash(exc)
+
+    def _editor_preview(self, game_id, payload):
+        try:
+            result = self.server.service.editor_preview(
+                game_id, payload.get("commands"))
+            self._json(result)
+        except GameError as exc:
+            self._error(exc.code, exc.message, exc.status)
+
+    def _editor_apply(self, game_id, payload):
+        try:
+            request_id = self._require_request_id(payload)
+            expected = payload.get("expected_revision")
+            if not isinstance(expected, int):
+                raise GameError("invalid_input",
+                                "expected_revision (int) is required", 400)
+            result = self.server.service.editor_apply(
+                game_id, expected, request_id, payload.get("commands"))
+            self._json(result)
+        except GameError as exc:
+            self._error(exc.code, exc.message, exc.status)
 
     def _require_request_id(self, payload):
         request_id = payload.get("request_id")
@@ -504,6 +635,32 @@ class Handler(BaseHTTPRequestHandler):
             raise GameError("invalid_input", "request_id too long", 400)
         return request_id
 
+
+
+def _policy_state_payload(service, game_id):
+    """GET /api/games/<id>/policy-state: A's policy state merged with the
+    catalogs subset (faiths incl. labels/tenets, jurisdictions) and the
+    people roster the editor UI needs. Read-only."""
+    from src.game.features.relationship_policy import catalog as \
+        policy_catalog
+    cat = policy_catalog.load_catalog()
+    state = service.get_state(game_id)
+    policy = service.get_policy_state(game_id)
+    roster = [{"id": p["id"], "name": p.get("name", ""),
+               "alive": p.get("alive", True)}
+              for p in state.get("people", [])]
+    return {"policy": policy,
+            "jurisdiction_id": policy.get("jurisdiction_id"),
+            "profiles": policy.get("profiles"),
+            "overrides": policy.get("overrides"),
+            "policy_revision": policy.get("policy_revision"),
+            "editor_audit": policy.get("editor_audit"),
+            "catalogs": {"faiths": cat.get("faiths", []),
+                         "jurisdictions": [{
+                             "id": j["id"], "label": j.get("label", j["id"]),
+                             "recognition": j.get("recognition", {})}
+                            for j in cat.get("jurisdiction_presets", [])]},
+            "people": roster}
 
 
 def _enriched_list_payload(service):
@@ -525,7 +682,8 @@ def _enriched_list_payload(service):
     return listing
 
 
-def make_server(port=8765, save_dir=SAVE_DIR):
+def make_server(port=8765, save_dir=SAVE_DIR, log_path=SERVER_LOG):
+    _ensure_logging(log_path)
     server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     server.service = GameService(save_dir)
     return server

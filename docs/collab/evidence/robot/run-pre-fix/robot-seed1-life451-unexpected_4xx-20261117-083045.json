@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 451,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alvina",
+    "last_name": "Rollins",
+    "gender": "female",
+    "country": "France",
+    "seed": 310993480,
+    "request_id": "robot-1-451-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 2077269360,
+     "base": "woman",
+     "skin_tone": "medium-light",
+     "hair": "white",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "flower"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_7a3a7998be",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r3535",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_7a3a7998be",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "e7359e85-0fe5-4dc8-a5fe-0e3d1a1ab574"
+   },
+   "request_id": "robot-1-r3536",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 452 --seed 1 --from-life 451 --fail-fast"
+}

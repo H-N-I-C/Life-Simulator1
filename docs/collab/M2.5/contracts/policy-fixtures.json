@@ -1,0 +1,484 @@
+{
+  "_status": "PROPOSAL (Kimi B, 2026-11-17). Executable fixtures for the policy evaluator (policy-evaluator.md §3 mappings — all scores hand-checkable). The actual accept/refuse DRAW is C's per-offer seeded sampling and is NOT asserted here; only the deterministic p_refuse formula result is. D can execute these cross-contract after freeze.",
+  "evaluator_version": "ev-1.0.0-proposal",
+  "evaluator_entry": {
+    "_for_d": "entry point the eligibility-matrix runner loads after freeze",
+    "module": "src/game/features/relationship_policy/evaluator.py",
+    "function": "evaluate_offer",
+    "signature": "evaluate_offer(interaction_kind, initiator_id, target_id, context, *, rng=None) -> EvaluatorResult (policy-evaluator.md §5)",
+    "chronology_guard": "delegates adult/dead checks to A's centralized guard (A publishes the hook separately)"
+  },
+  "reason_code_vocabulary": {
+    "_for_d": "soft-score reason codes (emitted in reasons[] when |contribution| >= 3); hard-validity codes are returned via hard.code, never in reasons[]",
+    "soft": [
+      "attraction",
+      "chemistry",
+      "trust",
+      "personal_tenets",
+      "faith_tenets",
+      "culture",
+      "law_risk",
+      "reputation",
+      "class",
+      "adult_age_gap",
+      "existing_commitments",
+      "kinship",
+      "convert_request"
+    ],
+    "hard": [
+      "not_adult",
+      "dead",
+      "self_target",
+      "unknown_person",
+      "duplicate_member",
+      "graph_error"
+    ]
+  },
+  "personas": {
+    "initiator_generic": {
+      "person_ref": "p_init",
+      "gender": "female",
+      "profile": {
+        "faith_id": "faith_unaffiliated",
+        "culture_id": "culture_meridian",
+        "orientation": "bisexual",
+        "openness": 0.5,
+        "jealousy": 0.4,
+        "monogamy_preference": 0.5,
+        "attraction_to_initiator": null
+      }
+    },
+    "target_riverlands_faithful": {
+      "person_ref": "p_t1",
+      "gender": "male",
+      "age": 30,
+      "profile": {
+        "faith_id": "faith_ancestorist",
+        "culture_id": "culture_meridian",
+        "orientation": "heterosexual",
+        "openness": 0.5,
+        "jealousy": 0.4,
+        "monogamy_preference": 0.8,
+        "personal_tenet_overrides": {},
+        "attraction_to_initiator": 0.5
+      }
+    },
+    "target_dissenter": {
+      "person_ref": "p_t2",
+      "gender": "male",
+      "age": 29,
+      "profile": {
+        "faith_id": "faith_ancestorist",
+        "culture_id": "culture_meridian",
+        "orientation": "heterosexual",
+        "openness": 0.7,
+        "jealousy": 0.3,
+        "monogamy_preference": 0.2,
+        "personal_tenet_overrides": {
+          "plural_unions": "favoured"
+        },
+        "attraction_to_initiator": 0.8
+      }
+    },
+    "target_port_plural": {
+      "person_ref": "p_t3",
+      "gender": "female",
+      "age": 28,
+      "profile": {
+        "faith_id": "faith_tidebound",
+        "culture_id": "culture_saraki",
+        "orientation": "bisexual",
+        "openness": 0.6,
+        "jealousy": 0.35,
+        "monogamy_preference": 0.3,
+        "personal_tenet_overrides": {},
+        "attraction_to_initiator": 0.7
+      }
+    }
+  },
+  "fixtures": [
+    {
+      "name": "illegal_but_attemptable_plural_union",
+      "_intent": "Recognition changes consequences, NEVER eligibility (spec §3 freeze fixture).",
+      "input": {
+        "interaction_kind": "propose_plural_union",
+        "initiator": "initiator_generic",
+        "target": "target_riverlands_faithful",
+        "context": {
+          "relationship": {
+            "chemistry": 20,
+            "trust": 30
+          },
+          "existing_unions_target": [
+            "u_1"
+          ],
+          "kinship_category": "none",
+          "age_gap_years": 4,
+          "jurisdiction": "jur_riverlands",
+          "reputation": 0
+        }
+      },
+      "expected": {
+        "hard": {
+          "ok": true
+        },
+        "score": 12,
+        "score_breakdown": {
+          "base": 50,
+          "attraction": 0,
+          "chemistry": -6,
+          "trust": -4,
+          "personal_tenets": 0,
+          "faith_tenets": -10,
+          "culture": 0,
+          "law_risk": -12,
+          "reputation": 0,
+          "class": 0,
+          "adult_age_gap": 0,
+          "existing_commitments": -6
+        },
+        "faith_tenets_detail": "plural_unions -6 + interfaith_unions -6, clamped to the frozen faith_tenets bound [-10, +10] (CORRECTED 2026-11-17: pre-freeze total summed the unclamped -12; flagged to Claude)",
+        "reasons_include": [
+          "chemistry",
+          "faith_tenets",
+          "law_risk",
+          "existing_commitments"
+        ],
+        "refusal": {
+          "possible": true,
+          "p_refuse": 0.33
+        },
+        "projected_recognition": {
+          "status": "unrecognized",
+          "jurisdiction_id": "jur_riverlands",
+          "law_version": 0,
+          "basis": "ceremony"
+        },
+        "projected_consequences": [
+          {
+            "trigger": "ceremony_of_unrecognized_union",
+            "effect": "civil_fine",
+            "ledger_category": "legal",
+            "amount_range": [
+              500,
+              2000
+            ]
+          }
+        ],
+        "eligibility_note": "attemptable despite the unrecognized projection; the fine posts once per union at ceremony"
+      }
+    },
+    {
+      "name": "refusal_stays_possible_at_high_score",
+      "_intent": "A high score does not manufacture consent (spec §1): p_refuse is always >= 0.05 and C's sampled draw may refuse.",
+      "input": {
+        "interaction_kind": "propose_plural_union",
+        "initiator": "initiator_generic",
+        "target": "target_dissenter",
+        "context": {
+          "relationship": {
+            "chemistry": 100,
+            "trust": 100
+          },
+          "existing_unions_target": [],
+          "kinship_category": "none",
+          "age_gap_years": 2,
+          "jurisdiction": "jur_metropolis_charter",
+          "reputation": 0
+        }
+      },
+      "expected": {
+        "hard": {
+          "ok": true
+        },
+        "score": 78,
+        "score_breakdown": {
+          "base": 50,
+          "attraction": 9,
+          "chemistry": 10,
+          "trust": 10,
+          "personal_tenets": 8,
+          "faith_tenets": -9,
+          "culture": 0,
+          "law_risk": 0,
+          "reputation": 0,
+          "class": 0,
+          "adult_age_gap": 0,
+          "existing_commitments": 0
+        },
+        "faith_tenets_detail": "plural_unions -3 (halved: personal override), interfaith_unions -6 (full weight)",
+        "refusal": {
+          "possible": true,
+          "p_refuse": 0.23
+        },
+        "projected_recognition": {
+          "status": "recognized",
+          "jurisdiction_id": "jur_metropolis_charter",
+          "law_version": 0,
+          "basis": "ceremony"
+        }
+      }
+    },
+    {
+      "name": "personal_override_halves_public_tenet_weight",
+      "_intent": "Personal dissent differs from public teaching: the overridden public tenet counts at half weight (-6 -> -3).",
+      "input": {
+        "interaction_kind": "propose_plural_union",
+        "initiator": "initiator_generic",
+        "target": "target_dissenter",
+        "context": {
+          "relationship": {
+            "chemistry": 40,
+            "trust": 40
+          },
+          "existing_unions_target": [],
+          "kinship_category": "none",
+          "age_gap_years": 2,
+          "jurisdiction": "jur_highland_compact",
+          "reputation": 0
+        }
+      },
+      "expected": {
+        "hard": {
+          "ok": true
+        },
+        "score": 54,
+        "score_breakdown": {
+          "base": 50,
+          "attraction": 9,
+          "chemistry": -2,
+          "trust": -2,
+          "personal_tenets": 8,
+          "faith_tenets": -9,
+          "culture": 0,
+          "law_risk": 0,
+          "reputation": 0,
+          "class": 0,
+          "adult_age_gap": 0,
+          "existing_commitments": 0
+        },
+        "reasons_include": [
+          "personal_tenets",
+          "faith_tenets",
+          "attraction"
+        ],
+        "refusal": {
+          "possible": true,
+          "p_refuse": 0.23
+        },
+        "projected_recognition": {
+          "status": "recognized",
+          "jurisdiction_id": "jur_highland_compact",
+          "law_version": 0,
+          "basis": "ceremony"
+        }
+      }
+    },
+    {
+      "name": "bounded_adult_age_gap_contribution",
+      "_intent": "Large adult age gaps are a bounded soft penalty only; both adults remain fully eligible.",
+      "input": {
+        "interaction_kind": "propose_union",
+        "initiator": "initiator_generic",
+        "target": "target_port_plural",
+        "context": {
+          "relationship": {
+            "chemistry": 50,
+            "trust": 50
+          },
+          "existing_unions_target": [],
+          "kinship_category": "none",
+          "age_gap_years": 34,
+          "jurisdiction": "jur_metropolis_charter",
+          "reputation": 0
+        }
+      },
+      "expected": {
+        "hard": {
+          "ok": true
+        },
+        "score": 42,
+        "score_breakdown": {
+          "base": 50,
+          "attraction": 6,
+          "chemistry": 0,
+          "trust": 0,
+          "personal_tenets": 0,
+          "faith_tenets": 0,
+          "culture": -4,
+          "law_risk": 0,
+          "reputation": 0,
+          "class": 0,
+          "adult_age_gap": -10,
+          "existing_commitments": 0
+        },
+        "faith_tenets_detail": "interfaith_unions -6 + same_gender_unions +6 (both participants female) = 0",
+        "culture_detail": "saraki interfaith_social_stance disfavoured -4",
+        "refusal": {
+          "possible": true,
+          "p_refuse": 0.28
+        }
+      }
+    },
+    {
+      "name": "neutral_defaults_no_name_gender_inference",
+      "_intent": "Identical profiles score identically regardless of names (spec §3); only profile data matters.",
+      "input_variants": [
+        {
+          "label": "Aisha + Maria",
+          "rename": {
+            "p_init": "Aisha",
+            "p_t3": "Maria"
+          }
+        },
+        {
+          "label": "Sam + Robin",
+          "rename": {
+            "p_init": "Sam",
+            "p_t3": "Robin"
+          }
+        },
+        {
+          "label": "Yuki + Noor",
+          "rename": {
+            "p_init": "Yuki",
+            "p_t3": "Noor"
+          }
+        }
+      ],
+      "input": {
+        "interaction_kind": "propose_union",
+        "initiator": "initiator_generic",
+        "target": "target_port_plural",
+        "context": {
+          "relationship": {
+            "chemistry": 50,
+            "trust": 50
+          },
+          "existing_unions_target": [],
+          "kinship_category": "none",
+          "age_gap_years": 3,
+          "jurisdiction": "jur_metropolis_charter",
+          "reputation": 0
+        }
+      },
+      "expected": {
+        "same_score_for_all_variants": 52,
+        "hard": {
+          "ok": true
+        },
+        "score_breakdown": {
+          "base": 50,
+          "attraction": 6,
+          "culture": -4
+        },
+        "refusal": {
+          "possible": true,
+          "p_refuse": 0.28
+        }
+      }
+    },
+    {
+      "name": "kinship_is_soft_acceptance_only",
+      "_intent": "Related adults remain fully attemptable (spec fixed rule); kinship is a bounded social acceptance contribution, NOT a gate and NOT the biological health coefficient (that is A's conception model).",
+      "input": {
+        "interaction_kind": "propose_union",
+        "initiator": "initiator_generic",
+        "target": {
+          "person_ref": "p_cousin",
+          "gender": "male",
+          "age": 27,
+          "profile": {
+            "faith_id": "faith_unaffiliated",
+            "culture_id": "culture_meridian",
+            "orientation": "bisexual",
+            "openness": 0.5,
+            "jealousy": 0.4,
+            "monogamy_preference": 0.5,
+            "personal_tenet_overrides": {},
+            "attraction_to_initiator": 0.5
+          }
+        },
+        "context": {
+          "relationship": {
+            "chemistry": 50,
+            "trust": 50
+          },
+          "existing_unions_target": [],
+          "kinship_category": "first_cousin",
+          "age_gap_years": 3,
+          "jurisdiction": "jur_metropolis_charter",
+          "reputation": 0
+        }
+      },
+      "expected": {
+        "hard": {
+          "ok": true
+        },
+        "score": 44,
+        "score_breakdown": {
+          "base": 50,
+          "attraction": 0,
+          "chemistry": 0,
+          "trust": 0,
+          "personal_tenets": 0,
+          "faith_tenets": 0,
+          "culture": 0,
+          "law_risk": 0,
+          "reputation": 0,
+          "class": 0,
+          "adult_age_gap": 0,
+          "existing_commitments": 0,
+          "kinship": -6
+        },
+        "reasons_include": [
+          "kinship"
+        ],
+        "refusal": {
+          "possible": true,
+          "p_refuse": 0.33
+        },
+        "eligibility_note": "attemptable; -6 is social acceptance only. Social/adoptive/in-law links alone score 0; the biological coefficient is never part of this score."
+      }
+    },
+    {
+      "name": "hard_validity_rejections",
+      "_intent": "Hard failures never produce a score and are not overridable by editor, tenets, laws or content.",
+      "cases": [
+        {
+          "input_overrides": {
+            "target_age": 17
+          },
+          "expected_hard_code": "not_adult"
+        },
+        {
+          "input_overrides": {
+            "initiator_age": 17
+          },
+          "expected_hard_code": "not_adult"
+        },
+        {
+          "input_overrides": {
+            "target_dead": true
+          },
+          "expected_hard_code": "dead"
+        },
+        {
+          "input_overrides": {
+            "target_id_same_as_initiator": true
+          },
+          "expected_hard_code": "self_target"
+        },
+        {
+          "input_overrides": {
+            "target_id": "p_unknown"
+          },
+          "expected_hard_code": "unknown_person"
+        }
+      ],
+      "expected": {
+        "no_score_on_hard_failure": true
+      }
+    }
+  ]
+}

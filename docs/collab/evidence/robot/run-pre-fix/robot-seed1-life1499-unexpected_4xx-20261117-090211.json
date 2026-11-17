@@ -1,0 +1,72 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1499,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adaline",
+    "last_name": "Locklear",
+    "gender": "female",
+    "country": "UK",
+    "seed": 1722151256,
+    "request_id": "robot-1-1499-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1086455236,
+     "base": "person",
+     "skin_tone": "default",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_6755fe14b9",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11889",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_6755fe14b9",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11890",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_6755fe14b9",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "b9855792-27a8-463b-a370-3b27de7a60e5"
+   },
+   "request_id": "robot-1-r11891",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1500 --seed 1 --from-life 1499 --fail-fast"
+}

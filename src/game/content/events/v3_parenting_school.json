@@ -1,0 +1,311 @@
+{
+  "schema_version": 3,
+  "events": [
+    {
+      "id": "par_school_bully",
+      "title": "Trouble at School",
+      "text": "{person:child} has been coming home quiet. Today you learned why: someone at school has been picking on them.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "school_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "school",
+          "label": "Go to the school and sort it out",
+          "effects": {
+            "relationship": 6,
+            "stress": 3
+          },
+          "outcome_text": "It was awkward, official, and absolutely the right call."
+        },
+        {
+          "id": "stand_up",
+          "label": "Coach them to stand up for themselves",
+          "effects": {
+            "relationship": 4,
+            "happiness": 1,
+            "stress": 1
+          },
+          "outcome_text": "We practised comebacks at the dinner table."
+        },
+        {
+          "id": "ignore",
+          "label": "Kids work these things out alone",
+          "effects": {
+            "relationship": -5,
+            "stress": 2
+          },
+          "outcome_text": "The quiet at dinner lasted a long time."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_school_project",
+      "title": "Science Fair Season",
+      "text": "The science fair is in two weeks and {person:child} wants to build a volcano. A big volcano.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "school_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "supplies",
+          "label": "Buy proper supplies",
+          "effects": {
+            "money": -30,
+            "relationship": 5,
+            "happiness": 2
+          },
+          "outcome_text": "The eruption made the neighbours look over the fence."
+        },
+        {
+          "id": "weekend",
+          "label": "Build it from cupboard scraps together",
+          "effects": {
+            "happiness": 3,
+            "stress": 3,
+            "relationship": 4
+          },
+          "outcome_text": "It leaned a little, and it was magnificent."
+        },
+        {
+          "id": "solo",
+          "label": "Let them handle it alone",
+          "effects": {
+            "relationship": -2,
+            "happiness": -1
+          },
+          "outcome_text": "The volcano was small. So was the smile about it."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_school_sport",
+      "title": "Team Tryouts",
+      "text": "{person:child} wants to join the school team. Practices are three evenings a week, plus fees.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "school_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "fees",
+          "label": "Pay the fees and clear your evenings",
+          "effects": {
+            "money": -80,
+            "happiness": 3,
+            "relationship": 5
+          },
+          "outcome_text": "I memorised the practice schedule faster than they did."
+        },
+        {
+          "id": "carpool",
+          "label": "Make the logistics work yourself",
+          "effects": {
+            "stress": 4,
+            "relationship": 4
+          },
+          "outcome_text": "My weeks became a relay race of pickups."
+        },
+        {
+          "id": "no",
+          "label": "It's too much this term",
+          "effects": {
+            "relationship": -4,
+            "happiness": -2
+          },
+          "outcome_text": "They said fine. They did not say it warmly."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_school_report",
+      "title": "The Report Card",
+      "text": "{person:child}'s report card came home with numbers that need a conversation.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "school_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "tutor",
+          "label": "Hire a tutor",
+          "effects": {
+            "money": -150,
+            "relationship": 3,
+            "stress": -1
+          },
+          "outcome_text": "The next report card told its own story."
+        },
+        {
+          "id": "ground",
+          "label": "Ground them until it improves",
+          "effects": {
+            "relationship": -5,
+            "stress": 2
+          },
+          "outcome_text": "The house was disciplined and cold."
+        },
+        {
+          "id": "shrug",
+          "label": "Grades aren't everything",
+          "effects": {
+            "relationship": 1,
+            "happiness": 1
+          },
+          "outcome_text": "The conversation never quite happened."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_school_lunch",
+      "title": "Lunch Money",
+      "text": "{person:child} admits, eventually, that lunch money has been 'going missing' at school.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "school_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "top_up",
+          "label": "Top up the money and talk about it",
+          "effects": {
+            "money": -10,
+            "relationship": 4
+          },
+          "outcome_text": "The real conversation happened over dinner."
+        },
+        {
+          "id": "packed",
+          "label": "Pack lunch from now on",
+          "effects": {
+            "stress": 2,
+            "relationship": 1
+          },
+          "outcome_text": "Balanced meals, slightly resentful gratitude."
+        },
+        {
+          "id": "tough",
+          "label": "They should handle it themselves",
+          "effects": {
+            "relationship": -3
+          },
+          "outcome_text": "They stopped mentioning lunch."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_pet_request",
+      "title": "Please Please Please",
+      "text": "{person:child} has produced a hand-drawn contract promising to walk, feed and love a dog. It is very convincing.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "school_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "dog",
+          "label": "Adopt the dog",
+          "effects": {
+            "money": -120,
+            "happiness": 8,
+            "stress": 2
+          },
+          "outcome_text": "The contract survived three weeks. The dog stayed forever."
+        },
+        {
+          "id": "fish",
+          "label": "Start with a fish",
+          "effects": {
+            "money": -20,
+            "happiness": 3,
+            "relationship": 2
+          },
+          "outcome_text": "The fish was named Captain. Responsibilities were partial."
+        },
+        {
+          "id": "no",
+          "label": "No pets",
+          "effects": {
+            "relationship": -4,
+            "happiness": -2
+          },
+          "outcome_text": "The drawings on the fridge stopped appearing."
+        }
+      ],
+      "weight": 1
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 39,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alexei",
+    "last_name": "Cross",
+    "gender": "male",
+    "country": "USA",
+    "seed": 200009811,
+    "request_id": "robot-1-39-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1745798938,
+     "base": "person",
+     "skin_tone": "medium-light",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_144eb1a18b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r585",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_144eb1a18b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r586",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_144eb1a18b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r587",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_144eb1a18b",
+   "action": "play_toys",
+   "payload": {},
+   "request_id": "robot-1-r588",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_144eb1a18b",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "68c039f1-828c-4d30-a8f8-b23d80893781"
+   },
+   "request_id": "robot-1-r589",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 40 --seed 1 --from-life 39 --fail-fast"
+}

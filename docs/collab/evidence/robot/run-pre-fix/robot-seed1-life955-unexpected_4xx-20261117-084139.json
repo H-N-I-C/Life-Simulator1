@@ -1,0 +1,78 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 955,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adela",
+    "last_name": "Hamilton",
+    "gender": "female",
+    "country": "China",
+    "seed": 1496301402,
+    "request_id": "robot-1-955-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 183849359,
+     "base": "woman",
+     "skin_tone": "medium-light",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "flower",
+      "crown"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_9e25b6dce9",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r7230",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_9e25b6dce9",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r7231",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_9e25b6dce9",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "13f7ef18-bebb-45d4-9c3b-d72e52a81c11"
+   },
+   "request_id": "robot-1-r7232",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 956 --seed 1 --from-life 955 --fail-fast"
+}

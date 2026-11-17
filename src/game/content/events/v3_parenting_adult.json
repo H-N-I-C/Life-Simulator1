@@ -1,0 +1,307 @@
+{
+  "schema_version": 3,
+  "events": [
+    {
+      "id": "par_adult_moving_out",
+      "title": "Boxes by the Door",
+      "text": "{person:child} is moving out. The boxes have been packed with alarming efficiency.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "deposit",
+          "label": "Help with the deposit",
+          "effects": {
+            "money": -800,
+            "relationship": 6,
+            "happiness": 2
+          },
+          "outcome_text": "A new key, a tight hug, and a very quiet drive home."
+        },
+        {
+          "id": "support",
+          "label": "Give furniture and fierce pride",
+          "effects": {
+            "relationship": 5,
+            "happiness": 1
+          },
+          "outcome_text": "My lamp has a new life now."
+        },
+        {
+          "id": "stay",
+          "label": "Are you sure about this?",
+          "effects": {
+            "relationship": -5,
+            "stress": 2
+          },
+          "outcome_text": "They left anyway, and the goodbye was colder than the weather."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_adult_wedding",
+      "title": "The Wedding",
+      "text": "{person:child} is getting married and, delicately, budget conversations have begun.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "contribute",
+          "label": "Contribute properly",
+          "effects": {
+            "money": -2000,
+            "happiness": 5,
+            "relationship": 6
+          },
+          "outcome_text": "The toast I gave made the whole tent cry."
+        },
+        {
+          "id": "gift",
+          "label": "A modest gift, lovingly chosen",
+          "effects": {
+            "money": -200,
+            "happiness": 2,
+            "relationship": 3
+          },
+          "outcome_text": "It wasn't the biggest gift, and they knew what it meant."
+        },
+        {
+          "id": "handmade",
+          "label": "Offer time instead: plan it with them",
+          "effects": {
+            "stress": 4,
+            "relationship": 5,
+            "happiness": 3
+          },
+          "outcome_text": "Six weeks of spreadsheets and one unforgettable day."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_adult_job_loss",
+      "title": "Between Jobs",
+      "text": "{person:child} lost their job. The brave voice on the phone fooled no one.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "support",
+          "label": "Cover their rent this month",
+          "effects": {
+            "money": -1000,
+            "relationship": 6
+          },
+          "outcome_text": "That's what family is for, I said, and meant it."
+        },
+        {
+          "id": "advice",
+          "label": "Work the problem together over dinner",
+          "effects": {
+            "relationship": 4,
+            "happiness": 1
+          },
+          "outcome_text": "Three hours, two pots of coffee, one plan."
+        },
+        {
+          "id": "tough_love",
+          "label": "They're an adult now",
+          "effects": {
+            "relationship": -4
+          },
+          "outcome_text": "The phone calls got shorter."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_adult_inlaw",
+      "title": "In-Law Troubles",
+      "text": "{person:child} unloads about their partner over coffee. It is the third time this month.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "side",
+          "label": "Side with your kid, obviously",
+          "effects": {
+            "relationship": 3,
+            "stress": 1
+          },
+          "outcome_text": "My loyalty was noted. So was the escalation."
+        },
+        {
+          "id": "neutral",
+          "label": "Stay diplomatically neutral",
+          "effects": {
+            "stress": -2,
+            "relationship": 2
+          },
+          "outcome_text": "I listened, nodded, and fixed nothing — which helped."
+        },
+        {
+          "id": "defend",
+          "label": "Defend the partner",
+          "effects": {
+            "relationship": -4
+          },
+          "outcome_text": "The coffee ended early."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_adult_birthday",
+      "title": "Your Birthday",
+      "text": "{person:child} wants to take you out for your birthday. They are insistent.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Let them treat you",
+          "effects": {
+            "happiness": 5,
+            "relationship": 3
+          },
+          "outcome_text": "Watching them signal the waiter was worth every year."
+        },
+        {
+          "id": "cook",
+          "label": "Insist on cooking for everyone instead",
+          "effects": {
+            "happiness": 4,
+            "stress": 2
+          },
+          "outcome_text": "My kitchen, my rules, my favourite people."
+        },
+        {
+          "id": "lowkey",
+          "label": "Keep it low-key this year",
+          "effects": {
+            "happiness": 2,
+            "stress": -1
+          },
+          "outcome_text": "A phone call, a card, quiet contentment."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_adult_car",
+      "title": "Breakdown on the Highway",
+      "text": "{person:child}'s car died dramatically on the highway, one week before rent is due.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "adult_child_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "repairs",
+          "label": "Pay for the repairs",
+          "effects": {
+            "money": -600,
+            "relationship": 5
+          },
+          "outcome_text": "The car lives. The gratitude was loud."
+        },
+        {
+          "id": "lend",
+          "label": "Lend part, they cover the rest",
+          "effects": {
+            "money": -300,
+            "relationship": 3
+          },
+          "outcome_text": "A handwritten IOU appeared on my fridge."
+        },
+        {
+          "id": "budget",
+          "label": "Teach them to budget around it",
+          "effects": {
+            "relationship": -2,
+            "stress": 1
+          },
+          "outcome_text": "Useful. Unpopular. Useful."
+        }
+      ],
+      "weight": 1
+    }
+  ]
+}

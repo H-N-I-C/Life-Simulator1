@@ -1,0 +1,313 @@
+{
+  "schema_version": 3,
+  "events": [
+    {
+      "id": "par_grandkid_visit",
+      "title": "First Solo Visit",
+      "text": "{person:child} is arriving for their first sleepover at your place, clutching a small suitcase and big plans.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "grandchild_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "spoil",
+          "label": "A weekend of spoiling",
+          "effects": {
+            "money": -40,
+            "happiness": 6,
+            "relationship": 4
+          },
+          "outcome_text": "Pancakes for dinner. Rules suspended. Memories made."
+        },
+        {
+          "id": "crafts",
+          "label": "Crafts, stories and early bedtimes",
+          "effects": {
+            "happiness": 4,
+            "stress": 1,
+            "relationship": 3
+          },
+          "outcome_text": "The macaroni art hangs in a place of honour."
+        },
+        {
+          "id": "busy",
+          "label": "Postpone — you're swamped",
+          "effects": {
+            "happiness": -3,
+            "relationship": -2
+          },
+          "outcome_text": "The suitcase went home unopened."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_grandkid_play",
+      "title": "The School Play",
+      "text": "{person:child} has a small but, they stress, pivotal role in the school play.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "grandchild_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "attend",
+          "label": "Travel in for opening night",
+          "effects": {
+            "money": -100,
+            "happiness": 6,
+            "relationship": 5
+          },
+          "outcome_text": "Second row. Full heart. A standing ovation of one, many times."
+        },
+        {
+          "id": "gift",
+          "label": "Send flowers for the dressing room",
+          "effects": {
+            "money": -25,
+            "happiness": 3,
+            "relationship": 3
+          },
+          "outcome_text": "My card was read aloud to the whole cast."
+        },
+        {
+          "id": "miss",
+          "label": "You'll catch the next one",
+          "effects": {
+            "happiness": -2,
+            "relationship": -2
+          },
+          "outcome_text": "There is always a next one, they said brightly."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_grandkid_week",
+      "title": "A Week of Babysitting",
+      "text": "An emergency at home: could you take {person:child} for a full week?",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "grandchild_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "yes",
+          "label": "Take the whole week",
+          "effects": {
+            "stress": 5,
+            "happiness": 4,
+            "relationship": 5
+          },
+          "outcome_text": "Seven days. I slept for ten afterwards. Worth it."
+        },
+        {
+          "id": "days",
+          "label": "Take a few days, not all",
+          "effects": {
+            "stress": 2,
+            "happiness": 2,
+            "relationship": 2
+          },
+          "outcome_text": "A compromise everyone could live with."
+        },
+        {
+          "id": "no",
+          "label": "You can't manage it this time",
+          "effects": {
+            "relationship": -3,
+            "stress": -1
+          },
+          "outcome_text": "Needs must, and it stung anyway."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_grandkid_recipe",
+      "title": "The Family Recipe",
+      "text": "{person:child} has decided it is time to learn the famous family recipe. From you. Properly.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "grandchild_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "baking",
+          "label": "A full baking day together",
+          "effects": {
+            "happiness": 5,
+            "stress": -2,
+            "relationship": 5
+          },
+          "outcome_text": "Flour everywhere. The secret is apparently 'a feeling'."
+        },
+        {
+          "id": "card",
+          "label": "Write it down on a recipe card",
+          "effects": {
+            "relationship": 3,
+            "happiness": 2
+          },
+          "outcome_text": "The card is already creased from being carried around."
+        },
+        {
+          "id": "busy",
+          "label": "Maybe when they're older",
+          "effects": {
+            "relationship": -2
+          },
+          "outcome_text": "Some recipes wait. Hopefully not too long."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_grandkid_holiday",
+      "title": "Holiday Plans",
+      "text": "The family is negotiating where to spend the holidays, and {person:child} has voted loudly for your house.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "grandchild_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "host",
+          "label": "Host everyone at yours",
+          "effects": {
+            "money": -500,
+            "happiness": 6,
+            "stress": 3
+          },
+          "outcome_text": "Chaos, crowding, and the good kind of exhaustion."
+        },
+        {
+          "id": "travel",
+          "label": "Travel to them instead",
+          "effects": {
+            "money": -300,
+            "happiness": 4
+          },
+          "outcome_text": "I arrived with gifts and left with leftovers."
+        },
+        {
+          "id": "video",
+          "label": "Video calls this year",
+          "effects": {
+            "happiness": 1,
+            "stress": -2
+          },
+          "outcome_text": "A pixelated toast across the miles."
+        }
+      ],
+      "weight": 1
+    },
+    {
+      "id": "par_grandkid_portrait",
+      "title": "A Work of Art",
+      "text": "{person:child} has presented you with an original portrait. It is... abstract.",
+      "interaction": {
+        "kind": "parenting_request",
+        "romantic": false
+      },
+      "roles": {
+        "actor": {
+          "kind": "person",
+          "select": "player"
+        },
+        "child": {
+          "kind": "person",
+          "select": "predicate",
+          "predicate": "grandchild_of_actor"
+        }
+      },
+      "choices": [
+        {
+          "id": "frame",
+          "label": "Frame it properly",
+          "effects": {
+            "money": -15,
+            "happiness": 5,
+            "relationship": 4
+          },
+          "outcome_text": "It now hangs where every visitor can admire it."
+        },
+        {
+          "id": "fridge",
+          "label": "Fridge-door gallery placement",
+          "effects": {
+            "happiness": 3,
+            "relationship": 3
+          },
+          "outcome_text": "Fridge-door gallery placement — the highest honour in my household."
+        },
+        {
+          "id": "file",
+          "label": "Tuck it into a drawer",
+          "effects": {
+            "happiness": -2,
+            "relationship": -2
+          },
+          "outcome_text": "Some art senses when it has been filed."
+        }
+      ],
+      "weight": 1
+    }
+  ]
+}

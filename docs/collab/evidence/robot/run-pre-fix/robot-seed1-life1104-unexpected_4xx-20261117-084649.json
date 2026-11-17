@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1104,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alley",
+    "last_name": "Barr",
+    "gender": "male",
+    "country": "Australia",
+    "seed": 1801181945,
+    "request_id": "robot-1-1104-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 392928782,
+     "base": "person",
+     "skin_tone": "medium-dark",
+     "hair": "white",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "glasses"
+     ],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_ee57f44ad0",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8466",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_ee57f44ad0",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "22257cda-92d9-40c0-b432-36bda76be22a"
+   },
+   "request_id": "robot-1-r8467",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1105 --seed 1 --from-life 1104 --fail-fast"
+}

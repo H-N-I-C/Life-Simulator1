@@ -1,0 +1,54 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1544,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aristotle",
+    "last_name": "Finch",
+    "gender": "male",
+    "country": "Indonesia",
+    "seed": 710913804,
+    "request_id": "robot-1-1544-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 535960299,
+     "base": "person",
+     "skin_tone": "dark",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_05",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_2abe13ced7",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "c4054c48-8a5e-4f33-a142-081f840ceda5"
+   },
+   "request_id": "robot-1-r12390",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1545 --seed 1 --from-life 1544 --fail-fast"
+}

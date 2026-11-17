@@ -1,0 +1,63 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 2,
+ "life_index": 198,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Allys",
+    "last_name": "O'Donnell",
+    "gender": "female",
+    "country": "Canada",
+    "seed": 351802907,
+    "request_id": "robot-2-198-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 559170408,
+     "base": "man",
+     "skin_tone": "dark",
+     "hair": "white",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_016a8bcd8c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-2-r20744",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_016a8bcd8c",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "b2c73aef-57a9-42c8-a6a9-1bb4c326c1c3"
+   },
+   "request_id": "robot-2-r20745",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 199 --seed 2 --from-life 198 --fail-fast"
+}

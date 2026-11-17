@@ -399,6 +399,7 @@ class SaveTests(unittest.TestCase):
         from src.lifesim_lib.safe_save import load_save
 
         player = Player()
+        player.age = 18  # biological creation uses the protected adult guard
         kid = player.generate_child(player.parents["Mother"])
         kid.age = 5
         player.children.append(kid)
@@ -462,6 +463,7 @@ class SuccessorTests(unittest.TestCase):
         from src.people.classes.sibling import Sibling
 
         player = Player()
+        player.age = 18
         mother = player.parents["Mother"]
         father = player.parents["Father"]
         successor = player.generate_child(mother)
@@ -507,6 +509,7 @@ class FixRound1Tests(unittest.TestCase):
     def _player_with_bio_child(self):
         from src.people.classes.player import Player
         player = Player()
+        player.age = 18  # biological creation uses the protected adult guard
         kid = player.generate_child(player.parents["Mother"])
         kid.mother = player.parents["Mother"]
         kid.father = player.parents["Father"]

@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 804,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Agamemnon",
+    "last_name": "Moon",
+    "gender": "male",
+    "country": "USA",
+    "seed": 2086238752,
+    "request_id": "robot-1-804-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 2720330,
+     "base": "man",
+     "skin_tone": "dark",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "crown",
+      "flower"
+     ],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_33b68e055d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r6104",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_33b68e055d",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "8a6de7ba-d923-475b-8800-3727d34e2034"
+   },
+   "request_id": "robot-1-r6105",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 805 --seed 1 --from-life 804 --fail-fast"
+}

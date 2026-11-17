@@ -1,0 +1,92 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1383,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alton",
+    "last_name": "Davidson",
+    "gender": "male",
+    "country": "Nigeria",
+    "seed": 1512159216,
+    "request_id": "robot-1-1383-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_a956e8740b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11205",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_a956e8740b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11206",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_a956e8740b",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_tantrum"
+   },
+   "request_id": "robot-1-r11207",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_a956e8740b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11208",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_a956e8740b",
+   "action": "conversation",
+   "payload": {
+    "target_id": "988a0029-bdd2-4efb-aec3-38ac2f80cb14"
+   },
+   "request_id": "robot-1-r11209",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_a956e8740b",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "f50fdec3-dbc4-41de-aaf0-25310e7928d0"
+   },
+   "request_id": "robot-1-r11210",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1384 --seed 1 --from-life 1383 --fail-fast"
+}

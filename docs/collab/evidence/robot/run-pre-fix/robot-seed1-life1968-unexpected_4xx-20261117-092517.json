@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1968,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alessandro",
+    "last_name": "Jennings",
+    "gender": "male",
+    "country": "Japan",
+    "seed": 161838089,
+    "request_id": "robot-1-1968-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 238654276,
+     "base": "woman",
+     "skin_tone": "medium",
+     "hair": "white",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses",
+      "earrings"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_f959a4131f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15692",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_f959a4131f",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "3b453b56-ed2a-4127-b60f-7e0ec0a28c5b"
+   },
+   "request_id": "robot-1-r15693",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1969 --seed 1 --from-life 1968 --fail-fast"
+}

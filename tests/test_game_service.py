@@ -179,8 +179,9 @@ class CreationTests(unittest.TestCase):
         self.assertEqual(player["appearance"]["seed"], 7)
         self.assertEqual(state["journal"][0]["kind"], "birth")
         actions = {a["id"] for a in state["available_actions"]}
+        # spend_time needs age >= 5 (rule gate); a newborn only sees these
         self.assertEqual(actions,
-                         {"age_up", "spend_time", "surrender"})
+                         {"age_up", "surrender"})
         self.assertEqual(state["country"], "Australia")
 
     def test_profile_validation(self):
@@ -273,6 +274,189 @@ class InteractionTests(unittest.TestCase):
                         {"target_id": st["player_id"]})
         # the player is not one of their own relations
         self.assertEqual(ctx.exception.code, "not_allowed")
+
+    def test_spend_time_spec_dispatch_agree_across_year_and_reload(self):
+        # Q1 consolidation (C's report): the once-per-year flag lives ONLY
+        # on the relation object (relation.spent_time, reset by the yearly
+        # relation phase). env["year_actions"] is a legacy envelope field,
+        # not a source of truth. Advertised spec and dispatch must agree,
+        # across a year boundary and a reload.
+        svc, gid, mid = self._new()
+        st = svc.get_state(gid)
+        grow = 0
+        while next(p for p in st["people"]
+                   if p["id"] == st["player_id"])["age"] < 5:
+            # unique request ids: the replay log returns a stored response
+            # for a reused request_id without re-executing
+            st = age_up_once(svc, gid, "agree-grow%d" % grow)
+            grow += 1
+
+        def offered(state):
+            # a DISABLED spec (enabled: false + reason) is not an offer;
+            # spec and dispatch agree when both refuse
+            return any(a["id"] == "spend_time"
+                       and a.get("target_id") == mid
+                       and a.get("enabled", True)
+                       for a in state["available_actions"])
+
+        # year N: offered -> dispatch ok -> no longer offered, dispatch 409
+        self.assertTrue(offered(st))
+        st = svc.command(gid, st["revision"], "agree-1", "spend_time",
+                         {"target_id": mid})
+        self.assertFalse(offered(st))
+        with self.assertRaises(GameError) as ctx:
+            svc.command(gid, st["revision"], "agree-2", "spend_time",
+                        {"target_id": mid})
+        self.assertEqual(ctx.exception.code, "not_allowed")
+
+        # reload mid-year: the spent flag survives on the relation; spec and
+        # dispatch still agree (no stale year_actions resurrection)
+        svc2 = GameService(svc.save_dir)
+        st2 = svc2.get_state(gid)
+        self.assertFalse(offered(st2))
+        with self.assertRaises(GameError) as ctx:
+            svc2.command(gid, st2["revision"], "agree-3", "spend_time",
+                         {"target_id": mid})
+        self.assertEqual(ctx.exception.code, "not_allowed")
+
+        # year boundary resets exactly one offer, dispatch agrees again
+        st2 = age_up_once(svc2, gid, "agree-year")
+        self.assertTrue(offered(st2))
+        st2 = svc2.command(gid, st2["revision"], "agree-4", "spend_time",
+                           {"target_id": mid})
+        self.assertFalse(offered(st2))
+
+    def test_spend_time_not_advertised_for_parent_outside_relations(self):
+        # A parent reachable in the person walk but NOT in
+        # player.relations is refused by rule dispatch ("that person is not
+        # in your relationships") — advertising them would be a
+        # spec/dispatch disagreement. Fails without the consolidation:
+        # the old fallback spec offered them (empty year_actions, no
+        # relations check).
+        svc, gid, mid = self._new()
+        st = svc.get_state(gid)
+        grow = 0
+        while next(p for p in st["people"]
+                   if p["id"] == st["player_id"])["age"] < 5:
+            st = age_up_once(svc, gid, "out-grow%d" % grow)
+            grow += 1
+        env = svc._load(gid)
+        player = env["player"]
+        mother = next(p for p in list(player.relations)
+                      if p.person_id == mid)
+        player.relations.remove(mother)
+        # still reachable through the person walk via a stale mother link:
+        # the old fallback spec WOULD advertise her here (and did, before
+        # the consolidation), while rule dispatch refuses — the exact
+        # spec/dispatch split this test guards
+        player.mother = mother
+        svc._save(env)
+        st = svc.get_state(gid)
+        offered = [a for a in st["available_actions"]
+                   if a["id"] == "spend_time" and a.get("target_id") == mid]
+        self.assertEqual(offered, [])
+        # dispatch agrees: still refuses (found via the walk, rejected by
+        # the relations membership check)
+        with self.assertRaises(GameError) as ctx:
+            svc.command(gid, st["revision"], "out-1", "spend_time",
+                        {"target_id": mid})
+        self.assertEqual(ctx.exception.code, "not_allowed")
+
+    def test_spend_time_not_advertised_below_age_5(self):
+        # Robot player (D) found this advertised-but-refused: the service's
+        # fallback spend_time spec lacked the age >= 5 gate the rule
+        # enforces (rule_actions.spend_time). Specs and dispatch must agree.
+        svc, gid, mid = self._new()
+        st = svc.get_state(gid)
+        player = next(p for p in st["people"]
+                      if p["id"] == st["player_id"])
+        self.assertLess(player["age"], 5)
+        offered = [a for a in st["available_actions"]
+                   if a["id"] == "spend_time"]
+        self.assertEqual(offered, [])
+        # dispatch agrees: refused, typed conflict
+        with self.assertRaises(GameError) as ctx:
+            svc.command(gid, st["revision"], "u5", "spend_time",
+                        {"target_id": mid})
+        self.assertEqual(ctx.exception.code, "not_allowed")
+        self.assertEqual(ctx.exception.status, 409)
+        # ...and the action appears once the player turns 5
+        while player["age"] < 5:
+            st = age_up_once(svc, gid, "grow-%d" % player["age"])
+            player = next(p for p in st["people"]
+                          if p["id"] == st["player_id"])
+        actions = {(a["id"], a.get("target_id"))
+                   for a in st["available_actions"]}
+        self.assertIn(("spend_time", mid), actions)
+
+
+class AskForMoneyLedgerTests(unittest.TestCase):
+    """Robot player (D) found ask_for_money -> typed 500 LedgerConflict
+    (crash_id e1b1a7e5326b): both parents granting in the same turn reused
+    the constant occurrence id 'ask_money' under one fixed turn_id, so the
+    second grant reused the posting key with a different amount."""
+
+    def _setup(self):
+        svc = make_service()
+        st = svc.new_game(PROFILE, "am-create")
+        gid = st["game_id"]
+        grow = 0
+        while next(p for p in st["people"]
+                   if p["id"] == st["player_id"])["age"] < 6:
+            st = age_up_once(svc, gid, "am-grow%d" % grow)
+            grow += 1
+        # force a guaranteed grant from either parent
+        env = svc._load(gid)
+        for person in svc._walk_people(env["player"]):
+            if type(person).__name__ == "Parent":
+                person.generosity = 100
+                person.money = 150
+        svc._save(env)
+        st = svc.get_state(gid)
+        parents = {p["role"]: p["id"] for p in st["people"]
+                   if p.get("role") in ("mother", "father")}
+        return svc, gid, parents, st
+
+    def _money(self, svc, gid):
+        return svc._load(gid)["player"].money
+
+    def test_both_parents_grant_same_turn_plus_retry_plus_next_year(self):
+        svc, gid, parents, st = self._setup()
+        money0 = self._money(svc, gid)
+
+        # first ask: grant posts once
+        st = svc.command(gid, st["revision"], "am-1", "ask_for_money",
+                         {"target_id": parents["mother"]})
+        money1 = self._money(svc, gid)
+        self.assertGreater(money1, money0)
+
+        # exact retry: same request_id + original revision replays the
+        # stored response; nothing is reposted
+        svc.command(gid, st["revision"], "am-1", "ask_for_money",
+                    {"target_id": parents["mother"]})
+        self.assertEqual(self._money(svc, gid), money1)
+
+        # second ask (other parent, same turn): pre-fix this raised
+        # LedgerConflict and 500'd; both legs must post independently
+        st = svc.command(gid, st["revision"], "am-2", "ask_for_money",
+                         {"target_id": parents["father"]})
+        money2 = self._money(svc, gid)
+        self.assertGreater(money2, money1)
+
+        # across a year boundary: asking again refuses (3-strike rule) but
+        # must never crash the ledger
+        st = age_up_once(svc, gid, "am-year")
+        st = svc.command(gid, st["revision"], "am-3", "ask_for_money",
+                         {"target_id": parents["mother"]})
+        self.assertEqual(self._money(svc, gid), money2)
+
+        # exactly two gift rows, each with its own per-command occurrence
+        env = svc._load(gid)
+        gifts = [row for row in env["ledger"]
+                 if row["category"] == "gift_received"]
+        self.assertEqual(len(gifts), 2)
+        self.assertEqual(len({row["source_key"] for row in gifts}), 2)
+
 
 class DecisionTests(unittest.TestCase):
     def test_early_childhood_decision_flow(self):
@@ -697,6 +881,34 @@ class LifespanTests(unittest.TestCase):
         with self.assertRaises(GameError) as ctx:
             svc2.command(gid, st2["revision"], "z1", "age_up", {})
         self.assertEqual(ctx.exception.code, "game_over")
+
+
+class LearnTraitHeadlessTests(unittest.TestCase):
+    """Q1: learn_trait must not print from headless rules (C's finding);
+    it returns the message for the caller to surface."""
+
+    def _capture_stdout(self, fn):
+        import contextlib
+        import io
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            result = fn()
+        return result, buf.getvalue()
+
+    def test_learn_trait_returns_message_without_printing(self):
+        from src.people.classes.player import Player
+        player = Player("Test", "Case")
+        (learned, message, color), out = self._capture_stdout(
+            lambda: player.learn_trait("NERD"))
+        self.assertTrue(learned)
+        self.assertIn("gained", message)
+        self.assertEqual(out, "")  # nothing leaks to stdout
+        # repeat: nothing learned, no message
+        (learned2, message2, _), out2 = self._capture_stdout(
+            lambda: player.learn_trait("NERD"))
+        self.assertFalse(learned2)
+        self.assertIsNone(message2)
+        self.assertEqual(out2, "")
 
 
 class RNGIsolationTests(unittest.TestCase):

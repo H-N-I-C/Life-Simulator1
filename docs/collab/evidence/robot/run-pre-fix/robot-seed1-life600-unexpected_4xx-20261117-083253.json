@@ -1,0 +1,56 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 600,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Amara",
+    "last_name": "Cassidy",
+    "gender": "female",
+    "country": "Nigeria",
+    "seed": 310066647,
+    "request_id": "robot-1-600-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 872408147,
+     "base": "woman",
+     "skin_tone": "medium-light",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "crown"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_36c73a286b",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "bd983a5e-ae79-44a7-84b6-ede540293ad9"
+   },
+   "request_id": "robot-1-r4559",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 601 --seed 1 --from-life 600 --fail-fast"
+}

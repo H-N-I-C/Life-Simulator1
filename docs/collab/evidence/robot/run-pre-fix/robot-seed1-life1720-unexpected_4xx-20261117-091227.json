@@ -1,0 +1,56 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1720,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alexa",
+    "last_name": "Sparks",
+    "gender": "female",
+    "country": "India",
+    "seed": 2036099743,
+    "request_id": "robot-1-1720-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 513923002,
+     "base": "woman",
+     "skin_tone": "light",
+     "hair": "white",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "flower"
+     ],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_623f6d275e",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "211a4a34-7d5f-42eb-a2ba-3d2b30aa0aab"
+   },
+   "request_id": "robot-1-r13431",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1721 --seed 1 --from-life 1720 --fail-fast"
+}

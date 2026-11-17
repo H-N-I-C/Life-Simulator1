@@ -1,0 +1,75 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1082,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alisun",
+    "last_name": "Baker",
+    "gender": "female",
+    "country": "India",
+    "seed": 1056434463,
+    "request_id": "robot-1-1082-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 433839274,
+     "base": "man",
+     "skin_tone": "medium",
+     "hair": "red",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "crown",
+      "glasses"
+     ],
+     "background": "bg_05",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_14a43a2fe7",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8269",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_14a43a2fe7",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r8270",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_14a43a2fe7",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "d697d935-8db9-41cf-b37f-daf94e5c29d9"
+   },
+   "request_id": "robot-1-r8271",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1083 --seed 1 --from-life 1082 --fail-fast"
+}

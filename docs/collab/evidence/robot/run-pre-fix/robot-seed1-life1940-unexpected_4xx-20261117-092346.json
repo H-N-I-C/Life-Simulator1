@@ -1,0 +1,63 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1940,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alston",
+    "last_name": "Hunt",
+    "gender": "male",
+    "country": "China",
+    "seed": 548720649,
+    "request_id": "robot-1-1940-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 92313057,
+     "base": "woman",
+     "skin_tone": "medium-light",
+     "hair": "red",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_8bf115aff6",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r15482",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_8bf115aff6",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "840e89ac-203f-4191-a0a8-7d7b82846740"
+   },
+   "request_id": "robot-1-r15483",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1941 --seed 1 --from-life 1940 --fail-fast"
+}

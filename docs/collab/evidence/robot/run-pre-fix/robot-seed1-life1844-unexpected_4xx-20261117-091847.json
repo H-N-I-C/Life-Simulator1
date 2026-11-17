@@ -1,0 +1,102 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1844,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alice",
+    "last_name": "Byrne",
+    "gender": "female",
+    "country": "Brazil",
+    "seed": 1724443297,
+    "request_id": "robot-1-1844-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 2120139615,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "cap",
+      "glasses"
+     ],
+     "background": "bg_05",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_1534f41fb3",
+   "action": "definitely_not_an_action",
+   "payload": {},
+   "request_id": "robot-1-r14656",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown action\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_1534f41fb3",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r14657",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_1534f41fb3",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r14658",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_1534f41fb3",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r14659",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_1534f41fb3",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "dd411d8a-1c9f-42c9-8646-a7b6016622fd"
+   },
+   "request_id": "robot-1-r14660",
+   "expected_revision": 4
+  },
+  {
+   "n": 7,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1845 --seed 1 --from-life 1844 --fail-fast"
+}

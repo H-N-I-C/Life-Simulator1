@@ -1,0 +1,84 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 1437,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'spend_time' -> HTTP 409: {\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Anatollo",
+    "last_name": "Davidson",
+    "gender": "male",
+    "country": "Japan",
+    "seed": 1653195226,
+    "request_id": "robot-1-1437-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1425690861,
+     "base": "woman",
+     "skin_tone": "default",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_1f7f9dd455",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11574",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_1f7f9dd455",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r11575",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_1f7f9dd455",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_tantrum"
+   },
+   "request_id": "robot-1-r11576",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_1f7f9dd455",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "dc7a40f4-bbb9-4705-b46e-5da2447f9dca"
+   },
+   "request_id": "robot-1-r11577",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"you are too young\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1438 --seed 1 --from-life 1437 --fail-fast"
+}
