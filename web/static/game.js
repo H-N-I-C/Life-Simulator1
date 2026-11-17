@@ -1118,6 +1118,31 @@ $("backToLives").addEventListener("click", () => {
   showResume();
 });
 
+/* M2.5 shell hooks shared by the editor and the feature screens (Kimi B).
+ * After a successful out-of-band transaction (editor apply, wedding or
+ * graph command) the shell adopts the server's new revision by re-reading
+ * authoritative state and re-rendering — no page reload, focus stays
+ * where the feature module put it. */
+async function refreshShell() {
+  const gid = currentGameId();
+  if (!gid) return null;
+  const raw = await api("/api/games/" + encodeURIComponent(gid));
+  state = normalizeState(raw);
+  render();
+  selectScreen(activeScreen);
+  return state;
+}
+const shellHooks = {
+  getState: () => state,
+  refresh: refreshShell,
+  // Feature screens drive game commands through the shell's retry-stable
+  // operation machinery (persisted op + replay ledger), never ad-hoc.
+  sendAction: (actionId, payload, targetId) =>
+    sendAction(actionId, payload || {}, targetId),
+  resolveDecision: (decisionId, optionId, inputs) =>
+    resolveDecision(decisionId, optionId, inputs || {}),
+};
+
 /* M2.5 in-play character editor (relationship_policy feature, B). Lazy
  * import so the game page pays nothing when the panel stays closed. */
 let editorModule = null;
@@ -1127,7 +1152,7 @@ $("editorToggle").addEventListener("click", async () => {
       editorModule = await import(
         "/static/features/relationship_policy/editor.js");
     }
-    editorModule.toggleEditor(state);
+    editorModule.toggleEditor(state, shellHooks);
   } catch (err) {
     showToast("Editor failed to load.", true);
   }
@@ -1157,6 +1182,33 @@ $("familyTreeToggle").addEventListener("click", async () => {
     }
   } catch (err) {
     showToast("Family tree failed to load.", true);
+  }
+});
+
+/* M2.5 dating & weddings screens (Kimi B's relationship_policy feature
+ * module). Lazy-import and mount into a toggleable card, same pattern as
+ * the editor and the family tree. */
+let m25Module = null;
+let m25Card = null;
+$("m25Toggle").addEventListener("click", async () => {
+  try {
+    if (!m25Card) {
+      m25Card = document.createElement("section");
+      m25Card.className = "card";
+      m25Card.id = "m25Card";
+      m25Card.hidden = true;
+      $("actionList").parentElement.appendChild(m25Card);
+    }
+    if (!m25Module) {
+      m25Module = await import(
+        "/static/features/relationship_policy/m25_screens.js");
+    }
+    m25Card.hidden = !m25Card.hidden;
+    if (!m25Card.hidden) {
+      await m25Module.mountM25(m25Card, shellHooks);
+    }
+  } catch (err) {
+    showToast("Dating & weddings failed to load.", true);
   }
 });
 

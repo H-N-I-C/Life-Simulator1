@@ -1,0 +1,99 @@
+{
+  "preview": {
+    "label": "Law fine (forbidden ceremony)",
+    "amount": 500,
+    "ledger_category": "legal",
+    "occurrence": "lawfine:uni-4c07beeb3999:0"
+  },
+  "sampled": {
+    "accepted": true,
+    "p_accept": 0.21,
+    "score": 35,
+    "projected_recognition": {
+      "status": "forbidden",
+      "jurisdiction_id": "jur_metropolis_charter",
+      "law_version": 1,
+      "basis": "ceremony"
+    },
+    "projected_consequences": [
+      {
+        "trigger": "ceremony_of_unrecognized_union",
+        "effect": "civil_fine",
+        "ledger_category": "legal",
+        "amount_range": [
+          500,
+          500
+        ]
+      },
+      {
+        "trigger": "ceremony_of_unrecognized_union",
+        "effect": "civil_fine",
+        "ledger_category": "legal",
+        "amount_range": [
+          700,
+          700
+        ]
+      }
+    ]
+  },
+  "union": {
+    "union_id": "uni-4c07beeb3999",
+    "person_ids": [
+      "d25c96c9-7c90-45c8-8fbd-97d89c448c0d",
+      "ae9bcfe2-b4fb-434d-9080-cb7c64f640bf"
+    ],
+    "kind": "marriage",
+    "status": "active",
+    "recognition": {
+      "status": "forbidden",
+      "jurisdiction_id": "jur_metropolis_charter",
+      "law_version": 1,
+      "basis": "ceremony"
+    },
+    "ceremony": {
+      "held": true,
+      "turn": 6,
+      "age": 30,
+      "venue_id": "courthouse",
+      "guests": 0,
+      "outfit_id": "hand_me_down",
+      "honeymoon_id": "none"
+    },
+    "prenup": null,
+    "exclusivity": {
+      "agreement": "exclusive"
+    },
+    "start_turn": 5,
+    "end_turn": null,
+    "policy_revision": 1
+  },
+  "before_money": 10000,
+  "after_money": 8800,
+  "legal_rows": [
+    {
+      "id": "le_1",
+      "source_key": "t_000002:weddings:lawfine:uni-4c07beeb3999:0:d25c96c9-7c90-45c8-8fbd-97d89c448c0d:fine",
+      "turn_id": "t_000002",
+      "age": 30,
+      "person_id": "d25c96c9-7c90-45c8-8fbd-97d89c448c0d",
+      "category": "legal",
+      "amount": -500,
+      "balance_after": 9500,
+      "description": "Fine for a forbidden ceremony (uni-4c07beeb3999)",
+      "group_id": "lawfine:uni-4c07beeb3999:6"
+    },
+    {
+      "id": "le_2",
+      "source_key": "t_000002:weddings:lawfine:uni-4c07beeb3999:1:d25c96c9-7c90-45c8-8fbd-97d89c448c0d:fine",
+      "turn_id": "t_000002",
+      "age": 30,
+      "person_id": "d25c96c9-7c90-45c8-8fbd-97d89c448c0d",
+      "category": "legal",
+      "amount": -700,
+      "balance_after": 8800,
+      "description": "Fine for a forbidden ceremony (uni-4c07beeb3999)",
+      "group_id": "lawfine:uni-4c07beeb3999:6"
+    }
+  ],
+  "ledger_unchanged": false
+}

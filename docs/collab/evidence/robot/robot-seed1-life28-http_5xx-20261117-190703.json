@@ -1,0 +1,40 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 28,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Ainslee",
+    "last_name": "Olsen",
+    "gender": "female",
+    "country": "India",
+    "seed": 777,
+    "request_id": "robot-1-28-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 498092603,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "cap"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    },
+    "scenario": "graduating_18"
+   }
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 29 --seed 1 --from-life 28 --fail-fast"
+}

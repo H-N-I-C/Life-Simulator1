@@ -1,0 +1,223 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 42,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "action 'age_up' -> HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aleda",
+    "last_name": "Hodge",
+    "gender": "female",
+    "country": "USA",
+    "seed": 437489068,
+    "request_id": "robot-1-42-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 552239763,
+     "base": "person",
+     "skin_tone": "dark",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "crown",
+      "cap"
+     ],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r7223",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r7224",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r7225",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r7226",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_tantrum"
+   },
+   "request_id": "robot-1-r7227",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r7228",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r7229",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r7230",
+   "expected_revision": 8
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_4",
+    "option_id": "continue"
+   },
+   "request_id": "robot-1-r7231",
+   "expected_revision": 9
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-1-r7232",
+   "expected_revision": 10
+  },
+  {
+   "n": 11,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r7233",
+   "expected_revision": 10
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_5",
+    "option_id": "ask_final"
+   },
+   "request_id": "robot-1-r7234",
+   "expected_revision": 11
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_5",
+    "option_id": "ask_final"
+   },
+   "request_id": "robot-1-r7234",
+   "expected_revision": 11
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_6",
+    "option_id": "cancel"
+   },
+   "request_id": "robot-1-r7236",
+   "expected_revision": 12
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-1-r7237",
+   "expected_revision": 13
+  },
+  {
+   "n": 17,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 18,
+   "kind": "command",
+   "game_id": "g_cd8c3be48a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r7238",
+   "expected_revision": 13
+  },
+  {
+   "n": 19,
+   "kind": "error",
+   "status": 500,
+   "body": "{\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 43 --seed 1 --from-life 42 --fail-fast"
+}

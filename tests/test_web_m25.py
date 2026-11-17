@@ -124,7 +124,9 @@ class EditorRouteTests(unittest.TestCase):
         data = json.loads(body)
         self.assertTrue(data["valid"])
         self.assertEqual(data["affected_people"], [self.player_id])
-        self.assertEqual(data["policy_revision_delta"], 0)
+        # R4: personal edits are policy-input changes, so the preview
+        # advertises the revision bump the apply will perform.
+        self.assertEqual(data["policy_revision_delta"], 1)
         # save untouched
         _, after = self.req("GET", "/api/games/%s/policy-state"
                             % self.game_id)

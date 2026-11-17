@@ -135,6 +135,7 @@ def knows(env, observer_id, fact_id, confidence_at_least=0.0):
 
 
 def known_facts(env, observer_id):
+    observer_id = _norm_observer(env, observer_id)
     normalize_knowledge(env)
     return [rec["fact_id"] for rec in env["knowledge"]["records"]
             if rec["observer_id"] == observer_id]
@@ -163,14 +164,24 @@ def reputation_delta(env, person_id, scope_id, delta, occurrence_key):
     return True
 
 
+def reputation_changes_known(env, observer_id):
+    """Fact-backed changes this observer learned; world totals are private.
+
+    Old facts without provenance contribute nothing. Learning a fact twice
+    does not duplicate its effects, and hidden scopes leave no UI row.
+    """
+    known = set(known_facts(env, observer_id))
+    return [change for fact in env["knowledge"]["facts"]
+            if fact["fact_id"] in known
+            for change in fact.get("reputation_changes", [])]
+
+
 def reputation_as_known(env, person_id, scope_id, observer_id):
-    """NPC reactions read reputation-as-known-to-that-NPC; the UI shows
-    reputation-as-known-to-player; the editor sees true values. Without
-    knowledge of a fact that changed the value, an observer sees the
-    value as of what they learned — M2.5a keeps one current value per
-    scope and gates REACTIONS on known_fact, so uninformed NPCs never
-    act on it (frozen §5)."""
-    return reputation_get(env, person_id, scope_id)
+    """Project only this observer's fact-backed changes in the scope."""
+    value = sum(change["delta"] for change in reputation_changes_known(
+        env, observer_id) if change.get("person_id") == person_id
+        and change.get("scope", "global") == scope_id)
+    return max(-100, min(100, value))
 
 
 # ------------------------------------------------------- journal visibility
@@ -210,3 +221,32 @@ def pending_visible(env, pending):
         return any(bindings.get(role, role) == env["player"].person_id
                    for role in participants)
     return scope == "public"
+
+
+# ------------------------------------------------------------- projections
+
+def known_secret_relationship_ids(env, observer_id=PLAYER_OBSERVER):
+    """Relationship edges the observer legitimately KNOWS despite their
+    `secret` visibility: a fact naming the edge (relationship_id) or its
+    subject pair, with a knowledge record for this observer. Undiscovered
+    secret edges stay hidden from every projection (frozen §2)."""
+    normalize_knowledge(env)
+    graph = env.get("graph") or {}
+    known_pairs = set()
+    known_edge_ids = set()
+    for fact in env["knowledge"]["facts"]:
+        if not knows(env, observer_id, fact["fact_id"]):
+            continue
+        subjects = fact.get("subject_ids") or []
+        if len(subjects) == 2:
+            known_pairs.add(frozenset(subjects))
+        if fact.get("relationship_id"):
+            known_edge_ids.add(fact["relationship_id"])
+    out = set()
+    for rel in graph.get("relationships", []):
+        if rel.get("visibility") != "secret":
+            continue
+        if rel["relationship_id"] in known_edge_ids \
+                or frozenset(rel["person_ids"]) in known_pairs:
+            out.add(rel["relationship_id"])
+    return out

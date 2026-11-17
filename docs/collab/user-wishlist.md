@@ -23,3 +23,20 @@ Feature list (to be specced by Codex after M2):
 - No marriage restrictions in the rules: everything is a modifier (religion, law, culture, relation, orientation, class, age gap, existing spouses).
 - Character editor (like BitLife's character editing): the player can edit characters' attributes AND these romance modifiers later in play, e.g. attraction/orientation, religion and its tenets, culture, personal openness, jealousy, monogamy preference, and local law toggles. Edits apply immediately and persist in saves.
 - The only fixed limit (Claude, not editable): romance, sex and marriage require both characters to be 18+. The editor cannot change a character's age to get around this, and age edits can't make a minor eligible.
+
+## Roadmap additions approved by the user — 2026-11-17
+
+All eight proposed additions are now scheduled and planned, rather than remaining unscheduled ideas. Implementation follows accepted M0–M12; M2.5 stays the current priority.
+
+| Milestone | Addition | Plan |
+|---|---|---|
+| M13 | A world with its own history: economic cycles, technology and local changes | [World history](M13/01-spec.md) |
+| M14 | NPCs who live independently: careers, relationships, families and moves | [Independent NPC lives](M14/01-spec.md) |
+| M15 | An inner life: values, ambitions, insecurities and changing priorities | [Inner life](M15/01-spec.md) |
+| M16 | Deeper caregiving, recovery, disability, grief and rebuilding | [Caregiving and recovery](M16/01-spec.md) |
+| M17 | Creative work becomes a named artifact with collaborators, reviews and lasting audiences | [Creative works](M17/01-spec.md) |
+| M18 | Player-facing scenario/content creation with validated export and import | [Player content editor](M18/01-spec.md) |
+| M19 | What-if save branches and timeline comparison | [What-if timelines](M19/01-spec.md) |
+| M20 | An optional storytelling director for pacing and connected stories | [Storytelling director](M20/01-spec.md) |
+
+See [the delivery/dependency plan](M13-20-plan.md). Current ownership, contract freeze and review rules continue to apply.

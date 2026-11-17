@@ -488,6 +488,17 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 self._report_crash(exc)
             return
+        if path.startswith("/api/games/") and \
+                path.endswith("/relationships-view"):
+            game_id = path[len("/api/games/"):-len("/relationships-view")]
+            try:
+                self._json(_relationships_view(self.server.service,
+                                               game_id))
+            except GameError as exc:
+                self._error(exc.code, exc.message, exc.status)
+            except Exception as exc:
+                self._report_crash(exc)
+            return
         if path.startswith("/api/games/"):
             game_id = path[len("/api/games/"):]
             if "/" in game_id or not game_id:
@@ -598,6 +609,17 @@ class Handler(BaseHTTPRequestHandler):
                     payload = self._read_json_body()
                     getattr(self, handler)(game_id, payload)
                     return
+            if path.startswith("/api/games/") \
+                    and path.endswith("/wedding-quote"):
+                game_id = path[len("/api/games/"):-len("/wedding-quote")]
+                payload = self._read_json_body()
+                self._wedding_quote(game_id, payload)
+                return
+            if path.startswith("/api/games/") and path.endswith("/wedding"):
+                game_id = path[len("/api/games/"):-len("/wedding")]
+                payload = self._read_json_body()
+                self._wedding_command(game_id, payload)
+                return
             self._send("not found", code=404)
         except GameError as exc:
             self._error(exc.code, exc.message, exc.status)
@@ -623,6 +645,42 @@ class Handler(BaseHTTPRequestHandler):
                                 "expected_revision (int) is required", 400)
             result = self.server.service.editor_apply(
                 game_id, expected, request_id, payload.get("commands"))
+            self._json(result)
+        except GameError as exc:
+            self._error(exc.code, exc.message, exc.status)
+
+    def _wedding_quote(self, game_id, payload):
+        """Q2: the wedding planner's law-fine quote. A's quote is sampled
+        ONCE and persisted on the wedding plan (a mutation), so this is a
+        POST, not a GET; the response is the exact charge list the
+        ceremony will post (preview total == posted total)."""
+        try:
+            union_id = payload.get("union_id")
+            if not isinstance(union_id, str) or not union_id:
+                raise GameError("invalid_input", "union_id is required", 400)
+            self._json(self.server.service.wedding_quote(game_id, union_id))
+        except GameError as exc:
+            self._error(exc.code, exc.message, exc.status)
+
+    def _wedding_command(self, game_id, payload):
+        """M2.5 wedding planner / divorce route: typed envelope around A's
+        replay-safe wedding_command (plan_wedding, renew_vows,
+        divorce_union). Mutation authority stays in the service."""
+        try:
+            request_id = self._require_request_id(payload)
+            expected = payload.get("expected_revision")
+            if not isinstance(expected, int) or isinstance(expected, bool):
+                raise GameError("invalid_input",
+                                "expected_revision (int) is required", 400)
+            op = payload.get("op")
+            if op not in ("plan_wedding", "renew_vows", "divorce_union"):
+                raise GameError("invalid_input", "unknown wedding op", 400)
+            args = payload.get("args")
+            if not isinstance(args, dict):
+                raise GameError("invalid_input", "args must be an object",
+                                400)
+            result = self.server.service.wedding_command(
+                game_id, expected, request_id, op, args)
             self._json(result)
         except GameError as exc:
             self._error(exc.code, exc.message, exc.status)
@@ -661,6 +719,155 @@ def _policy_state_payload(service, game_id):
                              "recognition": j.get("recognition", {})}
                             for j in cat.get("jurisdiction_presets", [])]},
             "people": roster}
+
+
+def _relationships_view(service, game_id):
+    """GET /api/games/<id>/relationships-view: read-only M2.5 projection
+    for B's dating/wedding/reputation screens — the player's unions
+    (partner descriptors, recognition, ceremony, prenup, shared dependent
+    children for the divorce preview), what the PLAYER observer knows
+    (facts + reputation-as-known), and the fictional weddings price
+    catalog. Composed from the canonical envelope under the service lock;
+    this route never mutates (all mutation authority stays in
+    GameService)."""
+    from src.game.features.knowledge import core as knowledge
+    from src.game.features.family_graph.graph import dependent_children
+    from src.game.features.weddings import core as weddings
+    with service._lock:
+        env = service._load(game_id)
+        player = env["player"]
+        graph = env["graph"]
+        people = service._all_people(env)
+        for pid in env.get("dead_ids", []):
+            if pid in people:
+                people[pid].alive = False
+
+        def descriptor(pid):
+            p = people.get(pid)
+            if p is None:
+                return {"id": pid, "name": "Someone", "age": None,
+                        "alive": True, "appearance": None}
+            app = getattr(p, "appearance", None)
+            return {"id": pid,
+                    "name": p.name,
+                    "age": getattr(p, "age", None),
+                    "alive": getattr(p, "alive", True) is not False,
+                    "appearance": app.to_dict()
+                    if hasattr(app, "to_dict") else None}
+
+        my_children = set(dependent_children(graph, player.person_id))
+        unions = []
+        for u in graph["unions"]:
+            if player.person_id not in u["person_ids"]:
+                continue
+            other_id = next(pid for pid in u["person_ids"]
+                            if pid != player.person_id)
+            shared = [cid for cid in dependent_children(graph, other_id)
+                      if cid in my_children]
+            unions.append({
+                "union_id": u["union_id"],
+                "partner": descriptor(other_id),
+                "kind": u["kind"],
+                "status": u["status"],
+                "recognition": (u.get("recognition") or {}).get("status"),
+                "ceremony_held": bool((u.get("ceremony") or {}).get("held")),
+                "prenup_amount": (u.get("prenup") or {}).get("amount") or 0,
+                "shared_children": [descriptor(cid) for cid in shared],
+                "renewals": (env.get("weddings", {}).get("renewals", {})
+                             .get(u["union_id"], 0)),
+            })
+
+        records = {r["fact_id"]: r
+                   for r in env["knowledge"].get("records", [])
+                   if r.get("observer_id") == knowledge.PLAYER_OBSERVER}
+
+        # R5: active courtship/relationship edges and pending offers the
+        # player is part of, so the UI can drive (and show the state of)
+        # the authorized offer journey.
+        relationships = []
+        for rel in graph["relationships"]:
+            if rel.get("status") != "active" \
+                    or player.person_id not in rel["person_ids"]:
+                continue
+            other_id = next(pid for pid in rel["person_ids"]
+                            if pid != player.person_id)
+            relationships.append({
+                "relationship_id": rel["relationship_id"],
+                "kind": rel.get("kind"),
+                "other": descriptor(other_id),
+                "visibility": rel.get("visibility", "public"),
+                "exclusivity": rel.get("exclusivity", "exclusive"),
+                "chemistry": rel.get("chemistry"),
+                "trust": rel.get("trust"),
+                "satisfaction": rel.get("satisfaction")})
+        offers = []
+        for offer in graph.get("offers", []):
+            if offer.get("status") != "pending":
+                continue
+            if player.person_id not in (offer["initiator_id"],
+                                        offer["target_id"]):
+                continue
+            other_id = (offer["target_id"]
+                        if offer["initiator_id"] == player.person_id
+                        else offer["initiator_id"])
+            offers.append({
+                "offer_id": offer["offer_id"],
+                "interaction_kind": offer["interaction_kind"],
+                "direction": ("outgoing" if offer["initiator_id"]
+                              == player.person_id else "incoming"),
+                "other": descriptor(other_id),
+                "created_turn": offer.get("creation_turn"),
+                "expiry_turn": offer.get("expiry_turn")})
+
+        # The pending offer's display reasons (already filtered by C at
+        # creation to what the player may see). Exposed ONLY when the
+        # pending itself is player-visible, using the same serialization
+        # predicate as get_state — a private offer never leaks here.
+        pending_reasons = []
+        pending = env.get("pending")
+        if pending and knowledge.pending_visible(env, pending):
+            for r in pending.get("reasons") or []:
+                if isinstance(r, dict) and r.get("code"):
+                    pending_reasons.append({"code": r["code"],
+                                            "label_key": r.get("label_key")})
+        facts = []
+        for fact_id in knowledge.known_facts(env, knowledge.PLAYER_OBSERVER):
+            fact = knowledge.get_fact(env, fact_id)
+            rec = records.get(fact_id, {})
+            facts.append({
+                "fact_id": fact_id,
+                "kind": fact["kind"],
+                "subjects": [descriptor(pid)
+                             for pid in fact["subject_ids"]],
+                "learned_turn": rec.get("learned_turn"),
+                "source": rec.get("source"),
+            })
+
+        reputation = []
+        known_scopes = {(change["person_id"], change.get("scope", "global"))
+                        for change in knowledge.reputation_changes_known(
+                            env, knowledge.PLAYER_OBSERVER)}
+        for person_id, scope_id in sorted(known_scopes):
+            if person_id == player.person_id:
+                continue  # the player reads their own standing elsewhere
+            reputation.append({
+                "person": descriptor(person_id),
+                "scope_id": scope_id,
+                "value": knowledge.reputation_as_known(
+                    env, person_id, scope_id, knowledge.PLAYER_OBSERVER)})
+
+        return {"unions": unions, "facts": facts,
+                "reputation": reputation, "money": player.money,
+                "pending_reasons": pending_reasons,
+                "relationships": relationships, "offers": offers,
+                "catalog": {
+                    "venues": weddings.VENUES,
+                    "outfits": weddings.OUTFITS,
+                    "honeymoons": weddings.HONEYMOONS,
+                    "renewal_tiers": {"backyard": 0, "dinner": 400,
+                                      "extravaganza": 4000},
+                    "child_support_per_child":
+                        weddings.CHILD_SUPPORT_PER_CHILD}}
 
 
 def _enriched_list_payload(service):

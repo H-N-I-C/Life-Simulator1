@@ -1,0 +1,289 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 21,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "action 'conversation' -> HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aloysia",
+    "last_name": "Morgan",
+    "gender": "female",
+    "country": "UK",
+    "seed": 1062592058,
+    "request_id": "robot-1-21-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 597201539,
+     "base": "woman",
+     "skin_tone": "dark",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "flower"
+     ],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r4432",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r4433",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-1-r4434",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r4435",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r4436",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_release"
+   },
+   "request_id": "robot-1-r4437",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-1-r4438",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "conversation",
+   "payload": {
+    "target_id": "2b2420bf-356f-4cfc-9898-69d8705f69b7"
+   },
+   "request_id": "robot-1-r4439",
+   "expected_revision": 7
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-1-r4440",
+   "expected_revision": 8
+  },
+  {
+   "n": 11,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r4441",
+   "expected_revision": 8
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "conversation",
+   "payload": {
+    "target_id": "4fe29a8e-66dc-4c75-a10e-3fb1d85cc65a"
+   },
+   "request_id": "robot-1-r4442",
+   "expected_revision": 9
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "definitely_not_an_action",
+   "payload": {},
+   "request_id": "robot-1-r4443",
+   "expected_revision": 10
+  },
+  {
+   "n": 15,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown action\"}}"
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-1-r4444",
+   "expected_revision": 10
+  },
+  {
+   "n": 17,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 18,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "doctor",
+   "payload": {},
+   "request_id": "robot-1-r4445",
+   "expected_revision": 10
+  },
+  {
+   "n": 19,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "back"
+   },
+   "request_id": "robot-1-r4446",
+   "expected_revision": 11
+  },
+  {
+   "n": 20,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r4447",
+   "expected_revision": 11
+  },
+  {
+   "n": 21,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 11 does not match current revision 12\"}}"
+  },
+  {
+   "n": 22,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "4fe29a8e-66dc-4c75-a10e-3fb1d85cc65a"
+   },
+   "request_id": "robot-1-r4448",
+   "expected_revision": 12
+  },
+  {
+   "n": 23,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r4449",
+   "expected_revision": 13
+  },
+  {
+   "n": 24,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "insult",
+   "payload": {
+    "target_id": "4fe29a8e-66dc-4c75-a10e-3fb1d85cc65a"
+   },
+   "request_id": "robot-1-r4450",
+   "expected_revision": 14
+  },
+  {
+   "n": 25,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-1-r4451",
+   "expected_revision": 15
+  },
+  {
+   "n": 26,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 27,
+   "kind": "command",
+   "game_id": "g_86c913e72f",
+   "action": "conversation",
+   "payload": {
+    "target_id": "2b2420bf-356f-4cfc-9898-69d8705f69b7"
+   },
+   "request_id": "robot-1-r4452",
+   "expected_revision": 15
+  },
+  {
+   "n": 28,
+   "kind": "error",
+   "status": 500,
+   "body": "{\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 22 --seed 1 --from-life 21 --fail-fast"
+}

@@ -50,26 +50,6 @@ class _V3Context:
         return getattr(self._gc, name)
 
 
-def _bindable(ev, actor_id, context):
-    """Light pre-binding: every required role must bind non-null against
-    THIS envelope (C's instantiate3 re-binds identically at offer time).
-    """
-    from src.game import events as event_mod
-    roles = ev.get("roles") or {}
-    bound_child = None
-    for name, cfg in roles.items():
-        select = cfg.get("select", "player" if name == "actor" else None)
-        if select == "player":
-            continue
-        pred = cfg.get("predicate")
-        pid = event_mod.PREDICATES[pred](actor_id, context)
-        if pid is None and not cfg.get("optional"):
-            return None
-        if name == "child" and pid is not None:
-            bound_child = pid
-    return bound_child or actor_id
-
-
 def advance_parenting_phase(env, ctx, service, rng):
     """Yearly phase hook (A's coordinator call site). Returns the phase
     result dict; offers at most one occurrence per year."""
@@ -84,16 +64,22 @@ def advance_parenting_phase(env, ctx, service, rng):
 
     eligible = []
     for ev in _events():
-        child_id = _bindable(ev, actor_id, context)
-        if child_id is None:
+        # C's single v3 dispatch path (R7/E6): bindability probe plus the
+        # evaluated condition tree — min_age etc. can never be bypassed.
+        bindings = event_mod.v3_bindable(ev, actor_id, context)
+        if bindings is None:
             continue
+        child_id = bindings.get("child") or actor_id
         if core.is_seen(env, ev["id"], child_id):
+            continue
+        if not event_mod.evaluate_v3_conditions(
+                ev.get("conditions") or {}, context, bindings, actor_id):
             continue
         eligible.append((ev, child_id))
     if not eligible:
         return {"events": [], "money_entries": [],
                 "pending_decision": None,
-                "continuation": {"phase_id": "illness",
+                "continuation": {"phase_id": "drama_events",
                                  "item_cursor": 0},
                 "finished_turn": False}
 
@@ -124,5 +110,5 @@ def advance_parenting_phase(env, ctx, service, rng):
         pending["pre_applied"] = True
     return {"events": [], "money_entries": [],
             "pending_decision": pending,
-            "continuation": {"phase_id": "illness", "item_cursor": 0},
+            "continuation": {"phase_id": "drama_events", "item_cursor": 0},
             "finished_turn": False}

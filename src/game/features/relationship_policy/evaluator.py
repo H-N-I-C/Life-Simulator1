@@ -3,8 +3,9 @@
 Scores acceptance for the 7 romantic interaction kinds. Two jobs only:
 hard validity (never overridable) and a bounded, explainable soft score.
 It never bans a legal adult consensual attempt and never manufactures
-consent — refusal stays possible at any score (C draws it once per offer
-using `p_refuse` from this result).
+consent — refusal stays possible at any score (R3 ratified contract:
+C draws ONCE per offer with `accept = u < acceptance.p_accept`;
+`refusal.p_refuse` is display-only, `1 - p_accept`).
 
 Deterministic: no RNG here. All person/edge reads go through the
 injected read-only graph/policy views (A's queries at integration time),
@@ -113,6 +114,7 @@ class StaticPolicyView(PolicyView):
 def _hard_fail(code):
     return {"hard": {"ok": False, "code": code}, "score": None,
             "score_breakdown": None, "reasons": [],
+            "acceptance": {"possible": False},
             "refusal": {"possible": False},
             "projected_recognition": None,
             "projected_consequences": [], "policy_revision": 0}
@@ -315,15 +317,23 @@ def evaluate_offer(interaction_kind, initiator_id, target_id, graph,
 
     score = _clamp(50 + sum(contributions.values()), 0, 100)
 
+    # R3 ratified probability contract (Claude, M2.5-fix-round-2.md):
+    # ONE sampled-once draw per offer: accept = (u < p_accept). The
+    # refusal traits (openness, jealousy) live INSIDE p_accept; p_refuse
+    # is derived for display only. p_accept is clamped to [0.02, 0.98]
+    # so refusal is always possible and acceptance is never impossible
+    # for an eligible adult pair (soft modifiers are never bans).
     openness = float(t_profile.get("openness", 0.5))
     jealousy = float(t_profile.get("jealousy", 0.4))
-    p_refuse = round(_clamp(0.05 + 0.4 * (1 - openness) + 0.2 * jealousy,
-                            0.05, 0.6), 2)
+    trait_drag = (0.4 * (1 - openness) + 0.2 * jealousy) / 2.0
+    p_accept = _clamp(round(score / 100.0 - trait_drag, 4), 0.02, 0.98)
+    p_refuse = round(1.0 - p_accept, 2)
 
     return {"hard": {"ok": True, "code": None},
             "score": score,
             "score_breakdown": dict(contributions, base=50),
             "reasons": reasons,
+            "acceptance": {"possible": True, "p_accept": p_accept},
             "refusal": {"possible": True, "p_refuse": p_refuse},
             "projected_recognition": projected,
             "projected_consequences": consequences,

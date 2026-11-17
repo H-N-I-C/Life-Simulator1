@@ -56,8 +56,8 @@ def _non_related(graph, a_id, b_id):
 
 def _non_stranger(graph, a_id, b_id):
     return _active_relationship_between(graph, a_id, b_id) is not None \
-        or any(b_id in u["person_ids"] and u["status"] == "active"
-                for u in graph["unions"])
+        or any(set(u["person_ids"]) == {a_id, b_id}
+               and u["status"] == "active" for u in graph["unions"])
 
 
 def adult_non_related_stranger(actor_id, context):

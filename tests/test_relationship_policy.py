@@ -228,6 +228,40 @@ class EvaluatorFixtureTests(unittest.TestCase):
                 self.assertEqual(result["hard"]["code"],
                                  case["expected_hard_code"])
                 self.assertIsNone(result["score"])
+                self.assertFalse(result["acceptance"]["possible"])
+
+    def test_acceptance_probability_tracks_score(self):
+        """R3 ratified contract: ONE draw, accept = u < p_accept;
+        openness/jealousy live INSIDE p_accept; p_accept clamped to
+        [0.02, 0.98] so refusal is always possible and acceptance is
+        never impossible; refusal.p_refuse = 1 - p_accept (display)."""
+        fx = self.by_name("neutral_defaults_no_name_gender_inference")
+        graph, policy, i_id, t_id = build_fixture_case(
+            self.personas, fx["input"])
+        result = evaluator.evaluate_offer(fx["input"]["interaction_kind"],
+                                          i_id, t_id, graph, policy)
+        self.assertTrue(result["acceptance"]["possible"])
+        p = result["acceptance"]["p_accept"]
+        self.assertTrue(0.02 <= p <= 0.98)
+        self.assertAlmostEqual(result["refusal"]["p_refuse"], round(1 - p, 2),
+                               places=2)
+        # higher score → higher acceptance, monotone
+        graph2, policy2, i_id2, t_id2 = build_fixture_case(
+            self.personas, fx["input"])
+        policy2._profiles[t_id2]["attraction_to_initiator"] = 1.0
+        graph2._scores = {"chemistry": 100, "trust": 100}
+        hi = evaluator.evaluate_offer(fx["input"]["interaction_kind"],
+                                      i_id2, t_id2, graph2, policy2)
+        self.assertGreater(hi["score"], result["score"])
+        self.assertGreater(hi["acceptance"]["p_accept"], p)
+        # refusal stays possible even at a perfect score...
+        graph2._persons[t_id2]["openness"] = 0.0
+        graph2._persons[t_id2]["jealousy"] = 1.0
+        worst = evaluator.evaluate_offer(fx["input"]["interaction_kind"],
+                                         i_id2, t_id2, graph2, policy2)
+        self.assertGreaterEqual(worst["refusal"]["p_refuse"], 0.02)
+        # ...and acceptance stays possible even at the worst score
+        self.assertGreaterEqual(worst["acceptance"]["p_accept"], 0.02)
 
     def test_unknown_interaction_kind_is_typed_error(self):
         graph, policy, i_id, t_id = build_fixture_case(
@@ -390,7 +424,41 @@ class EditorTests(unittest.TestCase):
         self.assertEqual(entry["before"]["openness"], 0.5)
         self.assertEqual(entry["after"]["openness"], 0.9)
         self.assertEqual(entry["turn"], 12)
-        self.assertEqual(self.state["policy_revision"], 0)  # no policy data
+
+    def test_r4_personal_edits_bump_revision_and_fire_hook(self):
+        """R4: personal attribute/tenet/conversion edits change that
+        person's acceptance inputs, so they bump policy_revision and fire
+        the supersession hook with exactly the affected person ids."""
+        calls = []
+        ed = self.editor_mod.Editor(self.state,
+                                    supersession_hook=calls.append)
+        out = ed.apply([
+            {"name": "edit_person_attributes", "scope": "person",
+             "target_id": "p_a", "patch": {"openness": 0.99}},
+            {"name": "edit_personal_tenets", "scope": "personal_tenets",
+             "target_id": "p_b",
+             "patch": {"tenet_overrides": {"plural_unions": "favoured"}}}],
+            turn=5)
+        self.assertEqual(self.state["policy_revision"], 1)
+        self.assertEqual(out["policy_revision"], 1)
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(calls[0]["affected_person_ids"], ["p_a", "p_b"])
+        self.assertEqual(calls[0]["affected_jurisdictions"], [])
+        # preview advertises the same delta
+        preview = ed.preview([
+            {"name": "convert_profile", "scope": "person",
+             "target_id": "p_a", "patch": {"target_faith_id": "faith_tidebound"}}])
+        self.assertTrue(preview["valid"], preview)
+        self.assertEqual(preview["policy_revision_delta"], 1)
+        # rename alone is not a policy input change: no bump, no hook
+        calls.clear()
+        ed2 = self.editor_mod.Editor(self.state,
+                                     supersession_hook=calls.append)
+        before = self.state["policy_revision"]
+        ed2.apply([{"name": "rename_person", "scope": "person",
+                    "target_id": "p_a", "patch": {"first_name": "Jo"}}])
+        self.assertEqual(self.state["policy_revision"], before)
+        self.assertEqual(calls, [])
 
     def test_personal_tenets_affect_only_that_person(self):
         ed = self.editor_mod.Editor(self.state)
@@ -559,8 +627,9 @@ class EditorTests(unittest.TestCase):
         self.assertEqual(out["audit"][0]["command"], "convert_profile")
         self.assertEqual(out["audit"][0]["before"],
                          {"faith_id": "faith_tidebound"})
-        # personal conversion is not shared policy data
-        self.assertEqual(self.state["policy_revision"], 0)
+        # R4: personal conversion IS a policy-input change for that
+        # person (faith tenets feed their acceptance scores)
+        self.assertEqual(self.state["policy_revision"], 1)
         bad = ed.preview([
             {"name": "convert_profile", "scope": "person",
              "target_id": "p_a",

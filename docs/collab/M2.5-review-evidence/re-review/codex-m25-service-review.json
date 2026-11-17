@@ -1,0 +1,68 @@
+{
+  "missing_wedding_args": {
+    "type": "TypeError",
+    "message": "plan_wedding() missing 5 required positional arguments: 'union_id', 'venue_id', 'guests', 'outfit_id', and 'honeymoon_id'"
+  },
+  "chemistry_sampled": null,
+  "chemistry_without_consent_relationships": [
+    {
+      "relationship_id": "rel-3a9120fa749a",
+      "person_ids": [
+        "3c9f21fd-a3a1-4550-b875-3722f7050a1f",
+        "1c0e064f-2336-436c-8995-ae41becbc022"
+      ],
+      "kind": "courtship",
+      "satisfaction": 55,
+      "trust": 45,
+      "chemistry": 55,
+      "exclusivity": {
+        "agreement": "exclusive"
+      },
+      "visibility": "public",
+      "start_turn": 1,
+      "end_turn": null,
+      "status": "active"
+    }
+  ],
+  "modifier_edit": {
+    "result": {
+      "revision": 3,
+      "policy_revision": 0,
+      "audit": [
+        {
+          "command": "edit_person_attributes",
+          "scope": "person",
+          "target_id": "1c0e064f-2336-436c-8995-ae41becbc022",
+          "before": {
+            "openness": 0.5
+          },
+          "after": {
+            "openness": 0.99
+          },
+          "turn": 2
+        }
+      ]
+    },
+    "pending": null
+  },
+  "same_child_changed_request": {
+    "first": {
+      "coefficient_band": "0",
+      "roll": 0.16704624128056855,
+      "adjustment": "none",
+      "bio_mother_id": "3c9f21fd-a3a1-4550-b875-3722f7050a1f",
+      "bio_father_id": "1c0e064f-2336-436c-8995-ae41becbc022"
+    },
+    "second": {
+      "coefficient_band": "0",
+      "roll": 0.6112714124178615,
+      "adjustment": "none",
+      "bio_mother_id": "1c0e064f-2336-436c-8995-ae41becbc022",
+      "bio_father_id": "3c9f21fd-a3a1-4550-b875-3722f7050a1f"
+    },
+    "keys": [
+      "future-child:conception-1",
+      "future-child:conception-2"
+    ]
+  }
+}

@@ -307,9 +307,12 @@ class MigrationTests(unittest.TestCase):
         child.mother = player
         child.father = partner
         player.children = [child]
-        archive_ex = make_person("Morgan", 40)
-        env = {"player": player, "archive": [archive_ex], "revision": 5}
+        archive_ex = Partner(40, Gender.Female, 50, 50, 30, 0)
+        ensure_person_id(archive_ex)
+        env = {"player": player, "archive": [archive_ex], "revision": 5,
+               "graph": new_graph()}
         graph = migrate_v2(env)
+        self.assertEqual(graph["migration_version"], 2)
         unions = graph["unions"]
         self.assertEqual(len(unions), 1)
         self.assertEqual(unions[0]["kind"], "marriage")
@@ -326,10 +329,71 @@ class MigrationTests(unittest.TestCase):
                          next(e["relationship_id"] for e in
                               graph["relationships"]
                               if e["status"] == "active"))
+        # idempotent: a second run adds nothing
+        again = migrate_v2(env)
+        self.assertEqual(len(again["unions"]), 1)
+        self.assertEqual(len(again["relationships"]),
+                         len(graph["relationships"]))
+        self.assertEqual(len(again["parentage"]), len(graph["parentage"]))
 
-    def test_v2_migration_never_breaks_on_odd_data(self):
-        self.assertEqual(migrate_v2({}), new_graph())
-        self.assertEqual(migrate_v2({"player": None}), new_graph())
+    def test_v2_dating_and_engaged_partners_get_no_union(self):
+        from src.people.classes.partner import Partner
+        for status, expected_kind in ((0, "courtship"), (1, "committed")):
+            player = make_person("Riley", 34)
+            partner = Partner(35, Gender.Male, 50, 50, 70, status)
+            ensure_person_id(partner)
+            player.partner = partner
+            graph = migrate_v2({"player": player, "archive": [],
+                                "graph": new_graph()})
+            self.assertEqual(graph["unions"], [],
+                             "status %r must not become a union" % status)
+            active = [e for e in graph["relationships"]
+                      if e["status"] == "active"]
+            self.assertEqual(len(active), 1)
+            self.assertEqual(active[0]["kind"], expected_kind)
+
+    def test_v2_migration_never_invents_romance_from_archive(self):
+        """Archive members who are NOT ex-partners (a dead parent) must not
+        become ended romantic edges; adopted children get adoptive, never
+        biological, edges."""
+        from src.people.classes.partner import Partner
+        player = make_person("Riley", 34)
+        dead_parent = make_person("Pat", 71, alive=False)
+        player.relations = [dead_parent]
+        adopted = make_person("Sam", 7)
+        adopted.adopted = True
+        adopted.mother = player
+        player.children = [adopted]
+        env = {"player": player, "archive": [dead_parent],
+               "graph": new_graph()}
+        graph = migrate_v2(env)
+        self.assertEqual(graph["relationships"], [])
+        self.assertEqual(graph["unions"], [])
+        edges = [(e["child_id"], e["parent_id"], e["role"])
+                 for e in graph["parentage"]]
+        self.assertIn((adopted.person_id, player.person_id, "adoptive"),
+                      edges)
+        self.assertFalse([e for e in graph["parentage"]
+                          if e["role"] == "biological"
+                          and e["child_id"] == adopted.person_id])
+
+    def test_v2_migration_merges_into_existing_graph_and_survives_odd_data(self):
+        player = make_person("Riley", 34)
+        graph = new_graph()
+        graph["parentage"].append({"child_id": "c1", "parent_id": "p1",
+                                   "role": "biological", "source": "birth",
+                                   "confidence": "certain"})
+        env = {"player": player, "archive": [], "graph": graph}
+        out = migrate_v2(env)
+        # partial history is preserved, not reset
+        self.assertEqual(len(out["parentage"]), 1)
+        self.assertEqual(out["migration_version"], 2)
+        # odd data: no crash, marker unset so a later load can retry
+        empty = migrate_v2({})
+        self.assertEqual(empty["unions"], [])
+        self.assertEqual(empty["relationships"], [])
+        none_player = migrate_v2({"player": None})
+        self.assertEqual(none_player["relationships"], [])
 
 
 if __name__ == "__main__":

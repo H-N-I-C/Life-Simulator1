@@ -1,0 +1,89 @@
+{
+  "preview": {
+    "union_id": "uni-4cf4d1798934",
+    "status": "forbidden",
+    "jurisdiction_id": "jur_metropolis_charter",
+    "law_version": 1,
+    "policy_revision": 1,
+    "lines": [
+      {
+        "occurrence_id": "lawfine:uni-4cf4d1798934:0",
+        "category": "legal",
+        "amount": 1923,
+        "leg": "fine",
+        "description": "Fine for a forbidden ceremony (uni-4cf4d1798934)"
+      }
+    ],
+    "total": 1923
+  },
+  "sampled": {
+    "accepted": true,
+    "p_accept": 0.21,
+    "score": 35,
+    "projected_recognition": {
+      "status": "forbidden",
+      "jurisdiction_id": "jur_metropolis_charter",
+      "law_version": 1,
+      "basis": "ceremony"
+    },
+    "projected_consequences": [
+      {
+        "trigger": "ceremony_of_unrecognized_union",
+        "effect": "civil_fine",
+        "ledger_category": "legal",
+        "amount_range": [
+          500,
+          2000
+        ]
+      }
+    ]
+  },
+  "union": {
+    "union_id": "uni-4cf4d1798934",
+    "person_ids": [
+      "4bd80950-3bf1-4abc-9742-10f245967055",
+      "cf86872e-ebee-4aa0-92a2-47a7accc7952"
+    ],
+    "kind": "marriage",
+    "status": "active",
+    "recognition": {
+      "status": "forbidden",
+      "jurisdiction_id": "jur_metropolis_charter",
+      "law_version": 1,
+      "basis": "ceremony"
+    },
+    "ceremony": {
+      "held": true,
+      "turn": 6,
+      "age": 30,
+      "venue_id": "courthouse",
+      "guests": 0,
+      "outfit_id": "hand_me_down",
+      "honeymoon_id": "none"
+    },
+    "prenup": null,
+    "exclusivity": {
+      "agreement": "exclusive"
+    },
+    "start_turn": 5,
+    "end_turn": null,
+    "policy_revision": 1
+  },
+  "before_money": 10000,
+  "after_money": 8077,
+  "legal_rows": [
+    {
+      "id": "le_1",
+      "source_key": "t_000002:weddings:lawfine:uni-4cf4d1798934:0:4bd80950-3bf1-4abc-9742-10f245967055:fine",
+      "turn_id": "t_000002",
+      "age": 30,
+      "person_id": "4bd80950-3bf1-4abc-9742-10f245967055",
+      "category": "legal",
+      "amount": -1923,
+      "balance_after": 8077,
+      "description": "Fine for a forbidden ceremony (uni-4cf4d1798934)",
+      "group_id": "lawfine:uni-4cf4d1798934:6"
+    }
+  ],
+  "ledger_unchanged": false
+}

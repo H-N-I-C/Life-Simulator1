@@ -12,6 +12,8 @@ from src.game.features.family_graph.graph import GraphError, assert_adult_romant
 def _guard_union(env, service, union):
     people = service._all_people(env)
     a, b = union["person_ids"]
+    if env["player"].person_id not in (a, b):
+        raise GraphError("not_allowed", "this is not your union", 409)
     assert_adult_romantic(people.get(a), people.get(b))
 
 # ------------------------------------------------------------- catalog
@@ -44,10 +46,11 @@ HONEYMOONS = {
 ANNIVERSARY_MILESTONES = (1, 5, 10, 15, 20, 25, 30, 40, 50)
 
 CHILD_SUPPORT_PER_CHILD = 2000  # one-time posting + obligation record
+RENEWAL_TIERS = {"backyard": 0, "dinner": 400, "extravaganza": 4000}
 
 
 def new_weddings_state():
-    return {"anniversaries": {}, "renewals": {}}
+    return {"anniversaries": {}, "renewals": {}, "renewal_years": {}}
 
 
 def normalize_weddings(env):
@@ -56,11 +59,95 @@ def normalize_weddings(env):
         env["weddings"] = new_weddings_state()
         return True
     dirty = False
-    for key, default in (("anniversaries", {}), ("renewals", {})):
+    for key, default in (("anniversaries", {}), ("renewals", {}),
+                         ("renewal_years", {}), ("quotes", {})):
         if not isinstance(state.get(key), type(default)):
             state[key] = default
             dirty = True
+    # Older saves have counts but no year guard. Recover only recorded
+    # history (including free renewals, which have no ledger row).
+    for union in env.get("graph", {}).get("unions", []):
+        uid = union["union_id"]
+        if uid in state["renewal_years"]:
+            continue
+        years = [entry["age"] for entry in env.get("journal", [])
+                 if entry.get("kind") == "wedding"
+                 and entry.get("text") == "Vows renewed, promises made fresh."
+                 and set(entry.get("person_ids", [])) == set(union["person_ids"])
+                 and isinstance(entry.get("age"), int)]
+        if years:
+            state["renewal_years"][uid] = max(years)
+            dirty = True
     return dirty
+
+
+def quote_ceremony_fines(env, union_id):
+    """Q1: ONE shared engine quote for ceremony legal consequences.
+
+    Samples variable ranges ONCE, stores the quote on the wedding plan
+    (env["weddings"]["quotes"][union_id], persisted with the save) and
+    returns ALL fine lines. A stored quote is reused while the law is
+    unchanged (same jurisdiction law_version and same union recognition
+    status); a law edit reprojects, so the next call re-samples
+    deliberately — never a silent redraw. `plan_wedding` posts EXACTLY
+    these stored lines (preview total == posted total, always).
+
+    Callers sample on the gameplay stream: the service wraps this in
+    _GameRNG. Returns {"union_id", "status", "jurisdiction_id",
+    "law_version", "policy_revision", "lines": [{occurrence_id,
+    category, amount, leg, description}], "total"}."""
+    import random as _game_random
+    from src.game.features.relationship_policy import catalog as \
+        policy_catalog
+    graph = env["graph"]
+    union = next((u for u in graph["unions"] if u["union_id"] == union_id),
+                 None)
+    if union is None:
+        raise GraphError("not_found", "unknown union", 404)
+    if union["status"] != "active":
+        raise GraphError("graph_error", "union is not active", 409)
+    normalize_weddings(env)
+    policy = env.get("policy") or {}
+    recognition = union.get("recognition") or {}
+    jurisdiction_id = recognition.get("jurisdiction_id") \
+        or policy.get("jurisdiction_id")
+    jurisdiction = policy_catalog.resolve_jurisdiction(
+        policy_catalog.load_catalog(), policy.get("overrides"),
+        jurisdiction_id)
+    law_version = int(jurisdiction.get("law_version", 0))
+    status = recognition.get("status")
+    quotes = env["weddings"]["quotes"]
+    stored = quotes.get(union_id)
+    if stored is not None and stored.get("law_version") == law_version \
+            and stored.get("status") == status:
+        return stored
+    lines = []
+    if status in ("unrecognized", "forbidden"):
+        index = 0
+        for consequence in jurisdiction.get("consequences") or []:
+            if consequence.get("trigger") \
+                    != "ceremony_of_unrecognized_union" \
+                    or consequence.get("effect") != "civil_fine":
+                continue
+            lo, hi = (consequence.get("amount") or {}).get(
+                "randint", [0, 0])
+            amount = _game_random.randint(int(lo), int(hi))
+            lines.append({
+                "occurrence_id": "lawfine:%s:%d" % (union_id, index),
+                "category": consequence.get("ledger_category", "legal"),
+                "amount": amount,
+                "leg": "fine",
+                "description": "Fine for a %s ceremony (%s)"
+                               % (status, union_id)})
+            index += 1
+    quote = {"union_id": union_id, "status": status,
+             "jurisdiction_id": jurisdiction_id,
+             "law_version": law_version,
+             "policy_revision": int(policy.get("policy_revision", 0)),
+             "lines": lines,
+             "total": sum(line["amount"] for line in lines)}
+    quotes[union_id] = quote
+    return quote
 
 
 def wedding_cost(venue_id, guests, outfit_id, honeymoon_id):
@@ -104,8 +191,25 @@ def plan_wedding(env, service, union_id, venue_id, guests, outfit_id,
                                        "ceremony", 409)
     _guard_union(env, service, union)
     parts = wedding_cost(venue_id, guests, outfit_id, honeymoon_id)
+    # L1/Q1: ceremony law consequences post through ONE shared engine
+    # quote: sampled once, stored on the plan, never redrawn. The
+    # Ledger posts EXACTLY these stored lines (preview total == posted
+    # total); the occurrence key is per union + consequence, so replays
+    # and retries never double-charge. The total (parts + quote) passes
+    # the affordability gate.
+    from src.game.finance import CATEGORIES as _LEDGER_CATEGORIES
     player = env["player"]
-    total = sum(amount for _, amount in parts)
+    quote = quote_ceremony_fines(env, union_id)
+    recognition = union.get("recognition") or {}
+    fines = []
+    for line in quote["lines"]:
+        if line["category"] not in _LEDGER_CATEGORIES:
+            raise GraphError(
+                "invalid_input",
+                "law consequence names an unknown ledger category "
+                "%r" % line["category"])
+        fines.append(line)
+    total = sum(amount for _, amount in parts) + quote["total"]
     if total > 0 and player.money < total:
         raise GraphError(
             "not_allowed",
@@ -122,6 +226,15 @@ def plan_wedding(env, service, union_id, venue_id, guests, outfit_id,
                 "category": "wedding", "amount": -amount,
                 "description": "Wedding %s (%s)" % (item, union_id),
                 "group_id": f"wed:{union_id}:{turn}"})
+    for fine in fines:
+        money_entries.append({
+            "phase": "weddings",
+            "occurrence_id": fine["occurrence_id"],
+            "leg": fine["leg"], "account_owner_id": player.person_id,
+            "category": fine["category"],
+            "amount": -fine["amount"],
+            "description": fine["description"],
+            "group_id": "lawfine:%s:%s" % (union_id, turn)})
     ledger.post_many(turn_id, player.age, money_entries)
     # age (not revision) is the year clock: commands within one year
     # (resolves etc.) must not advance the anniversary calendar
@@ -146,7 +259,7 @@ def plan_wedding(env, service, union_id, venue_id, guests, outfit_id,
 def renew_vows(env, service, union_id, turn, tier="backyard"):
     """Vow renewal for the SELECTED union. Free tier always available."""
     from src.game.features.family_graph import transitions
-    tiers = {"backyard": 0, "dinner": 400, "extravaganza": 4000}
+    tiers = RENEWAL_TIERS
     if tier not in tiers:
         raise GraphError("invalid_input", "unknown renewal tier")
     graph = env["graph"]
@@ -159,6 +272,10 @@ def renew_vows(env, service, union_id, turn, tier="backyard"):
     cost = tiers[tier]
     _guard_union(env, service, union)
     player = env["player"]
+    state = env["weddings"]
+    last_year = state["renewal_years"].get(union_id)
+    if last_year is not None and last_year >= player.age:
+        raise GraphError("not_allowed", "vows already renewed this year", 409)
     money_entries = []
     if cost:
         if player.money < cost:
@@ -167,7 +284,7 @@ def renew_vows(env, service, union_id, turn, tier="backyard"):
                 f"the renewal costs ${cost:,} and you have "
                 f"${player.money:,}", 409)
         money_entries.append({
-            "phase": "weddings", "occurrence_id": f"vows:{union_id}",
+            "phase": "weddings", "occurrence_id": f"vows:{union_id}:{player.age}",
             "leg": "main", "account_owner_id": player.person_id,
             "category": "wedding", "amount": -cost,
             "description": "Vow renewal (%s)" % union_id})
@@ -176,7 +293,7 @@ def renew_vows(env, service, union_id, turn, tier="backyard"):
         ledger = Ledger(env, resolver=service._make_resolver(env))
         turn_id = env["turn"].get("turn_id", f"t_{env['revision'] + 1:06d}")
         ledger.post_many(turn_id, player.age, money_entries)
-    state = env["weddings"]
+    state["renewal_years"][union_id] = player.age
     state["renewals"][union_id] = state["renewals"].get(union_id, 0) + 1
     player.change_happiness(3)
     return {"ok": True, "ids": {"union_id": union_id},
@@ -282,6 +399,9 @@ def anniversary_check(env, service):
     state = env["weddings"]
     journals = []
     for union in graph["unions"]:
+        if union["status"] != "active" \
+                or env["player"].person_id not in union["person_ids"]:
+            continue
         ceremony = union.get("ceremony") or {}
         if not ceremony.get("held"):
             continue

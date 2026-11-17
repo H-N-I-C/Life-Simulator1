@@ -35,3 +35,5 @@ HALT AFTER M2: lifted by the user on 2026-11-17 for quality sprint Q1 (docs/coll
 Branch guard (2026-11-17): before starting any task, run `git branch --show-current`. It must print `dev`. If it doesn't, STOP and tell Claude. Never check out other branches yourself, and never work on the `test` branch.
 
 Messaging limit (user, 2026-11-17): agents don't message each other for routine coordination. Put open questions in the relevant README's 'Open items' list; Claude reviews and routes them in batches. Direct agent-to-agent messages are only for genuine blockers.
+
+Fix-round protocol (user, 2026-11-17): after each Codex review, SMALL fixes are done by Codex and BIG fixes by the Kimi agents (Claude splits them, keeping the work even and the files non-overlapping). When both are done, Codex re-evaluates. Claude does the final evaluation before anything goes to the user.

@@ -155,6 +155,123 @@ class EditorBrowserSmokeTests(unittest.TestCase):
         finally:
             proc.kill()
 
+    def test_second_consecutive_edit_and_m25_screens(self):
+        """B1 regression (Codex review: second edit got 409 stale_revision)
+        in the real browser: two applies back-to-back inside one editor
+        session must both commit. Then the M2.5 dating & weddings card
+        renders its tabs at phone width."""
+        proc, conn = launch_chrome()
+        try:
+            session = conn.new_session("about:blank")
+            session.call("Runtime.enable")
+            session.call("Page.enable")
+            session.call("Emulation.setDeviceMetricsOverride",
+                         {"width": 390, "height": 844,
+                          "deviceScaleFactor": 1, "mobile": True})
+            base = "http://127.0.0.1:%d" % self.port
+            session.call("Page.navigate",
+                         {"url": base + "/game?game=" + self.game_id})
+            session.wait_js(
+                "(document.getElementById('gameView')||{}).hidden === "
+                "false", timeout=15, desc="game view renders")
+            session.js("document.getElementById('editorToggle').click();"
+                       " true")
+            session.wait_js(
+                "(document.getElementById('editorPanel')||{}).hidden === "
+                "false && document.querySelectorAll("
+                "'#editorPeople button').length > 0", timeout=15,
+                desc="editor panel renders")
+            # select the player so the attribute form is present
+            session.js("document.querySelector('#editorPeople button')"
+                       ".click(); true")
+            session.wait_js(
+                "document.getElementById('edOpenness') !== null",
+                timeout=15, desc="person form renders")
+
+            def apply_openness(value, marker):
+                session.js("document.getElementById('edOpenness').value ="
+                           " '%s'; true" % value)
+                session.js("document.getElementById('edPreview').click();"
+                           " true")
+                session.wait_js(
+                    "document.querySelectorAll('#editorPreview button')"
+                    ".length >= 2", timeout=15,
+                    desc="preview offers apply (%s)" % marker)
+                session.js("document.querySelector('#editorPreview "
+                           ".primary').click(); true")
+                session.wait_js(
+                    "document.querySelector('#editorPreview li') !== null",
+                    timeout=15,
+                    desc="apply commits (%s)" % marker)
+
+            apply_openness("0.61", "first edit")
+            # The B1 fix: this second edit used to 409 because the panel
+            # sent the page-load revision; it must now commit too.
+            apply_openness("0.72", "second edit")
+            # ...and a third proves the chain is stable, not lucky.
+            apply_openness("0.64", "third edit")
+            session.wait_js(
+                "!document.getElementById('editorStatus').textContent"
+                ".includes('409')", timeout=5,
+                desc="no 409 surfaced in editor status")
+
+            request = urllib.request.Request(
+                "http://127.0.0.1:%d/api/games/%s/policy-state"
+                % (self.port, self.game_id))
+            with urllib.request.urlopen(request) as res:
+                policy = json.loads(res.read())
+            request = urllib.request.Request(
+                "http://127.0.0.1:%d/api/games/%s" % (self.port,
+                                                      self.game_id))
+            with urllib.request.urlopen(request) as res:
+                state = json.loads(res.read())
+            profile = policy["profiles"][state["player_id"]]
+            self.assertAlmostEqual(profile["openness"], 0.64, places=5)
+            # three fresh audits appended (the class game may carry
+            # earlier edits from the other browser test)
+            self.assertEqual(
+                [a["command"] for a in policy["editor_audit"][-3:]],
+                ["edit_person_attributes"] * 3)
+
+            # M2.5 screens: open the card, tabs render, weddings tab shows
+            # the (empty) union state without errors.
+            session.js("document.getElementById('m25Toggle').click();"
+                       " true")
+            session.wait_js(
+                "(document.getElementById('m25Card')||{}).hidden === "
+                "false && document.querySelectorAll('#m25Body').length "
+                "=== 1", timeout=15, desc="m25 card opens")
+            session.wait_js(
+                "document.querySelectorAll('[data-tab]').length === 3",
+                timeout=15, desc="three tabs render")
+            session.js("document.querySelector('[data-tab=weddings]')"
+                       ".click(); true")
+            session.wait_js(
+                "document.getElementById('m25Body').textContent.length "
+                "> 0", timeout=15, desc="weddings tab renders content")
+            body = session.js(
+                "document.getElementById('m25Body').textContent")
+            self.assertIn("No active unions", body)
+            session.js("document.querySelector('[data-tab=reputation]')"
+                       ".click(); true")
+            session.wait_js(
+                "document.getElementById('m25Body').textContent.length "
+                "> 0", timeout=15, desc="reputation tab renders content")
+            session.js("document.querySelector('[data-tab=dating]')"
+                       ".click(); true")
+            session.wait_js(
+                "document.getElementById('m25Body').textContent.length "
+                "> 0", timeout=15, desc="dating tab renders content")
+            # phone width: no horizontal overflow
+            overflow = session.js(
+                "document.documentElement.scrollWidth > "
+                "document.documentElement.clientWidth")
+            self.assertFalse(overflow)
+            self.assertIsNone(session.js(
+                "document.querySelector('.crash-overlay') || null"))
+        finally:
+            proc.kill()
+
 
 if __name__ == "__main__":
     unittest.main()

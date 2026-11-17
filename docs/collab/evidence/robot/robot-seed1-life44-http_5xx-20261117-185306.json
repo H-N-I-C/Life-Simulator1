@@ -1,0 +1,25 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 44,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Arel",
+    "last_name": "Schroeder",
+    "gender": "male",
+    "country": "Indonesia",
+    "seed": 638311802,
+    "request_id": "robot-1-44-create"
+   }
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 45 --seed 1 --from-life 44 --fail-fast"
+}

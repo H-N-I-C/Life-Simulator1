@@ -54,18 +54,29 @@ def _milestone(context, player, bindings, value, rng):
     return [], []
 
 
-def _sample_conception(context, player, bindings, value, rng):
+def _sample_conception(context, player, bindings, value, rng,
+                       occurrence_id=None):
     from src.game.features.family_graph import sample_conception
     env = _env(context)
     mother = _pid(bindings, value.get("mother"))
     father = _pid(bindings, value.get("father"))
+    # One persisted outcome per conception, identified by the stored
+    # occurrence id (a replayed occurrence reuses its outcome; a new
+    # occurrence for the same pair is a new conception). The stored key
+    # is checked BEFORE any draw, so a replayed occurrence never
+    # re-consumes the gameplay RNG.
+    key = "occurrence:%s" % occurrence_id if occurrence_id \
+        else "%s+%s" % (mother, father)
+    outcomes = env["graph"].setdefault("conception_outcomes", {})
+    if key in outcomes:
+        return [], []
     rule_actions._guard_romance(context.people_by_id.get(mother),
                                 context.people_by_id.get(father))
-    outcome = sample_conception(env["graph"], mother, father, rng)
-    # one persisted outcome per recorded conception for this pair
-    key = "%s+%s" % (mother, father)
-    env["graph"].setdefault("conception_outcomes", {}) \
-        .setdefault(key, []).append(outcome)
+    outcome = sample_conception(env["graph"], mother, father, rng,
+                                persons_by_id=context.people_by_id)
+    outcome["bio_mother_id"] = mother
+    outcome["bio_father_id"] = father
+    outcomes[key] = outcome
     return [], []
 
 
@@ -103,12 +114,17 @@ def _end_union(context, player, bindings, value, rng):
 
 def _chemistry(context, player, bindings, value, rng):
     env = _env(context)
+    stored = (env.get("pending") or {}).get("sampled") or {}
+    if stored.get("accepted") is False:
+        # a stored refusal cancels the date's spark: no edge, no delta
+        return [], []
     a_id = _pid(bindings, value["between"][0])
     b_id = _pid(bindings, value["between"][1])
     rel = _find_active_relationship(env["graph"], a_id, b_id)
     if rel is None:
-        raise rule_actions.RuleError(
-            "not_found", "no active relationship between the bound pair")
+        # A chemistry delta is not consent. Only an accepted offer may
+        # create the edge; established relationships may change normally.
+        return [], []
     delta = _int_value(value.get("delta", 0), rng, "delta")
     patch = {"chemistry": max(0, min(100, rel["chemistry"] + delta))}
     transitions.update_relationship_op(env, rel["relationship_id"], patch,

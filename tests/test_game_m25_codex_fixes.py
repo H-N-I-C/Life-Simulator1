@@ -373,7 +373,14 @@ class CodexFixes(unittest.TestCase):
         for ages in ((17, 18), (18, 17), (18, 18)):
             with self.subTest(ages=ages):
                 env = self.new(18, 18)
-                uid = env["graph"]["unions"][0]["union_id"]
+                # a real union edge (dating partners no longer migrate to
+                # unions; only recorded marriages do)
+                uid = graph.form_union(env["graph"], env["player"],
+                                       env["player"].partner, "marriage",
+                                       {"status": "recognized",
+                                        "jurisdiction_id": "jur-neutral-default",
+                                        "law_version": 1, "basis": "registration"},
+                                       turn=0)
                 env["player"].age, env["player"].partner.age = ages
                 self.svc._save(env)
                 st = self.svc.get_state(self.gid)

@@ -1,0 +1,200 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 710,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "action 'ask_for_money' -> HTTP 500: {\"error\": \"internal\", \"crash_id\": \"a72456fc6631\"}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aileen",
+    "last_name": "Palmer",
+    "gender": "female",
+    "country": "China",
+    "seed": 1159649460,
+    "request_id": "robot-1-710-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 964144989,
+     "base": "person",
+     "skin_tone": "light",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "cap",
+      "flower"
+     ],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_0ac8b7d969",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r72897",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_0ac8b7d969",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r72898",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_0ac8b7d969",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm",
+    "inputs": null
+   },
+   "request_id": "robot-1-r72899",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_0ac8b7d969",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r72900",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_0ac8b7d969",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "ask_final"
+   },
+   "request_id": "robot-1-r72901",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_0ac8b7d969",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "cancel"
+   },
+   "request_id": "robot-1-r72902",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_0ac8b7d969",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r72903",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_0ac8b7d969",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r72904",
+   "expected_revision": 8
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_0ac8b7d969",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r72905",
+   "expected_revision": 9
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_0ac8b7d969",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r72906",
+   "expected_revision": 10
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_0ac8b7d969",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_4",
+    "option_id": "d_4_hide"
+   },
+   "request_id": "robot-1-r72907",
+   "expected_revision": 11
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_0ac8b7d969",
+   "action": "study_harder",
+   "payload": {},
+   "request_id": "robot-1-r72908",
+   "expected_revision": 12
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_0ac8b7d969",
+   "action": "compliment",
+   "payload": {
+    "target_id": "927c6b72-315c-4b2a-b3cc-92ce699a5b70"
+   },
+   "request_id": "robot-1-r72909",
+   "expected_revision": 13
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_0ac8b7d969",
+   "action": "ask_for_money",
+   "payload": {
+    "target_id": "87eb36a5-0be9-4231-9a25-66e6754adb39"
+   },
+   "request_id": "robot-1-r72910",
+   "expected_revision": 14
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_0ac8b7d969",
+   "action": "ask_for_money",
+   "payload": {
+    "target_id": "927c6b72-315c-4b2a-b3cc-92ce699a5b70"
+   },
+   "request_id": "robot-1-r72911",
+   "expected_revision": 15
+  },
+  {
+   "n": 16,
+   "kind": "error",
+   "status": 500,
+   "body": "{\"error\": \"internal\", \"crash_id\": \"a72456fc6631\"}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 711 --seed 1 --from-life 710 --fail-fast"
+}

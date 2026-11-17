@@ -1,0 +1,139 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 23,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "action 'age_up' -> HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Arie",
+    "last_name": "Golden",
+    "gender": "male",
+    "country": "France",
+    "seed": 797089582,
+    "request_id": "robot-1-23-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 852959140,
+     "base": "woman",
+     "skin_tone": "dark",
+     "hair": "red",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "flower",
+      "glasses"
+     ],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_2af22948b5",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-1-r4428",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_2af22948b5",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r4429",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_2af22948b5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "ask_final"
+   },
+   "request_id": "robot-1-r4430",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_2af22948b5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "ask_final"
+   },
+   "request_id": "robot-1-r4430",
+   "expected_revision": 2
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_2af22948b5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "cancel"
+   },
+   "request_id": "robot-1-r4432",
+   "expected_revision": 3
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_2af22948b5",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-1-r4433",
+   "expected_revision": 4
+  },
+  {
+   "n": 8,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_2af22948b5",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r4434",
+   "expected_revision": 4
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_2af22948b5",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-1-r4435",
+   "expected_revision": 5
+  },
+  {
+   "n": 11,
+   "kind": "error",
+   "status": 500,
+   "body": "{\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 24 --seed 1 --from-life 23 --fail-fast"
+}

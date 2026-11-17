@@ -203,11 +203,12 @@ class V2MigrationIntegrationTests(unittest.TestCase):
         # simulate a real M2 married family: partner + recorded child
         env = svc._load(gid)
         env["player"].age = 30  # a real married M2 save has an adult player
-        partner = Partner(33, Gender.Female, 50, 50, 80, 1)
+        partner = Partner(33, Gender.Female, 50, 50, 80, 2)
         ensure_person_id(partner)
         env["player"].partner = partner
         svc._save(env)
-        # wipe the M2.5 graph as a pre-M2.5 save would have
+        # wipe the M2.5 graph AND the migration marker, as a pre-M2.5
+        # save would have
         from src.game.features.family_graph import new_graph
         env = svc._load(gid)
         env["graph"] = new_graph()
@@ -290,6 +291,76 @@ class RelatednessAndConceptionTests(unittest.TestCase):
             self.svc.record_conception(self.gid, "child-x", kid.person_id,
                                        adult.person_id, "conc-2")
         self.assertEqual(ctx.exception.code, "not_adult")
+
+    def test_conception_binds_parentage_and_consumes_once_at_birth(self):
+        env = self.svc._load(self.gid)
+        adults = [p for p in self.svc._walk_people(env["player"])
+                  if p.age >= 18]
+        mother, father = adults[0].person_id, adults[1].person_id
+        out = self.svc.record_conception(self.gid, "child-bound", mother,
+                                         father, "conc-3")
+        self.assertEqual(out["bio_mother_id"], mother)
+        self.assertEqual(out["bio_father_id"], father)
+        env2 = self.svc._load(self.gid)
+        edges = {(e["child_id"], e["parent_id"], e["role"], e["confidence"])
+                 for e in env2["graph"]["parentage"]}
+        self.assertIn(("child-bound", mother, "biological", "certain"),
+                      edges)
+        self.assertIn(("child-bound", father, "biological", "certain"),
+                      edges)
+        # consumed exactly once at birth; a retried birth gets nothing
+        got = self.svc.consume_conception_outcome(self.gid, "child-bound")
+        self.assertEqual(got["adjustment"], out["adjustment"])
+        self.assertIsNone(self.svc.consume_conception_outcome(
+            self.gid, "child-bound"))
+        # a child with no recorded conception (legacy birth/adoption)
+        self.assertIsNone(self.svc.consume_conception_outcome(
+            self.gid, "child-unrecorded"))
+
+    def test_newborn_after_initial_parents_gets_parentage_on_load(self):
+        """The per-record backfill is not all-or-nothing: a child born
+        after the first load still gets graph parentage for both recorded
+        parents (and only real recorded parents)."""
+        from src.people.classes.child import Child
+        from src.lifesim_lib.lifesim_lib import Gender
+        env = self.svc._load(self.gid)
+        env["player"].age = 30
+        mother = next(p for p in self.svc._walk_people(env["player"])
+                      if getattr(p, "name", "") and p.age >= 18)
+        baby = Child("Newborn", "Test", Gender.Male, 50, 50)
+        baby.age = 0
+        baby.mother = env["player"]
+        baby.father = mother
+        env["player"].children.append(baby)
+        self.svc._save(env)
+        self.svc.get_state(self.gid)  # triggers load + backfill
+        env2 = self.svc._load(self.gid)
+        parents = {e["parent_id"] for e in env2["graph"]["parentage"]
+                   if e["child_id"] == baby.person_id}
+        self.assertEqual(parents, {env2["player"].person_id,
+                                   mother.person_id})
+
+    def test_relatedness_honours_unknown_lineage_marker(self):
+        from src.appearance.integration import ensure_person_id
+        from src.people.classes.parent import Parent
+        from src.lifesim_lib.lifesim_lib import Gender
+        env = self.svc._load(self.gid)
+        pid = env["player"].person_id
+        stranger = Parent("Riley", 32, Gender.Female)
+        ensure_person_id(stranger)
+        env["player"].relations.append(stranger)
+        self.svc._save(env)
+        # a Parent-typed acquaintance is NOT a recorded parent
+        self.assertEqual(self.svc.get_relatedness(
+            self.gid, pid, stranger.person_id)["category"], "unrelated")
+        env = self.svc._load(self.gid)
+        stranger = next(p for p in env["player"].relations
+                        if p.person_id == stranger.person_id)
+        stranger.lineage = "unknown"
+        self.svc._save(env)
+        got = self.svc.get_relatedness(self.gid, pid, stranger.person_id)
+        self.assertEqual(got["category"], "unknown")
+        self.assertEqual(got["coefficient_band"], "unknown")
 
 
 class GraphCommandTests(unittest.TestCase):
@@ -605,6 +676,236 @@ class DatingEvaluatorEditorIntegrationTests(unittest.TestCase):
             before["score_breakdown"].get("personal_tenets"),
             after["score_breakdown"].get("personal_tenets"),
             "the tenet edit must change the personal-tenets contribution")
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+class DatingOfferApplierTests(unittest.TestCase):
+    """A3: the offer/respond domain appliers through the real resolver.
+    Accepted -> courtship edge (stranger -> partner); refused -> a stored
+    declined outcome with no invented relationship."""
+
+    EVENT = {
+        "id": "m25_test_date_offer",
+        "title": "A match wants to meet",
+        "text": "{person:target} asks {name} out for coffee.",
+        "interaction": {"kind": "date", "romantic": True},
+        "roles": {
+            "actor": {"kind": "person", "select": "player"},
+            "target": {"kind": "person", "select": "predicate",
+                       "predicate": "adult_non_related_stranger"},
+        },
+        "choices": [
+            {"id": "accept", "label": "Go on the date", "cost": {},
+             "effects": {
+                 "chemistry": {"between": ["actor", "target"],
+                               "delta": {"randint": [3, 8]}},
+                 "offer": {"interaction": "propose_courtship",
+                           "to": "target", "as": "npc"}},
+             "outcome_text": "We had a lovely evening."},
+            {"id": "decline", "label": "Not tonight", "cost": {},
+             "effects": {}, "outcome_text": "I swiped away."},
+        ],
+        "audience": {"scope": "player_known",
+                     "participants": ["actor", "target"]},
+    }
+
+    def setUp(self):
+        import random
+        from src.appearance.integration import ensure_person_id
+        from src.game.events import EventEngine, GameContext
+        from src.game.features.parenting.engine import _V3Context
+        from src.people.classes.parent import Parent
+        from src.lifesim_lib.lifesim_lib import Gender
+        self._random = random
+        self.dir = tempfile.mkdtemp(prefix="lifesim-m25-offer-")
+        self.svc = GameService(self.dir)
+        self.st = self.svc.new_game(dict(PROFILE), "offer-create")
+        self.gid = self.st["game_id"]
+        env = self.svc._load(self.gid)
+        env["player"].age = 30
+        stranger = Parent("Riley", 32, Gender.Female)
+        ensure_person_id(stranger)
+        stranger.relationship = 40
+        env["player"].relations.append(stranger)
+        self.target_id = stranger.person_id
+        self.svc._save(env)
+        # bind the stranger once, as the engine does at offer creation
+        env = self.svc._load(self.gid)
+        ctx = _V3Context(GameContext(env, self.svc))
+        self.pending = EventEngine.instantiate3(
+            self.EVENT, 7, random.Random(3), ctx,
+            prebound={"target": self.target_id})
+        self.pending["id"] = "d_offer_test"
+        env["pending"] = self.pending
+        self.svc._save(env)
+
+    def _resolve_accept(self):
+        st = self.svc.get_state(self.gid)
+        return self.svc.command(
+            self.gid, st["revision"], "req-offer-1", "resolve_decision",
+            {"decision_id": "d_offer_test",
+             "option_id": next(o["id"] for o in
+                               self.pending["options"]
+                               if o["id"].endswith("accept"))})
+
+    def _graph(self):
+        return self.svc._load(self.gid)["graph"]
+
+    def test_accepted_offer_creates_courtship_edge_once(self):
+        env = self.svc._load(self.gid)
+        sampled = dict(env["pending"].get("sampled") or {})
+        sampled["accepted"] = True
+        env["pending"]["sampled"] = sampled
+        self.svc._save(env)
+        self._resolve_accept()
+        graph = self._graph()
+        offers = graph["offers"]
+        self.assertEqual(len(offers), 1)
+        self.assertEqual(offers[0]["status"], "accepted")
+        self.assertEqual(set(offers[0]["person_ids"])
+                         if "person_ids" in offers[0] else
+                         {offers[0]["initiator_id"],
+                          offers[0]["target_id"]},
+                         {env["player"].person_id, self.target_id})
+        active = [r for r in graph["relationships"]
+                  if r["status"] == "active"]
+        self.assertEqual(len(active), 1)
+        self.assertEqual(set(active[0]["person_ids"]),
+                         {env["player"].person_id, self.target_id})
+        self.assertEqual(active[0]["kind"], "courtship")
+        # replayed occurrence: a second resolve cannot duplicate the edge
+        self._resolve_accept()
+        graph = self._graph()
+        active = [r for r in graph["relationships"]
+                  if r["status"] == "active"]
+        self.assertEqual(len(active), 1)
+
+    def test_refused_offer_is_a_stored_outcome_without_an_edge(self):
+        env = self.svc._load(self.gid)
+        sampled = dict(env["pending"].get("sampled") or {})
+        sampled["accepted"] = False
+        env["pending"]["sampled"] = sampled
+        self.svc._save(env)
+        self._resolve_accept()
+        graph = self._graph()
+        offers = graph["offers"]
+        self.assertEqual(len(offers), 1)
+        self.assertEqual(offers[0]["status"], "declined")
+        self.assertEqual(graph["relationships"], [])
+        self.assertEqual(graph["unions"], [])
+        # the refusal preserved the attempt record
+        self.assertEqual(offers[0]["attempt"]["count"], 1)
+
+    def test_offer_without_stored_response_stays_pending(self):
+        self._resolve_accept()
+        graph = self._graph()
+        offers = graph["offers"]
+        self.assertEqual(len(offers), 1)
+        self.assertEqual(offers[0]["status"], "pending")
+        # R2 (Codex): chemistry is not consent — with no stored accepted
+        # response nothing may create the relationship; the offer waits
+        # for the target's answer via `respond`
+        self.assertEqual(graph["relationships"], [])
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+class EditorSupersessionReprojectionTests(unittest.TestCase):
+    """A4: a jurisdiction law edit reprojects recognition onto the living
+    world's active unions; policy edits supersede relevant stored offers,
+    never unrelated pendings."""
+
+    JUR = "jur-editor-test"
+
+    def setUp(self):
+        from src.appearance.integration import ensure_person_id
+        from src.people.classes.parent import Parent
+        from src.lifesim_lib.lifesim_lib import Gender
+        self.dir = tempfile.mkdtemp(prefix="lifesim-m25-ed-")
+        self.svc = GameService(self.dir)
+        self.st = self.svc.new_game(dict(PROFILE), "ed-create")
+        self.gid = self.st["game_id"]
+        env = self.svc._load(self.gid)
+        env["player"].age = 30
+        spouse = Parent("Jordan", 32, Gender.Male)
+        ensure_person_id(spouse)
+        env["player"].relations.append(spouse)
+        self.spouse_id = spouse.person_id
+        self.svc._save(env)
+        env = self.svc._load(self.gid)
+        st = self.svc.get_state(self.gid)
+        self.svc.graph_command(
+            self.gid, st["revision"], "ed-form-union", "form_union",
+            {"a_id": st["player_id"], "b_id": self.spouse_id,
+             "kind": "marriage",
+             "recognition": {"status": "recognized",
+                             "jurisdiction_id": self.JUR,
+                             "law_version": 1, "basis": "ceremony"},
+             "turn": 0})
+
+    def _union(self):
+        env = self.svc._load(self.gid)
+        return env["graph"]["unions"][0], env
+
+    def _edit_law(self, status):
+        st = self.svc.get_state(self.gid)
+        return self.svc.editor_apply(
+            self.gid, st["revision"], "ed-law-%s" % status,
+            [{"name": "edit_jurisdiction", "scope": "jurisdiction",
+              "target_id": self.JUR,
+              "patch": {"recognition": {"monogamous_civil": status}}}])
+
+    def test_law_edit_reprojects_recognition_on_active_union(self):
+        self._edit_law("forbidden")
+        union, env = self._union()
+        self.assertEqual(union["recognition"]["status"], "forbidden")
+        self.assertEqual(union["recognition"]["law_version"],
+                         env["policy"]["policy_revision"])
+        # the union still exists; nothing was deleted or retro-fined
+        self.assertEqual(union["status"], "active")
+        self.assertEqual(len(env["graph"]["unions"]), 1)
+
+    def test_unrelated_law_does_not_touch_the_union(self):
+        st = self.svc.get_state(self.gid)
+        self.svc.editor_apply(
+            self.gid, st["revision"], "ed-other-law",
+            [{"name": "edit_jurisdiction", "scope": "jurisdiction",
+              "target_id": "jur-somewhere-else",
+              "patch": {"recognition": {"monogamous_civil": "forbidden"}}}])
+        union, _env = self._union()
+        self.assertEqual(union["recognition"]["status"], "recognized")
+
+    def test_policy_edit_supersedes_relevant_pending_offer(self):
+        # a stored v3 date pending involving the spouse
+        env = self.svc._load(self.gid)
+        env["pending"] = {
+            "id": "d_ed_date", "kind": "v3", "title": "Date",
+            "text": "A date offer.", "options": [{"id": "go",
+                                                  "label": "Go"}],
+            "interaction": {"kind": "date", "romantic": True},
+            "bindings": {"actor": env["player"].person_id,
+                         "target": self.spouse_id}}
+        self.svc._save(env)
+        self._edit_law("unrecognized")
+        env = self.svc._load(self.gid)
+        self.assertIsNone(env["pending"])
+        # a non-romantic pending is left alone
+        env["pending"] = {"id": "d_ed_par", "kind": "v3",
+                          "title": "School",
+                          "text": "A parenting request.",
+                          "options": [{"id": "ok", "label": "OK"}],
+                          "interaction": {"kind": "parenting_request",
+                                          "romantic": False},
+                          "bindings": {"actor": env["player"].person_id}}
+        self.svc._save(env)
+        self._edit_law("recognized")
+        env = self.svc._load(self.gid)
+        self.assertIsNotNone(env["pending"])
 
 
 if __name__ == "__main__":

@@ -1,0 +1,39 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 25,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aditya",
+    "last_name": "Adkins",
+    "gender": "male",
+    "country": "Japan",
+    "seed": 202151881,
+    "request_id": "robot-1-25-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 940036670,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "earrings"
+     ],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 26 --seed 1 --from-life 25 --fail-fast"
+}

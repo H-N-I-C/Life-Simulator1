@@ -31,3 +31,5 @@ Rebalance M2.5 (Claude, 2026-11-17): C's task step 5 (PARENTING: styles, kids' p
 Rebalance M2.5 #2 (Claude, 2026-11-17): WEDDINGS & MARRIAGE (C's step 4: guests, venue, outfit, honeymoon, cash prenups, anniversaries, vows, selected-union breakup/divorce) moves to Kimi A in src/game/features/weddings/**, using C's v3 loader. C keeps dating (current), drama/secrets/reputation and general content. A sends C requests for anything needed in C's files.
 
 Rebalance M2.5 #3 (Claude, 2026-11-17): DRAMA/SECRETS/REPUTATION (C's step 3: jealousy and expectations, affairs, observer knowledge, discovery, scoped reputation, forgiveness; consensual plural unions aren't automatically cheating) moves to Kimi A in src/game/features/knowledge/**, implementing C's frozen reputation-knowledge.md. C keeps dating (current), the loader/schema and the general content, and reviews A's knowledge implementation against its contract.
+
+Rebalance M2.5 #4: CANCELLED (B had already built the dating screen; B keeps it, and C reviews it).

@@ -1,0 +1,39 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 48,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Ailey",
+    "last_name": "Kaplan",
+    "gender": "female",
+    "country": "Japan",
+    "seed": 202776716,
+    "request_id": "robot-1-48-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1556116011,
+     "base": "man",
+     "skin_tone": "light",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "glasses"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 49 --seed 1 --from-life 48 --fail-fast"
+}

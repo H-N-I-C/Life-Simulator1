@@ -1,0 +1,40 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 43,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adair",
+    "last_name": "Becker",
+    "gender": "male",
+    "country": "Canada",
+    "seed": 1352867699,
+    "request_id": "robot-1-43-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1631722577,
+     "base": "person",
+     "skin_tone": "default",
+     "hair": "red",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "crown",
+      "earrings"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 44 --seed 1 --from-life 43 --fail-fast"
+}

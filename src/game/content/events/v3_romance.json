@@ -1,0 +1,648 @@
+{
+  "schema_version": 3,
+  "events": [
+    {
+      "id": "rom_first_date_coffee",
+      "title": "Coffee With Someone New",
+      "text": "{person:stranger} from the bookshop finally asked me out. We are meeting for coffee this afternoon.",
+      "interaction": {"kind": "date", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "stranger": {"kind": "person", "select": "predicate", "predicate": "adult_non_related_stranger"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "stranger"]},
+      "choices": [
+        {"id": "go", "label": "Go and be myself",
+         "effects": {"stats": {"happiness": {"randint": [3, 8]}}, "relationship": 5},
+         "outcome_text": "I went, I laughed too loudly at my own joke, and they laughed too. I count that as a win."},
+        {"id": "nerves", "label": "Cancel at the last minute",
+         "effects": {"stats": {"stress": -2, "happiness": -2}},
+         "outcome_text": "I texted an excuse and put the phone face down. The quiet felt heavier than I expected."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_first_date_rained_out",
+      "title": "Washed Out",
+      "text": "My first date with {person:crush} is tonight, and the sky has opened up like it is personally offended.",
+      "interaction": {"kind": "date", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "crush": {"kind": "person", "select": "predicate", "predicate": "adult_acquaintance"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "crush"]},
+      "choices": [
+        {"id": "embrace", "label": "Dance in the rain anyway",
+         "effects": {"stats": {"happiness": {"randint": [4, 9]}}, "relationship": 6, "health": -1},
+         "outcome_text": "We got drenched and silly, and the date was better than anything I had planned."},
+        {"id": "reschedule", "label": "Reschedule for next week",
+         "effects": {"relationship": 2},
+         "outcome_text": "We moved it to next week. They seemed relieved, and so was I."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_first_date_walk",
+      "title": "The Long Way Round",
+      "text": "{person:crush} suggested we just walk and talk, no plan, no restaurant, no escape route.",
+      "interaction": {"kind": "date", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "crush": {"kind": "person", "select": "predicate", "predicate": "adult_acquaintance"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "crush"]},
+      "choices": [
+        {"id": "walk", "label": "Take the long way",
+         "effects": {"stats": {"happiness": {"randint": [3, 7]}, "health": 1}, "relationship": 5},
+         "outcome_text": "We walked until the streetlights came on. I did not notice the time at all."},
+        {"id": "coffee_first", "label": "Suggest a café instead",
+         "effects": {"stats": {"happiness": 2}, "relationship": 2, "money": -12},
+         "outcome_text": "We settled into a corner booth and talked over coffee until it went cold."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_first_date_nervous",
+      "title": "Nerves",
+      "text": "I am ten minutes early for my date with {person:stranger} and my hands will not sit still.",
+      "interaction": {"kind": "date", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "stranger": {"kind": "person", "select": "predicate", "predicate": "adult_non_related_stranger"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "stranger"]},
+      "choices": [
+        {"id": "breathe", "label": "Breathe and wait",
+         "effects": {"stats": {"happiness": {"randint": [2, 7]}, "stress": -3}, "relationship": 4},
+         "outcome_text": "I breathed, they arrived, and the nerves turned into something warmer."},
+        {"id": "flee", "label": "Leave before they get here",
+         "effects": {"stats": {"stress": -1, "happiness": -3}},
+         "outcome_text": "I walked away fast and pretended I had never been there. My heart took an hour to slow down."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_first_date_second_thoughts",
+      "title": "Second Thoughts",
+      "text": "{person:crush} is sweet, but my stomach says something is off. I cannot tell if it is instinct or fear.",
+      "interaction": {"kind": "date", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "crush": {"kind": "person", "select": "predicate", "predicate": "adult_acquaintance"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "crush"]},
+      "choices": [
+        {"id": "trust_gut", "label": "Trust my gut and step back",
+         "effects": {"stats": {"stress": -2}, "relationship": -2},
+         "outcome_text": "I politely pulled away. Something in me unclenched the same evening."},
+        {"id": "give_chance", "label": "Give it one more chance",
+         "effects": {"stats": {"happiness": {"randint": [-3, 6]}}, "relationship": 3},
+         "outcome_text": "I gave it one more evening. I am still not sure if it was patience or stubbornness."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_chemistry_spark",
+      "title": "The Spark",
+      "text": "{person:lover} reached for the same mug as me and neither of us moved away.",
+      "interaction": {"kind": "flirt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "lover": {"kind": "person", "select": "predicate", "predicate": "adult_existing_lover"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "lover"]},
+      "choices": [
+        {"id": "lean_in", "label": "Lean into the moment",
+         "effects": {"chemistry": {"between": ["actor", "lover"], "delta": {"randint": [3, 7]}}, "stats": {"happiness": 4}},
+         "outcome_text": "The air crackled like the first week all over again."},
+        {"id": "playful", "label": "Make a joke of it",
+         "effects": {"stats": {"happiness": 2}, "relationship": 2},
+         "outcome_text": "I joked, they chased me with a dishcloth, and the kitchen rang with laughing."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_chemistry_slow_burn",
+      "title": "Slow Burn",
+      "text": "Nothing dramatic happened today. {person:lover} just read beside me while it rained, and it felt like enough.",
+      "interaction": {"kind": "flirt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "lover": {"kind": "person", "select": "predicate", "predicate": "adult_existing_lover"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "lover"]},
+      "choices": [
+        {"id": "savour", "label": "Savour the quiet",
+         "effects": {"chemistry": {"between": ["actor", "lover"], "delta": {"randint": [2, 5]}}, "stats": {"stress": -3, "happiness": 3}},
+         "outcome_text": "I put my feet on their lap and read the same paragraph four times, happy."},
+        {"id": "tea", "label": "Put the kettle on",
+         "effects": {"stats": {"happiness": 2}, "money": -4},
+         "outcome_text": "Two teas, one blanket, zero complaints."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_chemistry_dance_floor",
+      "title": "One More Dance",
+      "text": "At a friend's party, {person:lover} pulled me up for one more dance than I planned.",
+      "interaction": {"kind": "flirt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "lover": {"kind": "person", "select": "predicate", "predicate": "adult_existing_lover"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "lover"]},
+      "choices": [
+        {"id": "dance", "label": "Dance badly, happily",
+         "effects": {"chemistry": {"between": ["actor", "lover"], "delta": {"randint": [3, 6]}}, "stats": {"happiness": 5, "health": 1}},
+         "outcome_text": "I have never been a good dancer. Neither have they. It was perfect."},
+        {"id": "watch", "label": "Cheer them on from the side",
+         "effects": {"stats": {"happiness": 2}, "relationship": 2},
+         "outcome_text": "I watched them laugh under the lights and felt embarrassingly fond."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_flirt_bar",
+      "title": "A Bold Compliment",
+      "text": "A stranger across the room is smiling at me like we share a secret. {person:stranger} has confidence I envy.",
+      "interaction": {"kind": "flirt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "stranger": {"kind": "person", "select": "predicate", "predicate": "adult_non_related_stranger"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "stranger"]},
+      "choices": [
+        {"id": "smile_back", "label": "Smile back",
+         "effects": {"stats": {"happiness": 4, "looks": 1}, "relationship": 3},
+         "outcome_text": "I smiled back, and the whole evening tilted a few degrees brighter."},
+        {"id": "look_away", "label": "Look away politely",
+         "effects": {"stats": {"stress": -1}},
+         "outcome_text": "I studied my glass very hard for the rest of the night."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_flirt_grocery",
+      "title": "Aisle Five",
+      "text": "{person:crush} and I keep reaching for the same shelf at the market. It stopped being an accident two aisles ago.",
+      "interaction": {"kind": "flirt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "crush": {"kind": "person", "select": "predicate", "predicate": "adult_acquaintance"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "crush"]},
+      "choices": [
+        {"id": "say_something", "label": "Say something silly",
+         "effects": {"stats": {"happiness": {"randint": [2, 6]}}, "relationship": 4},
+         "outcome_text": "I commented on the tragic state of the tomatoes. They laughed. Progress."},
+        {"id": "move_on", "label": "Keep shopping",
+         "effects": {},
+         "outcome_text": "I let the moment pass and wondered about it all the way home."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_rejection_polite",
+      "title": "A Kind No",
+      "text": "I asked {person:stranger} if they would like to get dinner sometime, and I watched them search for a gentle way to decline.",
+      "interaction": {"kind": "flirt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "stranger": {"kind": "person", "select": "predicate", "predicate": "adult_non_related_stranger"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "stranger"]},
+      "choices": [
+        {"id": "grace", "label": "Accept it with grace",
+         "effects": {"stats": {"happiness": -2, "karma": 2, "stress": -2}},
+         "outcome_text": "I said I understood and meant it. A kind no still stings, but it heals clean."},
+        {"id": "press", "label": "Push a little harder",
+         "effects": {"stats": {"happiness": -5, "stress": 3}, "relationship": -4},
+         "outcome_text": "I pushed, and watched their patience close like a shop shutter. I deserved that."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_rejection_wrong_assumption",
+      "title": "Wrong Read",
+      "text": "I was sure {person:crush} had been flirting with me for weeks. Today I found out they are happily taken.",
+      "interaction": {"kind": "flirt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "crush": {"kind": "person", "select": "predicate", "predicate": "adult_acquaintance"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "crush"]},
+      "choices": [
+        {"id": "laugh_it_off", "label": "Laugh at myself",
+         "effects": {"stats": {"happiness": -2, "stress": -3, "karma": 1}},
+         "outcome_text": "I laughed at my own dramatic reading of the situation. Mostly laughed."},
+        {"id": "sulk", "label": "Sulk about it",
+         "effects": {"stats": {"happiness": -6, "stress": 2}},
+         "outcome_text": "I sulked for two days. My mirror suggested I get over it."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_flirt_while_partnered",
+      "title": "A Flicker of Guilt",
+      "text": "Someone attractive flirted with me at the market and, for a second, I forgot I came here with {person:partner}.",
+      "interaction": {"kind": "flirt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "partner": {"kind": "person", "select": "predicate", "predicate": "adult_partner_or_lover_of_actor"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "partner"]},
+      "choices": [
+        {"id": "walk_away", "label": "Find my partner immediately",
+         "effects": {"stats": {"happiness": 2, "karma": 2}, "relationship": 4},
+         "outcome_text": "I found my person across the market and squeezed their hand. The flicker stayed a flicker."},
+        {"id": "enjoy", "label": "Enjoy the attention a little too long",
+         "effects": {"stats": {"happiness": 3, "karma": -3, "stress": 2}, "relationship": -3},
+         "outcome_text": "I let it go on a beat too long. Nothing happened, but I did not love how it felt after."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_ex_texts",
+      "title": "An Old Number",
+      "text": "My phone lit up with a name I deleted but never forgot. {person:ex} wants to know how I have been.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "ex": {"kind": "person", "select": "predicate", "predicate": "adult_ex_lover_of_actor"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "ex"]},
+      "choices": [
+        {"id": "reply", "label": "Reply, keep it light",
+         "effects": {"stats": {"happiness": {"randint": [-2, 5]}, "stress": 2}, "relationship": 2},
+         "outcome_text": "We traded a few careful messages. Some doors are better left as doors."},
+        {"id": "ignore", "label": "Leave it unread",
+         "effects": {"stats": {"stress": -2}},
+         "outcome_text": "I left it unread and went to make tea with shaking hands."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_ex_rebound_date",
+      "title": "Familiar Territory",
+      "text": "{person:ex} suggested we get dinner and catch up properly. Old habits are offering me a chair.",
+      "interaction": {"kind": "date", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "ex": {"kind": "person", "select": "predicate", "predicate": "adult_ex_lover_of_actor"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "ex"]},
+      "choices": [
+        {"id": "dinner", "label": "Go to dinner",
+         "effects": {"stats": {"happiness": {"randint": [-4, 8]}, "stress": 3}, "relationship": 3, "money": -25},
+         "outcome_text": "Dinner was easy in all the old dangerous ways. I am still deciding how I feel about that."},
+        {"id": "decline", "label": "Decline kindly",
+         "effects": {"stats": {"stress": -1, "happiness": 1}, "karma": 1},
+         "outcome_text": "I declined with real kindness. Growth is rarely dramatic."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_ex_closure",
+      "title": "The Conversation We Owed",
+      "text": "{person:ex} wants to meet and finally talk about how it ended. Every version of this talk lives in my head.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "ex": {"kind": "person", "select": "predicate", "predicate": "adult_ex_lover_of_actor"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "ex"]},
+      "choices": [
+        {"id": "meet", "label": "Meet and say the true things",
+         "effects": {"stats": {"happiness": {"randint": [2, 8]}, "stress": -5}, "relationship": 4},
+         "outcome_text": "We said the true things. Whatever we are now, it is finally honest."},
+        {"id": "not_ready", "label": "I am not ready",
+         "effects": {"stats": {"stress": 1, "happiness": -2}},
+         "outcome_text": "I said not yet. Maybe someday, maybe never. I can live with either."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_ex_partner_reacts",
+      "title": "They Noticed",
+      "text": "{person:partner} saw the messages from {person:ex} on my screen before I did.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "partner": {"kind": "person", "select": "predicate", "predicate": "adult_partner_or_lover_of_actor"},
+        "ex": {"kind": "person", "select": "predicate", "predicate": "adult_ex_lover_of_actor"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "partner", "ex"]},
+      "choices": [
+        {"id": "reassure", "label": "Show the messages, reassure them",
+         "effects": {"stats": {"stress": -3}, "relationship": 5},
+         "outcome_text": "I handed over the phone and answered every question. Trust is built in moments like this."},
+        {"id": "defensive", "label": "Get defensive",
+         "effects": {"stats": {"stress": 4, "happiness": -4}, "relationship": -6},
+         "outcome_text": "I got defensive about nothing, which made it look like something. Smooth."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_money_fight_bill",
+      "title": "The Bill Again",
+      "text": "{person:partner} and I are staring at another bill that is bigger than either of us admitted it would be.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "partner": {"kind": "person", "select": "predicate", "predicate": "adult_partner_or_lover_of_actor"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "partner"]},
+      "choices": [
+        {"id": "team", "label": "Sit down and plan together",
+         "effects": {"stats": {"stress": -4, "happiness": 2}, "relationship": 5},
+         "outcome_text": "We spread the bills on the table and made a plan. It felt like us against the problem."},
+        {"id": "blame", "label": "Point out whose fault it is",
+         "effects": {"stats": {"stress": 5, "happiness": -5}, "relationship": -6},
+         "outcome_text": "I won the argument about fault and lost the evening entirely."}
+      ],
+      "weight": 2
+    },
+    {
+      "id": "rom_money_fight_splurge",
+      "title": "The Surprise Splurge",
+      "text": "{person:partner} came home glowing about a purchase we definitely did not budget for.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "partner": {"kind": "person", "select": "predicate", "predicate": "adult_partner_or_lover_of_actor"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "partner"]},
+      "choices": [
+        {"id": "calm", "label": "Ask about it calmly",
+         "effects": {"stats": {"stress": -2}, "relationship": 3},
+         "outcome_text": "I asked before I judged. It turned out there was a story, and a receipt, and a plan."},
+        {"id": "explode", "label": "Let them have it",
+         "effects": {"stats": {"stress": 4, "happiness": -4}, "relationship": -7},
+         "outcome_text": "I said the money was the point, but my volume said the money was not the point."},
+        {"id": "splurge_too", "label": "Retail-therapy right back",
+         "effects": {"stats": {"happiness": 3, "stress": 2}, "relationship": -2, "money": -60},
+         "outcome_text": "I bought something ridiculous too. Petty? Yes. Satisfying? Briefly."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_money_fight_secret_debt",
+      "title": "The Hidden Statement",
+      "text": "I found a statement {person:partner} had tucked away. There is a debt I never knew about.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "partner": {"kind": "person", "select": "predicate", "predicate": "adult_partner_or_lover_of_actor"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "partner"]},
+      "choices": [
+        {"id": "honest_talk", "label": "Ask for the whole truth",
+         "effects": {"stats": {"stress": -3, "happiness": 1}, "relationship": 4},
+         "outcome_text": "It was shame, not malice. Ugly to find, easier to carry together."},
+        {"id": "cold", "label": "Go cold and quiet",
+         "effects": {"stats": {"stress": 5, "happiness": -6}, "relationship": -6},
+         "outcome_text": "I went quiet for days. The silence cost more than the debt."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_money_team_up",
+      "title": "Small Wins",
+      "text": "{person:partner} proposed we both take packed lunches for a month and put the savings toward something fun.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "partner": {"kind": "person", "select": "predicate", "predicate": "adult_partner_or_lover_of_actor"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "partner"]},
+      "choices": [
+        {"id": "join", "label": "Game on",
+         "effects": {"stats": {"happiness": {"randint": [2, 6]}, "smarts": 1}, "relationship": 5, "money": {"randint": [40, 90]}},
+         "outcome_text": "We became insufferable lunch accountants and saved a small fortune."},
+        {"id": "opt_out", "label": "I like my café lunches",
+         "effects": {"stats": {"happiness": 1}, "relationship": -1},
+         "outcome_text": "I opted out. They did it anyway and showed me the jar. I felt judged by a jar."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_inlaws_dinner",
+      "title": "Dinner With The In-Laws",
+      "text": "{person:partner}'s family invited us to dinner, and their mother has already asked me three questions I cannot answer correctly.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "partner": {"kind": "person", "select": "predicate", "predicate": "adult_partner_or_lover_of_actor"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "partner"]},
+      "choices": [
+        {"id": "charm", "label": "Turn on the charm",
+         "effects": {"stats": {"happiness": 2, "stress": 1}, "relationship": 4},
+         "outcome_text": "I smiled through the interrogation and passed the gravy. Diplomacy survives another year."},
+        {"id": "partner_help", "label": "Kick my partner under the table",
+         "effects": {"stats": {"stress": -2}, "relationship": 2},
+         "outcome_text": "They caught my eye, took the conversational wheel, and rescued me mid-sentence."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_inlaws_comment",
+      "title": "The Backhanded Compliment",
+      "text": "{person:partner}'s parent told me I look 'so much healthier than last time'. {person:partner} squeezed my hand too late.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "partner": {"kind": "person", "select": "predicate", "predicate": "adult_partner_or_lover_of_actor"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "partner"]},
+      "choices": [
+        {"id": "let_go", "label": "Let it slide off",
+         "effects": {"stats": {"stress": -2, "happiness": 1}, "relationship": 2},
+         "outcome_text": "I let it slide off me like rain off a roof. Their family, their weather."},
+        {"id": "vent", "label": "Vent the whole car ride home",
+         "effects": {"stats": {"stress": 3, "happiness": -3}, "relationship": -2},
+         "outcome_text": "I replayed the comment with commentary for forty minutes. My partner took it like a saint."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_inlaws_holiday",
+      "title": "Whose Holiday Is It?",
+      "text": "Both families want us for the holiday. {person:partner} is watching me decide, and I can feel the trap loading.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "partner": {"kind": "person", "select": "predicate", "predicate": "adult_partner_or_lover_of_actor"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "partner"]},
+      "choices": [
+        {"id": "split", "label": "Propose splitting the day",
+         "effects": {"stats": {"stress": 2, "happiness": 2}, "relationship": 4, "money": -30},
+         "outcome_text": "We did both houses, ate twice, and slept for ten hours. Worth it."},
+        {"id": "ours", "label": "Declare a holiday for just us",
+         "effects": {"stats": {"happiness": 4, "stress": -2}, "relationship": 3, "money": -45},
+         "outcome_text": "We stayed home in our pajamas and let the phone ring. Glorious treason."},
+        {"id": "calls", "label": "Call both families instead",
+         "effects": {"stats": {"happiness": 1, "stress": 1}, "relationship": 1},
+         "outcome_text": "We called each family and sang badly over the phone. It was enough."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_makeup_apology",
+      "title": "The First Word",
+      "text": "{person:partner} and I have not spoken properly in two days. The argument is old; the silence is older.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "partner": {"kind": "person", "select": "predicate", "predicate": "adult_partner_or_lover_of_actor"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "partner"]},
+      "choices": [
+        {"id": "apologize", "label": "Say the first sorry",
+         "effects": {"stats": {"happiness": {"randint": [3, 8]}, "stress": -5}, "relationship": 6},
+         "outcome_text": "I said sorry first. It cost me nothing and gave back everything."},
+        {"id": "wait", "label": "Wait for them to break first",
+         "effects": {"stats": {"stress": 3, "happiness": -4}, "relationship": -3},
+         "outcome_text": "I waited. The silence got comfortable, which frightened me more than the argument."}
+      ],
+      "weight": 2
+    },
+    {
+      "id": "rom_makeup_gesture",
+      "title": "A Small White Flag",
+      "text": "Things with {person:partner} are still frosty. Maybe a gesture would melt what words cannot.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "partner": {"kind": "person", "select": "predicate", "predicate": "adult_partner_or_lover_of_actor"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "partner"]},
+      "choices": [
+        {"id": "flowers", "label": "Bring home flowers",
+         "effects": {"stats": {"happiness": 4}, "relationship": 5, "money": -20},
+         "outcome_text": "Flowers, an eyebrow raised, then the smallest smile. Truce declared."},
+        {"id": "cook", "label": "Cook their favourite meal",
+         "effects": {"stats": {"happiness": 3, "health": 1}, "relationship": 4, "money": -12},
+         "outcome_text": "I slightly burnt the edges. They ate every bite and knew exactly what it meant."},
+        {"id": "note", "label": "Leave a silly apology note",
+         "effects": {"stats": {"happiness": 2}, "relationship": 3},
+         "outcome_text": "The note was terrible. That was the point. We laughed by lunch."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_makeup_slow_thaw",
+      "title": "The Thaw",
+      "text": "After the fight with {person:partner}, neither of us apologised, but they made my coffee this morning. Just the way I like it.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "partner": {"kind": "person", "select": "predicate", "predicate": "adult_partner_or_lover_of_actor"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "partner"]},
+      "choices": [
+        {"id": "receive", "label": "Receive it warmly",
+         "effects": {"stats": {"happiness": 3, "stress": -3}, "relationship": 4},
+         "outcome_text": "I drank the coffee and said thank you like it meant everything. It did."},
+        {"id": "bring_pastry", "label": "Bring home a pastry tonight",
+         "effects": {"stats": {"happiness": 3}, "relationship": 4, "money": -6},
+         "outcome_text": "A pastry on the table said what we were both too stubborn to. We are getting there."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_anniversary_remembered",
+      "title": "They Remembered",
+      "text": "{person:lover} remembered our anniversary before I did, and there are candles where the bills usually pile up.",
+      "interaction": {"kind": "date", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "lover": {"kind": "person", "select": "predicate", "predicate": "adult_existing_lover"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "lover"]},
+      "choices": [
+        {"id": "cherish", "label": "Cherish every second",
+         "effects": {"chemistry": {"between": ["actor", "lover"], "delta": {"randint": [3, 7]}}, "stats": {"happiness": 6, "stress": -3}},
+         "outcome_text": "We ate by candlelight and remembered out loud. I fell for them all over again."},
+        {"id": "gift", "label": "Reveal the gift I hid",
+         "effects": {"stats": {"happiness": 5}, "relationship": 4, "money": -35},
+         "outcome_text": "Their face when they unwrapped it — I would pay that thirty-five dollars a hundred times."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_anniversary_forgot",
+      "title": "Calendar Blindness",
+      "text": "I forgot our anniversary. {person:lover} is being very understanding in a way that is somehow worse than shouting.",
+      "interaction": {"kind": "repair_attempt", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "lover": {"kind": "person", "select": "predicate", "predicate": "adult_existing_lover"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "lover"]},
+      "choices": [
+        {"id": "make_amends", "label": "Make real amends",
+         "effects": {"stats": {"happiness": 2, "stress": -2}, "relationship": 3, "money": -50},
+         "outcome_text": "I planned a whole make-up evening and swore a silent oath to my calendar."},
+        {"id": "excuse", "label": "Blame how busy I've been",
+         "effects": {"stats": {"stress": 3, "happiness": -3}, "relationship": -5},
+         "outcome_text": "Busy is a bad apology. They accepted it, which somehow felt worse."}
+      ],
+      "weight": 1
+    },
+    {
+      "id": "rom_anniversary_celebration",
+      "title": "Another Year Of Us",
+      "text": "Another year with {person:lover}. The tradition is that we do something we have never done before.",
+      "interaction": {"kind": "date", "romantic": true},
+      "conditions": {"min_age": 18},
+      "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "lover": {"kind": "person", "select": "predicate", "predicate": "adult_existing_lover"}
+      },
+      "audience": {"scope": "player_known", "participants": ["actor", "lover"]},
+      "choices": [
+        {"id": "roadtrip", "label": "A day trip somewhere new",
+         "effects": {"chemistry": {"between": ["actor", "lover"], "delta": {"randint": [2, 6]}}, "stats": {"happiness": 6, "stress": -2}, "money": -40},
+         "outcome_text": "We got pleasantly lost, found a tiny bakery, and agreed it was our new tradition."},
+        {"id": "home", "label": "Recreate our first date at home",
+         "effects": {"chemistry": {"between": ["actor", "lover"], "delta": {"randint": [2, 5]}}, "stats": {"happiness": 4, "stress": -3}, "money": -10},
+         "outcome_text": "Same food, same terrible playlist, same butterflies. Cheaper than the original, sweeter too."},
+        {"id": "stars", "label": "Watch the stars from the porch",
+         "effects": {"chemistry": {"between": ["actor", "lover"], "delta": {"randint": [1, 4]}}, "stats": {"happiness": 3, "stress": -2}},
+         "outcome_text": "We dragged a blanket onto the porch and counted shooting stars badly. Free and perfect."}
+      ],
+      "weight": 1
+    }
+  ]
+}

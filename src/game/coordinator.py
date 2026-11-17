@@ -17,12 +17,14 @@ from src.game import rule_adapter
 PHASE_ORDER = [
     "year_start", "relations_age", "player_stats", "mortality",
     "work_income", "education", "debt_service", "family_events",
-    "parenting_events", "drama_events", "illness", "annual_events",
+    "parenting_events", "drama_events", "romance_events", "illness",
+    "annual_events",
     "decision_offer", "year_close",
 ]
 
 RULE_PHASES = ("work_income", "education", "debt_service",
-               "family_events", "illness")  # served by rule_actions._PHASES
+               "family_events", "illness",
+               "romance_events")  # served by rule_actions._PHASES
 
 
 def _year_start(env, ctx, service, rng):
@@ -344,6 +346,7 @@ def _noop_phase(next_phase):
 _NOOP_NEXT = {
     "debt_service": "family_events",
     "family_events": "illness",
+    "drama_events": "illness",
     "illness": "annual_events",
     "annual_events": "decision_offer",
 }
@@ -378,9 +381,39 @@ def run_turn(env, service, rng):
             continue
         if phase_id in RULE_PHASES:
             from src.menus import rule_actions
+            born_before = None
+            pregnant_before = False
+            if phase_id == "family_events":
+                # R8: snapshot children so a birth in this phase consumes
+                # its recorded conception in the SAME transaction
+                born_before = {c.person_id for c in
+                               env["player"].children}
+                # W2: snapshot pregnancy flags so a pregnancy that ends
+                # here WITHOUT a birth (miscarriage) retires its draw
+                _pl = env["player"]
+                pregnant_before = bool(_pl.is_pregnant) or bool(
+                    getattr(_pl.partner, "is_pregnant", False)
+                    if _pl.partner is not None else False)
             result = rule_actions.advance_phase(
                 ctx, phase_id, rng, turn["turn_id"],
                 year_start_happiness=year_start_happiness)
+            if born_before is not None:
+                from src.game.features.parenting import core as \
+                    parenting_core
+                newborn_seen = False
+                for child in env["player"].children:
+                    if child.person_id not in born_before:
+                        newborn_seen = True
+                        parenting_core.apply_birth_conception(env, child)
+                if pregnant_before and not newborn_seen:
+                    _pl = env["player"]
+                    still_pregnant = bool(_pl.is_pregnant) or bool(
+                        getattr(_pl.partner, "is_pregnant", False)
+                        if _pl.partner is not None else False)
+                    if not still_pregnant:
+                        # the pregnancy ended without a birth: retire the
+                        # recorded draw and its active binding
+                        parenting_core.terminate_active_conception(env)
         else:
             impl = _DEFAULT_IMPLS.get(phase_id) or _noop_phase(
                 _NOOP_NEXT.get(phase_id, "year_close"))

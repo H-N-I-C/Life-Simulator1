@@ -1,0 +1,13 @@
+{
+ "robot": "manual repro (Kimi D, R11 round 2)",
+ "kind": "scenario_setup_5xx",
+ "finding": "POST /api/games with scenario=university_pending_17 and an unlucky seed answers HTTP 500 internal_error instead of a typed 4xx: scenario setup fails the university smarts gate and raises GameError(internal_error, ..., 500) in src/game/scenarios.py drive_scenario (~line 427).",
+ "reproduced_seeds": [
+  2021261880,
+  254938035,
+  1852648667
+ ],
+ "rate": "~3 hits in <=1500 randomized profiles (in-process GameService, 2026-11-17)",
+ "robot_mitigation": "robot boundary lives pin seed 777 (verified good), so the 500 no longer fires in robot runs; the mapping bug itself is A-owned",
+ "date": "2026-11-17"
+}

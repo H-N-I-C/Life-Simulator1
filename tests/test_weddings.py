@@ -147,6 +147,10 @@ class RenewalAndAnniversaryTests(WeddingCase):
             {"union_id": uni, "tier": "backyard"})
         self.assertTrue(res["result"]["ok"])
         self.assertEqual(self._money(), 1000)  # free tier
+        # Renewals are once per union per natural year, not per command.
+        env = self.svc._load(self.gid)
+        env["player"].age += 1
+        self.svc._save(env)
         st = self.svc.get_state(self.gid)
         res = self.svc.wedding_command(
             self.gid, st["revision"], "v2", "renew_vows",

@@ -79,10 +79,11 @@ def inherit_appearance(rng, mother, father, age=0):
 
     parents = [_coerce(p) for p in (mother, father)]
     parents = [p for p in parents if p is not None]
+    skin_tone = _inherit_skin(rng, parents)
     app = Appearance(
         seed=rng.randrange(1, 2**31),
         base=_inherit_base(rng, parents),
-        skin_tone=_inherit_skin(rng, parents),
+        skin_tone=skin_tone,
         hair=_inherit_hair(rng, parents),
         facial_hair="none",
         headwear="none",
@@ -91,7 +92,13 @@ def inherit_appearance(rng, mother, father, age=0):
         look_override="none",
     )
     # mutation: small chance the hair trait drifts (curly/red/default).
-    if parents and rng.random() < 0.1:
+    # Design invariant (asserted by test_appearance): a biological child
+    # differs from BOTH parents in at most ONE physical trait — so the
+    # hair mutation is skipped when the skin tone already landed
+    # in-between the parents' tones.
+    novel_skin = parents and skin_tone not in tuple(
+        p.skin_tone for p in parents)
+    if parents and not novel_skin and rng.random() < 0.1:
         app.hair = rng.choice(["default", "curly", "red"])
     age_appropriate(app, age)
     return app

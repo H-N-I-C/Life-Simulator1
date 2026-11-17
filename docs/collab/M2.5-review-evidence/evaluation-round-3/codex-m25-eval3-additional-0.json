@@ -1,0 +1,140 @@
+{
+  "ordinary_pregnancy_female": {
+    "player_id": "39d75c69-b659-40fe-9234-ac51f876fa98",
+    "partner_id": "46af8a8f-507c-47a3-b76a-cd91765bd055",
+    "player_gender": "Gender.Female",
+    "player_pregnant": true,
+    "partner_pregnant": false,
+    "outcomes": {
+      "legacy:46af8a8f-507c-47a3-b76a-cd91765bd055:39d75c69-b659-40fe-9234-ac51f876fa98#0": {
+        "coefficient_band": "0",
+        "roll": 0.4494910647887381,
+        "adjustment": "none",
+        "bio_mother_id": "46af8a8f-507c-47a3-b76a-cd91765bd055",
+        "bio_father_id": "39d75c69-b659-40fe-9234-ac51f876fa98"
+      }
+    }
+  },
+  "ordinary_pregnancy_male": {
+    "player_id": "9facd189-0312-4d6f-b851-ea8e3366ee1c",
+    "partner_id": "14431929-f1a9-4ac9-ac2a-415c54ed11f6",
+    "player_gender": "Gender.Male",
+    "player_pregnant": false,
+    "partner_pregnant": true,
+    "outcomes": {}
+  },
+  "marriage_before": {
+    "family": {
+      "parents": [
+        "fce0eba9-4e89-4bc7-bea3-0b0a7232f044",
+        "728f5c07-f442-4831-82ed-76ce9fc0e436"
+      ],
+      "partner": "3431c756-b2c0-47e5-a491-2f2b96ff4eaf",
+      "partner_status": 2,
+      "children": [],
+      "siblings": []
+    },
+    "union": {
+      "union_id": "uni-9515b35cec43",
+      "person_ids": [
+        "fe04027a-c470-49ae-b88a-9c7339e85d93",
+        "3431c756-b2c0-47e5-a491-2f2b96ff4eaf"
+      ],
+      "kind": "marriage",
+      "status": "active",
+      "recognition": {
+        "status": "recognized",
+        "jurisdiction_id": "jur-neutral-default",
+        "law_version": 1,
+        "basis": "registration"
+      },
+      "ceremony": {
+        "held": false,
+        "turn": null,
+        "venue_id": null
+      },
+      "prenup": null,
+      "exclusivity": {
+        "agreement": "exclusive"
+      },
+      "start_turn": 0,
+      "end_turn": null,
+      "policy_revision": 0
+    }
+  },
+  "after_actual_divorce": {
+    "family": {
+      "parents": [
+        "fce0eba9-4e89-4bc7-bea3-0b0a7232f044",
+        "728f5c07-f442-4831-82ed-76ce9fc0e436"
+      ],
+      "partner": "3431c756-b2c0-47e5-a491-2f2b96ff4eaf",
+      "partner_status": 2,
+      "children": [],
+      "siblings": []
+    },
+    "unions": [
+      {
+        "union_id": "uni-9515b35cec43",
+        "person_ids": [
+          "fe04027a-c470-49ae-b88a-9c7339e85d93",
+          "3431c756-b2c0-47e5-a491-2f2b96ff4eaf"
+        ],
+        "kind": "marriage",
+        "status": "divorced",
+        "recognition": {
+          "status": "recognized",
+          "jurisdiction_id": "jur-neutral-default",
+          "law_version": 1,
+          "basis": "registration"
+        },
+        "ceremony": {
+          "held": false,
+          "turn": null,
+          "venue_id": null
+        },
+        "prenup": null,
+        "exclusivity": {
+          "agreement": "exclusive"
+        },
+        "start_turn": 0,
+        "end_turn": 88,
+        "policy_revision": 0
+      }
+    ],
+    "relationships": [
+      {
+        "relationship_id": "rel-2dacf3926441",
+        "person_ids": [
+          "fe04027a-c470-49ae-b88a-9c7339e85d93",
+          "3431c756-b2c0-47e5-a491-2f2b96ff4eaf"
+        ],
+        "kind": "committed",
+        "satisfaction": 100,
+        "trust": 100,
+        "chemistry": 50,
+        "exclusivity": {
+          "agreement": "exclusive"
+        },
+        "visibility": "public",
+        "start_turn": 0,
+        "end_turn": null,
+        "status": "active"
+      }
+    ],
+    "legacy_divorce_actions": [
+      {
+        "target_id": "3431c756-b2c0-47e5-a491-2f2b96ff4eaf",
+        "target_label": "Armond Kemp",
+        "id": "divorce",
+        "category": "relationships",
+        "label": "Divorce",
+        "enabled": true,
+        "reason": null,
+        "limits": [],
+        "inputs": [],
+        "known_costs": []
+      }
+    ]
+  }
+}

@@ -95,12 +95,13 @@ def age_to(svc, gid, target, start=0):
         guard += 1
         if st["status"] == "dead":
             raise AssertionError("died before target age")
-    if st["pending_decision"]:
+    while st["pending_decision"]:
         d = st["pending_decision"]
         st = svc.command(gid, st["revision"], f"clear-{guard}",
                          "resolve_decision",
                          {"decision_id": d["id"],
                           "option_id": d["options"][0]["id"]})
+        guard += 1
     return st
 
 

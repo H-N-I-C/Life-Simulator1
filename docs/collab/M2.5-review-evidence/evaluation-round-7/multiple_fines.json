@@ -1,0 +1,118 @@
+{
+  "preview": {
+    "union_id": "uni-bb09d82bd8a0",
+    "status": "forbidden",
+    "jurisdiction_id": "jur_metropolis_charter",
+    "law_version": 1,
+    "policy_revision": 1,
+    "lines": [
+      {
+        "occurrence_id": "lawfine:uni-bb09d82bd8a0:0",
+        "category": "legal",
+        "amount": 500,
+        "leg": "fine",
+        "description": "Fine for a forbidden ceremony (uni-bb09d82bd8a0)"
+      },
+      {
+        "occurrence_id": "lawfine:uni-bb09d82bd8a0:1",
+        "category": "legal",
+        "amount": 700,
+        "leg": "fine",
+        "description": "Fine for a forbidden ceremony (uni-bb09d82bd8a0)"
+      }
+    ],
+    "total": 1200
+  },
+  "sampled": {
+    "accepted": true,
+    "p_accept": 0.21,
+    "score": 35,
+    "projected_recognition": {
+      "status": "forbidden",
+      "jurisdiction_id": "jur_metropolis_charter",
+      "law_version": 1,
+      "basis": "ceremony"
+    },
+    "projected_consequences": [
+      {
+        "trigger": "ceremony_of_unrecognized_union",
+        "effect": "civil_fine",
+        "ledger_category": "legal",
+        "amount_range": [
+          500,
+          500
+        ]
+      },
+      {
+        "trigger": "ceremony_of_unrecognized_union",
+        "effect": "civil_fine",
+        "ledger_category": "legal",
+        "amount_range": [
+          700,
+          700
+        ]
+      }
+    ]
+  },
+  "union": {
+    "union_id": "uni-bb09d82bd8a0",
+    "person_ids": [
+      "d48c5922-14fe-4452-b0c9-b148b5b3d4a4",
+      "0e993724-70f7-477f-be0b-51285be09c74"
+    ],
+    "kind": "marriage",
+    "status": "active",
+    "recognition": {
+      "status": "forbidden",
+      "jurisdiction_id": "jur_metropolis_charter",
+      "law_version": 1,
+      "basis": "ceremony"
+    },
+    "ceremony": {
+      "held": true,
+      "turn": 6,
+      "age": 30,
+      "venue_id": "courthouse",
+      "guests": 0,
+      "outfit_id": "hand_me_down",
+      "honeymoon_id": "none"
+    },
+    "prenup": null,
+    "exclusivity": {
+      "agreement": "exclusive"
+    },
+    "start_turn": 5,
+    "end_turn": null,
+    "policy_revision": 1
+  },
+  "before_money": 10000,
+  "preview_total": 1200,
+  "after_money": 8800,
+  "legal_rows": [
+    {
+      "id": "le_1",
+      "source_key": "t_000002:weddings:lawfine:uni-bb09d82bd8a0:0:d48c5922-14fe-4452-b0c9-b148b5b3d4a4:fine",
+      "turn_id": "t_000002",
+      "age": 30,
+      "person_id": "d48c5922-14fe-4452-b0c9-b148b5b3d4a4",
+      "category": "legal",
+      "amount": -500,
+      "balance_after": 9500,
+      "description": "Fine for a forbidden ceremony (uni-bb09d82bd8a0)",
+      "group_id": "lawfine:uni-bb09d82bd8a0:6"
+    },
+    {
+      "id": "le_2",
+      "source_key": "t_000002:weddings:lawfine:uni-bb09d82bd8a0:1:d48c5922-14fe-4452-b0c9-b148b5b3d4a4:fine",
+      "turn_id": "t_000002",
+      "age": 30,
+      "person_id": "d48c5922-14fe-4452-b0c9-b148b5b3d4a4",
+      "category": "legal",
+      "amount": -700,
+      "balance_after": 8800,
+      "description": "Fine for a forbidden ceremony (uni-bb09d82bd8a0)",
+      "group_id": "lawfine:uni-bb09d82bd8a0:6"
+    }
+  ],
+  "ledger_unchanged": false
+}

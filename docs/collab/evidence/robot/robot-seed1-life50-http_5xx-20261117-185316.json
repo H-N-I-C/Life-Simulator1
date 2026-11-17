@@ -1,0 +1,40 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 50,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Almira",
+    "last_name": "Justice",
+    "gender": "female",
+    "country": "Brazil",
+    "seed": 779836974,
+    "request_id": "robot-1-50-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1120787923,
+     "base": "person",
+     "skin_tone": "light",
+     "hair": "default",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "flower",
+      "crown"
+     ],
+     "background": "bg_05",
+     "look_override": "none"
+    }
+   }
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 51 --seed 1 --from-life 50 --fail-fast"
+}

@@ -844,7 +844,7 @@ def _activity_specs(p, context=None):
     return specs
 
 
-def _relationship_specs(p):
+def _relationship_specs(context, p):
     specs = []
     for rel in p.relations:
         base = {"target_id": _pid(rel), "target_label": rel.name}
@@ -877,6 +877,27 @@ def _relationship_specs(p):
                           "category": "relationships",
                           "label": "Ask for money", "enabled": True,
                           "reason": None, "limits": []})
+        # E2/W3: targetable adult offers (B's "Ask out" / "Propose a
+        # union" rows). Advertised only when dispatch will accept: adult
+        # player, adult target, not enrolled. Eligibility beyond that
+        # (hard validity, consent) is the offer's own typed outcome.
+        # A proposal additionally needs the courtship stage: advertised
+        # disabled with the exact reason dispatch would refuse.
+        if p.age >= 18 and rel.age >= 18 and not p.is_in_school():
+            specs.append({**base, "id": "courtship_offer",
+                          "category": "relationships",
+                          "label": "Ask out", "enabled": True,
+                          "reason": None, "limits": []})
+            env = getattr(context, "_env", None)
+            courting = env is not None and _active_stage_edge(
+                env, p.person_id, _pid(rel)) is not None
+            specs.append({**base, "id": "union_proposal",
+                          "category": "relationships",
+                          "label": "Propose a union",
+                          "enabled": courting,
+                          "reason": None if courting else
+                                    "you need an active courtship first",
+                          "limits": []})
     return specs
 
 
@@ -890,9 +911,9 @@ def action_specs(context):
     predicate drives both this projection and the dispatcher. Pure read."""
     p = _player(context)
     if p.is_in_school():
-        return (_school_action_specs(p) + _relationship_specs(p)
+        return (_school_action_specs(p) + _relationship_specs(context, p)
                 + _activity_specs(p, context))
-    specs = (_work_action_specs(p) + _relationship_specs(p)
+    specs = (_work_action_specs(p) + _relationship_specs(context, p)
              + _activity_specs(p, context))
     if p.age >= 18 and p.marital_status == 0 and p.date_options > 0:
         specs.append({"id": "find_partner", "category": "relationships",
@@ -945,6 +966,9 @@ ACTION_IDS = (
     "study_harder", "skip_school", "drop_out", "find_job",
     "work_harder", "adjust_hours", "request_raise", "retire",
     "quit_job",
+    # context-bound self actions dispatch through _CONTEXT_SELF_ACTIONS;
+    # ACTION_IDS admits them to the service command allowlist
+    "dating_app", "courtship_offer", "union_proposal",
 )
 
 _ACTIONS = {
@@ -1142,7 +1166,12 @@ def advance_phase(context, phase_id, rng, turn_id="turn",
     if fn is family_events_phase:
         snapshot = getattr(context, "turn_snapshot", None)
         return fn(p, turn_id, rng,
-                  snapshot_ids=set(snapshot) if snapshot else None)
+                  snapshot_ids=set(snapshot) if snapshot else None,
+                  env=getattr(context, "_env", None))
+    if fn is romance_events_phase:
+        # needs the envelope-bound context (graph/policy reads), not the
+        # bare player
+        return fn(context, rng)
     return fn(p, turn_id, rng)
 
 
@@ -1561,8 +1590,12 @@ def sample_try_for_baby(player, rng):
 def resolve_pregnancy(player, pending, option_id, rng):
     options = [o["id"] for o in pending.get("options", [])]
     _check(option_id in options, "invalid_input", "unknown option")
-    sampled = pending["sampled"]
     partner = player.partner
+    _check(partner is not None, "not_allowed", "you have no partner")
+    # Recheck saved offers at resolve, including an overruled abort that
+    # would continue pregnancy. No effects or RNG before protected gates.
+    _guard_romance(player, partner)
+    sampled = pending["sampled"]
     chances = sampled.get("overrule_chance") or {}
     _check(option_id in chances, "invalid_input",
            "no stored outcome for this option")
@@ -2550,7 +2583,7 @@ _OFFER_ACTIONS = {
 _SCHOOL_BLOCKED_ACTIONS = {
     "try_for_baby", "break_up", "propose", "call_off_engagement",
     "plan_wedding", "divorce", "renew_vows", "find_partner",
-    "dating_app",
+    "dating_app", "courtship_offer", "union_proposal",
 }
 
 
@@ -2614,8 +2647,9 @@ def sample_relation_death(player, relation, rng, sudden=False):
         # "inheritance". Clamp the mean above lo so the draw stays positive.
         avg = max(avg, lo + 1)
         inheritance = max(1, _round_stochastic(rng, _randexpo(rng, lo, avg)))
-        money.append(_money("mortality", "inheritance", "transfer", player,
-                            "inheritance", inheritance,
+        money.append(_money("mortality",
+                            f"inheritance:{_pid(relation)}", "transfer",
+                            player, "inheritance", inheritance,
                             f"Inherited from {relation.name}"))
         player.change_happiness(
             _round_stochastic(rng, 1.5 * math.log10(inheritance)))
@@ -2902,6 +2936,14 @@ def _resolve_event_v3(context, player, pending, option_id, rng):
 
     # 2. Domain effects must all be applicable before anything mutates.
     domain = dict(option.get("_domain") or {})
+    refused_offer = ((pending.get("sampled") or {}).get("accepted") is False
+                     and "offer" in domain)
+    if refused_offer:
+        domain = {"offer": domain["offer"]}  # record refusal, never gains
+    elif "offer" in domain:
+        # Resolve stored consent before chemistry can adjust the new edge.
+        domain = {"offer": domain["offer"], **{
+            key: value for key, value in domain.items() if key != "offer"}}
     for key in domain:
         _check(key in _DOMAIN_EFFECTS, "not_available",
                f"domain effect {key!r} is not available in this engine yet")
@@ -2938,7 +2980,7 @@ def _resolve_event_v3(context, player, pending, option_id, rng):
                 getattr(player, f"change_{key}")(amount)
 
     before = _stat_snapshot(player, tuple(STAT_NAMES))
-    fx = dict(option.get("_effects", {}))
+    fx = {} if refused_offer else dict(option.get("_effects", {}))
     for key, amount in fx.items():
         if key == "money":
             if amount:
@@ -2978,6 +3020,8 @@ def _resolve_event_v3(context, player, pending, option_id, rng):
                        STAT_NAMES)
     outcome_text = _render_v3_outcome(option.get("_outcome", ""),
                                       player, bindings, context)
+    if refused_offer and option.get("_effects"):
+        outcome_text = "The offer was declined."
     events.append(_event("decision", outcome_text or
                          pending.get("title", "Event"), player, changes))
     finished = bool(structural.get("terminal"))
@@ -3041,9 +3085,246 @@ DATING_APP_EVENT = {
 }
 
 
+# E2 (fix round 2): the generic targetable adult offer journey B's UI
+# calls ("Ask out" / "Propose a union"). Same ratified draw contract as
+# the dating app: B's evaluator gates hard validity, ONE seeded accept
+# draw is stored in the pending, resolve applies the stored answer via
+# A's "offer" domain applier (accepted courtship -> relationship edge,
+# accepted proposal -> union; a stored no records a declined offer).
+# The player initiates, so the offer effect carries no "as": "npc".
+
+COURTSHIP_OFFER_EVENT = {
+    "id": "m25_courtship_offer",
+    "title": "Asking them out",
+    "text": "{name} works up the nerve to ask {person:target} out.",
+    "interaction": {"kind": "propose_courtship", "romantic": True},
+    "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "target": {"kind": "person", "select": "predicate",
+                   "predicate": "adult_acquaintance"},
+    },
+    "choices": [
+        {"id": "ask", "label": "Ask them out", "cost": {},
+         "effects": {"stats": {"stress": 1},
+                     "offer": {"interaction": "propose_courtship",
+                               "to": "target"}},
+         "outcome_text": "I asked, and they said yes."},
+        {"id": "back_out", "label": "Lose my nerve", "cost": {},
+         "effects": {}, "outcome_text":
+             "I put the question away for another day."},
+    ],
+    "audience": {"scope": "player_known", "participants": ["actor",
+                                                           "target"]},
+}
+
+UNION_PROPOSAL_EVENT = {
+    "id": "m25_union_proposal",
+    "title": "A proposal",
+    "text": "{name} gets down on one knee in front of {person:target}.",
+    "interaction": {"kind": "propose_union", "romantic": True},
+    "roles": {
+        "actor": {"kind": "person", "select": "player"},
+        "target": {"kind": "person", "select": "predicate",
+                   "predicate": "adult_acquaintance"},
+    },
+    "choices": [
+        {"id": "ask", "label": "Propose a union", "cost": {},
+         "effects": {"stats": {"stress": 2},
+                     "offer": {"interaction": "propose_union",
+                               "to": "target"}},
+         "outcome_text": "They said yes — we are engaged to be wed."},
+        {"id": "back_out", "label": "Not yet", "cost": {},
+         "effects": {}, "outcome_text":
+             "The ring stays in my pocket a little longer."},
+    ],
+    "audience": {"scope": "player_known", "participants": ["actor",
+                                                           "target"]},
+}
+
+# action id -> (evaluator kind, event def, stored-refusal outcome text)
+_TARGETED_OFFER_ACTIONS = {
+    "courtship_offer": (
+        "propose_courtship", COURTSHIP_OFFER_EVENT,
+        "I asked, and they turned me down."),
+    "union_proposal": (
+        "propose_union", UNION_PROPOSAL_EVENT,
+        "They said no to the proposal."),
+}
+
+# W3: the romantic kinds that satisfy the documented courtship stage
+# before a union proposal (any active romantic relationship edge).
+_STAGE_KINDS = ("courtship", "committed", "lover", "consort")
+
+
+def _active_stage_edge(env, a_id, b_id):
+    """Active romantic relationship edge between the pair — the
+    courtship stage a union proposal requires. None if not courting."""
+    pair = {a_id, b_id}
+    for rel in env["graph"].get("relationships") or []:
+        if rel.get("status") == "active" \
+                and set(rel.get("person_ids") or ()) == pair \
+                and rel.get("kind") in _STAGE_KINDS:
+            return rel
+    return None
+
+
+def terminate_active_conception(env, player, turn=None,
+                                cause="miscarriage"):
+    """W2 miscarriage writer hook: a pregnancy that ends in loss retires
+    its recorded conception outcome AT THE MISCARRIAGE, so the next
+    pregnancy never reuses the lost draw. The outcome is marked
+    `terminated` with the cause AND `consumed` — A's existing
+    consumed-record semantics guarantee it is never rerolled or applied
+    to a later child, while `terminated`/`terminated_turn` keep the
+    immutable history of the loss. The active binding is cleared.
+    Returns the retired outcome key or None."""
+    outcomes = (env.get("graph") or {}).get("conception_outcomes") or {}
+    key = getattr(player, "_active_conception_key", None)
+    outcome = outcomes.get(key) if key else None
+    if outcome is None or outcome.get("consumed") \
+            or outcome.get("terminated"):
+        # fall back: the unconsumed, unterminated outcome bound to this
+        # player's pair (the miscarriage branch knows the carrier, not
+        # the key)
+        partner = getattr(player, "partner", None)
+        pid = getattr(player, "person_id", None)
+        paid = getattr(partner, "person_id", None)
+        pair = {p for p in (pid, paid) if p}
+        for candidate, record in outcomes.items():
+            if record.get("consumed") or record.get("terminated"):
+                continue
+            if {record.get("bio_mother_id"),
+                    record.get("bio_father_id")} == pair:
+                key, outcome = candidate, record
+                break
+        else:
+            return None
+    outcome["terminated"] = cause
+    if turn is not None:
+        outcome["terminated_turn"] = turn
+    outcome["consumed"] = True
+    if getattr(player, "_active_conception_key", None) == key:
+        player._active_conception_key = None
+    return key
+
+
+def _plural_union_event(event, interaction):
+    """Copy of a proposal event with every interaction reference swapped
+    to the plural kind (the stored offer must carry the kind actually
+    evaluated so the applier records/form the right union type)."""
+    derived = dict(event)
+    derived["interaction"] = {"kind": interaction, "romantic": True}
+    choices = []
+    for option in event["choices"]:
+        option = dict(option)
+        effects = option.get("effects") or {}
+        if "offer" in effects:
+            effects = dict(effects)
+            offer = dict(effects["offer"])
+            offer["interaction"] = interaction
+            effects["offer"] = offer
+            option["effects"] = effects
+        choices.append(option)
+    derived["choices"] = choices
+    return derived
+
+
+def sample_targeted_offer(context, player, payload, rng, action_id):
+    """E2: player-initiated courtship/proposal offer to one chosen adult.
+    Authorised offer->response per the ratified draw contract: hard
+    validity from B's evaluator (18+/alive/not-self can never be scored
+    around), ONE seeded accept draw stored in the pending, resolve
+    applies the stored answer through A's registered appliers."""
+    from src.game.events import EventEngine
+    interaction, event, refusal_text = _TARGETED_OFFER_ACTIONS[action_id]
+    env = getattr(context, "_env", None)
+    _check(env is not None, "invalid_input",
+           f"{action_id} needs the game service context")
+    target_id = (payload or {}).get("target_id")
+    _check(isinstance(target_id, str) and target_id, "invalid_input",
+           "target_id is required")
+    _check(target_id != player.person_id, "invalid_input",
+           "you cannot target yourself")
+    _find_person(context, target_id)  # typed not_found for unknown ids
+    from src.game.events import EventEngine
+    from src.game.features.family_graph.service_view import (
+        ServiceGraphView, ServicePolicyView)
+    from src.game.features.relationship_policy.evaluator import (
+        evaluate_offer)
+    from src.game.events import GameContext
+    graph = ServiceGraphView(env)
+    policy = ServicePolicyView(env)
+    if action_id == "union_proposal":
+        # W3 stage contract (ratified B->C R5 item): a union proposal
+        # requires an active courtship-stage edge. Attemptable regardless
+        # of law — recognition is a consequence, never a gate.
+        _check(_active_stage_edge(env, player.person_id, target_id)
+               is not None, "not_allowed",
+               "you need an active courtship before proposing a union")
+        # Ordinary vs plural: an existing active union on EITHER side
+        # makes this a plural proposal, so the evaluator reads the
+        # jurisdiction's plural recognition and the stored offer carries
+        # the kind the applier must form.
+        if graph.active_union_count(player.person_id) \
+                or graph.active_union_count(target_id):
+            interaction = "propose_plural_union"
+            event = _plural_union_event(event, interaction)
+    scored = evaluate_offer(interaction, player.person_id, target_id,
+                            graph, policy, env.get("policy_revision", 0))
+    _check(scored.get("hard", {}).get("ok"), "not_allowed",
+           "this is not possible right now")
+    p_accept = (scored.get("acceptance") or {}).get("p_accept")
+    if p_accept is None:
+        p_accept = 1.0 - float(
+            (scored.get("refusal") or {}).get("p_refuse", 0.0))
+    p_accept = min(max(float(p_accept), 0.02), 0.98)
+    accepted = rng.random() < p_accept
+    v3_context = GameContext(env, context._service)
+    pending = EventEngine.instantiate3(
+        event, 0, rng, v3_context, prebound={"target": target_id})
+    sampled = dict(pending.get("sampled") or {})
+    sampled["accepted"] = accepted
+    sampled["p_accept"] = p_accept
+    sampled["score"] = scored.get("score")
+    # W3: persist the law projection at offer creation so the accepted
+    # offer forms the union with the recognition the evaluator actually
+    # projected (never the applier's recognized default), plus the
+    # configured consequences of a forbidden/unrecognized ceremony.
+    projected = scored.get("projected_recognition")
+    if projected:
+        sampled["projected_recognition"] = projected
+    consequences = scored.get("projected_consequences")
+    if consequences:
+        sampled["projected_consequences"] = list(consequences)
+    pending["sampled"] = sampled
+    reasons = scored.get("reasons") or []
+    if reasons:
+        from src.game.features.knowledge.drama import filter_reasons
+        pending["reasons"] = filter_reasons(env, reasons)
+    if not accepted:
+        # Stored refusal: happiness/stress effects are replaced by the
+        # refusal outcome; ONLY the offer domain survives so resolving
+        # records the declined attempt (A's graph accounting).
+        for option in pending["options"]:
+            if option["id"].endswith("_ask"):
+                option["_effects"] = {}
+                domain = option.get("_domain") or {}
+                option["_domain"] = (
+                    {"offer": domain["offer"]} if "offer" in domain
+                    else None)
+                option["_outcome"] = refusal_text
+    return _result(pending_decision=pending)
+
+
 def sample_dating_app(context, player, payload, rng):
     """Create a dating-app date offer: bind target, score with B's
-    evaluator, draw accept/refuse once, store everything in the pending."""
+    evaluator, draw accept/refuse once, store everything in the pending.
+
+    R3 ratified contract (M2.5-fix-round-2.md): one sampled-once draw per
+    offer, stored here, never redrawn; accept = (u < p_accept) with B's
+    p_accept clamped to [0.02, 0.98] so refusal is always possible and
+    acceptance is never impossible for an eligible adult pair. Hard
+    validity (18+, alive, not self) is the separate gate above."""
     from src.game.events import EventEngine, PREDICATES
     env = getattr(context, "_env", None)
     _check(env is not None, "invalid_input",
@@ -3056,19 +3337,28 @@ def sample_dating_app(context, player, payload, rng):
         ServiceGraphView, ServicePolicyView)
     from src.game.features.relationship_policy.evaluator import (
         evaluate_offer)
+    from src.game.events import GameContext
     graph = ServiceGraphView(env)
     policy = ServicePolicyView(env)
     scored = evaluate_offer("date", player.person_id, target_id, graph,
                             policy, env.get("policy_revision", 0))
     _check(scored.get("hard", {}).get("ok"), "not_allowed",
            "this match is not possible right now")
-    p_refuse = float((scored.get("refusal") or {}).get("p_refuse", 0.0))
-    p_refuse = min(max(p_refuse, 0.0), 1.0)
-    accepted = rng.random() >= p_refuse
+    p_accept = (scored.get("acceptance") or {}).get("p_accept")
+    if p_accept is None:
+        # tolerant fallback for pre-contract evaluator results
+        p_accept = 1.0 - float(
+            (scored.get("refusal") or {}).get("p_refuse", 0.0))
+    p_accept = min(max(float(p_accept), 0.02), 0.98)
+    accepted = rng.random() < p_accept
+    # instantiate3 resolves names/money/affordability through the proper
+    # GameContext adapter (the RuleContext boundary has no person_name).
+    v3_context = GameContext(env, context._service)
     pending = EventEngine.instantiate3(
-        DATING_APP_EVENT, 0, rng, context, prebound={"target": target_id})
+        DATING_APP_EVENT, 0, rng, v3_context, prebound={"target": target_id})
     sampled = dict(pending.get("sampled") or {})
     sampled["accepted"] = accepted
+    sampled["p_accept"] = p_accept
     sampled["score"] = scored.get("score")
     pending["sampled"] = sampled
     reasons = scored.get("reasons") or []
@@ -3081,7 +3371,8 @@ def sample_dating_app(context, player, payload, rng):
         for option in pending["options"]:
             if option["id"].endswith("_accept"):
                 option["_effects"] = {}
-                option["_domain"] = None
+                domain = option.get("_domain") or {}
+                option["_domain"] = {"offer": domain["offer"]} if "offer" in domain else None
                 option["_outcome"] = (
                     "I got stood up — they never replied.")
     return _result(pending_decision=pending)
@@ -3091,7 +3382,63 @@ def sample_dating_app(context, player, payload, rng):
 # player): offer creation binds and scores against the envelope.
 _CONTEXT_SELF_ACTIONS = {
     "dating_app": sample_dating_app,
+    "courtship_offer": lambda c, p, payload, r: sample_targeted_offer(
+        c, p, payload, r, "courtship_offer"),
+    "union_proposal": lambda c, p, payload, r: sample_targeted_offer(
+        c, p, payload, r, "union_proposal"),
 }
+
+
+def romance_events_phase(context, rng):
+    """Yearly v3 romance slot (fix round 2, R7): offers at most ONE rom_*
+    occurrence per year through the single v3 dispatch path
+    (EventEngine.sample_v3: seen-cadence + age bounds + the evaluated
+    condition tree + role bindability, one weighted draw). Cadence lives
+    in env["v3_seen"] (plain list, pickle-safe). A wires the phase into
+    the coordinator (PHASE_ORDER after drama_events + RULE_PHASES) —
+    two lines, requested via contracts README Open items; until then
+    this phase is inert in production but fully exercised in tests.
+    Children never enter: every shipped rom_* event declares
+    interaction.romantic with min_age 18."""
+    from src.game import events as event_mod
+    from src.game import rule_adapter
+    env = getattr(context, "_env", None)
+    _check(env is not None and "graph" in env and
+           "next_decision_num" in env, "invalid_input",
+           "romance_events needs the game service context")
+    player = env["player"]
+    done = {"phase_id": "illness", "item_cursor": 0}
+    if player.age < 18 or env.get("pending"):
+        return _result(continuation=done)
+    seen = env.setdefault("v3_seen", [])
+    engine = event_mod.EventEngine(event_mod.load_event_files())
+    v3_context = event_mod.GameContext(env, context._service)
+    ev, bindings = engine.sample_v3(
+        rng, player.age, seen, v3_context, prefixes=("rom_",),
+        actor_id=player.person_id)
+    if ev is None:
+        return _result(continuation=done)
+    seq = env["next_decision_num"]
+    env["next_decision_num"] += 1
+    seen.append(ev["id"])
+    pending = event_mod.EventEngine.instantiate3(
+        ev, seq, rng, v3_context, prebound=bindings)
+    if pending.get("pre_effects"):
+        rule_adapter.apply_effects_bundle(
+            env, context._service, player, pending["pre_effects"],
+            occurrence=f"{ev['id']}:pre",
+            person_ids=pending.get("_pre_person_ids_extra") or [],
+            journal_kind="event",
+            outcome_text=pending["text"],
+            audience=pending.get("audience") or "public",
+            fact_id=pending.get("fact_id"))
+        pending["pre_applied"] = True
+    return _result(pending_decision=pending, continuation=done)
+
+
+# register the phase (defined after the _PHASES dict; same pattern as
+# _SELF_ACTIONS["surrender"])
+_PHASES["romance_events"] = romance_events_phase
 
 
 # register in resolve_choice dispatch
@@ -3352,7 +3699,8 @@ def child_social_year(child, rng):
     return events
 
 
-def family_events_phase(player, turn_id, rng, snapshot_ids=None):
+def family_events_phase(player, turn_id, rng, snapshot_ids=None,
+                        env=None):
     """family_events phase: births/naming first, then per-child yearly
     subrules. A iterates the frozen turn snapshot: pass snapshot_ids
     (person_id set) so only snapshot members are updated — newborns are
@@ -3369,6 +3717,11 @@ def family_events_phase(player, turn_id, rng, snapshot_ids=None):
                 "family", "I suffered a miscarriage and lost the baby!",
                 player, _changes(before, _stat_snapshot(
                     player, ("happiness",)), ("happiness",))))
+            if env is not None:
+                # W2: retire the lost pregnancy's recorded conception so
+                # the next pregnancy draws fresh (A's consumers skip
+                # terminated records; see terminate_active_conception)
+                terminate_active_conception(env, player, turn=turn_id)
         else:
             father = player._recent_child_father or player.partner
             player._recent_child_father = None
@@ -3402,6 +3755,9 @@ def family_events_phase(player, turn_id, rng, snapshot_ids=None):
                 "and lost the baby!", player,
                 _changes(before, _stat_snapshot(player, ("happiness",)),
                          ("happiness",))))
+            if env is not None:
+                # W2: the binding lives on the service player either way
+                terminate_active_conception(env, player, turn=turn_id)
         else:
             c = player.generate_child(partner)
             events.extend(_birth_events(player, c, rng, mother=False))

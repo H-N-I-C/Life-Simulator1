@@ -1,0 +1,137 @@
+{
+  "ordinary_pregnancy_female": {
+    "player_id": "1aed0445-49fc-44ec-8efa-4bd6f68a098f",
+    "partner_id": "2e278aed-6c98-493f-bf8a-33505a716fc0",
+    "player_gender": "Gender.Female",
+    "player_pregnant": true,
+    "partner_pregnant": false,
+    "outcomes": {
+      "legacy:1aed0445-49fc-44ec-8efa-4bd6f68a098f:2e278aed-6c98-493f-bf8a-33505a716fc0#0": {
+        "coefficient_band": "0",
+        "roll": 0.4494910647887381,
+        "adjustment": "none",
+        "bio_mother_id": "1aed0445-49fc-44ec-8efa-4bd6f68a098f",
+        "bio_father_id": "2e278aed-6c98-493f-bf8a-33505a716fc0",
+        "pregnancy_id": "d_1"
+      }
+    }
+  },
+  "ordinary_pregnancy_male": {
+    "player_id": "e10c1058-ecbf-498e-a233-d891d31d809c",
+    "partner_id": "f22d9d79-d853-4700-bc5b-f186d8f53300",
+    "player_gender": "Gender.Male",
+    "player_pregnant": false,
+    "partner_pregnant": true,
+    "outcomes": {
+      "legacy:f22d9d79-d853-4700-bc5b-f186d8f53300:e10c1058-ecbf-498e-a233-d891d31d809c#0": {
+        "coefficient_band": "0",
+        "roll": 0.4494910647887381,
+        "adjustment": "none",
+        "bio_mother_id": "f22d9d79-d853-4700-bc5b-f186d8f53300",
+        "bio_father_id": "e10c1058-ecbf-498e-a233-d891d31d809c",
+        "pregnancy_id": "d_1"
+      }
+    }
+  },
+  "marriage_before": {
+    "family": {
+      "parents": [
+        "311e3328-e5a8-4795-a81f-812aa93d55d8",
+        "6b86c012-ad77-46b4-bc36-67920c55949f"
+      ],
+      "partner": "b7840f0a-5069-46a1-b156-663f6f910a84",
+      "partner_status": 2,
+      "children": [],
+      "siblings": []
+    },
+    "union": {
+      "union_id": "uni-6dd2bec182c5",
+      "person_ids": [
+        "6ea8d463-4c8d-4d50-b413-c3065b1f923c",
+        "b7840f0a-5069-46a1-b156-663f6f910a84"
+      ],
+      "kind": "marriage",
+      "status": "active",
+      "recognition": {
+        "status": "recognized",
+        "jurisdiction_id": "jur-neutral-default",
+        "law_version": 1,
+        "basis": "registration"
+      },
+      "ceremony": {
+        "held": false,
+        "turn": null,
+        "venue_id": null
+      },
+      "prenup": null,
+      "exclusivity": {
+        "agreement": "exclusive"
+      },
+      "start_turn": 0,
+      "end_turn": null,
+      "policy_revision": 0
+    }
+  },
+  "after_actual_divorce": {
+    "family": {
+      "parents": [
+        "311e3328-e5a8-4795-a81f-812aa93d55d8",
+        "6b86c012-ad77-46b4-bc36-67920c55949f"
+      ],
+      "partner": "b7840f0a-5069-46a1-b156-663f6f910a84",
+      "partner_status": 0,
+      "children": [],
+      "siblings": []
+    },
+    "unions": [
+      {
+        "union_id": "uni-6dd2bec182c5",
+        "person_ids": [
+          "6ea8d463-4c8d-4d50-b413-c3065b1f923c",
+          "b7840f0a-5069-46a1-b156-663f6f910a84"
+        ],
+        "kind": "marriage",
+        "status": "divorced",
+        "recognition": {
+          "status": "recognized",
+          "jurisdiction_id": "jur-neutral-default",
+          "law_version": 1,
+          "basis": "registration"
+        },
+        "ceremony": {
+          "held": false,
+          "turn": null,
+          "venue_id": null
+        },
+        "prenup": null,
+        "exclusivity": {
+          "agreement": "exclusive"
+        },
+        "start_turn": 0,
+        "end_turn": 88,
+        "policy_revision": 0
+      }
+    ],
+    "relationships": [
+      {
+        "relationship_id": "rel-fb3e6364113d",
+        "person_ids": [
+          "6ea8d463-4c8d-4d50-b413-c3065b1f923c",
+          "b7840f0a-5069-46a1-b156-663f6f910a84"
+        ],
+        "kind": "committed",
+        "satisfaction": 100,
+        "trust": 100,
+        "chemistry": 50,
+        "exclusivity": {
+          "agreement": "exclusive"
+        },
+        "visibility": "public",
+        "start_turn": 0,
+        "end_turn": null,
+        "status": "active"
+      }
+    ],
+    "legacy_divorce_actions": []
+  }
+}

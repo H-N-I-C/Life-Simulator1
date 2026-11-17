@@ -29,23 +29,12 @@ def _events():
     return _EVENT_CACHE
 
 
-def _bindable(ev, actor_id, context):
-    from src.game import events as event_mod
-    roles = ev.get("roles") or {}
-    for name, cfg in roles.items():
-        select = cfg.get("select", "player" if name == "actor" else None)
-        if select == "player":
-            continue
-        pred = cfg.get("predicate")
-        pid = event_mod.PREDICATES[pred](actor_id, context)
-        if pid is None and not cfg.get("optional"):
-            return False
-    return True
-
-
 def advance_drama_phase(env, ctx, service, rng):
     """Yearly phase hook (A's coordinator call site). At most one drama
-    occurrence per year; unseen occurrences only."""
+    occurrence per year; unseen occurrences only. Eligibility routes
+    through C's single v3 dispatch path (R7/E6): bindability probe plus
+    the evaluated condition tree, so e.g. min_age-gated content is never
+    served to the wrong age."""
     from src.game import events as event_mod
     from src.game import rule_adapter
 
@@ -65,13 +54,18 @@ def advance_drama_phase(env, ctx, service, rng):
     for ev in _events():
         if ev["id"] in seen:
             continue
-        if not _bindable(ev, actor_id, context):
+        bindings = event_mod.v3_bindable(ev, actor_id, context)
+        if bindings is None:
+            continue
+        if not event_mod.evaluate_v3_conditions(
+                ev.get("conditions") or {}, context, bindings, actor_id):
             continue
         eligible.append(ev)
     if not eligible:
         return {"events": [], "money_entries": [],
                 "pending_decision": None,
-                "continuation": {"phase_id": "illness", "item_cursor": 0},
+                "continuation": {"phase_id": "romance_events",
+                                 "item_cursor": 0},
                 "finished_turn": False}
 
     total = sum(ev.get("weight", 1) for ev in eligible)
@@ -100,5 +94,6 @@ def advance_drama_phase(env, ctx, service, rng):
         pending["pre_applied"] = True
     return {"events": [], "money_entries": [],
             "pending_decision": pending,
-            "continuation": {"phase_id": "illness", "item_cursor": 0},
+            "continuation": {"phase_id": "romance_events",
+                             "item_cursor": 0},
             "finished_turn": False}

@@ -814,3 +814,149 @@ class JournalTextQualityTest(unittest.TestCase):
                                       "treat:Common Cold", random.Random(15))
         texts += [e["text"] for e in out["events"]]
         self.assertTrue(any("the common cold" in t for t in texts), texts)
+
+
+class W1InheritanceCollisionTest(unittest.TestCase):
+    """Round 4 W1: two parents leaving different bequests in the SAME
+    mortality turn must post as distinct ledger occurrences (keyed by
+    the deceased's immutable id), never collide as LedgerConflict, and
+    replay idempotently."""
+
+    def new(self):
+        import tempfile
+        from src.game.service import GameService
+        self.tmp = tempfile.TemporaryDirectory(prefix="m25-w1-")
+        self.addCleanup(self.tmp.cleanup)
+        self.svc = GameService(self.tmp.name)
+        state = self.svc.new_game({"first_name": "Ada", "last_name": "Lee",
+                                   "gender": "female", "country": "Australia",
+                                   "seed": 97}, "create")
+        self.gid = state["game_id"]
+        env = self.svc._load(self.gid)
+        player = env["player"]
+        player.age = 30
+        player.money = 0
+        self.parents = []
+        for estate in (100, 60):  # different estates -> different draws
+            parent = Parent("Lastname", 70, Gender.Female)
+            parent.generosity = 100
+            parent.money = estate
+            player.relations.append(parent)
+            self.parents.append(parent)
+        self.svc._ensure_ids(env)
+        env["balances"][player.person_id] = 0
+        for parent in self.parents:
+            env["balances"][parent.person_id] = parent.money
+        self.svc._save(env)
+        self.pid = player.person_id
+
+    def _draw_inheritance(self, parent, start):
+        """Force a bequest draw for this parent; returns the money entry
+        or None if the seeded draw declined both rolls."""
+        money = parent.money
+        for seed in range(start, start + 200):
+            parent.generosity = 100
+            parent.money = money
+            result = ra.sample_relation_death(
+                self.svc._load(self.gid)["player"], parent,
+                random.Random(seed))
+            if result["money_entries"]:
+                return result["money_entries"][0]
+        return None
+
+    def test_two_inheritances_same_turn_post_without_conflict(self):
+        from src.game import rule_adapter
+        self.new()
+        env = self.svc._load(self.gid)
+        player = env["player"]
+        entries = []
+        for i, parent in enumerate(self.parents):
+            entry = self._draw_inheritance(parent, 40 * i)
+            self.assertIsNotNone(entry)
+            entries.append(entry)
+        self.assertNotEqual(entries[0]["amount"], entries[1]["amount"])
+        # W1: occurrence is the deceased's immutable id — never shared
+        occ = [e["occurrence_id"] for e in entries]
+        self.assertEqual(len(set(occ)), 2)
+        for entry, parent in zip(entries, self.parents):
+            self.assertEqual(entry["occurrence_id"],
+                             f"inheritance:{parent.person_id}")
+        turn = env["turn"]["turn_id"]
+        rule_adapter.post_money_entries(env, self.svc, turn, player.age,
+                                        entries)
+        credits = [e["amount"] for e in entries]
+        self.assertEqual(env["balances"][self.pid], sum(credits))
+        # replay of the same postings is idempotent, never LedgerConflict
+        rule_adapter.post_money_entries(env, self.svc, turn, player.age,
+                                        entries)
+        self.assertEqual(env["balances"][self.pid], sum(credits))
+        self.svc._save(env)
+        env = self.svc._load(self.gid)
+        self.assertEqual(env["balances"][self.pid], sum(credits))
+
+
+class W2MiscarriageTerminationTest(unittest.TestCase):
+    """Round 4 W2 (C half): the miscarriage writer retires the lost
+    pregnancy's recorded conception AT THE LOSS — terminated history is
+    kept, the active binding is cleared, so nothing downstream can
+    reuse the lost draw. (A's half: record/find skip terminated.)"""
+
+    def _env_with_outcome(self, player):
+        partner = partner_for(player)
+        env = {"graph": {"conception_outcomes": {
+            "legacy:m:f#0": {"bio_mother_id": player.person_id,
+                             "bio_father_id": partner.person_id,
+                             "pregnancy_id": "d_1"}}},
+            "archive": [], "dead_ids": []}
+        player._active_conception_key = "legacy:m:f#0"
+        return env, partner
+
+    def _miscarriage_seed(self):
+        # fertility 0 always fails the continue-roll; need randint(1,5)==1
+        for seed in range(400):
+            if random.Random(seed).randint(1, 5) == 1:
+                return seed
+        raise AssertionError("no miscarriage seed found")
+
+    def test_miscarriage_terminates_active_conception(self):
+        player = adult()
+        player.gender = Gender.Female
+        player.fertility = 0
+        player.is_pregnant = True
+        env, _ = self._env_with_outcome(player)
+        ra.family_events_phase(player, 3, random.Random(self._miscarriage_seed()),
+                               env=env)
+        outcome = env["graph"]["conception_outcomes"]["legacy:m:f#0"]
+        self.assertEqual(outcome["terminated"], "miscarriage")
+        self.assertEqual(outcome["terminated_turn"], 3)
+        self.assertTrue(outcome["consumed"])  # never reusable (W2)
+        self.assertIsNone(player._active_conception_key)
+        self.assertFalse(player.is_pregnant)
+
+    def test_partner_miscarriage_terminates_via_pair_fallback(self):
+        player = adult(gender=Gender.Male)
+        player.fertility = 100
+        env, partner = self._env_with_outcome(player)
+        partner.fertility = 0
+        partner.is_pregnant = True
+        del player._active_conception_key  # binding unknown to the branch
+        ra.family_events_phase(player, 4, random.Random(self._miscarriage_seed()),
+                               env=env)
+        outcome = env["graph"]["conception_outcomes"]["legacy:m:f#0"]
+        self.assertEqual(outcome["terminated"], "miscarriage")
+        self.assertEqual(outcome["terminated_turn"], 4)
+        self.assertFalse(partner.is_pregnant)
+
+    def test_birth_branch_does_not_terminate(self):
+        # the hook fires on LOSS only; a continuing pregnancy (fertility
+        # 150 always continues) leaves the draw untouched for the birth
+        player = adult()
+        player.gender = Gender.Female
+        player.fertility = 150
+        player.is_pregnant = True
+        player._recent_child_father = player.partner
+        env, _ = self._env_with_outcome(player)
+        ra.family_events_phase(player, 3, random.Random(5), env=env)
+        outcome = env["graph"]["conception_outcomes"]["legacy:m:f#0"]
+        self.assertNotIn("terminated", outcome)
+        self.assertFalse(player.is_pregnant)

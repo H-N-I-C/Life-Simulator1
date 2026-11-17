@@ -1,0 +1,37 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 30,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alphonse",
+    "last_name": "Sharpe",
+    "gender": "male",
+    "country": "Australia",
+    "seed": 1289972433,
+    "request_id": "robot-1-30-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 730598346,
+     "base": "woman",
+     "skin_tone": "medium-light",
+     "hair": "red",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 31 --seed 1 --from-life 30 --fail-fast"
+}

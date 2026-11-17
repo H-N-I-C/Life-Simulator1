@@ -21,7 +21,7 @@ CATEGORIES = {
     "debt_borrow", "debt_repay", "loan_borrow", "loan_repay",
     "medical", "activity", "transfer", "inheritance", "lottery",
     "gift_received", "gift_given", "wedding", "education",
-    "estate_close", "other",
+    "estate_close", "legal", "other",
 }
 
 

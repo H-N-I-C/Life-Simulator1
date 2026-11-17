@@ -1,11 +1,11 @@
 {
-  "_status": "PROPOSAL (Kimi B, 2026-11-17). Executable fixtures for the policy evaluator (policy-evaluator.md §3 mappings — all scores hand-checkable). The actual accept/refuse DRAW is C's per-offer seeded sampling and is NOT asserted here; only the deterministic p_refuse formula result is. D can execute these cross-contract after freeze.",
+  "_status": "RATIFIED UPDATE (Kimi B, 2026-11-17): refusal values recomputed per the R3 ratified probability contract (M2.5-fix-round-2.md) \u2014 ONE sampled-once draw accept = u < acceptance.p_accept; p_accept = clamp(score/100 - (0.4*(1-openness)+0.2*jealousy)/2, 0.02, 0.98); refusal.p_refuse = 1 - p_accept (display only). Scores/breakdowns unchanged.",
   "evaluator_version": "ev-1.0.0-proposal",
   "evaluator_entry": {
     "_for_d": "entry point the eligibility-matrix runner loads after freeze",
     "module": "src/game/features/relationship_policy/evaluator.py",
     "function": "evaluate_offer",
-    "signature": "evaluate_offer(interaction_kind, initiator_id, target_id, context, *, rng=None) -> EvaluatorResult (policy-evaluator.md §5)",
+    "signature": "evaluate_offer(interaction_kind, initiator_id, target_id, context, *, rng=None) -> EvaluatorResult (policy-evaluator.md \u00a75)",
     "chronology_guard": "delegates adult/dead checks to A's centralized guard (A publishes the hook separately)"
   },
   "reason_code_vocabulary": {
@@ -99,7 +99,7 @@
   "fixtures": [
     {
       "name": "illegal_but_attemptable_plural_union",
-      "_intent": "Recognition changes consequences, NEVER eligibility (spec §3 freeze fixture).",
+      "_intent": "Recognition changes consequences, NEVER eligibility (spec \u00a73 freeze fixture).",
       "input": {
         "interaction_kind": "propose_plural_union",
         "initiator": "initiator_generic",
@@ -146,7 +146,7 @@
         ],
         "refusal": {
           "possible": true,
-          "p_refuse": 0.33
+          "p_refuse": 0.98
         },
         "projected_recognition": {
           "status": "unrecognized",
@@ -165,12 +165,16 @@
             ]
           }
         ],
-        "eligibility_note": "attemptable despite the unrecognized projection; the fine posts once per union at ceremony"
+        "eligibility_note": "attemptable despite the unrecognized projection; the fine posts once per union at ceremony",
+        "acceptance": {
+          "possible": true,
+          "p_accept": 0.02
+        }
       }
     },
     {
       "name": "refusal_stays_possible_at_high_score",
-      "_intent": "A high score does not manufacture consent (spec §1): p_refuse is always >= 0.05 and C's sampled draw may refuse.",
+      "_intent": "A high score does not manufacture consent (spec \u00a71): p_refuse is always >= 0.05 and C's sampled draw may refuse.",
       "input": {
         "interaction_kind": "propose_plural_union",
         "initiator": "initiator_generic",
@@ -209,13 +213,17 @@
         "faith_tenets_detail": "plural_unions -3 (halved: personal override), interfaith_unions -6 (full weight)",
         "refusal": {
           "possible": true,
-          "p_refuse": 0.23
+          "p_refuse": 0.31
         },
         "projected_recognition": {
           "status": "recognized",
           "jurisdiction_id": "jur_metropolis_charter",
           "law_version": 0,
           "basis": "ceremony"
+        },
+        "acceptance": {
+          "possible": true,
+          "p_accept": 0.69
         }
       }
     },
@@ -264,13 +272,17 @@
         ],
         "refusal": {
           "possible": true,
-          "p_refuse": 0.23
+          "p_refuse": 0.55
         },
         "projected_recognition": {
           "status": "recognized",
           "jurisdiction_id": "jur_highland_compact",
           "law_version": 0,
           "basis": "ceremony"
+        },
+        "acceptance": {
+          "possible": true,
+          "p_accept": 0.45
         }
       }
     },
@@ -316,13 +328,17 @@
         "culture_detail": "saraki interfaith_social_stance disfavoured -4",
         "refusal": {
           "possible": true,
-          "p_refuse": 0.28
+          "p_refuse": 0.7
+        },
+        "acceptance": {
+          "possible": true,
+          "p_accept": 0.305
         }
       }
     },
     {
       "name": "neutral_defaults_no_name_gender_inference",
-      "_intent": "Identical profiles score identically regardless of names (spec §3); only profile data matters.",
+      "_intent": "Identical profiles score identically regardless of names (spec \u00a73); only profile data matters.",
       "input_variants": [
         {
           "label": "Aisha + Maria",
@@ -374,7 +390,11 @@
         },
         "refusal": {
           "possible": true,
-          "p_refuse": 0.28
+          "p_refuse": 0.59
+        },
+        "acceptance": {
+          "possible": true,
+          "p_accept": 0.405
         }
       }
     },
@@ -436,9 +456,13 @@
         ],
         "refusal": {
           "possible": true,
-          "p_refuse": 0.33
+          "p_refuse": 0.7
         },
-        "eligibility_note": "attemptable; -6 is social acceptance only. Social/adoptive/in-law links alone score 0; the biological coefficient is never part of this score."
+        "eligibility_note": "attemptable; -6 is social acceptance only. Social/adoptive/in-law links alone score 0; the biological coefficient is never part of this score.",
+        "acceptance": {
+          "possible": true,
+          "p_accept": 0.3
+        }
       }
     },
     {

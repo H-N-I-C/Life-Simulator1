@@ -119,10 +119,11 @@ def _known_request(f):
 
 
 class Runner:
-    def __init__(self, base, session, out):
+    def __init__(self, base, session, out, service=None):
         self.base = base
         self.s = session
         self.out = out
+        self.service = service
         self.results = []   # (flow, name, ok, extra)
         self.ctx = {}       # flow context, exposed to JS as window.CTX
 
@@ -1283,6 +1284,366 @@ class Runner:
         self.record(flow, "cmd %s" % action, ok,
                     "status=%s %s" % (status, json.dumps(result)[:160]))
 
+    # ---- M2.5 hooks (D2 flows) ------------------------------------------
+
+    def _hook_phone_viewport(self, flow, width=390, height=844):
+        """All M2.5 flows are phone-width journeys (frozen D2)."""
+        self.s.call("Emulation.setDeviceMetricsOverride",
+                    {"width": width, "height": height,
+                     "deviceScaleFactor": 1, "mobile": width < 500})
+        self.record(flow, "phone viewport %dx%d" % (width, height), True)
+
+    def _hook_store_first_option(self, flow, match="", as_="opt_id",
+                                 enabled_only=True):
+        """Store the id of the first pending option whose id contains
+        `match` (case-insensitive); PendingSkip when the pending shape
+        is not there."""
+        d = (self.ctx.get("state") or {}).get("pending_decision")
+        if not d:
+            raise PendingSkip("no pending_decision to pick an option from")
+        options = d.get("options") or []
+        if enabled_only:
+            options = [o for o in options if o.get("enabled")]
+        found = next((o for o in options if match.lower() in
+                      o.get("id", "").lower()), None)
+        if found is None:
+            self.record(flow, "option containing %r" % match, False,
+                        json.dumps([o.get("id") for o in options])[:200])
+            return
+        self.ctx[as_] = found["id"]
+        self.record(flow, "option %r stored" % found["id"], True)
+
+    def _hook_wedding_op(self, flow, op, args=None, request_id=None,
+                         revision="current", as_="wed_result",
+                         expect_status=None):
+        """POST /api/games/<id>/wedding (A's replay-safe wrapper)."""
+        import uuid
+        state = self.ctx["state"]
+        body = {"op": op, "args": _resolve(args or {}, self.ctx, state),
+                "request_id": _resolve(request_id, self.ctx, state)
+                if request_id else str(uuid.uuid4())}
+        if revision == "current":
+            body["expected_revision"] = state["revision"]
+        elif isinstance(revision, int):
+            body["expected_revision"] = revision
+        else:  # "CTX.<key>" resolving to a stored int
+            body["expected_revision"] = _resolve(revision, self.ctx, state)
+        req = urllib.request.Request(
+            self.base + "/api/games/" + state["game_id"] + "/wedding",
+            data=json.dumps(body).encode(),
+            headers={"Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req) as resp:
+                result = json.loads(resp.read())
+                status = resp.status
+        except urllib.error.HTTPError as exc:
+            result = json.loads(exc.read() or b"{}")
+            status = exc.code
+        self.ctx[as_] = result
+        self.ctx[as_ + "_request_id"] = body["request_id"]
+        self.ctx[as_ + "_revision"] = body["expected_revision"]
+        want = expect_status
+        ok = status == want if want else status < 400
+        self.record(flow, "wedding op %s" % op, ok,
+                    "status=%s %s" % (status, json.dumps(result)[:160]))
+
+    def _hook_editor_apply(self, flow, commands, request_id=None,
+                           revision="current", as_="ed_result",
+                           expect_status=None):
+        """POST /api/games/<id>/editor/apply (frozen editor protocol)."""
+        import uuid
+        state = self.ctx["state"]
+        body = {"commands": _resolve(commands, self.ctx, state),
+                "request_id": _resolve(request_id, self.ctx, state)
+                if request_id else str(uuid.uuid4())}
+        if revision == "current":
+            body["expected_revision"] = state["revision"]
+        elif isinstance(revision, int):
+            body["expected_revision"] = revision
+        else:
+            body["expected_revision"] = _resolve(revision, self.ctx, state)
+        req = urllib.request.Request(
+            self.base + "/api/games/" + state["game_id"] + "/editor/apply",
+            data=json.dumps(body).encode(),
+            headers={"Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req) as resp:
+                result = json.loads(resp.read())
+                status = resp.status
+        except urllib.error.HTTPError as exc:
+            result = json.loads(exc.read() or b"{}")
+            status = exc.code
+        self.ctx[as_] = result
+        self.ctx[as_ + "_request_id"] = body["request_id"]
+        self.ctx[as_ + "_revision"] = body["expected_revision"]
+        want = expect_status
+        ok = status == want if want else status < 400
+        self.record(flow, "editor/apply %s" %
+                    json.dumps(body["commands"])[:80], ok,
+                    "status=%s %s" % (status, json.dumps(result)[:160]))
+
+    def _hook_api_get(self, flow, suffix, as_="api_result"):
+        """GET /api/games/<current game_id>/<suffix> (no mutation; the
+        M2.5 projection endpoints under test in D2)."""
+        state = self.ctx["state"]
+        with urllib.request.urlopen(
+                self.base + "/api/games/" + state["game_id"] + "/"
+                + suffix, timeout=10) as resp:
+            body = json.loads(resp.read())
+        self.ctx[as_] = body
+        self.record(flow, "GET %s" % suffix, True)
+
+    def _hook_plant_secret(self, flow, as_="secret_fact_id"):
+        """R11 HTTP secrecy fixture: persist a PRIVATE journal row and a
+        secret fact the player does NOT know (identical planting to A's
+        test_game_m25_codex_fixes sentinel test). The asserted surface is
+        the real HTTP projection, not the in-process filter."""
+        if self.service is None:
+            raise PendingSkip("no service handle for secret planting")
+        state = self.ctx["state"]
+        env = self.service._load(state["game_id"])
+        from src.game import rule_adapter
+        from src.game.features.knowledge import core as knowledge
+        rule_adapter.journal_events(env, [{
+            "kind": "event", "text": "PRIVATE_SENTINEL_M25",
+            "person_ids": [], "changes": {},
+            "audience": "private", "fact_id": "f_hidden_m25"}])
+        fact_id = knowledge.mint_fact(
+            env, "secret_union",
+            [self.ctx.get("partner_id") or state["player_id"]],
+            env["revision"])
+        self.service._save(env)
+        self.ctx[as_] = fact_id
+        self.record(flow, "private row + unknown secret fact planted",
+                    True, "fact_id=%s" % fact_id)
+
+    def _hook_learn_secret(self, flow, fact_id="CTX.secret_fact_id"):
+        """The player learns the planted fact (diegetic disclosure)."""
+        if self.service is None:
+            raise PendingSkip("no service handle for learn step")
+        state = self.ctx["state"]
+        fact_id = _resolve(fact_id, self.ctx, state)
+        env = self.service._load(state["game_id"])
+        from src.game.features.knowledge import core as knowledge
+        knowledge.learn(env, state["player_id"], fact_id, env["revision"],
+                        "told")
+        self.service._save(env)
+        self.record(flow, "player learned the fact", True, fact_id)
+
+    def _hook_add_adult_stranger(self, flow, name="Sam Stranger",
+                                 as_="stranger_id"):
+        """Fixture an adult who is genuinely eligible for the dating app:
+        reachable for state serialization, but NOT player.partner and with
+        no graph relationship/union/parentage edge to the actor. This is the
+        missing preconditions fixture only; all offers/dates still run
+        through the public command surface."""
+        if self.service is None:
+            raise PendingSkip("no service handle for stranger fixture")
+        state = self.ctx["state"]
+        env = self.service._load(state["game_id"])
+        from src.people.classes.partner import Partner
+        from src.lifesim_lib.lifesim_lib import Gender
+        stranger = Partner(26, Gender.Male, 60, 60, 100, 0)
+        stranger.name = name
+        stranger.appearance = QA_APPEARANCE
+        env["player"].relations.append(stranger)
+        self.service._ensure_ids(env)
+        env["balances"][stranger.person_id] = 0
+        self.service.stamp_person_profile(env, stranger)
+        self.service._save(env)
+        self.ctx[as_] = stranger.person_id
+        self.record(flow, "unrelated adult stranger fixture added", True,
+                    "%s %s" % (name, stranger.person_id[:8]))
+
+    def _hook_seed_next_draw(self, flow, seed=31):
+        """Pin the persisted gameplay RNG stream for the next public action.
+        Seed 31 gives u=0.012278, below the ratified 0.02 p_accept floor;
+        seed 153 gives u=0.993368, above the 0.98 ceiling. This makes the
+        required accepted/refused branches deterministic without changing
+        production probability code or redrawing stored answers."""
+        import random
+        if self.service is None:
+            raise PendingSkip("no service handle for RNG boundary pin")
+        state = self.ctx["state"]
+        env = self.service._load(state["game_id"])
+        env["rng_state"] = random.Random(seed).getstate()
+        self.service._save(env)
+        self.record(flow, "next gameplay draw pinned", True,
+                    "seed=%s u=%.6f" % (seed, random.Random(seed).random()))
+
+    def _hook_real_offer_journey(self, flow, target_id="CTX.partner_id",
+                                 accept_seed=31, as_="real_union_id"):
+        """E7: exercise B/C's authorised offer journey through the public
+        command surface. No in-process graph command is used: courtship and
+        union offers are advertised actions, the stored v3 response is
+        pinned to the acceptance boundary, and acceptance forms the union
+        through A's domain applier."""
+        target_id = _resolve(target_id, self.ctx, self.ctx.get("state") or {})
+        expected = (
+            ("courtship_offer", "propose_courtship", "said yes"),
+            ("union_proposal", "propose_union", "engaged to be wed"),
+        )
+        for action, kind, accepted_phrase in expected:
+            self._hook_refresh_state(flow)
+            state = self.ctx["state"]
+            if action == "union_proposal":
+                env = self.service._load(state["game_id"])
+                participants = {env["player"].person_id, target_id}
+                if any(u.get("status") == "active"
+                       and participants.intersection(u.get("person_ids", []))
+                       for u in env["graph"]["unions"]):
+                    kind = "propose_plural_union"
+            specs = [a for a in state.get("available_actions") or []
+                     if a.get("id") == action
+                     and a.get("target_id") == target_id]
+            advertised = bool(specs) and all(a.get("enabled")
+                                             for a in specs)
+            self.record(flow, "%s advertised for real journey" % action,
+                        advertised, "target=%s" % target_id[:8])
+            if not advertised:
+                return
+            self._hook_seed_next_draw(flow, seed=accept_seed)
+            self._hook_cmd(flow, action=action,
+                           payload={"target_id": target_id},
+                           as_="offer_result")
+            self._hook_refresh_state(flow)
+            pending = (self.ctx["state"] or {}).get("pending_decision") or {}
+            shape_ok = pending.get("interaction", {}).get("kind") == kind \
+                and pending.get("bindings", {}).get("target") == target_id
+            self.record(flow, "%s stored pending bound to target" % action,
+                        shape_ok,
+                        "kind=%s accepted=%s" %
+                        (pending.get("interaction", {}).get("kind"),
+                         (pending.get("sampled") or {}).get("accepted")))
+            if not shape_ok:
+                return
+            accepted_ok = (pending.get("sampled") or {}).get("accepted") \
+                is True
+            self.record(flow, "%s acceptance boundary stored" % action,
+                        accepted_ok,
+                        "p_accept=%s" %
+                        (pending.get("sampled") or {}).get("p_accept"))
+            if not accepted_ok:
+                return
+            ask = next((o for o in pending.get("options") or []
+                        if o.get("id", "").endswith("_ask")), None)
+            ask_ok = ask is not None and ask.get("enabled", True)
+            self.record(flow, "%s response option offered" % action,
+                        ask_ok, "option=%s" %
+                        (ask or {}).get("id"))
+            if not ask_ok:
+                return
+            before = len((self.ctx["state"] or {}).get("journal") or [])
+            self._hook_cmd(flow, action="resolve_decision",
+                           payload={"decision_id": pending["id"],
+                                    "option_id": ask["id"]},
+                           as_="offer_resolve")
+            self._hook_refresh_state(flow)
+            texts = [j.get("text", "") for j in
+                     ((self.ctx["state"] or {}).get("journal") or [])[before:]]
+            resolved = any(accepted_phrase in text for text in texts)
+            self.record(flow, "%s accepted through stored response" % action,
+                        resolved, "deterministic_seed=%s" % accept_seed)
+            if not resolved:
+                return
+        self._hook_api_get(flow, "relationships-view", as_="real_view")
+        active = [u for u in self.ctx["real_view"].get("unions") or []
+                  if u.get("status") == "active"
+                  and (u.get("partner") or {}).get("id") == target_id]
+        ok = len(active) == 1
+        self.record(flow, "real offer journey forms one active union", ok,
+                    "active_with_target=%d" % len(active))
+        if ok:
+            self.ctx[as_] = active[0]["union_id"]
+
+    def _hook_refusal_boundary(self, flow, target_id="CTX.refuse_id",
+                               refusal_seed=153):
+        """Deterministic stored-refusal boundary for C's targeted offer:
+        u=0.993368 is above the 0.98 p_accept ceiling, so the stored answer
+        must be refusal; resolving records the declined offer only."""
+        target_id = _resolve(target_id, self.ctx, self.ctx.get("state") or {})
+        self._hook_refresh_state(flow)
+        state = self.ctx["state"]
+        specs = [a for a in state.get("available_actions") or []
+                 if a.get("id") == "courtship_offer"
+                 and a.get("target_id") == target_id]
+        advertised = bool(specs) and all(a.get("enabled") for a in specs)
+        self.record(flow, "courtship_offer advertised for refusal boundary",
+                    advertised, "target=%s" % target_id[:8])
+        if not advertised:
+            return
+        self._hook_seed_next_draw(flow, seed=refusal_seed)
+        self._hook_cmd(flow, action="courtship_offer",
+                       payload={"target_id": target_id},
+                       as_="refuse_result")
+        self._hook_refresh_state(flow)
+        pending = (self.ctx["state"] or {}).get("pending_decision") or {}
+        refused = pending.get("interaction", {}).get("kind") == \
+            "propose_courtship" \
+            and pending.get("bindings", {}).get("target") == target_id \
+            and (pending.get("sampled") or {}).get("accepted") is False
+        self.record(flow, "refusal boundary stored", refused,
+                    "accepted=%s p_accept=%s" %
+                    ((pending.get("sampled") or {}).get("accepted"),
+                     (pending.get("sampled") or {}).get("p_accept")))
+        if not refused:
+            return
+        ask = next((o for o in pending.get("options") or []
+                    if o.get("id", "").endswith("_ask")), None)
+        self._hook_cmd(flow, action="resolve_decision",
+                       payload={"decision_id": pending["id"],
+                                "option_id": (ask or {}).get("id")},
+                       as_="refuse_resolve")
+        self._hook_refresh_state(flow)
+        journal = (self.ctx["state"] or {}).get("journal") or []
+        recorded = any("turned me down" in j.get("text", "")
+                       for j in journal)
+        self.record(flow, "stored refusal records declined attempt", recorded)
+        self._hook_api_get(flow, "relationships-view", as_="refuse_view")
+        no_edge = not any((r.get("other") or {}).get("id") == target_id
+                          for r in self.ctx["refuse_view"].get("relationships")
+                          or []) and not any(
+                              (u.get("partner") or {}).get("id") == target_id
+                              and u.get("status") == "active"
+                              for u in self.ctx["refuse_view"].get("unions")
+                              or [])
+        self.record(flow, "refusal creates no courtship edge or union",
+                    no_edge)
+
+    def _hook_graph_op(self, flow, op, args=None, as_="graph_result"):
+        """Run one of A's typed graph transitions through the REAL in-process
+        service wrapper (same replay/revision envelope the UI-facing API
+        uses; B's own screen tests form unions exactly this way). The web
+        server does not route /graph, so this goes to the service."""
+        import uuid
+        if self.service is None:
+            raise PendingSkip("no service handle for graph op %s" % op)
+        state = self.ctx["state"]
+        result = self.service.graph_command(
+            state["game_id"], state["revision"], str(uuid.uuid4()), op,
+            _resolve(args or {}, self.ctx, state))
+        self.ctx[as_] = result
+        self.record(flow, "graph op %s" % op, True,
+                    json.dumps(result)[:160])
+        self._hook_refresh_state(flow)
+
+    def _hook_load_game_in_page(self, flow):
+        """Point the BROWSER page at the flow's game (flows drive the API
+        directly; in-page UI mounts need sessionStorage game_id + reload)
+        and wait until the page has a normalized state."""
+        state = self.ctx["state"]
+        self.s.js("sessionStorage.setItem('game_id', %s); true"
+                  % json.dumps(state["game_id"]))
+        self.s.call("Page.navigate", {"url": self.base + "/game"})
+        self.s.wait_js("!!document.querySelector('#actionList') && "
+                       "document.querySelector('#actionList').children.length "
+                       ">= 0 && (document.getElementById('ageUp') !== null "
+                       "|| document.querySelector('#actionList button') !== "
+                       "null || document.body.innerText.indexOf('Age up') "
+                       ">= 0)", timeout=20, desc="game page state loaded")
+        self.record(flow, "game loaded in page", True,
+                    "game_id=%s" % state["game_id"][:8])
+
     def _hook_assert_state(self, flow):
         """Validate the frozen M2 state/ledger shapes on ctx['state']
         (captured via an {"api": ...} or refresh_state step)."""
@@ -1430,7 +1791,11 @@ def main():
         print("FAIL: chromium not found")
         return 1
     os.makedirs(EVIDENCE, exist_ok=True)
-    save_dir = tempfile.mkdtemp(prefix="lifesim-browser-check-")
+    # Keep throwaway browser saves on the root filesystem: /tmp is a small
+    # shared tmpfs quota for several agents (the earlier robot EDQUOT root
+    # cause), and these scenario games are not small.
+    save_dir = tempfile.mkdtemp(prefix="lifesim-browser-check-",
+                                dir=os.path.join(ROOT, "game_saves"))
     httpd = server.make_server(0, save_dir=save_dir)
     httpd.dev_mode = True  # scenario starts are dev-only (play-web --dev)
     port = httpd.server_port
@@ -1439,7 +1804,8 @@ def main():
     try:
         chrome, conn = launch_chrome()
         s = conn.new_session()
-        runner = Runner("http://127.0.0.1:%d" % port, s, EVIDENCE)
+        runner = Runner("http://127.0.0.1:%d" % port, s, EVIDENCE,
+                        service=httpd.service)
         for path in PAGES:
             for w, h in VIEWPORTS:
                 runner.check_page(path, w, h)

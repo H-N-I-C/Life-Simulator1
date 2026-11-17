@@ -568,6 +568,52 @@ class EventEngine:
                     return False
         return True
 
+    # ------------------------------------------------------------- v3 path
+    # ONE evaluated dispatch/condition path for v3 (M2.5 fix round 2, R7):
+    # the same tree is used by offer creation (this selector), the yearly
+    # phases (A's engines and C's romance_events_phase) and resolve-time
+    # validity. Leaves follow the frozen table in event-schema-v3.md §2;
+    # reads go through A's graph/knowledge queries and B's published
+    # policy predicates — this file never mints domain truth.
+
+    def sample_v3(self, rng, age, seen_ids, context, prefixes=None,
+                  actor_id=None):
+        """The single v3 dispatch path: cadence (seen_ids) + age bounds +
+        the evaluated condition tree + role bindability, then ONE
+        weighted draw. `prefixes` restricts the pool (e.g. ("rom_",)).
+        Returns (event, bindings) or (None, None); bindings are the ids
+        probed here so offer creation can prebind the SAME people."""
+        actor_id = actor_id or _v3_person_id(context)
+        pool = []
+        for ev in self.events:
+            if ev.get("schema_version") != 3:
+                continue
+            if prefixes and not any(ev["id"].startswith(p)
+                                    for p in prefixes):
+                continue
+            if ev["id"] in seen_ids:
+                continue
+            cond = ev.get("conditions") or {}
+            if not (cond.get("min_age", 0) <= age <=
+                    cond.get("max_age", 200)):
+                continue
+            bindings = v3_bindable(ev, actor_id, context)
+            if bindings is None:
+                continue
+            if not evaluate_v3_conditions(cond, context, bindings,
+                                          actor_id):
+                continue
+            pool.append((ev, bindings))
+        if not pool:
+            return None, None
+        total = sum(ev.get("weight", 1) for ev, _ in pool)
+        roll = rng.randrange(total)
+        for ev, bindings in pool:
+            roll -= ev.get("weight", 1)
+            if roll < 0:
+                return ev, bindings
+        return pool[-1]
+
     def roll_independent(self, rng, age, used_ids, context):
         """A's coordinator entry point for finding-round #5 (independent
         chance_n events, handled separately from the flavor pool)."""
@@ -1034,6 +1080,229 @@ class EventEngine:
         }
 
 
+def _v3_env(context):
+    env = getattr(context, "_env", None)
+    if env is None:
+        raise EventValidationError(
+            "v3 conditions need an envelope-backed context")
+    return env
+
+
+def _v3_bound_id(bindings, people, role):
+    pid = (bindings or {}).get(role)
+    return pid if pid in people else None
+
+
+def _v3_pair_edge(graph, a_id, b_id, kind):
+    for edge in graph.get(kind + "s", []):
+        if set(edge.get("person_ids", [])) == {a_id, b_id}:
+            return edge
+    return None
+
+
+def _v3_node(node, context, bindings, people, pid):
+    if not isinstance(node, dict):
+        return False
+    if "all" in node:
+        return all(_v3_node(n, context, bindings, people, pid)
+                   for n in node["all"])
+    if "any" in node:
+        return any(_v3_node(n, context, bindings, people, pid)
+                   for n in node["any"])
+    if "not" in node:
+        return not _v3_node(node["not"], context, bindings, people, pid)
+    kind = node.get("kind")
+    env = _v3_env(context)
+    graph = env["graph"]
+
+    if kind == "bound":
+        return (bindings or {}).get(node.get("role")) is not None
+
+    if kind in ("relationship_state", "union_state", "expectation"):
+        a_id = _v3_bound_id(bindings, people, node.get("role_a", "actor"))
+        b_id = _v3_bound_id(bindings, people, node.get("role_b"))
+        if not a_id or not b_id:
+            return False
+        if kind == "relationship_state":
+            edge = _v3_pair_edge(graph, a_id, b_id, "relationship")
+            if not edge or edge.get("status") != "active":
+                return False
+            if node.get("kinds") and edge.get("kind") not in node["kinds"]:
+                return False
+            for metric in ("chemistry", "trust", "satisfaction"):
+                if metric in node and \
+                        float(edge.get(metric, 0)) < node[metric]:
+                    return False
+            return True
+        if kind == "union_state":
+            edge = _v3_pair_edge(graph, a_id, b_id, "union")
+            if not edge:
+                return False
+            if node.get("status") and \
+                    edge.get("status") not in node["status"]:
+                return False
+            if node.get("kinds") and edge.get("kind") not in node["kinds"]:
+                return False
+            return True
+        # expectation: the pair's exclusivity agreement; absent agreement
+        # defaults to exclusive (affairs = violating an exclusive one;
+        # consensual plural is recorded explicitly, never inferred).
+        edge = _v3_pair_edge(graph, a_id, b_id, "relationship")
+        agreement = ((edge or {}).get("exclusivity") or {}).get(
+            "agreement") or (edge or {}).get("expectation") or "exclusive"
+        want = node.get("value", node.get("values"))
+        if isinstance(want, list):
+            return agreement in want
+        return agreement == want
+
+    if kind == "recognition_status":
+        union_id = (bindings or {}).get(node.get("role", node.get("union_role")))
+        for union in graph.get("unions", []):
+            if union.get("union_id") == union_id:
+                status = (union.get("recognition") or {}).get("status")
+                want = node.get("status", node.get("values"))
+                return status in want if isinstance(want, list) \
+                    else status == want
+        return False
+
+    if kind == "kinship":
+        from src.game.features.family_graph import graph as graph_mod
+        a_id = _v3_bound_id(bindings, people, node.get("role_a", "actor"))
+        b_id = _v3_bound_id(bindings, people, node.get("role_b"))
+        if not a_id or not b_id:
+            return False
+        category = graph_mod.graph_relatedness(graph, a_id, b_id, people)[
+            "category"]
+        want = node.get("categories", node.get("category"))
+        return category in want if isinstance(want, list) \
+            else category == want
+
+    if kind == "milestone":
+        from src.game.features.parenting import core as parenting_core
+        child_id = (bindings or {}).get(node.get("role"))
+        if child_id is None:
+            return False
+        milestones = (env.get("parenting", {}).get("milestones", {})
+                      .get(child_id, {}))
+        return node.get("id") in milestones
+
+    if kind in ("known_fact", "reputation_at_least"):
+        from src.game.features.knowledge import core as knowledge
+        observer = node.get("observer", "actor")
+        observer_id = pid if observer == "actor" else \
+            (bindings or {}).get(observer)
+        if observer_id is None:
+            return False
+        # knowledge core normalizes the reserved 'player' observer itself
+        if kind == "known_fact":
+            for fact_id in knowledge.known_facts(env, observer_id):
+                fact = knowledge.get_fact(env, fact_id)
+                if node.get("fact_id") and \
+                        fact_id != node["fact_id"]:
+                    continue
+                if node.get("fact_kind") and \
+                        fact.get("kind") != node["fact_kind"]:
+                    continue
+                if not knowledge.knows(
+                        env, observer_id, fact_id,
+                        confidence_at_least=node.get("confidence", 0.0)):
+                    continue
+                return True
+            return False
+        target_id = (bindings or {}).get(node.get("role"))
+        if target_id is None:
+            return False
+        scope = node.get("scope", "global")
+        return knowledge.reputation_as_known(
+            env, target_id, scope, observer_id) >= node.get("value", 0)
+
+    # B's published policy predicates (frozen names, evaluator.py)
+    if kind in ("tenet_stance", "faith_id", "jurisdiction_id",
+                "attraction_band", "openness_band", "monogamy_band"):
+        from src.game.features.family_graph.service_view import \
+            ServicePolicyView
+        from src.game.features.relationship_policy import evaluator as \
+            policy_eval
+        policy = ServicePolicyView(env)
+        if kind == "jurisdiction_id":
+            current = policy_eval.predicate_jurisdiction_id(policy)
+            want = node.get("value", node.get("values"))
+            return current in want if isinstance(want, list) \
+                else current == want
+        target_id = pid if node.get("role", "actor") == "actor" else \
+            (bindings or {}).get(node.get("role"))
+        if target_id is None:
+            return False
+        profile = policy.profile(target_id)
+        if kind == "tenet_stance":
+            stance = policy_eval.predicate_tenet_stance(
+                policy.catalog, policy.overrides,
+                profile.get("faith_id"), node.get("tenet_id"),
+                profile.get("overrides") or None)
+            want = node.get("stance", node.get("value"))
+            return stance in want if isinstance(want, list) \
+                else stance == want
+        if kind == "faith_id":
+            current = policy_eval.predicate_faith_id(profile)
+            want = node.get("value", node.get("values"))
+            return current in want if isinstance(want, list) \
+                else current == want
+        band_fn = {"attraction_band": policy_eval.predicate_attraction_band,
+                   "openness_band": policy_eval.predicate_openness_band,
+                   "monogamy_band":
+                       policy_eval.predicate_monogamy_band}[kind]
+        current = band_fn(profile)
+        want = node.get("band", node.get("value"))
+        return current in want if isinstance(want, list) \
+            else current == want
+
+    raise EventValidationError(
+        f"unknown v3 condition kind {kind!r}")
+
+
+def evaluate_v3_conditions(conditions, context, bindings=None, actor_id=None):
+    """Evaluate one v3 condition tree (frozen event-schema-v3.md §2).
+    Scalar bounds (min_age/max_age) compose with all/any/not trees of the
+    frozen policy/graph/knowledge leaves. Used by the single dispatch
+    path (sample_v3) and available for resolve-time validity checks."""
+    conditions = conditions or {}
+    bindings = bindings or {}
+    people = _v3_people(context)
+    pid = actor_id or bindings.get("actor") or _v3_person_id(context)
+    person = people.get(pid)
+    age = getattr(person, "age", 0)
+    if not (conditions.get("min_age", 0) <= age <=
+            conditions.get("max_age", 200)):
+        return False
+    tree = {k: v for k, v in conditions.items() if k not in (
+        "min_age", "max_age", "once_per_lifetime", "requires", "chance_n")}
+    if not tree:
+        return True
+    return _v3_node(tree, context, bindings, people, pid)
+
+
+def v3_bindable(ev, actor_id, context):
+    """Probe every required role once against THIS envelope (read-only).
+    Returns the bindings dict, or None when a required role cannot bind.
+    The returned ids can prebind instantiate3 so the pending names the
+    same people the selector validated — never a resolve-time re-pick."""
+    roles, _ = _v3_role_names(ev)
+    bindings = {}
+    for name, cfg in roles.items():
+        select = cfg.get("select", "player" if name == "actor" else None)
+        if select == "player":
+            bound = actor_id
+        else:
+            fn = PREDICATES.get(cfg.get("predicate"))
+            if fn is None:
+                return None
+            bound = fn(actor_id, context)
+            if bound is None and not cfg.get("optional"):
+                return None
+        bindings[name] = bound
+    return bindings
+
+
 class _NullContext:
     """Minimal context for standalone loader use (tests)."""
     def alive_role(self, role):
@@ -1090,6 +1359,16 @@ class GameContext:
         self._env = env
         self._service = service
         self._player = env["player"]
+
+    @property
+    def people_by_id(self):
+        by_id = {}
+        for person in self._service._walk_people(self._player):
+            by_id[person.person_id] = person
+        for person in self._env.get("archive", []):
+            if person.person_id not in by_id:
+                by_id[person.person_id] = person
+        return by_id
 
     def alive_role(self, role):
         from src.lifesim_lib.lifesim_lib import Gender

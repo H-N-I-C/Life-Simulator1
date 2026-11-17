@@ -93,6 +93,25 @@ the target independently rolls refusal with
 drawn from the passed-in seeded RNG, stored once per offer (C owns offer
 sampling; this formula is the default B provides, freeze may adjust).
 
+## 3a. Acceptance probability (ratified R3 contract, 2026-11-17)
+
+ONE sampled-once draw per offer, stored in `pending.sampled` at offer
+creation, never redrawn on resolve or reload:
+
+```
+accept = (u < p_accept)
+p_accept = clamp(score/100 - (0.4*(1-openness) + 0.2*jealousy)/2,
+                 0.02, 0.98)
+p_refuse = 1 - p_accept          # display only
+```
+
+The refusal traits (openness, jealousy) live INSIDE `p_accept`; they do
+not move the frozen §3 score. The [0.02, 0.98] clamp makes refusal
+always possible and acceptance never impossible for an eligible adult
+pair — soft modifiers are never bans. Hard validity (18+, alive, not
+self, §2) is checked separately and is not a probability. Supersedes
+the §3 refusal-formula paragraph below, which is kept for history.
+
 ## 4. Reason disclosure
 
 Every score returns `reasons: [{code, contribution}]` for the
@@ -109,7 +128,8 @@ raw internals.
   "hard": {"ok": true, "code": null},
   "score": 0,                    // int 0..100, present only if hard.ok
   "reasons": [{"code": "law_risk", "contribution": -15, "label_key": "reason.law_risk"}],
-  "refusal": {"possible": true, "p_refuse": 0.23},
+  "acceptance": {"possible": true, "p_accept": 0.43}, // ratified R3
+  "refusal": {"possible": true, "p_refuse": 0.57},    // = 1 - p_accept
   "projected_recognition": {     // for union proposals only (A's shape)
     "status": "recognized | civil_only | unrecognized | forbidden",
     "jurisdiction_id": "jur_riverlands",
@@ -143,6 +163,6 @@ All read-only, all return typed errors on unknown ids.
 
 - **A**: confirm union recognition sub-shape and `editor_audit` save
   field; confirm exact frozen M2 ledger category name for legal fines.
-- **C**: confirm interaction_kind set and that C's offer sampling uses
-  `p_refuse` from this result (or proposes a different split).
+- **C**: interaction_kind set confirmed; C consumes `acceptance.p_accept`
+  per the ratified §3a contract (one sampled-once draw per offer).
 - Freeze: aggregation bounds and refusal formula above are the proposal.

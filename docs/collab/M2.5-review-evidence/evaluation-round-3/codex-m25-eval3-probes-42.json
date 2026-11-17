@@ -1,0 +1,80 @@
+{
+  "pregnancy_resolve_17_18": {
+    "accepted": false,
+    "error": "not_adult"
+  },
+  "pregnancy_resolve_18_17": {
+    "accepted": false,
+    "error": "not_adult"
+  },
+  "pregnancy_resolve_18_18": {
+    "accepted": true,
+    "pregnant": true
+  },
+  "ordinary_pregnancy": {
+    "pregnant": true,
+    "conception_outcomes": {
+      "legacy:ef457c4a-c798-4ec4-b7e4-b506ef069299:3816d803-6f96-4c04-bd1d-32be43712320#0": {
+        "coefficient_band": "0",
+        "roll": 0.9193757629725052,
+        "adjustment": "none",
+        "bio_mother_id": "ef457c4a-c798-4ec4-b7e4-b506ef069299",
+        "bio_father_id": "3816d803-6f96-4c04-bd1d-32be43712320"
+      }
+    }
+  },
+  "child_specific_consumption": {
+    "requested_child": "future-B",
+    "returned": {
+      "coefficient_band": "0",
+      "roll": 0.7273049382709591,
+      "adjustment": "none",
+      "bio_mother_id": "3816d803-6f96-4c04-bd1d-32be43712320",
+      "bio_father_id": "ef457c4a-c798-4ec4-b7e4-b506ef069299",
+      "consumed": true,
+      "consumed_child_id": "future-B"
+    },
+    "stored": {
+      "legacy:ef457c4a-c798-4ec4-b7e4-b506ef069299:3816d803-6f96-4c04-bd1d-32be43712320#0": {
+        "coefficient_band": "0",
+        "roll": 0.9193757629725052,
+        "adjustment": "none",
+        "bio_mother_id": "ef457c4a-c798-4ec4-b7e4-b506ef069299",
+        "bio_father_id": "3816d803-6f96-4c04-bd1d-32be43712320"
+      },
+      "future-A:record-A": {
+        "coefficient_band": "0",
+        "roll": 0.8830725558214114,
+        "adjustment": "none",
+        "bio_mother_id": "3816d803-6f96-4c04-bd1d-32be43712320",
+        "bio_father_id": "ef457c4a-c798-4ec4-b7e4-b506ef069299"
+      },
+      "future-B:record-B": {
+        "coefficient_band": "0",
+        "roll": 0.7273049382709591,
+        "adjustment": "none",
+        "bio_mother_id": "3816d803-6f96-4c04-bd1d-32be43712320",
+        "bio_father_id": "ef457c4a-c798-4ec4-b7e4-b506ef069299",
+        "consumed": true,
+        "consumed_child_id": "future-B"
+      }
+    }
+  },
+  "same_child_second_consumption": {
+    "coefficient_band": "0",
+    "roll": 0.9193757629725052,
+    "adjustment": "none",
+    "bio_mother_id": "ef457c4a-c798-4ec4-b7e4-b506ef069299",
+    "bio_father_id": "3816d803-6f96-4c04-bd1d-32be43712320",
+    "consumed": true,
+    "consumed_child_id": "future-B"
+  },
+  "drama_false_condition": {
+    "age": 30,
+    "pending_event": "rom_flirt_grocery"
+  },
+  "parenting_false_condition": {
+    "age": 30,
+    "pending_event": "dra_gossip_spread"
+  }
+}

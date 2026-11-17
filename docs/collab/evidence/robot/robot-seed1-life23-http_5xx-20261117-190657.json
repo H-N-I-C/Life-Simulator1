@@ -1,0 +1,40 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 23,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Arie",
+    "last_name": "Golden",
+    "gender": "male",
+    "country": "France",
+    "seed": 797089582,
+    "request_id": "robot-1-23-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 852959140,
+     "base": "woman",
+     "skin_tone": "dark",
+     "hair": "red",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "flower",
+      "glasses"
+     ],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 24 --seed 1 --from-life 23 --fail-fast"
+}

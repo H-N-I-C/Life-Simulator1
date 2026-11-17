@@ -1,0 +1,41 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 18,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"scenario setup failed: university application was not accepted with this seed (smarts gate); try another seed\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Andreas",
+    "last_name": "Bowman",
+    "gender": "male",
+    "country": "Spain",
+    "seed": 1026668708,
+    "request_id": "robot-7-18-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1939658351,
+     "base": "person",
+     "skin_tone": "dark",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses",
+      "earrings"
+     ],
+     "background": "bg_08",
+     "look_override": "none"
+    },
+    "scenario": "university_pending_17"
+   }
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 19 --seed 7 --from-life 18 --fail-fast"
+}

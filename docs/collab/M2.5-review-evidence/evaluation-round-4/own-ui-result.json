@@ -1,0 +1,591 @@
+{
+  "initial_family": {
+    "parents": [
+      "fb04c96a-5f84-4a37-ab2e-322644627a7c",
+      "bf03659b-2fee-444c-8706-409e5fd6cdd4"
+    ],
+    "partner": "743833e8-6926-4baf-b5c9-49e797bb6d54",
+    "partner_status": 2,
+    "children": [
+      "a1fc4423-ce39-4e99-b410-86a672b6c3d8"
+    ],
+    "siblings": []
+  },
+  "initial_unions": [
+    {
+      "union_id": "uni-3648e38cc098",
+      "person_ids": [
+        "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "743833e8-6926-4baf-b5c9-49e797bb6d54"
+      ],
+      "kind": "marriage",
+      "status": "active",
+      "recognition": {
+        "status": "recognized",
+        "jurisdiction_id": "jur-neutral-default",
+        "law_version": 1,
+        "basis": "registration"
+      },
+      "ceremony": {
+        "held": false,
+        "turn": null,
+        "venue_id": null
+      },
+      "prenup": null,
+      "exclusivity": {
+        "agreement": "exclusive"
+      },
+      "start_turn": 0,
+      "end_turn": null,
+      "policy_revision": 0
+    }
+  ],
+  "after_divorce": {
+    "parents": [
+      "fb04c96a-5f84-4a37-ab2e-322644627a7c",
+      "bf03659b-2fee-444c-8706-409e5fd6cdd4"
+    ],
+    "partner": "743833e8-6926-4baf-b5c9-49e797bb6d54",
+    "partner_status": 0,
+    "children": [
+      "a1fc4423-ce39-4e99-b410-86a672b6c3d8"
+    ],
+    "siblings": []
+  },
+  "Ask out": {
+    "sampled": {
+      "accepted": true,
+      "p_accept": 0.46,
+      "score": 60
+    },
+    "target": "743833e8-6926-4baf-b5c9-49e797bb6d54"
+  },
+  "Propose a union": {
+    "sampled": {
+      "accepted": true,
+      "p_accept": 0.46,
+      "score": 60
+    },
+    "target": "743833e8-6926-4baf-b5c9-49e797bb6d54"
+  },
+  "final": {
+    "family": {
+      "parents": [
+        "fb04c96a-5f84-4a37-ab2e-322644627a7c",
+        "bf03659b-2fee-444c-8706-409e5fd6cdd4"
+      ],
+      "partner": "743833e8-6926-4baf-b5c9-49e797bb6d54",
+      "partner_status": 2,
+      "children": [
+        "a1fc4423-ce39-4e99-b410-86a672b6c3d8"
+      ],
+      "siblings": []
+    },
+    "unions": [
+      {
+        "union_id": "uni-3648e38cc098",
+        "person_ids": [
+          "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+          "743833e8-6926-4baf-b5c9-49e797bb6d54"
+        ],
+        "kind": "marriage",
+        "status": "divorced",
+        "recognition": {
+          "status": "recognized",
+          "jurisdiction_id": "jur-neutral-default",
+          "law_version": 1,
+          "basis": "registration"
+        },
+        "ceremony": {
+          "held": false,
+          "turn": null,
+          "venue_id": null
+        },
+        "prenup": null,
+        "exclusivity": {
+          "agreement": "exclusive"
+        },
+        "start_turn": 0,
+        "end_turn": 94,
+        "policy_revision": 0
+      },
+      {
+        "union_id": "uni-a31c1039031e",
+        "person_ids": [
+          "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+          "743833e8-6926-4baf-b5c9-49e797bb6d54"
+        ],
+        "kind": "marriage",
+        "status": "active",
+        "recognition": {
+          "status": "recognized",
+          "jurisdiction_id": "jur_metropolis_charter",
+          "law_version": 0,
+          "basis": "ceremony"
+        },
+        "ceremony": {
+          "held": true,
+          "turn": 99,
+          "age": 30,
+          "venue_id": "courthouse",
+          "guests": 20,
+          "outfit_id": "hand_me_down",
+          "honeymoon_id": "none"
+        },
+        "prenup": null,
+        "exclusivity": {
+          "agreement": "exclusive"
+        },
+        "start_turn": 98,
+        "end_turn": null,
+        "policy_revision": 0
+      }
+    ],
+    "ledger": [
+      {
+        "id": "le_1",
+        "source_key": "t_000033:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:gross",
+        "turn_id": "t_000033",
+        "age": 19,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "income",
+        "amount": 143181,
+        "balance_after": 143181,
+        "description": "Annual gross pay"
+      },
+      {
+        "id": "le_2",
+        "source_key": "t_000033:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:tax",
+        "turn_id": "t_000033",
+        "age": 19,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "tax",
+        "amount": -28384,
+        "balance_after": 114797,
+        "description": "Income tax"
+      },
+      {
+        "id": "le_3",
+        "source_key": "t_000033:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:expenses",
+        "turn_id": "t_000033",
+        "age": 19,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "expenses",
+        "amount": -24388,
+        "balance_after": 90409,
+        "description": "Living expenses"
+      },
+      {
+        "id": "le_4",
+        "source_key": "t_000048:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:gross",
+        "turn_id": "t_000048",
+        "age": 20,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "income",
+        "amount": 143181,
+        "balance_after": 233590,
+        "description": "Annual gross pay"
+      },
+      {
+        "id": "le_5",
+        "source_key": "t_000048:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:tax",
+        "turn_id": "t_000048",
+        "age": 20,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "tax",
+        "amount": -28384,
+        "balance_after": 205206,
+        "description": "Income tax"
+      },
+      {
+        "id": "le_6",
+        "source_key": "t_000048:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:expenses",
+        "turn_id": "t_000048",
+        "age": 20,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "expenses",
+        "amount": -57102,
+        "balance_after": 148104,
+        "description": "Living expenses"
+      },
+      {
+        "id": "le_7",
+        "source_key": "t_000055:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:gross",
+        "turn_id": "t_000055",
+        "age": 21,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "income",
+        "amount": 143181,
+        "balance_after": 291285,
+        "description": "Annual gross pay"
+      },
+      {
+        "id": "le_8",
+        "source_key": "t_000055:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:tax",
+        "turn_id": "t_000055",
+        "age": 21,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "tax",
+        "amount": -28384,
+        "balance_after": 262901,
+        "description": "Income tax"
+      },
+      {
+        "id": "le_9",
+        "source_key": "t_000055:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:expenses",
+        "turn_id": "t_000055",
+        "age": 21,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "expenses",
+        "amount": -50700,
+        "balance_after": 212201,
+        "description": "Living expenses"
+      },
+      {
+        "id": "le_10",
+        "source_key": "t_000064:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:gross",
+        "turn_id": "t_000064",
+        "age": 22,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "income",
+        "amount": 143181,
+        "balance_after": 355382,
+        "description": "Annual gross pay"
+      },
+      {
+        "id": "le_11",
+        "source_key": "t_000064:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:tax",
+        "turn_id": "t_000064",
+        "age": 22,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "tax",
+        "amount": -28384,
+        "balance_after": 326998,
+        "description": "Income tax"
+      },
+      {
+        "id": "le_12",
+        "source_key": "t_000064:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:expenses",
+        "turn_id": "t_000064",
+        "age": 22,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "expenses",
+        "amount": -67116,
+        "balance_after": 259882,
+        "description": "Living expenses"
+      },
+      {
+        "id": "le_13",
+        "source_key": "t_000070:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:gross",
+        "turn_id": "t_000070",
+        "age": 23,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "income",
+        "amount": 143181,
+        "balance_after": 403063,
+        "description": "Annual gross pay"
+      },
+      {
+        "id": "le_14",
+        "source_key": "t_000070:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:tax",
+        "turn_id": "t_000070",
+        "age": 23,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "tax",
+        "amount": -28384,
+        "balance_after": 374679,
+        "description": "Income tax"
+      },
+      {
+        "id": "le_15",
+        "source_key": "t_000070:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:expenses",
+        "turn_id": "t_000070",
+        "age": 23,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "expenses",
+        "amount": -32266,
+        "balance_after": 342413,
+        "description": "Living expenses"
+      },
+      {
+        "id": "le_16",
+        "source_key": "t_000076:relationships:wedding#drv-dec-79-venue:drive-thru wedding chapel:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:cost",
+        "turn_id": "t_000076",
+        "age": 23,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "wedding",
+        "amount": -255,
+        "balance_after": 342158,
+        "description": "Married at a drive-thru wedding chapel"
+      },
+      {
+        "id": "le_17",
+        "source_key": "t_000076:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:gross",
+        "turn_id": "t_000076",
+        "age": 24,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "income",
+        "amount": 143181,
+        "balance_after": 485339,
+        "description": "Annual gross pay"
+      },
+      {
+        "id": "le_18",
+        "source_key": "t_000076:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:tax",
+        "turn_id": "t_000076",
+        "age": 24,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "tax",
+        "amount": -28384,
+        "balance_after": 456955,
+        "description": "Income tax"
+      },
+      {
+        "id": "le_19",
+        "source_key": "t_000076:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:expenses",
+        "turn_id": "t_000076",
+        "age": 24,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "expenses",
+        "amount": -63858,
+        "balance_after": 393097,
+        "description": "Living expenses"
+      },
+      {
+        "id": "le_20",
+        "source_key": "t_000084:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:gross",
+        "turn_id": "t_000084",
+        "age": 25,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "income",
+        "amount": 143181,
+        "balance_after": 536278,
+        "description": "Annual gross pay"
+      },
+      {
+        "id": "le_21",
+        "source_key": "t_000084:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:tax",
+        "turn_id": "t_000084",
+        "age": 25,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "tax",
+        "amount": -28384,
+        "balance_after": 507894,
+        "description": "Income tax"
+      },
+      {
+        "id": "le_22",
+        "source_key": "t_000084:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:expenses",
+        "turn_id": "t_000084",
+        "age": 25,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "expenses",
+        "amount": -62524,
+        "balance_after": 445370,
+        "description": "Living expenses"
+      },
+      {
+        "id": "le_23",
+        "source_key": "t_000086:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:gross",
+        "turn_id": "t_000086",
+        "age": 26,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "income",
+        "amount": 143181,
+        "balance_after": 588551,
+        "description": "Annual gross pay"
+      },
+      {
+        "id": "le_24",
+        "source_key": "t_000086:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:tax",
+        "turn_id": "t_000086",
+        "age": 26,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "tax",
+        "amount": -28384,
+        "balance_after": 560167,
+        "description": "Income tax"
+      },
+      {
+        "id": "le_25",
+        "source_key": "t_000086:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:expenses",
+        "turn_id": "t_000086",
+        "age": 26,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "expenses",
+        "amount": -38088,
+        "balance_after": 522079,
+        "description": "Living expenses"
+      },
+      {
+        "id": "le_26",
+        "source_key": "t_000088:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:gross",
+        "turn_id": "t_000088",
+        "age": 27,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "income",
+        "amount": 143181,
+        "balance_after": 665260,
+        "description": "Annual gross pay"
+      },
+      {
+        "id": "le_27",
+        "source_key": "t_000088:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:tax",
+        "turn_id": "t_000088",
+        "age": 27,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "tax",
+        "amount": -28384,
+        "balance_after": 636876,
+        "description": "Income tax"
+      },
+      {
+        "id": "le_28",
+        "source_key": "t_000088:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:expenses",
+        "turn_id": "t_000088",
+        "age": 27,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "expenses",
+        "amount": -37399,
+        "balance_after": 599477,
+        "description": "Living expenses"
+      },
+      {
+        "id": "le_29",
+        "source_key": "t_000088:decision_offer:flavor_anniversary_forgot:d_31_improvise#drv-dec-88-d_31_improvise:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:main",
+        "turn_id": "t_000088",
+        "age": 27,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "other",
+        "amount": -80,
+        "balance_after": 599397,
+        "description": "The Calendar Betrayal: Improvise a legendary evening"
+      },
+      {
+        "id": "le_30",
+        "source_key": "t_000091:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:gross",
+        "turn_id": "t_000091",
+        "age": 28,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "income",
+        "amount": 143181,
+        "balance_after": 742578,
+        "description": "Annual gross pay"
+      },
+      {
+        "id": "le_31",
+        "source_key": "t_000091:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:tax",
+        "turn_id": "t_000091",
+        "age": 28,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "tax",
+        "amount": -28384,
+        "balance_after": 714194,
+        "description": "Income tax"
+      },
+      {
+        "id": "le_32",
+        "source_key": "t_000091:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:expenses",
+        "turn_id": "t_000091",
+        "age": 28,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "expenses",
+        "amount": -32360,
+        "balance_after": 681834,
+        "description": "Living expenses"
+      },
+      {
+        "id": "le_33",
+        "source_key": "t_000092:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:gross",
+        "turn_id": "t_000092",
+        "age": 29,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "income",
+        "amount": 143181,
+        "balance_after": 825015,
+        "description": "Annual gross pay"
+      },
+      {
+        "id": "le_34",
+        "source_key": "t_000092:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:tax",
+        "turn_id": "t_000092",
+        "age": 29,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "tax",
+        "amount": -28384,
+        "balance_after": 796631,
+        "description": "Income tax"
+      },
+      {
+        "id": "le_35",
+        "source_key": "t_000092:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:expenses",
+        "turn_id": "t_000092",
+        "age": 29,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "expenses",
+        "amount": -44953,
+        "balance_after": 751678,
+        "description": "Living expenses"
+      },
+      {
+        "id": "le_36",
+        "source_key": "t_000094:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:gross",
+        "turn_id": "t_000094",
+        "age": 30,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "income",
+        "amount": 143181,
+        "balance_after": 894859,
+        "description": "Annual gross pay"
+      },
+      {
+        "id": "le_37",
+        "source_key": "t_000094:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:tax",
+        "turn_id": "t_000094",
+        "age": 30,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "tax",
+        "amount": -28384,
+        "balance_after": 866475,
+        "description": "Income tax"
+      },
+      {
+        "id": "le_38",
+        "source_key": "t_000094:work_income:salary:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:expenses",
+        "turn_id": "t_000094",
+        "age": 30,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "expenses",
+        "amount": -42898,
+        "balance_after": 823577,
+        "description": "Living expenses"
+      },
+      {
+        "id": "le_39",
+        "source_key": "t_000095:weddings:divorce:uni-3648e38cc098:support:a1fc4423-ce39-4e99-b410-86a672b6c3d8:3b532fe7-3d51-40a2-8fc5-dba80cc2fb94:paid",
+        "turn_id": "t_000095",
+        "age": 30,
+        "person_id": "3b532fe7-3d51-40a2-8fc5-dba80cc2fb94",
+        "category": "child_net",
+        "amount": -2000,
+        "balance_after": 821577,
+        "description": "Child support (a1fc4423-ce39-4e99-b410-86a672b6c3d8)",
+        "group_id": "divorce:uni-3648e38cc098"
+      },
+      {
+        "id": "le_40",
+        "source_key": "t_000095:weddings:divorce:uni-3648e38cc098:support:a1fc4423-ce39-4e99-b410-86a672b6c3d8:a1fc4423-ce39-4e99-b410-86a672b6c3d8:received",
+        "turn_id": "t_000095",
+        "age": 30,
+        "person_id": "a1fc4423-ce39-4e99-b410-86a672b6c3d8",
+        "category": "child_net",
+        "amount": 2000,
+        "balance_after": 2000,
+        "description": "Child support (a1fc4423-ce39-4e99-b410-86a672b6c3d8)",
+        "group_id": "divorce:uni-3648e38cc098"
+      }
+    ],
+    "overflow": false,
+    "text": "Armond Kemp\nArmond Kemp\nmarriage \u00b7 recognized \u00b7 married\nRenew the vows\nBackyard (free)\nDinner ($400)\nExtravaganza ($4,000)\nPart ways\n\nNo prenup \u2014 no settlement.\n\nChild support for 1 shared child: $2,000 (pays $2,000 now)\n\nRecognition never blocks a parting. Other unions and the children's parentage are untouched.\n\nRobin Kemp\nDivorce Armond Kemp"
+  }
+}

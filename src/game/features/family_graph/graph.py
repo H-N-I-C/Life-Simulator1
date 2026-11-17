@@ -117,6 +117,16 @@ def normalize_envelope(env):
     if not validate_graph(env.get("graph")):
         env["graph"] = new_graph()
         dirty = True
+    else:
+        # unions minted before the exclusivity agreement field default to
+        # the ordinary exclusive promise (an open/plural union is a
+        # deliberate, recorded choice — never a silent default)
+        for union in env["graph"]["unions"]:
+            if not isinstance(union.get("exclusivity"), dict) \
+                    or union["exclusivity"].get("agreement") not in (
+                        "exclusive", "open", "negotiated"):
+                union["exclusivity"] = {"agreement": "exclusive"}
+                dirty = True
     if not isinstance(env.get("editor_audit"), list):
         env["editor_audit"] = []
         dirty = True
@@ -268,12 +278,15 @@ def end_relationship(graph, relationship_id, turn):
 
 
 def form_union(graph, person_a, person_b, kind, recognition, turn,
-               prenup=None, ceremony=None, policy_revision=0):
+               prenup=None, ceremony=None, policy_revision=0,
+               exclusivity="exclusive"):
     """Form one pairwise union. Forbidden/unrecognized unions still form
     (attemptable); recognition is a label, never a gate. Adult guard."""
     assert_adult_romantic(person_a, person_b)
     if kind not in UNION_KINDS:
         _err("invalid_input", "unknown union kind")
+    if exclusivity not in ("exclusive", "open", "negotiated"):
+        _err("invalid_input", "unknown exclusivity agreement")
     a, b = _check_pair(person_a, person_b)
     if _active_union_between(graph, a, b):
         _conflict("graph_error", "an active union already exists between "
@@ -308,6 +321,7 @@ def form_union(graph, person_a, person_b, kind, recognition, turn,
         "ceremony": ceremony or {"held": False, "turn": None,
                                  "venue_id": None},
         "prenup": prenup,
+        "exclusivity": {"agreement": exclusivity},
         "start_turn": turn,
         "end_turn": None,
         # stamped at creation (B's policy_revision); additive to the
@@ -351,9 +365,15 @@ def add_parentage(graph, child, parent, role, source, confidence="certain",
     if role == "biological":
         if _would_create_cycle(graph, child_id, parent_id):
             _err("graph_error", "biological ancestry must be acyclic")
-        if turn is not None:
-            # chronology: a biological parent must be older than the child
-            pass
+        # chronology: a biological parent must be strictly older than the
+        # child (checked whenever both ages are known; missing ages are
+        # validated later, never invented)
+        child_age = getattr(child, "age", None)
+        parent_age = getattr(parent, "age", None)
+        if child_age is not None and parent_age is not None \
+                and parent_age <= child_age:
+            _err("graph_error",
+                 "a biological parent must be older than the child")
     edge = {"child_id": child_id, "parent_id": parent_id, "role": role,
             "source": source, "confidence": confidence}
     graph["parentage"].append(edge)
@@ -406,6 +426,7 @@ def record_offer(graph, initiator, target, interaction_kind, turn,
     if romantic or interaction_kind != "parenting_request":
         assert_adult_romantic(initiator, target)
     a, b = _check_pair(initiator, target)
+    offers = graph.setdefault("offers", [])
     offer = {
         "offer_id": _new_id("off"),
         "initiator_id": a,
@@ -422,7 +443,7 @@ def record_offer(graph, initiator, target, interaction_kind, turn,
         "status": "pending",
         "attempt": {"count": 1, "cooldown_until_turn": 0},
     }
-    graph["offers"].append(offer)
+    offers.append(offer)
     return offer["offer_id"]
 
 
@@ -724,11 +745,14 @@ def graph_tree(graph, focus_id, persons_by_id, max_generations=3,
             "nodes": list(nodes.values()), "edges": edges}
 
 
-def sample_conception(graph, bio_mother_id, bio_father_id, rng):
+def sample_conception(graph, bio_mother_id, bio_father_id, rng,
+                      persons_by_id=None):
     """Bounded FICTIONAL child-health adjustment, rolled ONCE per
     conception and persisted by the caller in conception_outcomes.
-    rng is the caller's seeded RNG. No draw for adoption."""
-    rel = graph_relatedness(graph, bio_mother_id, bio_father_id)
+    rng is the caller's seeded RNG. No draw for adoption. Honors the
+    explicit lineage:'unknown' marker when persons_by_id is passed."""
+    rel = graph_relatedness(graph, bio_mother_id, bio_father_id,
+                            persons_by_id=persons_by_id)
     band = rel["coefficient_band"]
     # fictional bands: higher relatedness -> higher (still small and
     # abstract) health-adjustment chance; calibration frozen with Claude.
@@ -746,78 +770,167 @@ def sample_conception(graph, bio_mother_id, bio_father_id, rng):
 
 # -------------------------------------------------------------- migration
 
-def migrate_v2(env):
-    """Migrate an M2 single-partner save into the M2.5 graph: exactly one
-    union edge from the old partner, biological parentage from RECORDED
-    child mother/father (never inferred from the current partner), archive
-    ex-partners as ended relationship edges, primary_relationship_id as a
-    presentation projection. No invented affairs/spouses/history; person
-    ids, cash, archives and pending stay untouched. Returns a fresh graph;
-    on any data oddity returns a neutral empty graph (loading must never
-    break)."""
-    graph = new_graph()
+# Bump when the legacy->graph mapping changes; the marker makes migration
+# run exactly once per save (never retriggered by "no union edges", which
+# is also true after a divorce).
+MIGRATION_VERSION = 2
+
+
+def _partner_married(partner):
+    """Faithful legacy mapping: raw Partner.status is 0 dating / 1 engaged /
+    2 married (Player.marital_status = raw + 1). Tolerate string statuses
+    from record-style fixtures. Only a genuinely married partner migrates
+    to a union edge; dating/engaged migrate to a relationship only."""
     try:
-        player = env["player"]
-        partner = getattr(player, "partner", None)
-        if partner is not None and getattr(partner, "person_id", None) \
-                and getattr(partner, "age", 0) >= ADULT_AGE \
-                and getattr(player, "age", 0) >= ADULT_AGE:
-            score = int(getattr(partner, "relationship", 50) or 50)
-            rel_id = start_relationship(
-                graph, player, partner, "committed",
-                {"satisfaction": score, "trust": score, "chemistry": 50},
-                turn=0)
-            graph["primary_relationship_id"] = rel_id
-            # legacy marital data is inconsistent (player.marital_status is
-            # a derived property); read the partner's raw status and never
-            # let marriage-kind detection break migration
-            try:
-                status = getattr(partner, "status", None)
-                married = status == 1 or status == "married"
-            except Exception:
-                married = False
-            form_union(
-                graph, player, partner,
-                "marriage" if married else "civil_partnership",
-                {"status": "recognized",
-                 "jurisdiction_id": "jur-neutral-default",
-                 "law_version": 1, "basis": "registration"},
-                turn=0)
-        # recorded biological parentage only
-        for child in list(getattr(player, "children", []) or []):
-            child_id = getattr(child, "person_id", None)
-            if not child_id:
-                continue
-            for parent_attr in ("mother", "father"):
-                parent = getattr(child, parent_attr, None)
-                if parent is None:
-                    continue
-                parent_id = getattr(parent, "person_id", None)
-                if not parent_id:
-                    continue
-                who = parent if hasattr(parent, "age") else \
-                    _Record(parent_id)
-                cid = child if hasattr(child, "age") else _Record(child_id)
-                if any(e["child_id"] == child_id
-                       and e["parent_id"] == parent_id
-                       and e["role"] == "biological"
-                       for e in graph["parentage"]):
-                    continue
-                add_parentage(graph, cid, who, "biological", "birth")
-        # archive: ex partners / deceased relatives become ended edges
-        for person in list(env.get("archive", []) or []):
-            pid = getattr(person, "person_id", None)
-            if not pid or pid == getattr(player, "person_id", None):
-                continue
-            if getattr(person, "age", 0) >= ADULT_AGE and \
-                    getattr(player, "age", 0) >= ADULT_AGE:
-                rid = start_relationship(
-                    graph, player, person, "committed",
-                    {"satisfaction": 0, "trust": 0, "chemistry": 0},
-                    turn=0)
-                update_relationship(graph, rid, {"end": True}, turn=0)
+        status = getattr(partner, "status", None)
     except Exception:
-        return new_graph()
+        status = None
+    if isinstance(status, str):
+        s = status.strip().lower()
+        if s in ("married", "husband", "wife"):
+            return True
+        if s in ("engaged", "fiance", "fiancee", "fiancé", "fiancée",
+                 "dating"):
+            return False
+    if status == 2:
+        return True
+    derived = getattr(partner, "marital_status", None)
+    return derived in (3, "married")
+
+
+def _partner_engaged(partner):
+    try:
+        status = getattr(partner, "status", None)
+    except Exception:
+        status = None
+    if isinstance(status, str):
+        return status.strip().lower() in ("engaged", "fiance", "fiancee",
+                                          "fiancé", "fiancée")
+    if status == 1:
+        return True
+    return getattr(partner, "marital_status", None) in (2, "engaged")
+
+
+def _is_archive_ex_partner(person):
+    """An archive is a list of DEAD/ARCHIVED PEOPLE, not an ex-partner
+    list: deceased relatives (parents, siblings, children) live there too
+    and must never become romantic ex edges. Only genuine ex-partners
+    (Partner instances or records explicitly marked ex_partner) qualify."""
+    if type(person).__name__ == "Partner":
+        return True
+    if getattr(person, "is_ex_partner", False):
+        return True
+    try:
+        return getattr(person, "status", None) == "ex_partner"
+    except Exception:
+        return False
+
+
+def _pair_edge_exists(edges, a_id, b_id):
+    pair = {a_id, b_id}
+    return any(set(e.get("person_ids", [])) == pair for e in edges)
+
+
+def migrate_v2(env):
+    """Migrate an M2 single-partner save into the M2.5 graph. Idempotent
+    (migration_version marker + per-edge dedupe), merging INTO the existing
+    graph so partial history is never discarded:
+
+    - the old partner migrates to exactly one union edge ONLY when the
+      recorded legacy status is married (2/'married'); dating (0) becomes
+      a courtship relationship, engaged (1) a committed relationship;
+    - parentage edges come only from RECORDED child mother/father links
+      (never inferred from the current partner); an adopted child's links
+      are adoptive, not biological;
+    - only genuine ex-partners in the archive become ended relationship
+      edges — never parents or other relatives;
+    - person ids, cash, archives and pending stay untouched (old pending
+      targets stay pinned to their stored person/edge).
+
+    On any data oddity the partial graph is kept (loading must never break
+    and history must never be silently reset); the marker is only set on
+    success so a later load can retry safely (all adds are deduped)."""
+    existing = env.get("graph")
+    graph = existing if isinstance(existing, dict) \
+        and isinstance(existing.get("relationships"), list) \
+        and isinstance(existing.get("unions"), list) \
+        and isinstance(existing.get("parentage"), list) else new_graph()
+    try:
+        player = env.get("player")
+        if player is not None:
+            pid = getattr(player, "person_id", None)
+            partner = getattr(player, "partner", None)
+            if pid and partner is not None \
+                    and getattr(partner, "person_id", None) \
+                    and getattr(partner, "age", 0) >= ADULT_AGE \
+                    and getattr(player, "age", 0) >= ADULT_AGE:
+                ppid = partner.person_id
+                score = int(getattr(partner, "relationship", 50) or 50)
+                kind = "committed" \
+                    if (_partner_engaged(partner)
+                        or _partner_married(partner)) else "courtship"
+                if not _pair_edge_exists(graph["relationships"], pid, ppid):
+                    rel_id = start_relationship(
+                        graph, player, partner, kind,
+                        {"satisfaction": score, "trust": score,
+                         "chemistry": 50}, turn=0)
+                    if graph.get("primary_relationship_id") is None:
+                        graph["primary_relationship_id"] = rel_id
+                # exactly one union edge, only for a recorded marriage
+                if _partner_married(partner) \
+                        and _active_union_between(graph, pid, ppid) is None:
+                    form_union(
+                        graph, player, partner, "marriage",
+                        {"status": "recognized",
+                         "jurisdiction_id": "jur-neutral-default",
+                         "law_version": 1, "basis": "registration"},
+                        turn=0)
+            # recorded parentage only; adopted != biological
+            for child in list(getattr(player, "children", []) or []):
+                child_id = getattr(child, "person_id", None)
+                if not child_id:
+                    continue
+                adopted = bool(getattr(child, "adopted", False))
+                role = "adoptive" if adopted else "biological"
+                source = "adoption" if adopted else "birth"
+                for parent_attr in ("mother", "father"):
+                    parent = getattr(child, parent_attr, None)
+                    if parent is None:
+                        continue
+                    parent_id = getattr(parent, "person_id", None)
+                    if not parent_id or parent_id == child_id:
+                        continue
+                    who = parent if hasattr(parent, "age") else \
+                        _Record(parent_id)
+                    cid = child if hasattr(child, "age") else _Record(child_id)
+                    if any(e["child_id"] == child_id
+                           and e["parent_id"] == parent_id
+                           and e["role"] == role
+                           for e in graph["parentage"]):
+                        continue
+                    add_parentage(graph, cid, who, role, source,
+                                  confidence="assumed")
+            # archive: ONLY genuine ex-partners become ended edges
+            for person in list(env.get("archive", []) or []):
+                apid = getattr(person, "person_id", None)
+                if not apid or apid == pid:
+                    continue
+                if not _is_archive_ex_partner(person):
+                    continue
+                if getattr(person, "age", 0) >= ADULT_AGE \
+                        and getattr(player, "age", 0) >= ADULT_AGE \
+                        and not _pair_edge_exists(graph["relationships"],
+                                                  pid, apid):
+                    rid = start_relationship(
+                        graph, player, person, "committed",
+                        {"satisfaction": 0, "trust": 0, "chemistry": 0},
+                        turn=0)
+                    update_relationship(graph, rid, {"end": True}, turn=0)
+        graph["migration_version"] = MIGRATION_VERSION
+    except Exception:
+        # keep the partial graph; leave the marker unset so a later load
+        # retries (every add above is deduped, so a retry is safe)
+        pass
     return graph
 
 

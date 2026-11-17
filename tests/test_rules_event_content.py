@@ -200,5 +200,129 @@ class OracleMatchTest(unittest.TestCase):
         self.assertIn("min_age_sampled", kinds)
 
 
+class RomancePackV3Test(unittest.TestCase):
+    """M2.5 finish C3: the general romance/relationship v3 pack
+    (v3_romance.json) — 30 adult-only events with the fixed-rule
+    interaction metadata, first-person outcomes, a free exit on every
+    event and valid role references, loadable through the real v3
+    loader and reachable via the yearly drama pipeline pool."""
+
+    PACK = os.path.join(CONTENT_DIR, "v3_romance.json")
+    V3_STAT_KEYS = STAT_KEYS
+
+    def setUp(self):
+        self.doc = json.load(open(self.PACK))
+        self.events = self.doc["events"]
+
+    def test_pack_shape_and_count(self):
+        self.assertEqual(self.doc["schema_version"], 3)
+        self.assertEqual(len(self.events), 30)
+        ids = [e["id"] for e in self.events]
+        self.assertEqual(len(set(ids)), len(ids))
+        self.assertTrue(all(i.startswith("rom_") for i in ids))
+
+    def test_adult_only_romantic_interactions(self):
+        for e in self.events:
+            inter = e.get("interaction")
+            self.assertIsNotNone(inter, e["id"])
+            self.assertIn(inter["kind"],
+                          {"flirt", "date", "propose_courtship",
+                           "propose_union", "propose_plural_union",
+                           "convert_request", "repair_attempt"}, e["id"])
+            self.assertIs(inter["romantic"], True, e["id"])
+            self.assertGreaterEqual(e.get("conditions", {}).get(
+                "min_age", 18), 18, e["id"])
+
+    def test_free_exit_and_first_person_outcomes(self):
+        for e in self.events:
+            free = False
+            for c in e["choices"]:
+                cost = (c.get("cost") or {}).get("money", 0)
+                money = c.get("effects", {}).get("money", 0)
+                negative = (isinstance(money, int) and money < 0) or (
+                    isinstance(money, dict)
+                    and money.get("sign") in (-1, "negative"))
+                if cost <= 0 and not negative:
+                    free = True
+                self.assertFalse(
+                    c.get("outcome_text", "").startswith("You "), e["id"])
+            self.assertTrue(free, f"{e['id']}: no free exit")
+
+    def test_text_roles_are_declared_and_audience_tagged(self):
+        import re
+        for e in self.events:
+            person_roles = {n for n, cfg in e["roles"].items()
+                            if cfg.get("kind", "person") == "person"}
+            for token in re.findall(r"\{person:(\w+)\}", e["text"]):
+                self.assertIn(token, person_roles, e["id"])
+            self.assertEqual(e["audience"]["scope"], "player_known", e["id"])
+            for p in e["audience"]["participants"]:
+                self.assertIn(p, person_roles, e["id"])
+
+    def test_loads_and_validates_through_real_loader(self):
+        from src.game import events as event_mod
+        import src.game.features.family_graph.predicates  # noqa: F401
+        loaded = event_mod.load_event_files()
+        mine = {e["id"]: e for e in loaded if e["id"].startswith("rom_")}
+        self.assertEqual(len(mine), 30)
+        for e in mine.values():
+            event_mod.validate_event3(e)
+
+
 if __name__ == "__main__":
     unittest.main()
+
+    def test_reachable_through_v3_pipeline_on_real_service(self):
+        # production route: real GameService env, graph backfilled from
+        # legacy state; every pack event must either bind and instantiate
+        # through instantiate3 (the yearly drama pipeline's exact call)
+        # or be cleanly ineligible — never crash.
+        import random
+        import tempfile
+        from src.game.service import GameService
+        from src.game.events import EventEngine, GameContext
+        from src.people.classes.partner import Partner
+        from src.lifesim_lib.lifesim_lib import Gender
+        from src.game.features.family_graph import core as graph_core
+        tmp = tempfile.TemporaryDirectory(prefix="m25-rom-")
+        self.addCleanup(tmp.cleanup)
+        svc = GameService(tmp.name)
+        state = svc.new_game({"first_name": "Ada", "last_name": "Lee",
+                              "gender": "female", "country": "Australia",
+                              "seed": 4242}, "create")
+        gid = state["game_id"]
+        env = svc._load(gid)
+        player = env["player"]
+        player.age = 30
+        player.money = 5000
+        partner = Partner(29, Gender.Male, 60, 60, 100, 0)
+        player.partner = partner
+        player.relations.append(partner)
+        stranger = Partner(31, Gender.Female, 60, 60, 100, 0)
+        player.relations.append(stranger)
+        svc._ensure_ids(env)
+        graph_core.backfill_all(env, svc)
+        context = GameContext(env, svc)
+        rng = random.Random(3)
+        bound = 0
+        for ev in self.events:
+            roles = ev.get("roles") or {}
+            ok = True
+            for name, cfg in roles.items():
+                if cfg.get("select", "player" if name == "actor" else None) \
+                        == "player":
+                    continue
+                from src.game import events as event_mod
+                if event_mod.PREDICATES[cfg["predicate"]](
+                        player.person_id, context) is None \
+                        and not cfg.get("optional"):
+                    ok = False
+            if not ok:
+                continue
+            pending = EventEngine.instantiate3(ev, 0, rng, context)
+            self.assertEqual(pending["schema_dialect"], "v3", ev["id"])
+            self.assertTrue(pending["options"], ev["id"])
+            bound += 1
+        # partner + stranger are present, so the partner/lover/stranger
+        # events bind; only ex-events (no ended relationship) stay out
+        self.assertGreaterEqual(bound, 25)

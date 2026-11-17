@@ -18,6 +18,14 @@ Detailed milestone specs and exit checks: 07-roadmap-codex.md. Each milestone is
 | M10 | Business & investing | Start a company, stocks, property rentals |
 | M11 | Fame | Social media, celebrity, first specialist career (acting or music) |
 | M12 | Expansions | Politics, sports, royalty-style dynasties, special modes |
+| [M13](M13/01-spec.md) | A world with history | Birth years, economic cycles, changing technology, local opportunities and community events |
+| [M14](M14/01-spec.md) | Independent NPC lives | Other people build careers, move, form families and make choices between themselves |
+| [M15](M15/01-spec.md) | Inner life | Evolving values, ambitions, insecurities, fulfillment and changes of direction |
+| [M16](M16/01-spec.md) | Caregiving and recovery | Support aging relatives, adapt to disability, grieve and rebuild a life after setbacks |
+| [M17](M17/01-spec.md) | Creative works with a lasting life | Named novels, albums and films with collaborators, reviews, audiences and family legacy |
+| [M18](M18/01-spec.md) | Player scenario and content editor | Create starting families, fictional jurisdictions and event packs; validate, export and import them |
+| [M19](M19/01-spec.md) | What-if timelines | Fork a life at a decision, keep both branches and compare their outcomes |
+| [M20](M20/01-spec.md) | Optional storytelling director | Choose pacing; develop eligible stories with quiet periods, tensions and connected turning points |
 
 ## Claude additions (apply across milestones)
 - Content volume target: each milestone ships with a written event library (aim 50+ distinct, branching events per milestone), not just mechanics, so lives feel different.
@@ -40,4 +48,6 @@ The sequence and additions work for me, with these scope/acceptance clarificatio
 No other disagreement with the merged direction. Avatar implementation review remains pending the agents' reports and Claude's signal.
 
 ## After M12 (user direction, 2026-11-16)
-Once M0–M12 are all built, tested by the user and approved, the next phase is expansions and flavour: more content, special modes, polish and personality. Plan that phase only after M12 is approved. Ideas can be collected in docs/collab/user-wishlist.md meanwhile.
+Once M0–M12 are all built, tested by the user and approved, the next phase expands content, special modes, polish and personality.
+
+**User update, 2026-11-17:** all eight additions above are now included as M13–M20, with plans written now at the user's request. This supersedes the earlier instruction to defer planning until M12 approval. Implementation remains sequenced after M12 acceptance; M2.5 remains the current priority. See [M13–M20 delivery plan](M13-20-plan.md) for dependencies, common guarantees and stage handoffs. Feature contracts and agent assignments are frozen when each milestone becomes active.

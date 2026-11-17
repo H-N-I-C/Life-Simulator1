@@ -75,13 +75,10 @@ class ServiceGraphView:
         from src.game.features.knowledge import core as knowledge
         value = 0
         scope = self._env.get("policy", {}).get("jurisdiction_id")
-        for fact in self._env.get("knowledge", {}).get("facts", []):
-            if not knowledge.knows(self._env, observer_id, fact["fact_id"]):
-                continue
-            for change in fact.get("reputation_changes", []):
-                if change.get("person_id") == person_id and change.get(
-                        "scope", "global") in ("global", scope):
-                    value += change["delta"]
+        for change in knowledge.reputation_changes_known(self._env, observer_id):
+            if change.get("person_id") == person_id and change.get(
+                    "scope", "global") in ("global", scope):
+                value += change["delta"]
         return max(-100, min(100, value))
 
 

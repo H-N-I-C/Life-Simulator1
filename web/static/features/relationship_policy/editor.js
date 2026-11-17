@@ -18,9 +18,11 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => (
 let gameState = null;   // normalized adapter state (for the people list)
 let policyState = null; // /policy-state payload
 let selectedPerson = null;
+let shellHooks = null;  // B1: {getState, refresh} published by the shell
 
-export function initEditor(state) {
+export function initEditor(state, hooks) {
   gameState = state;
+  shellHooks = hooks || shellHooks;
   let panel = $("editorPanel");
   if (!panel) {
     panel = document.createElement("section");
@@ -34,9 +36,10 @@ export function initEditor(state) {
   return panel;
 }
 
-export function toggleEditor(state) {
+export function toggleEditor(state, hooks) {
   gameState = state || gameState;
-  const panel = initEditor(gameState);
+  shellHooks = hooks || shellHooks;
+  const panel = initEditor(gameState, shellHooks);
   panel.hidden = !panel.hidden;
   if (!panel.hidden) loadPolicyState();
 }
@@ -352,20 +355,57 @@ async function previewOrApply(person) {
     applyBtn.disabled = true;
     cancelBtn.disabled = true;
     try {
+      // B1: read the CURRENT revision from the shell's live state at
+      // send time, not from the state snapshot captured when the panel
+      // opened — that staleness is what produced the second-edit 409.
+      const fresh = shellHooks && shellHooks.getState &&
+                    shellHooks.getState();
+      const revision = (fresh && fresh.revision != null)
+        ? fresh.revision : gameState.revision;
       const out = await api("/api/games/" + gid + "/editor/apply", {
         commands,
         request_id: crypto.randomUUID(),
-        expected_revision: gameState.revision,
+        expected_revision: revision,
       });
+      gameState.revision = out.revision;
       setStatus("Applied — policy revision " + out.policy_revision + ".");
-      previewBox.innerHTML = "<p class=\"muted\">Audit:</p><ul>" +
-        out.audit.map((a) => "<li>" + esc(a.command) + " on " +
-          esc(String(a.target_id)) + "</li>").join("") + "</ul>";
+      const items = out.audit.map((a) => esc(a.command) + " on " +
+        esc(String(a.target_id)));
+      // A's service-side reprojection (A4) makes the preview's projected
+      // recognition the unions' actual status; show it as the result.
+      for (const u of preview.affected_unions || []) {
+        items.push("Union " + esc(u.union_id) + " is now " +
+                   esc(u.projected_recognition) +
+                   (u.current_recognition !== u.projected_recognition
+                     ? " (was " + esc(u.current_recognition) + ")" : ""));
+      }
+      previewBox.innerHTML = "<p class=\"muted\">Applied:</p><ul>" +
+        items.map((t) => "<li>" + t + "</li>").join("") + "</ul>";
+      // Adopt the shell's authoritative state (new revision, renamed
+      // people, reprojected recognition) without a page reload; then
+      // re-render this panel's people list from the fresh state.
+      if (shellHooks && shellHooks.refresh) {
+        const s = await shellHooks.refresh(out);
+        if (s) {
+          gameState = s;
+          renderPeople();
+        }
+      }
       await loadPolicyState();
     } catch (err) {
       applyBtn.disabled = false;
       cancelBtn.disabled = false;
       setStatus("Apply failed: " + err.message, true);
+      if (err.code === "stale_revision" && shellHooks &&
+          shellHooks.refresh) {
+        // State moved elsewhere; adopt it so the next attempt sends the
+        // fresh revision.
+        const s = await shellHooks.refresh().catch(() => null);
+        if (s) {
+          gameState = s;
+          renderPeople();
+        }
+      }
     }
   });
   cancelBtn.addEventListener("click", () => {

@@ -36,8 +36,10 @@ from src.game.features.family_graph.graph import GraphError
 from src.game.features.family_graph import new_graph
 from src.game.features.relationship_policy.editor import new_policy_state
 import src.game.features.parenting.effects  # noqa: F401,E402  (registers v3 domain appliers + child predicates)
+import src.game.features.family_graph.effects  # noqa: F401,E402  (graph offer/respond v3 domain appliers)
 import src.game.features.family_graph.predicates  # noqa: F401,E402  (graph-backed v3 role predicates)
 import src.game.features.knowledge.effects  # noqa: F401,E402  (knowledge v3 domain appliers)
+from src.game.finance import LedgerConflict  # noqa: E402
 from src.game.features.parenting import new_parenting_state
 from src.game.features.weddings import new_weddings_state
 from src.lifesim_lib.lifesim_lib import Gender, clamp, round_stochastic
@@ -327,49 +329,101 @@ class GameService:
             if person.person_id not in profiles_map:
                 self.stamp_person_profile(env, person)
                 dirty = True
-        # M2 -> M2.5 family migration: a legacy single partner with an
-        # untouched graph migrates exactly once (one union, recorded
-        # parentage only, archive as ended edges)
-        if not env["graph"]["unions"] and not env["graph"]["relationships"] \
-                and getattr(env["player"], "partner", None) is not None:
+        # M2 -> M2.5 family migration: runs exactly once per save, guarded
+        # by the graph's migration_version marker (NOT by "no union edges",
+        # which is also true after a divorce). Migration is idempotent and
+        # merges into the existing graph, so a retry can never duplicate or
+        # discard history.
+        if env["graph"].get("migration_version") is None:
             from src.game.features.family_graph import migrate_v2
             env["graph"] = migrate_v2(env)
             dirty = True
-        # backfill graph parentage from legacy mother/father records once,
-        # so the family tree renders for current-format games too
-        if not env["graph"]["parentage"]:
-            everyone = list(people) + [
-                c for c in (getattr(env["player"], "children", None) or [])
-                if isinstance(c, Person)]
-            for person in everyone:
-                for attr in ("mother", "father"):
-                    par = getattr(person, attr, None)
-                    if par is None or not getattr(par, "person_id", None):
-                        continue
-                    if person.person_id == par.person_id:
-                        continue
+        else:
+            # E3: games whose FIRST load predated the family (scenario
+            # starts walk the player up from childhood across loads)
+            # stamped the marker while the partner did not exist yet —
+            # the married partner never migrated. Rerun the idempotent
+            # merge when a married adult partner has no graph edge; the
+            # graph stays authoritative, so a post-divorce game
+            # (partner None via the legacy sync) never re-triggers.
+            from src.game.features.family_graph import graph as _fg_graph
+            _player = env.get("player")
+            _partner = getattr(_player, "partner", None)
+            if _player is not None and _partner is not None \
+                    and getattr(_player, "age", 0) >= _fg_graph.ADULT_AGE \
+                    and getattr(_partner, "age", 0) >= _fg_graph.ADULT_AGE \
+                    and _fg_graph._partner_married(_partner):
+                _pid = getattr(_player, "person_id", None)
+                _ppid = getattr(_partner, "person_id", None)
+                if _pid and _ppid and not any(
+                        _pid in u["person_ids"]
+                        and _ppid in u["person_ids"]
+                        for u in env["graph"]["unions"]):
+                    from src.game.features.family_graph import migrate_v2
+                    env["graph"] = migrate_v2(env)
+                    dirty = True
+        # Backfill graph parentage from legacy mother/father records,
+        # per-record (never all-or-nothing): a newborn after the initial
+        # parents still gets edges on the next load. Adopted children get
+        # adoptive edges, never biological.
+        everyone = list(people) + [
+            c for c in (getattr(env["player"], "children", None) or [])
+            if isinstance(c, Person)]
+        for person in everyone:
+            adopted = bool(getattr(person, "adopted", False))
+            role = "adoptive" if adopted else "biological"
+            source = "adoption" if adopted else "birth"
+            for attr in ("mother", "father"):
+                par = getattr(person, attr, None)
+                if par is None or not getattr(par, "person_id", None):
+                    continue
+                if person.person_id == par.person_id:
+                    continue
+                if not any(
+                        e["child_id"] == person.person_id
+                        and e["parent_id"] == par.person_id
+                        for e in env["graph"]["parentage"]):
                     env["graph"]["parentage"].append({
                         "child_id": person.person_id,
                         "parent_id": par.person_id,
-                        "role": "biological",
-                        "source": "birth",
+                        "role": role,
+                        "source": source,
                         "confidence": "assumed"})
                     dirty = True
-                # legacy web games keep parents as Parent relations
-                for rel in getattr(person, "relations", None) or []:
-                    if isinstance(rel, Parent) and \
-                            person.person_id != rel.person_id and not any(
-                                e["child_id"] == person.person_id
-                                and e["parent_id"] == rel.person_id
-                                for e in env["graph"]["parentage"]):
-                        env["graph"]["parentage"].append({
-                            "child_id": person.person_id,
-                            "parent_id": rel.person_id,
-                            "role": "biological",
-                            "source": "birth",
-                            "confidence": "assumed"})
-                        dirty = True
+            # legacy web games keep the player's own parents as Parent
+            # relations; only a relation that IS a recorded parent (the
+            # person's mother/father attribute or parents-dict entry) may
+            # become a parentage edge — a Parent-typed acquaintance is not
+            # a parent
+            recorded = set()
+            for attr in ("mother", "father"):
+                par = getattr(person, attr, None)
+                if par is not None:
+                    recorded.add(getattr(par, "person_id", None))
+            for par in (getattr(person, "parents", None) or {}).values():
+                recorded.add(getattr(par, "person_id", None))
+            for rel in getattr(person, "relations", None) or []:
+                if isinstance(rel, Parent) \
+                        and rel.person_id in recorded \
+                        and person.person_id != rel.person_id and not any(
+                            e["child_id"] == person.person_id
+                            and e["parent_id"] == rel.person_id
+                            for e in env["graph"]["parentage"]):
+                    env["graph"]["parentage"].append({
+                        "child_id": person.person_id,
+                        "parent_id": rel.person_id,
+                        "role": role,
+                        "source": source,
+                        "confidence": "assumed"})
+                    dirty = True
         if dirty:
+            self._save(env)
+        # R5: the legacy single-partner view derives from the graph
+        # authority at load; pure-legacy partners (no graph edges) are
+        # untouched. Persist the resynced presentation once.
+        from src.game.features.family_graph import transitions as \
+            _fg_transitions
+        if _fg_transitions.sync_legacy_partner(env):
             self._save(env)
         return env
 
@@ -1042,9 +1096,12 @@ class GameService:
             focus = focus_id or env["player"].person_id
             if focus not in people:
                 raise _not_found("unknown person")
+            from src.game.features.knowledge.core import (
+                known_secret_relationship_ids)
+            known_ids = known_secret_relationship_ids(env)
             tree = fg.graph_tree(env["graph"], focus, people,
                                  max_generations=max_generations,
-                                 known_relationship_ids=set())
+                                 known_relationship_ids=known_ids)
             appearances = {}
             for node in tree["nodes"]:
                 person = people.get(node["person_id"])
@@ -1066,23 +1123,44 @@ class GameService:
             for pid in (a_id, b_id):
                 if pid not in people:
                     raise _not_found("unknown person")
-            return fg.graph_relatedness(env["graph"], a_id, b_id)
+            return fg.graph_relatedness(env["graph"], a_id, b_id,
+                                        persons_by_id=people)
 
     def record_conception(self, game_id, child_id, bio_mother_id,
                           bio_father_id, request_id):
         """Roll the bounded fictional child-health adjustment ONCE per
         conception, with the game RNG, and persist it. Idempotent per
         (child_id, request_id): a retried conception command returns the
-        stored outcome; adoption never routes here."""
+        stored outcome; adoption never routes here. The conception binds
+        IMMUTABLE biological parent ids: biological parentage edges are
+        recorded at conception (deduped), and the stored outcome carries
+        the bound parent ids for exactly-once consumption at birth."""
         from src.game.features import family_graph as fg
         with self._lock:
             if not isinstance(request_id, str) or not request_id:
                 raise _invalid("request_id must be a non-empty string")
+            if bio_mother_id == bio_father_id:
+                raise _invalid("biological parents must be two people")
             env = self._load(game_id)
             outcomes = env["graph"].setdefault("conception_outcomes", {})
             key = "%s:%s" % (child_id, request_id)
             if key in outcomes:
                 return json.loads(json.dumps(outcomes[key]))
+            # ONE conception per child: an existing bound outcome for this
+            # child wins BEFORE any RNG use — a retried or new-request
+            # conception of the same parents returns the stored draw; a
+            # different parent pair is a typed conflict, never a reroll.
+            for stored_key, stored in outcomes.items():
+                if not stored_key.startswith("%s:" % child_id):
+                    continue
+                bound = {stored.get("bio_mother_id"),
+                         stored.get("bio_father_id")}
+                if bound == {bio_mother_id, bio_father_id}:
+                    return json.loads(json.dumps(stored))
+                raise _conflict(
+                    "graph_error",
+                    "this child already has a conception bound to other "
+                    "biological parents")
             people = self._all_people(env)
             for pid in (bio_mother_id, bio_father_id):
                 person = people.get(pid)
@@ -1093,10 +1171,70 @@ class GameService:
                                     "both biological parents must be 18+")
             with _GameRNG(self, env):
                 outcome = fg.sample_conception(env["graph"], bio_mother_id,
-                                               bio_father_id, random)
+                                               bio_father_id, random,
+                                               persons_by_id=people)
+            outcome["bio_mother_id"] = bio_mother_id
+            outcome["bio_father_id"] = bio_father_id
+            # bind the conception to immutable biological parentage now,
+            # so a later birth cannot reroll or reassign the parents
+            existing = {(e["child_id"], e["parent_id"])
+                        for e in env["graph"]["parentage"]}
+            for parent_id in (bio_mother_id, bio_father_id):
+                if parent_id == child_id \
+                        or (child_id, parent_id) in existing:
+                    continue
+                env["graph"]["parentage"].append({
+                    "child_id": child_id, "parent_id": parent_id,
+                    "role": "biological", "source": "birth",
+                    "confidence": "certain"})
             outcomes[key] = outcome
             self._save(env)
             return json.loads(json.dumps(outcome))
+
+    def consume_conception_outcome(self, game_id, child_id):
+        """Exactly-once consumption of the recorded fictional conception
+        outcome at birth, however it was stored (service child:request
+        keys or v3 occurrence/pair keys). Returns the stored outcome
+        (incl. its adjustment) or None when no conception was recorded
+        (e.g. legacy births/adoption — adoption never rolls). Marks the
+        outcome consumed so a replayed/retried birth cannot apply it
+        twice."""
+        from src.game.features.parenting import core as parenting_core
+        with self._lock:
+            env = self._load(game_id)
+            child = self._all_people(env).get(child_id)
+            # the child record may not exist yet (a pre-birth id bound at
+            # conception): resolve the binding from graph parentage edges
+            probe = child if child is not None else child_id
+            key, outcome = parenting_core.find_conception_outcome(
+                env, probe)
+            if outcome is None:
+                return None
+            outcome["consumed"] = True
+            outcome["consumed_child_id"] = child_id
+            self._save(env)
+            return json.loads(json.dumps(outcome))
+
+    def wedding_quote(self, game_id, union_id):
+        """Q1: the shared engine quote for ceremony legal consequences
+        (B's planner route consumes this). Samples once, stores the
+        quote on the wedding plan and returns ALL fine lines; the
+        Ledger later posts exactly this quote. Sampling rides the
+        gameplay stream and the plan state persists, so this is a
+        mutation — B should expose it as POST, not GET."""
+        from src.game.features.weddings import core as weddings
+        from src.game.features.family_graph.graph import GraphError
+        with self._lock:
+            if not isinstance(union_id, str) or not union_id:
+                raise _invalid("union_id must be a non-empty string")
+            env = self._load(game_id)
+            try:
+                with _GameRNG(self, env):
+                    quote = weddings.quote_ceremony_fines(env, union_id)
+            except GraphError as e:
+                raise GameError(e.code, e.message, e.status) from e
+            self._save(env)
+            return json.loads(json.dumps(quote))
 
     # ------------------------------------------- M2.5 weddings adapter
 
@@ -1114,10 +1252,39 @@ class GameService:
             if not isinstance(request_id, str) or not request_id \
                     or len(request_id) > 128:
                 raise _invalid("request_id must be a non-empty string")
-            if op not in OPS:
+            if not isinstance(op, str) or op not in OPS:
                 raise _invalid("unknown wedding op")
+            if not isinstance(expected_revision, int) or isinstance(expected_revision, bool) \
+                    or expected_revision < 0:
+                raise _invalid("expected_revision must be a non-negative integer")
             if not isinstance(args, dict):
                 raise _invalid("args must be an object")
+            required = {"union_id"}
+            allowed = {"union_id"}
+            if op == "plan_wedding":
+                required |= {"venue_id", "guests", "outfit_id", "honeymoon_id"}
+                allowed = required
+            elif op == "renew_vows":
+                allowed |= {"tier"}
+            if required - args.keys() or args.keys() - allowed:
+                raise _invalid("missing or unknown wedding fields")
+            if not isinstance(args["union_id"], str) or not args["union_id"] \
+                    or len(args["union_id"]) > 128:
+                raise _invalid("union_id must be a non-empty id")
+            if op == "plan_wedding":
+                for key, catalog in (("venue_id", weddings.VENUES),
+                                     ("outfit_id", weddings.OUTFITS),
+                                     ("honeymoon_id", weddings.HONEYMOONS)):
+                    if not isinstance(args[key], str) or args[key] not in catalog:
+                        raise _invalid("unknown wedding %s" % key)
+                guests = args["guests"]
+                if not isinstance(guests, int) or isinstance(guests, bool) \
+                        or not 0 <= guests <= 500:
+                    raise _invalid("guests must be an integer in [0, 500]")
+            elif op == "renew_vows":
+                tier = args.get("tier", "backyard")
+                if not isinstance(tier, str) or tier not in weddings.RENEWAL_TIERS:
+                    raise _invalid("unknown renewal tier")
             env = self._load(game_id)
             for entry in env["replay"]:
                 if entry["request_id"] == request_id:
@@ -1135,11 +1302,18 @@ class GameService:
                     f"expected_revision {expected_revision} does not match "
                     f"current revision {env['revision']}")
             op_args = dict(args)
-            op_args.setdefault("turn", env["revision"])
+            op_args["turn"] = env["revision"]
             try:
-                result = OPS[op](env, self, **op_args)
+                # L1: ceremony law fines sample from the gameplay stream,
+                # so wedding commands run under the per-game RNG exactly
+                # like every other mutation.
+                with _GameRNG(self, env):
+                    result = OPS[op](env, self, **op_args)
             except GraphError as e:
                 raise GameError(e.code, e.message, e.status) from e
+            from src.game.features.family_graph import transitions as \
+                _fg_transitions
+            _fg_transitions.sync_legacy_partner(env)
             for entry in result.get("journal") or []:
                 self._journal(env, entry["kind"], entry["text"],
                               entry.get("person_ids", []))
@@ -1190,6 +1364,7 @@ class GameService:
                 result = transitions.OPS[op](env, **args)
             except GraphError as e:
                 raise GameError(e.code, e.message, e.status) from e
+            transitions.sync_legacy_partner(env)
             for entry in result.get("journal") or []:
                 self._journal(env, entry["kind"], entry["text"],
                               entry.get("person_ids", []))
@@ -1213,16 +1388,89 @@ class GameService:
 
     def _editor_supersede(self, env, flt):
         """A's on_policy_revision_bump (frozen filter): supersede matching
-        pending offers, preserving attempts/cooldowns/pre-effects."""
+        pending offers AND the actual stored decision when it is one of
+        those offers (dating pendings are not graph offers). Attempts/
+        cooldowns/pre-effects are preserved; supersession never resamples
+        and never invents consent; the cancelled offer resolves to a safe
+        explicit 'the moment has passed' outcome."""
         from src.game.features import family_graph
+        from src.game.features.family_graph.graph import ROMANTIC_KINDS
         jurisdictions = flt.get("affected_jurisdictions") or []
-        return family_graph.supersede_offers(
+        superseded = family_graph.supersede_offers(
             env["graph"],
-            interaction_kinds=["propose_courtship", "propose_union",
-                               "propose_plural_union", "convert_request"],
+            interaction_kinds=list(ROMANTIC_KINDS),
             affected_person_ids=flt.get("affected_person_ids"),
             affected_jurisdiction=jurisdictions[0]
             if len(jurisdictions) == 1 else None)
+        pending = env.get("pending")
+        if pending is not None and self._pending_superseded(
+                pending, flt, set(ROMANTIC_KINDS)):
+            env["pending"] = None
+            self._journal(
+                env, "event",
+                "The moment has passed — the offer no longer stands.",
+                [])
+            superseded.append("pending:%s" % pending.get("id"))
+        return superseded
+
+    @staticmethod
+    def _pending_superseded(pending, flt, romantic_kinds):
+        """A stored decision is superseded when its interaction is a
+        romantic kind the evaluator would now score differently AND it
+        touches an affected person. Legacy stored date offers count."""
+        kind = (pending.get("interaction") or {}).get("kind")
+        if kind is None and pending.get("kind") == "date_offer":
+            kind = "date"
+        if kind not in romantic_kinds:
+            return False
+        affected = flt.get("affected_person_ids")
+        if not affected:
+            return True
+        involved = set()
+        for value in (pending.get("bindings") or {}).values():
+            if isinstance(value, str):
+                involved.add(value)
+        for key in ("sampled_partner", "target_id"):
+            value = pending.get(key)
+            if isinstance(value, str):
+                involved.add(value)
+            elif hasattr(value, "person_id"):
+                involved.add(value.person_id)
+        return bool(involved & set(affected))
+
+    def _editor_reproject(self, env, jurisdiction_ids):
+        """A4 recognition REPROJECTION: a jurisdiction law edit updates
+        the living world's active unions in that jurisdiction — new
+        status from the ratified recognition patch, law_version stamped
+        with the new policy_revision, basis/union untouched. Unions the
+        edited law does not govern keep their recognition; no union is
+        deleted and no fine is retroactively repeated."""
+        from src.game.features.relationship_policy.editor import (
+            _union_type_of)
+        policy = env["policy"]
+        overrides = (policy.get("overrides") or {}).get("jurisdictions", {})
+        law_version = int(policy.get("policy_revision", 0))
+        changed = []
+        for union in env["graph"]["unions"]:
+            if union["status"] != "active":
+                continue
+            rec = union.get("recognition") or {}
+            if rec.get("jurisdiction_id") not in jurisdiction_ids:
+                continue
+            union_type = _union_type_of(union)
+            patch = (overrides.get(rec["jurisdiction_id"]) or {}) \
+                .get("recognition", {})
+            if union_type not in patch:
+                continue
+            if rec.get("status") == patch[union_type] \
+                    and int(rec.get("law_version", 0)) == law_version:
+                continue
+            new_rec = dict(rec)
+            new_rec["status"] = patch[union_type]
+            new_rec["law_version"] = law_version
+            union["recognition"] = new_rec
+            changed.append(union["union_id"])
+        return changed
 
     def editor_preview(self, game_id, commands):
         """Dry-run on a COPY of the policy state; the save is untouched."""
@@ -1298,6 +1546,16 @@ class GameService:
             self._journal(env, "editor",
                           f"{person.name} is now called {person.name}.",
                           [person.person_id])
+        # A4: jurisdiction law edits reproject recognition onto the
+        # living world's active unions immediately
+        jur_ids = sorted({entry.get("target_id") for entry in audit
+                          if entry.get("scope") == "jurisdiction"})
+        if jur_ids:
+            for union_id in self._editor_reproject(env, jur_ids):
+                self._journal(
+                    env, "editor",
+                    "The law changed, and a union's recognition "
+                    "changed with it.", [])
 
 
     def get_state(self, game_id):
@@ -1392,11 +1650,16 @@ class GameService:
                                f"catalog ID")
 
     def new_game(self, profile, request_id):
+        return self._new_game(profile, request_id)
+
+    def _new_game(self, profile, request_id, scenario_attempt=0,
+                  creation_fingerprint=None):
+        """Bound dev-scenario retries while retaining the caller's replay key."""
         with self._lock:
             if not isinstance(request_id, str) or not request_id or len(request_id) > 128:
                 raise _invalid("request_id must be a non-empty string")
             self._validate_profile(profile)
-            fingerprint = hashlib.sha256(
+            fingerprint = creation_fingerprint or hashlib.sha256(
                 json.dumps(profile, sort_keys=True, default=str).encode()
             ).hexdigest()
             ledger = self._load_creations()
@@ -1531,7 +1794,7 @@ class GameService:
                 raise
             scenario = profile.get("scenario")
             if scenario is not None:
-                from src.game.scenarios import drive_scenario
+                from src.game.scenarios import drive_scenario, SCENARIO_MAX_ATTEMPTS
                 try:
                     state = drive_scenario(self, game_id, scenario)
                 except GameError as e:
@@ -1543,14 +1806,23 @@ class GameService:
                         pass
                     ledger.pop(request_id, None)
                     self._save_creations(ledger)
-                    # terminal events can end a driven life early
-                    # (lightning now actually kills): retry with a
-                    # shifted seed, documented dev-factory limit
-                    if "life ended early" in e.message:
-                        seed = profile.get("seed", 1)
-                        if isinstance(seed, int) and seed < 10 ** 9:
-                            return self.new_game(
-                                dict(profile, seed=seed + 1), request_id)
+                    # Retry stochastic setup misses, not engine/I/O faults.
+                    # Keep the original fingerprint: the shifted seed is an
+                    # internal setup detail, not a new creation request.
+                    if e.code == "scenario_precondition" \
+                            or "life ended early" in e.message:
+                        if scenario_attempt + 1 < SCENARIO_MAX_ATTEMPTS:
+                            seed = profile.get("seed")
+                            next_seed = (seed if seed is not None else 0) + 1
+                            return self._new_game(
+                                dict(profile, seed=next_seed), request_id,
+                                scenario_attempt=scenario_attempt + 1,
+                                creation_fingerprint=fingerprint)
+                        raise GameError(
+                            "scenario_precondition",
+                            "scenario setup preconditions could not be met "
+                            f"after {SCENARIO_MAX_ATTEMPTS} attempts; try another seed",
+                            409) from e
                     raise
                 # replays of the creation request return the SCENARIO state
                 env = self._load(game_id)
@@ -1653,15 +1925,26 @@ class GameService:
                     "resolve_decision", "continue_as"):
                 raise _conflict("game_over", "this life has ended")
 
-            with _GameRNG(self, env):
-                if action == "age_up":
-                    self._cmd_age_up(env)
-                elif action == "resolve_decision":
-                    self._cmd_resolve(env, payload, request_id)
-                elif action == "continue_as":
-                    self._cmd_continue_as(env, payload)
-                else:
-                    self._cmd_rule_action(env, action, payload, request_id)
+            try:
+                with _GameRNG(self, env):
+                    if action == "age_up":
+                        self._cmd_age_up(env)
+                    elif action == "resolve_decision":
+                        self._cmd_resolve(env, payload, request_id)
+                    elif action == "continue_as":
+                        self._cmd_continue_as(env, payload)
+                    else:
+                        self._cmd_rule_action(env, action, payload,
+                                              request_id)
+            except LedgerConflict as exc:
+                # W1 (A half): a genuine posting-key collision is a
+                # typed conflict, never an unhandled 500; the save is
+                # unchanged because command failures discard the
+                # envelope.
+                raise GameError(
+                    "ledger_conflict",
+                    "a money posting key was reused with different "
+                    f"details: {exc}", 409) from exc
 
             env["revision"] += 1
             state = self._state(env)
@@ -2035,6 +2318,23 @@ class GameService:
         try:
             result = rule_actions.resolve_choice(
                 ctx, pending, option_id, inputs, random)
+            _pregnancy_continues = (
+                getattr(env["player"], "is_pregnant", False)
+                or getattr(getattr(env["player"], "partner", None),
+                           "is_pregnant", False))
+            if pending.get("kind") == "pregnancy" and _pregnancy_continues:
+                # E4/N1 (A-owned seam): a pregnancy that continues records
+                # its conception ONCE here on the service side (never in
+                # C's resolver), so the birth transaction consumes
+                # exactly one immutable draw. Both carrier branches count
+                # (the player herself OR her pregnant partner). Runs
+                # inside _GameRNG, so the draw rides the seeded gameplay
+                # stream.
+                from src.game.features.parenting import core as \
+                    _parenting_core
+                _parenting_core.record_legacy_conception(
+                    env, env["player"], random,
+                    pregnancy_id=pending.get("id"))
         except (rule_actions.RuleError, GraphError) as e:
             status = 409 if e.code in ("not_allowed", "refused", "not_adult") \
                 else 404 if e.code == "not_found" else 400
@@ -2074,7 +2374,14 @@ class GameService:
         if (env["pending"] is None and env["status"] == "alive"
                 and env.get("turn", {}).get("interrupted")):
             from src.game import coordinator
-            completed = coordinator.run_turn(env, self, random)
+            # A birth can resume here after a stored choice. Preserve the
+            # same typed guard errors as direct age_up, with full rollback.
+            try:
+                completed = coordinator.run_turn(env, self, random)
+            except (rule_actions.RuleError, GraphError) as e:
+                status = 409 if e.code in ("not_allowed", "refused", "not_adult") \
+                    else 404 if e.code == "not_found" else 400
+                raise GameError(e.code, e.message, status) from e
             if completed:
                 env["turn"] = {"cursor": {"phase_id": "year_start",
                                           "item_cursor": 0}}

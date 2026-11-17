@@ -7,6 +7,8 @@ afterwards (same save/replay/decision semantics).
 
 from src.game.service import GameError
 
+SCENARIO_MAX_ATTEMPTS = 8
+
 
 class Session:
     """In-memory scenario drive: many commands through the SAME code path
@@ -426,10 +428,9 @@ def drive_scenario(svc, game_id, scenario_id):
                     sess.save()
                     return sess.state()
                 raise GameError(
-                    "internal_error",
-                    "scenario setup failed: university application was not "
-                    "accepted with this seed (smarts gate); try another seed",
-                    500)
+                    "scenario_precondition",
+                    "scenario setup could not reach university acceptance "
+                    "with this seed (smarts gate)", 409)
             while st["pending_decision"]:
                 sess.st = _resolve_first_sess(sess, i)
                 st = sess.state()
@@ -459,9 +460,9 @@ def _check_university_pending(st):
     kind = st["pending_decision"].get("kind")
     if kind not in ("university_application", "university_funding"):
         raise GameError(
-            "internal_error",
-            f"scenario setup failed: expected a university pending "
-            f"decision at 17, got {kind!r}", 500)
+            "scenario_precondition",
+            f"scenario setup expected a university pending decision "
+            f"at 17, got {kind!r}", 409)
 
 
 def _apply_setup_hook(svc, game_id, st, spec, i):

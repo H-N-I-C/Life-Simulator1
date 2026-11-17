@@ -62,11 +62,12 @@ def update_relationship_op(env, relationship_id, patch, turn):
 
 
 def form_union_op(env, a_id, b_id, kind, recognition, turn, prenup=None,
-                  ceremony=None, policy_revision=0):
+                  ceremony=None, policy_revision=0, exclusivity="exclusive"):
     a, b = _resolve(env, a_id), _resolve(env, b_id)
     union_id = graph_mod.form_union(env["graph"], a, b, kind, recognition,
                                     turn, prenup=prenup, ceremony=ceremony,
-                                    policy_revision=policy_revision)
+                                    policy_revision=policy_revision,
+                                    exclusivity=exclusivity)
     return {"ok": True, "ids": {"union_id": union_id},
             "journal": [_j("union", f"{a.name} and {b.name} formed a "
                                     f"{kind}.", [a_id, b_id])],
@@ -140,3 +141,95 @@ OPS = {
     "record_offer": record_offer_op,
     "resolve_offer": resolve_offer_op,
 }
+
+
+# -------------------------------------------------- legacy projection sync
+
+def sync_legacy_partner(env):
+    """The graph is the canonical relationship authority; the legacy
+    single-partner view DERIVES from it (graph-contract §8):
+
+    - a current partner the graph recorded but no longer shares an ACTIVE
+      edge with (divorce/dissolve/widow/end) stops being presented as the
+      partner; a remaining active union's partner takes their place;
+    - a partner whose UNION ended but who still shares an active
+      courtship/committed edge keeps the partner downgraded to dating
+      (married status dies with the union — no stale Divorce action);
+    - a partner the graph never recorded (pure-legacy dating/marriage)
+      is legacy authority and is left untouched;
+    - a player with no legacy partner but an active union gains the
+      legacy projection (status married).
+
+    Idempotent; presentation only — never mints, ends or rerolls edges.
+    """
+    player = env.get("player")
+    if player is None:
+        return False
+    graph = env["graph"]
+    pid = getattr(player, "person_id", None)
+    if not pid:
+        return False
+    changed = False
+
+    def other_id(edge):
+        a, b = edge["person_ids"]
+        return b if a == pid else a
+
+    def active_edge_with(other):
+        for edge in graph["unions"] + graph["relationships"]:
+            if edge["status"] == "active" and pid in edge["person_ids"] \
+                    and other in edge["person_ids"]:
+                return True
+        return False
+
+    def recorded_with(other):
+        for edge in graph["unions"] + graph["relationships"]:
+            if pid in edge["person_ids"] and other in edge["person_ids"]:
+                return True
+        return False
+
+    def active_union_partners():
+        found = [((u.get("start_turn") or 0), other_id(u))
+                 for u in graph["unions"]
+                 if u["status"] == "active" and pid in u["person_ids"]]
+        found.sort()
+        return [other for _turn, other in found]
+
+    current = getattr(player, "partner", None)
+    current_id = getattr(current, "person_id", None)
+    if current_id is not None:
+        active_union = any(
+            u["status"] == "active" and current_id in u["person_ids"]
+            and pid in u["person_ids"] for u in graph["unions"])
+        if recorded_with(current_id) and not active_edge_with(current_id):
+            # the graph ended this pairing: the legacy view follows
+            current = None
+            player.partner = None
+            changed = True
+        elif active_union:
+            if hasattr(current, "status"):
+                if current.status != 2:
+                    changed = True
+                current.status = 2  # married presentation
+        elif recorded_with(current_id):
+            # N3: a surviving courtship/committed edge means the couple
+            # still dates, but the MARRIED presentation died with the
+            # union — downgrading removes the stale married status (and
+            # the legacy Divorce action) while keeping the partner.
+            if getattr(current, "status", None) == 2:
+                current.status = 0
+                changed = True
+    if current is None:
+        remaining = active_union_partners()
+        if remaining:
+            person = _people(env).get(remaining[0])
+            # the legacy view needs the full Partner interface (status,
+            # relationship, years_together, ...); a bare relative record
+            # can never serve as player.partner
+            if person is not None and hasattr(person, "status"):
+                player.partner = person
+                changed = True
+                if person not in player.relations:
+                    player.relations.append(person)
+                person.status = 2
+    return changed

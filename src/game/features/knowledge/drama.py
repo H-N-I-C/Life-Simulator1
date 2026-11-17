@@ -27,13 +27,11 @@ def _exclusive_agreements(edges):
             if (e.get("exclusivity") or {}).get("agreement") == "exclusive"]
 
 
-def detect_affair(env, a_id, b_id, turn, occurrence_id=None):
-    """Expectation check for a romantic occurrence between a and b.
-    Returns a minted `affair` fact id when the occurrence violates an
-    `exclusive` agreement of either participant with someone else;
-    returns None for consensual plural unions (open/negotiated
-    agreements or no exclusivity promise) — plural is not cheating.
-    """
+def is_affair_breach(env, a_id, b_id):
+    """True when a romantic occurrence between a and b violates an
+    `exclusive` agreement of either participant with someone else.
+    Consensual open/plural arrangements (or no exclusivity promise) are
+    NEVER a breach — plural is not cheating."""
     graph = env["graph"]
     rels_a, unions_a = _active_edges(graph, a_id)
     rels_b, unions_b = _active_edges(graph, b_id)
@@ -53,13 +51,22 @@ def detect_affair(env, a_id, b_id, turn, occurrence_id=None):
                 return union
         return None
 
-    if breach(rels_a, unions_a, a_id) is None \
-            and breach(rels_b, unions_b, b_id) is None:
+    return breach(rels_a, unions_a, a_id) is not None \
+        or breach(rels_b, unions_b, b_id) is not None
+
+
+def detect_affair(env, a_id, b_id, turn, occurrence_id=None):
+    """Expectation check for a romantic occurrence between a and b.
+    Returns a minted `affair` fact id when the occurrence violates an
+    `exclusive` agreement of either participant with someone else;
+    returns None for consensual plural unions (open/negotiated
+    agreements or no exclusivity promise) — plural is not cheating.
+    """
+    if not is_affair_breach(env, a_id, b_id):
         return None
-    rel = knowledge.mint_fact(
+    return knowledge.mint_fact(
         env, "affair", [a_id, b_id], turn,
         occurrence_id=occurrence_id)
-    return rel
 
 
 # ----------------------------------------------------- discovery / reveal

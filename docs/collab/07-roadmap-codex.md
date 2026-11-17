@@ -109,3 +109,18 @@ Use a persistent character summary, timeline, contextual decisions, and Relation
 For every milestone: browser smoke journey; focused rule/state tests; save/load and migration coverage for new fields; deterministic reproduction of failures; accessible keyboard controls; readable phone-width layouts; and portraits on supported person references. Test data should include poor/wealthy starts, different identities, children/adults/elders and multigeneration saves. Keep test scenarios developer-accessible without leaking internal implementation controls into normal play.
 
 Prioritize M1–M4 as the next core-game releases. Reassess later milestone order after actual play feedback; deliver each as its own small playable release rather than waiting for the entire roadmap.
+
+## M13–M20 — user-approved roadmap extension (2026-11-17)
+
+The user requested that all eight additions be incorporated into milestones and plans now. The [delivery plan](M13-20-plan.md) and individual specs extend this roadmap:
+
+- [M13 — World history](M13/01-spec.md): an advancing world, changing local circumstances and meaningful birth cohorts.
+- [M14 — Independent NPC lives](M14/01-spec.md): autonomous careers, moves and relationships within a persistent social world.
+- [M15 — Inner life](M15/01-spec.md): evolving priorities, ambitions and fulfillment.
+- [M16 — Caregiving and recovery](M16/01-spec.md): care responsibilities, adaptation, grief and rebuilding.
+- [M17 — Creative works](M17/01-spec.md): novels, albums and films become persistent works with audiences and legacy.
+- [M18 — Player content editor](M18/01-spec.md): author, validate, export and import scenarios, fictional settings and event packs.
+- [M19 — What-if timelines](M19/01-spec.md): fork committed lives and compare independent branches.
+- [M20 — Storytelling director](M20/01-spec.md): optional adaptive pacing using the established world and eligible content.
+
+These deepen the existing projects/social/legacy systems through explicit later deliverables. M2.5 remains active; no future implementation is started by this planning update.

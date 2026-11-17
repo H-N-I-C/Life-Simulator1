@@ -1,0 +1,26 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 45,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Anatollo",
+    "last_name": "Woods",
+    "gender": "male",
+    "country": "UK",
+    "seed": 777,
+    "request_id": "robot-1-45-create",
+    "scenario": "university_pending_17"
+   }
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 46 --seed 1 --from-life 45 --fail-fast"
+}

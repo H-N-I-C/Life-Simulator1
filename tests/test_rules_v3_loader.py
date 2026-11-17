@@ -255,12 +255,17 @@ class V3ResolveTest(unittest.TestCase):
             "first_date_with_refusal_outcome")
         option = next(o for o in pending["options"]
                       if o["id"].endswith("_accept"))
-        self.assertTrue(option["_domain"])  # chemistry + offer
+        self.assertTrue(option["_domain"])  # chemistry + offer (registered)
         happy_before = player.happiness
-        with self.assertRaises(ra.RuleError) as raised:
-            ra.resolve_choice(ctx, pending, option["id"], {},
-                              random.Random(1))
-        self.assertEqual(raised.exception.code, "not_available")
+        domain = dict(option["_domain"])
+        option["_domain"] = {**domain, "__unknown_test_effect": {}}
+        try:
+            with self.assertRaises(ra.RuleError) as raised:
+                ra.resolve_choice(ctx, pending, option["id"], {},
+                                  random.Random(1))
+            self.assertEqual(raised.exception.code, "not_available")
+        finally:
+            option["_domain"] = domain
         self.assertEqual(player.happiness, happy_before)  # nothing applied
         self.assertEqual(player.money, 500)
 
@@ -275,14 +280,22 @@ class V3ResolveTest(unittest.TestCase):
             target.change_relationship(10)
             return ([ra._event("decision", "We clicked.", target)], [])
 
+        saved = {k: ra._DOMAIN_EFFECTS.get(k)
+                 for k in ("chemistry", "offer")}
         ra.register_domain_effect("chemistry", fake_chemistry)
+        option = next(o for o in pending["options"]
+                      if o["id"].endswith("_accept"))
         try:
-            option = next(o for o in pending["options"]
-                          if o["id"].endswith("_accept"))
+            # an unknown domain effect fails typed BEFORE anything
+            # mutates (no partial application), even with real appliers
+            # registered for the other effects
+            domain = dict(option["_domain"])
+            option["_domain"] = {**domain, "__unknown_test_effect": {}}
             with self.assertRaises(ra.RuleError):
-                # 'offer' still unregistered: full validation first
                 ra.resolve_choice(ctx, pending, option["id"], {},
                                   random.Random(1))
+            self.assertEqual(calls, [])
+            option["_domain"] = domain
             ra.register_domain_effect(
                 "offer", lambda c, p, b, v, r: ([], []))
             result = ra.resolve_choice(ctx, pending, option["id"], {},
@@ -291,8 +304,12 @@ class V3ResolveTest(unittest.TestCase):
             self.assertTrue(any("clicked" in e["text"]
                                 for e in result["events"]))
         finally:
-            ra._DOMAIN_EFFECTS.pop("chemistry", None)
-            ra._DOMAIN_EFFECTS.pop("offer", None)
+            option["_domain"] = {k: v for k, v in domain.items()}
+            for k, v in saved.items():
+                if v is None:
+                    ra._DOMAIN_EFFECTS.pop(k, None)
+                else:
+                    ra._DOMAIN_EFFECTS[k] = v
 
     def test_stale_binding_resolves_to_safe_cancellation(self):
         player, ctx, pending = self._pending(

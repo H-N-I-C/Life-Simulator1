@@ -1,0 +1,39 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 49,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Abbott",
+    "last_name": "Bowling",
+    "gender": "male",
+    "country": "Japan",
+    "seed": 1063939332,
+    "request_id": "robot-1-49-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1547434222,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "crown"
+     ],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 50 --seed 1 --from-life 49 --fail-fast"
+}

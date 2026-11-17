@@ -48,11 +48,16 @@ V3_CLAUSE_KINDS = V2_CLAUSE_KINDS | {
 }
 
 # v2 Effects keys + C's v3 typed domain effects (event-schema-v3.md §4).
+# Bare stat keys are legal at the top level of an effects map: C's
+# loader lifts them (src/game/events.py, "tolerant lift"), so the
+# validator must mirror runtime or it false-positives on real content.
+_STAT_KEYS = {"happiness", "health", "smarts", "looks", "karma", "stress"}
+
 V2_EFFECT_KEYS = {
     "stats", "money", "relationship", "add_illness", "remove_illness",
     "learn_trait", "lose_trait", "set_flag", "lose_partner", "divorce",
     "gain_partner", "partner_death", "terminal",
-}
+} | _STAT_KEYS
 V3_EFFECT_KEYS = V2_EFFECT_KEYS | {
     "offer", "respond", "end_relationship", "end_union", "reveal_fact",
     "reputation", "chemistry", "convert_profile", "set_personal_tenet",

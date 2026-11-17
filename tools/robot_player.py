@@ -238,9 +238,30 @@ class Robot:
         }
         if rng.random() < 0.7:
             body["appearance"] = self._random_appearance(rng)
+        # M2.5 boundary characters (D3): every 9th life starts at 17
+        # (minor: romantic self-actions must stay refused with a typed
+        # 4xx), every 9th+1 at 18 (the first adult year). Fixed seed: the
+        # 17 scenario gates on the university smarts roll, so it needs a
+        # known-good seed (a setup miss currently surfaces as HTTP 500 —
+        # reported separately, do not bake it into the boundary sweep).
+        self.boundary_age = None
+        if life_index % 9 == 0:
+            body["scenario"] = "university_pending_17"
+            body["seed"] = 777
+            self.boundary_age = 17
+        elif life_index % 9 == 1:
+            body["scenario"] = "graduating_18"
+            body["seed"] = 777
+            self.boundary_age = 18
         self._log("create", body=body)
         state = self.client.post("/api/games", body)
         return state
+
+    @staticmethod
+    def _player_age(state):
+        player = next((p for p in state.get("people") or []
+                       if p.get("id") == state.get("player_id")), {})
+        return player.get("age")
 
     def _random_appearance(self, rng):
         cat = self.catalog.get("catalog") or {}
@@ -348,6 +369,15 @@ class Robot:
         inv = Invariant(start)
         if inv.problems:
             raise Failure("invariant", "; ".join(inv.problems), start)
+        if self.boundary_age is not None:
+            age = self._player_age(start)
+            if age != self.boundary_age:
+                raise Failure("invariant",
+                              "boundary life %d: player age %r, expected "
+                              "%d (scenario ignored?)"
+                              % (life_index, age, self.boundary_age), start)
+            self.stats["boundary_lives"] = \
+                self.stats.get("boundary_lives", 0) + 1
         state = start
         revision = state["revision"]
 
@@ -473,6 +503,27 @@ class Robot:
             self._command(game_id, revision, "definitely_not_an_action",
                           {}, rng, expect_status=400)
 
+        # M2.5 adult-gate probes (D3): while the player is a minor,
+        # romantic self-actions are never advertised and dispatch must
+        # refuse them with a typed 4xx — never a silent success, never
+        # a 5xx. This is the runtime half of the 17/18 boundary.
+        age = self._player_age(state)
+        if age is not None and age < 18 and rng.random() < 0.5:
+            self._command(game_id, revision, "dating_app", {}, rng,
+                          expect_status=(400, 403, 404, 409))
+            self.stats["minor_romantic_probes"] = \
+                self.stats.get("minor_romantic_probes", 0) + 1
+            partner = (state.get("family") or {}).get("partner")
+            if partner:
+                pid = partner.get("id") if isinstance(partner, dict) \
+                    else partner
+                for romantic in ("propose", "try_for_baby", "plan_wedding"):
+                    self._command(game_id, revision, romantic,
+                                  {"target_id": pid}, rng,
+                                  expect_status=(400, 403, 404, 409))
+                    self.stats["minor_romantic_probes"] = \
+                        self.stats.get("minor_romantic_probes", 0) + 1
+
         if rng.random() < self.age_up_bias:
             action = next(a for a in actions if a["id"] == "age_up")
         else:
@@ -595,7 +646,11 @@ def run(args):
         client = Client(base)
     else:
         import web.server as web_server
-        save_dir = tempfile.mkdtemp(prefix="robot_saves_")
+        save_dir = tempfile.mkdtemp(
+            prefix="robot_saves_",
+            # user quota on /tmp (tmpfs) is shared with the other
+            # agents' runs; the repo save dir lives on the root fs
+            dir=os.path.join(ROOT, "game_saves"))
         server = web_server.make_server(port=0, save_dir=save_dir)
         server.dev_mode = True
         thread = threading.Thread(target=server.serve_forever,

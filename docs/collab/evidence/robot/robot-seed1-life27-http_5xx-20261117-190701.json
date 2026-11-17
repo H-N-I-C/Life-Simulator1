@@ -1,0 +1,40 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 27,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aeriel",
+    "last_name": "Morse",
+    "gender": "female",
+    "country": "Canada",
+    "seed": 777,
+    "request_id": "robot-1-27-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1544457663,
+     "base": "person",
+     "skin_tone": "medium-light",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "cap"
+     ],
+     "background": "bg_06",
+     "look_override": "none"
+    },
+    "scenario": "university_pending_17"
+   }
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 28 --seed 1 --from-life 27 --fail-fast"
+}

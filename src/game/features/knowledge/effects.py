@@ -36,6 +36,21 @@ def _reveal_fact(context, player, bindings, value, rng, occurrence_id=None):
     turn = env.get("revision", 0)
     occurrence_id = occurrence_id or "reveal:%s:%s" % (
         context.turn_id, json.dumps([kind, sorted(about), sorted(to)]))
+    if kind == "affair":
+        # An `affair` label must be backed by an ACTUAL agreement breach
+        # (frozen §4): consensual open/plural arrangements are never
+        # affairs, and content cannot mint a cheating fact without one.
+        # The fact is established through detect_affair — the same
+        # agreement-aware production seam the drama engine uses — bound
+        # to THIS occurrence; reveal_fact below then reuses it (one
+        # immutable fact per occurrence, never two mints).
+        if len(about) != 2 \
+                or not drama.is_affair_breach(env, about[0], about[1]):
+            raise rule_actions.RuleError(
+                "not_allowed",
+                "this occurrence breaches no exclusive agreement")
+        drama.detect_affair(env, about[0], about[1], turn,
+                            occurrence_id=occurrence_id)
     reputation = []
     for spec in value.get("reputation") or []:
         pid = bindings.get(spec.get("person"))

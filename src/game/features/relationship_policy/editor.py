@@ -239,7 +239,9 @@ class Editor:
         affected_unions = []
         if jur_scopes and self.graph is not None:
             affected_unions = self._project_recognition(jur_scopes)
-        policy_delta = 1 if (faith_scopes or jur_scopes) else 0
+        policy_delta = 1 if (faith_scopes or jur_scopes or any(
+            kind in ("person", "personal_tenets", "convert_profile")
+            for kind, _t, _c, _d in prepared)) else 0
         journal = ["%s: %s" % (kind, target) for kind, target, _c, _d
                    in prepared]
         return {"valid": True, "errors": [],
@@ -287,14 +289,24 @@ class Editor:
                           "after": after, "turn": int(turn)})
         policy_changed = any(kind in ("faith_profile", "jurisdiction")
                              for kind, _t, _c, _d in prepared)
-        if policy_changed:
+        # R4: personal edits (attributes, personal tenets, conversion)
+        # change the policy inputs of THAT person's acceptance scores,
+        # so relevant pending offers must be superseded and the policy
+        # revision bumped just like shared-scope edits.
+        personal_targets = sorted({t for k, t, _c, _d in prepared
+                                   if k in ("person", "personal_tenets",
+                                            "convert_profile")})
+        if policy_changed or personal_targets:
             self.state["policy_revision"] = before_revision + 1
         self.state.setdefault("editor_audit", []).extend(audit)
-        if policy_changed and self.hook is not None:
-            self.hook({"affected_person_ids": sorted(self.state["profiles"]),
-                       "affected_jurisdictions": sorted({
-                           t for k, t, _c, _d in prepared
-                           if k == "jurisdiction"})})
+        if (policy_changed or personal_targets) and self.hook is not None:
+            self.hook({
+                "affected_person_ids": sorted(
+                    (set(self.state["profiles"]) if policy_changed
+                     else set()) | set(personal_targets)),
+                "affected_jurisdictions": sorted({
+                    t for k, t, _c, _d in prepared
+                    if k == "jurisdiction"})})
         return {"policy_revision": int(self.state["policy_revision"]),
                 "audit": audit}
 

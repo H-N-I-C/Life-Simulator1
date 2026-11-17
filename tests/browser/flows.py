@@ -782,4 +782,497 @@ FLOWS = [
             {"shot": "m2c-s5-successor"},
         ],
     },
+    # ------------------------------------------------------------------
+    # M2.5 flows (D2): dating app -> date; wedding planner/divorce ops;
+    # editor law change with reprojection + replay; family tree + the
+    # known-secrets projection. All at phone width (390x844).
+    # ------------------------------------------------------------------
+    {
+        # dating_app action -> frozen v3 offer pending -> deterministic
+        # stored acceptance -> date resolves through the real v3 resolver.
+        # married_30 proves the existing spouse is excluded as a stranger;
+        # D plants a genuinely unrelated adult fixture because the public
+        # dating-app predicate requires an eligible person to exist.
+        "name": "m25-dating-app",
+        "start": "/game",
+        "setup_js": "sessionStorage.removeItem('game_id')",
+        "steps": [
+            {"python": "phone_viewport"},
+            {"python": {"hook": "scenario_start",
+                        "scenario": "married_30"}},
+            {"python": {"hook": "refresh_state"}},
+            {"python": {"hook": "add_adult_stranger",
+                        "name": "Riley Stranger"}},
+            {"python": {"hook": "seed_next_draw", "seed": 31}},
+            {"python": {"hook": "cmd", "action": "dating_app"}},
+            {"python": {"hook": "refresh_state"}},
+            {"check_ctx": "state.pending_decision && "
+                "state.pending_decision.kind === 'm25_dating_app_date'",
+             "desc": "dating-app offer is the frozen v3 pending"},
+            {"check_ctx": "state.pending_decision.options.length === 2 && "
+                "state.pending_decision.options.every(function(o){"
+                "return o.enabled})",
+             "desc": "accept/decline both enabled and free"},
+            {"store_ctx": "state.pending_decision.bindings.target",
+             "as": "dating_target"},
+            {"check_ctx": "CTX.dating_target === CTX.stranger_id && "
+                "CTX.dating_target !== state.family.partner",
+             "desc": "fixture stranger chosen, not the existing spouse"},
+            {"check_ctx": "state.pending_decision.sampled.accepted === true",
+             "desc": "stored dating response pinned to acceptance boundary"},
+            {"store_ctx": "state.pending_decision.id", "as": "dating_dec"},
+            {"python": {"hook": "store_first_option", "match": "accept"}},
+            {"python": {"hook": "cmd", "action": "resolve_decision",
+                        "payload": {"decision_id": "CTX.dating_dec",
+                                    "option_id": "CTX.opt_id",
+                                    "inputs": {}}}},
+            {"python": {"hook": "refresh_state"}},
+            {"check_ctx": "state.people.some(function(p){"
+                "return p.id === CTX.dating_target})",
+             "desc": "the date made the match a known person"},
+            {"python": {"hook": "settle_turn"}},
+            {"python": {"hook": "settle_turn"}},
+            {"python": "load_game_in_page"},
+            {"js": "var b=document.getElementById('m25Toggle');"
+                   "if(b){b.click()}"},
+            {"wait_js": "var c=document.getElementById('m25Card');"
+                "c && !c.hidden && c.innerText.length > 20",
+             "desc": "M2.5 dating & weddings screen mounts"},
+            {"shot": "m25-dating-app"},
+        ],
+    },
+    {
+        # E7: start from the real married_with_child scenario, end its
+        # auto-migrated neutral-law union through the public wedding route,
+        # then REMARRY the same co-parent through C's authorised
+        # courtship_offer -> stored response -> union_proposal -> stored
+        # response journey. No in-process form_union setup shortcut is used.
+        "name": "m25-divorce",
+        "start": "/game",
+        "setup_js": "sessionStorage.removeItem('game_id')",
+        "steps": [
+            {"python": "phone_viewport"},
+            {"python": {"hook": "scenario_start",
+                        "scenario": "married_with_child"}},
+            {"python": {"hook": "refresh_state"}},
+            {"store_ctx": "state.player_id", "as": "player_id"},
+            {"python": "partner_id"},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "relview"}},
+            {"check_ctx": "CTX.relview.unions.filter(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.partner_id}).length === 1",
+             "desc": "one active union with the spouse"},
+            {"check_ctx": "CTX.relview.unions.filter(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.partner_id})[0].shared_children.length "
+                "=== 1",
+             "desc": "the shared dependent child is bound to the union"},
+            {"check_ctx": "Object.keys(CTX.relview.catalog.venues).some("
+                "function(k){return CTX.relview.catalog.venues[k].base "
+                "=== 0})",
+             "desc": "wedding planner publishes a free venue tier"},
+            {"store_js": "CTX.relview.unions.filter(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.partner_id})[0].union_id",
+             "as": "old_union_id"},
+            {"python": {"hook": "record_balance"}},
+            {"python": {"hook": "wedding_op", "op": "divorce_union",
+                        "args": {"union_id": "CTX.old_union_id"}}},
+            {"python": {"hook": "refresh_state"}},
+            {"check_ctx": "state.family.partner === CTX.partner_id && "
+                "state.family.partner_status !== 2 && "
+                "!state.available_actions.some(function(a){"
+                "return a.id === 'divorce' && "
+                "a.target_id === CTX.partner_id && a.enabled === true})",
+             "desc": "N3 exact post-divorce state: ex-partner is not married "
+                     "and legacy Divorce is disabled"},
+            {"check_ctx": "state.family.children.length === 1",
+             "desc": "shared child untouched by the divorce"},
+            {"python": {"hook": "real_offer_journey",
+                        "target_id": "CTX.partner_id"}},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "relview_real"}},
+            {"check_ctx": "CTX.relview_real.unions.filter(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.partner_id}).length === 1",
+             "desc": "real offer journey remarries the co-parent"},
+            {"check_ctx": "CTX.relview_real.unions.filter(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.partner_id})[0].shared_children.length "
+                "=== 1",
+             "desc": "shared dependent child bound to the new union"},
+            {"python": {"hook": "record_balance"}},
+            {"python": {"hook": "wedding_op", "op": "divorce_union",
+                        "args": {"union_id": "CTX.real_union_id"}}},
+            {"python": {"hook": "refresh_state"}},
+            {"check_ctx": "state.family.children.length === 1",
+             "desc": "shared child untouched by the second divorce"},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "relview2"}},
+            {"check_ctx": "CTX.relview2.unions.filter(function(u){"
+                "return u.union_id === CTX.real_union_id && "
+                "u.status === 'divorced'}).length === 1",
+             "desc": "real-journey union recorded divorced (not erased)"},
+            {"check_ctx": "CTX.relview2.unions.filter(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.partner_id}).length === 0",
+             "desc": "no active union remains with the spouse"},
+            {"python": "load_game_in_page"},
+            {"js": "var b=document.getElementById('m25Toggle');"
+                   "if(b){b.click()}"},
+            {"wait_js": "var c=document.getElementById('m25Card');"
+                "c && !c.hidden && c.innerText.length > 20",
+             "desc": "M2.5 screen mounts after the divorce"},
+            {"shot": "m25-divorce"},
+        ],
+    },
+    {
+        # Deterministic stored-response boundaries for C's targeted offer
+        # actions. Seed 153 forces refusal above the 0.98 p_accept clamp;
+        # seed 31 forces acceptance below the 0.02 floor. No retry loop.
+        "name": "m25-offer-boundaries",
+        "start": "/game",
+        "setup_js": "sessionStorage.removeItem('game_id')",
+        "steps": [
+            {"python": "phone_viewport"},
+            {"python": {"hook": "scenario_start",
+                        "scenario": "employed_30"}},
+            {"python": {"hook": "refresh_state"}},
+            {"python": {"hook": "add_adult_stranger",
+                        "name": "Refused Stranger", "as_": "refuse_id"}},
+            {"python": {"hook": "refusal_boundary",
+                        "target_id": "CTX.refuse_id"}},
+            {"python": {"hook": "add_adult_stranger",
+                        "name": "Accepted Stranger", "as_": "accept_id"}},
+            {"python": {"hook": "real_offer_journey",
+                        "target_id": "CTX.accept_id",
+                        "as_": "accept_union_id"}},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "boundary_view"}},
+            {"check_ctx": "CTX.boundary_view.unions.some(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.accept_id}) && "
+                "!CTX.boundary_view.unions.some(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.refuse_id})",
+             "desc": "accepted boundary forms union; refused boundary does not"},
+            {"shot": "m25-offer-boundaries"},
+        ],
+    },
+    {
+        # E7 completion evidence: start from a real spouse+child union,
+        # add an unrelated adult through D's fixture, form a SECOND active
+        # union through the same public offer journey, hold the free
+        # courthouse ceremony for that second union, then divorce only the
+        # second union. The original spouse union and shared child must
+        # survive selected divorce.
+        "name": "m25-two-union-selected-divorce",
+        "start": "/game",
+        "setup_js": "sessionStorage.removeItem('game_id')",
+        "steps": [
+            {"python": "phone_viewport"},
+            {"python": {"hook": "scenario_start",
+                        "scenario": "married_with_child"}},
+            {"python": {"hook": "refresh_state"}},
+            {"store_ctx": "state.player_id", "as": "player_id"},
+            {"python": "partner_id"},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "baseline_view"}},
+            {"check_ctx": "CTX.baseline_view.unions.some(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.partner_id && "
+                "u.shared_children.length === 1})",
+             "desc": "baseline spouse union has the shared child"},
+            {"python": {"hook": "add_adult_stranger",
+                        "name": "Sam Second", "as_": "second_id"}},
+            {"python": {"hook": "real_offer_journey",
+                        "target_id": "CTX.second_id",
+                        "as_": "second_union_id"}},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "two_union_view"}},
+            {"check_ctx": "CTX.two_union_view.unions.filter(function(u){"
+                "return u.status === 'active' && "
+                "(u.partner.id === CTX.partner_id || "
+                "u.partner.id === CTX.second_id)}).length === 2",
+             "desc": "two simultaneous active unions are public"},
+            {"check_ctx": "CTX.two_union_view.unions.some(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.partner_id && "
+                "u.shared_children.length === 1})",
+             "desc": "child remains bound to the original spouse union"},
+            {"python": {"hook": "record_balance"}},
+            {"python": {"hook": "wedding_op", "op": "plan_wedding",
+                        "args": {"union_id": "CTX.second_union_id",
+                                 "venue_id": "courthouse", "guests": 0,
+                                 "outfit_id": "hand_me_down",
+                                 "honeymoon_id": "none"}}},
+            {"python": {"hook": "refresh_state"}},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "wedding_view"}},
+            {"check_ctx": "CTX.wedding_view.unions.some(function(u){"
+                "return u.union_id === CTX.second_union_id && "
+                "u.status === 'active' && u.ceremony_held === true})",
+             "desc": "second union receives the free courthouse ceremony"},
+            {"check_ctx": "CTX.wedding_view.money === CTX.balance_before",
+             "desc": "free wedding configuration moved no money"},
+            {"python": {"hook": "wedding_op", "op": "divorce_union",
+                        "args": {"union_id": "CTX.second_union_id"}}},
+            {"python": {"hook": "refresh_state"}},
+            {"check_ctx": "state.family.children.length === 1",
+             "desc": "family child count unchanged by selected divorce"},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "after_selected_view"}},
+            {"check_ctx": "CTX.after_selected_view.unions.some(function(u){"
+                "return u.union_id === CTX.second_union_id && "
+                "u.status === 'divorced'})",
+             "desc": "selected second union recorded divorced"},
+            {"check_ctx": "CTX.after_selected_view.unions.some(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.partner_id && "
+                "u.shared_children.length === 1})",
+             "desc": "spouse union and shared child survive selected divorce"},
+            {"check_ctx": "!CTX.after_selected_view.unions.some(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.second_id})",
+             "desc": "no active second union remains"},
+            {"check_ctx": "CTX.after_selected_view.money === "
+                "CTX.wedding_view.money",
+             "desc": "selected divorce of childless second union moved no money"},
+            {"python": "load_game_in_page"},
+            {"js": "var b=document.getElementById('m25Toggle');"
+                   "if(b){b.click()}"},
+            {"wait_js": "var c=document.getElementById('m25Card');"
+                "c && !c.hidden && c.innerText.length > 20",
+             "desc": "M2.5 screen mounts after selected divorce"},
+            {"shot": "m25-two-union-selected-divorce"},
+        ],
+    },
+    {
+        # E7/editor law: replace the D2 in-process union setup with the
+        # public offer journey, then apply a save-local jurisdiction
+        # override and see THAT union's recognition reprojected. Also
+        # prove replay idempotence and optimistic concurrency.
+        "name": "m25-editor-law",
+        "start": "/game",
+        "setup_js": "sessionStorage.removeItem('game_id')",
+        "steps": [
+            {"python": "phone_viewport"},
+            {"python": {"hook": "scenario_start",
+                        "scenario": "married_with_child"}},
+            {"python": {"hook": "refresh_state"}},
+            {"store_ctx": "state.player_id", "as": "player_id"},
+            {"python": "partner_id"},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "relview"}},
+            {"store_js": "CTX.relview.unions.filter(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.partner_id})[0].union_id",
+             "as": "old_union_id"},
+            {"python": {"hook": "wedding_op", "op": "divorce_union",
+                        "args": {"union_id": "CTX.old_union_id"}}},
+            {"python": {"hook": "real_offer_journey",
+                        "target_id": "CTX.partner_id"}},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "relview_real"}},
+            {"check_ctx": "CTX.relview_real.unions.some(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.partner_id && "
+                "u.recognition === 'recognized'})",
+             "desc": "real-journey union recognized under baseline law"},
+            {"python": {"hook": "editor_apply", "commands": [
+                {"name": "edit_jurisdiction", "scope": "jurisdiction",
+                 "target_id": "jur_metropolis_charter",
+                 "patch": {"recognition": {
+                     "monogamous_civil": "unrecognized"}}}]}},
+
+            {"python": {"hook": "api_get", "suffix": "policy-state",
+                        "as_": "pol_after"}},
+            {"check_ctx": "CTX.pol_after.overrides.jurisdictions && "
+                "CTX.pol_after.overrides.jurisdictions.jur_metropolis_charter"
+                ".recognition.monogamous_civil === 'unrecognized'",
+             "desc": "save-local law override persisted"},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "relview2"}},
+            {"check_ctx": "CTX.relview2.unions.some(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.partner_id && "
+                "u.recognition === 'unrecognized'})",
+             "desc": "existing union's recognition reprojected (A4)"},
+            {"check_ctx": "CTX.relview2.money === CTX.relview_real.money",
+             "desc": "editor law change moved no money"},
+            # replay-exact retry: same request_id + the pre-apply
+            # revision must return the recorded response, not a 409
+            {"python": {"hook": "editor_apply", "commands": [
+                {"name": "edit_jurisdiction", "scope": "jurisdiction",
+                 "target_id": "jur_metropolis_charter",
+                 "patch": {"recognition": {
+                     "monogamous_civil": "unrecognized"}}}],
+                        "request_id": "CTX.ed_result_request_id",
+                        "revision": "CTX.ed_result_revision",
+                        "as_": "ed_replay"}},
+            {"check_ctx": "JSON.stringify(CTX.ed_replay) === "
+                "JSON.stringify(CTX.ed_result)",
+             "desc": "replay with the recorded request_id returns the "
+                    "recorded response byte-identically"},
+            {"python": {"hook": "editor_apply", "commands": [
+                {"name": "edit_jurisdiction", "scope": "jurisdiction",
+                 "target_id": "jur_metropolis_charter",
+                 "patch": {"recognition": {
+                     "monogamous_civil": "recognized"}}}],
+                        "revision": "CTX.ed_result_revision",
+                        "expect_status": 409}},
+            {"python": "load_game_in_page"},
+            {"js": "var b=document.getElementById('editorToggle');"
+                   "if(b){b.click()}"},
+            {"wait_js": "document.body.innerText.length > 40",
+             "desc": "editor screen mounts"},
+            {"shot": "m25-editor-law"},
+        ],
+    },
+    {
+        # L1: a configured forbidden-union ceremony fine is a real charge,
+        # not just an offer-time forecast. D drives the public editor ->
+        # courtship/proposal -> free ceremony path and asserts the $500
+        # civil fine posts once through the legal ledger.
+        "name": "m25-law-ceremony-fine",
+        "start": "/game",
+        "setup_js": "sessionStorage.removeItem('game_id')",
+        "steps": [
+            {"python": "phone_viewport"},
+            {"python": {"hook": "scenario_start",
+                        "scenario": "employed_30"}},
+            {"python": {"hook": "refresh_state"}},
+            {"python": {"hook": "add_adult_stranger",
+                        "name": "Fine Stranger", "as_": "fine_id"}},
+            {"python": {"hook": "editor_apply", "commands": [
+                {"name": "edit_jurisdiction", "scope": "jurisdiction",
+                 "target_id": "jur_metropolis_charter",
+                 "patch": {
+                     "recognition": {"monogamous_civil": "forbidden",
+                                     "plural_civil": "forbidden"},
+                     "consequences": [{
+                         "trigger": "ceremony_of_unrecognized_union",
+                         "effect": "civil_fine",
+                         "ledger_category": "legal",
+                         "amount": {"randint": [500, 500]},
+                         "max_per_occurrence_key": "union_id"}]}}]}},
+            {"python": {"hook": "refresh_state"}},
+            {"python": {"hook": "real_offer_journey",
+                        "target_id": "CTX.fine_id",
+                        "as_": "fine_union_id"}},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "fine_view"}},
+            {"check_ctx": "CTX.fine_view.unions.some(function(u){"
+                "return u.status === 'active' && "
+                "u.partner.id === CTX.fine_id && "
+                "u.recognition === 'forbidden'})",
+             "desc": "public proposal persists forbidden recognition"},
+            {"python": {"hook": "record_balance"}},
+            {"python": {"hook": "wedding_op", "op": "plan_wedding",
+                        "args": {"union_id": "CTX.fine_union_id",
+                                 "venue_id": "courthouse", "guests": 0,
+                                 "outfit_id": "hand_me_down",
+                                 "honeymoon_id": "none"}}},
+            {"python": {"hook": "refresh_state"}},
+            {"check_ctx": "state.money === CTX.balance_before - 500",
+             "desc": "L1 civil fine reduced money by configured amount"},
+            {"python": {"hook": "assert_last_payment",
+                        "category": "legal", "amount_min": 500,
+                        "amount_max": 500,
+                        "desc": "L1 civil fine posted exactly once"}},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "fine_after_view"}},
+            {"check_ctx": "CTX.fine_after_view.unions.some(function(u){"
+                "return u.union_id === CTX.fine_union_id && "
+                "u.status === 'active' && u.ceremony_held === true})",
+             "desc": "forbidden-union ceremony held after fine"},
+            {"python": "load_game_in_page"},
+            {"js": "var b=document.getElementById('m25Toggle');"
+                   "if(b){b.click()}"},
+            {"wait_js": "var c=document.getElementById('m25Card');"
+                "c && !c.hidden && c.innerText.length > 20",
+             "desc": "M2.5 screen mounts after fined ceremony"},
+            {"shot": "m25-law-ceremony-fine"},
+        ],
+    },
+    {
+        # Family tree renders the player, spouse and child at phone
+        # width; the secrets surface is the player-known projection
+        # (facts/reputation-as-known) with the pending's display reasons
+        # exposed only through the same predicate as get_state.
+        "name": "m25-family-tree",
+        "start": "/game",
+        "setup_js": "sessionStorage.removeItem('game_id')",
+        "steps": [
+            {"python": "phone_viewport"},
+            {"python": {"hook": "scenario_start",
+                        "scenario": "married_with_child"}},
+            {"python": {"hook": "refresh_state"}},
+            {"python": {"hook": "api_get", "suffix": "family-tree",
+                        "as_": "tree"}},
+            {"check_ctx": "CTX.tree.tree.nodes.length >= 3",
+             "desc": "tree projects player, spouse and child"},
+            {"check_ctx": "CTX.tree.tree.edges.some(function(e){"
+                "return e.kind === 'parentage'})",
+             "desc": "parentage edges present (real graph, no invention)"},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "relview"}},
+            {"check_ctx": "Array.isArray(CTX.relview.facts) && "
+                "Array.isArray(CTX.relview.reputation)",
+             "desc": "known-secrets projection arrays present"},
+            {"check_ctx": "CTX.relview.facts.every(function(f){"
+                "return !!f.fact_id && !!f.kind})",
+             "desc": "every known fact carries id+kind (provenance)"},
+            {"python": "load_game_in_page"},
+            {"js": "var b=document.getElementById('familyTreeToggle');"
+                   "if(b){b.click()}"},
+            {"wait_js": "document.querySelector('.ftree') !== null",
+             "desc": "family tree renders"},
+            {"shot": "m25-family-tree"},
+        ],
+    },
+    {
+        # R11: secrecy exercised through HTTP. A private journal row and
+        # a player-unknown secret fact are planted in the save (same
+        # planting as A's sentinel test); every assertion below reads
+        # REAL HTTP responses: get_state and relationships-view must not
+        # contain the sentinel, the hidden fact id, or the secret fact;
+        # after the player learns it, the fact appears in the view while
+        # the private row stays hidden.
+        "name": "m25-secrecy",
+        "start": "/game",
+        "setup_js": "sessionStorage.removeItem('game_id')",
+        "steps": [
+            {"python": "phone_viewport"},
+            {"python": {"hook": "scenario_start",
+                        "scenario": "married_with_child"}},
+            {"python": {"hook": "refresh_state"}},
+            {"python": "partner_id"},
+            {"python": "plant_secret"},
+            {"python": {"hook": "refresh_state"}},
+            {"check_ctx": "JSON.stringify(state).indexOf("
+                "'PRIVATE_SENTINEL_M25') === -1",
+             "desc": "HTTP get_state hides the private journal row"},
+            {"check_ctx": "JSON.stringify(state).indexOf('f_hidden_m25') "
+                "=== -1",
+             "desc": "HTTP get_state hides the private fact id"},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "relview"}},
+            {"check_ctx": "CTX.relview.facts.every(function(f){"
+                "return f.fact_id !== CTX.secret_fact_id})",
+             "desc": "the secrets view omits the unknown fact"},
+            {"python": "learn_secret"},
+            {"python": {"hook": "refresh_state"}},
+            {"check_ctx": "JSON.stringify(state).indexOf("
+                "'PRIVATE_SENTINEL_M25') === -1",
+             "desc": "private row still hidden after learning"},
+            {"python": {"hook": "api_get", "suffix": "relationships-view",
+                        "as_": "relview2"}},
+            {"check_ctx": "CTX.relview2.facts.some(function(f){"
+                "return f.fact_id === CTX.secret_fact_id})",
+             "desc": "the learned fact now appears in the secrets view"},
+            {"shot": "m25-secrecy"},
+        ],
+    },
 ]

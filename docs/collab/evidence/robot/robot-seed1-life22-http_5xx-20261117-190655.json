@@ -1,0 +1,67 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 1,
+ "life_index": 22,
+ "failure": {
+  "kind": "http_5xx",
+  "detail": "action 'resolve_decision' -> HTTP 500: {\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alphonso",
+    "last_name": "Alexander",
+    "gender": "male",
+    "country": "Germany",
+    "seed": 1935495882,
+    "request_id": "robot-1-22-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1922038465,
+     "base": "woman",
+     "skin_tone": "medium-light",
+     "hair": "red",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "earrings"
+     ],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_f3955eb0ef",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-1-r4453",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_f3955eb0ef",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue",
+    "inputs": null
+   },
+   "request_id": "robot-1-r4454",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 500,
+   "body": "{\"error\": {\"code\": \"internal_error\", \"message\": \"the operation failed; no changes were applied\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 23 --seed 1 --from-life 22 --fail-fast"
+}
