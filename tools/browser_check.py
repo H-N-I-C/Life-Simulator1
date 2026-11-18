@@ -1284,6 +1284,70 @@ class Runner:
         self.record(flow, "cmd %s" % action, ok,
                     "status=%s %s" % (status, json.dumps(result)[:160]))
 
+    # ---- v2 shell visibility hook (D, stage1-evaluation.md S1/S2) -------
+
+    def _hook_check_shell_visibility(self, flow, visible, hidden,
+                                     action_js=None):
+        """Assert ACTUAL visibility (checkVisibility, not the hidden attr)
+        of a shown/hidden view pair — the S1 failure mode is
+        hidden===true while a scoped `display:flex` still renders the
+        element. Three-state result: PASS when healthy; WARN only for the
+        exact confirmed S1 signature (Codex stage1-evaluation.md, B
+        fixing); FAIL for any other deviation. The WARN self-removes the
+        moment the CSS honors [hidden]."""
+        s = self.s
+        if action_js:
+            s.js(action_js)
+        s.wait_js("(() => { const v = document.getElementById(%s);"
+                  " return !!v && !v.hidden; })()" % json.dumps(visible),
+                  timeout=15,
+                  desc="%s shown" % visible)
+        res = s.js(
+            "(() => { const v = document.getElementById(%s);"
+            " const h = document.getElementById(%s);"
+            " return {visible_shown: !v.hidden,"
+            "  visible_check: v.checkVisibility(),"
+            "  hidden_attr: h.hidden, hidden_check: h.checkVisibility(),"
+            "  hidden_display: getComputedStyle(h).display}; })()"
+            % (json.dumps(visible), json.dumps(hidden)))
+        healthy = (res.get("visible_shown") and res.get("visible_check")
+                   and res.get("hidden_attr")
+                   and not res.get("hidden_check"))
+        s1 = (res.get("visible_shown") and res.get("visible_check")
+              and res.get("hidden_attr") and res.get("hidden_check")
+              and res.get("hidden_display") == "flex")
+        if healthy:
+            self.record(flow, "%s visible + %s actually hidden"
+                        % (visible, hidden), True,
+                        json.dumps(res)[:160])
+        elif s1:
+            self.record(flow, "WARN known S1: %s has hidden=true but "
+                        "checkVisibility=true (display:%s; scoped flex "
+                        "overrides [hidden]; B fixing per stage1-"
+                        "evaluation.md)" % (hidden, res.get("hidden_display")),
+                        True, json.dumps(res)[:160])
+        else:
+            self.record(flow, "%s visible + %s actually hidden"
+                        % (visible, hidden), False,
+                        json.dumps(res)[:200])
+
+    def _hook_resume_first_life(self, flow):
+        """From the all-lives list, resume the first life and assert the
+        game shell becomes ACTUALLY visible again (S1 round-trip)."""
+        s = self.s
+        s.wait_js("document.querySelectorAll('#lifeList button').length "
+                  ">= 1", timeout=15,
+                  desc="life list rows with Resume rendered")
+        s.js("(() => { const b = document.querySelector('#lifeList "
+             "button'); if (b) { b.click(); return true; } return false; })()")
+        s.wait_js("(() => { const g = document.getElementById('gameView');"
+                  " return !!g && !g.hidden; })()", timeout=15,
+                  desc="game view shown after resume")
+        ok = s.js("(() => { const g = document.getElementById('gameView');"
+                  " return !g.hidden && g.checkVisibility() === true; })()")
+        self.record(flow, "resume life: game view actually visible",
+                    ok is True)
+
     # ---- M2.5 hooks (D2 flows) ------------------------------------------
 
     def _hook_phone_viewport(self, flow, width=390, height=844):

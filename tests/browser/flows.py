@@ -1275,4 +1275,59 @@ FLOWS = [
             {"shot": "m25-secrecy"},
         ],
     },
+
+    {
+        # v2 shell route visibility (Kimi D, stage1-evaluation.md S1/S2):
+        # actual-visibility (checkVisibility) regressions for the
+        # More->Editor route, All lives -> resume, and death -> legacy.
+        # Runs against the CURRENT tree's v2 shell, not the pre-v2
+        # baseline. The S1 exact signature is WARN-masked only while B's
+        # scoped-CSS fix is open; it self-removes once [hidden] is
+        # honored, and any other deviation fails hard.
+        "name": "v2-route-visibility",
+        "start": "/game",
+        "setup_js": "sessionStorage.removeItem('game_id')",
+        "steps": [
+            {"python": "phone_viewport"},
+            {"python": {"hook": "scenario_start",
+                        "scenario": "married_30"}},
+            {"js": "window.location.href = '/game?game=' + "
+                   "window.CTX.game_id; true"},
+            {"wait_js": "!!document.getElementById('gameView') && "
+                "!document.getElementById('gameView').hidden",
+             "desc": "v2 shell game view loaded"},
+
+            {"js": "(() => { const hb = document.querySelector("
+                "'.v2-header-btn'); if (hb) hb.click(); const b = "
+                "Array.from(document.querySelectorAll('.v2-more button'))"
+                ".find(x => x.textContent.indexOf('Character editor') "
+                ">= 0); if (b) { b.click(); return true; } "
+                "return false; })()"},
+            {"wait_js": "!!document.getElementById('editorPanel') && "
+                "!document.getElementById('editorPanel').hidden",
+             "desc": "editor panel opened from More menu"},
+            {"check_js": "(() => { const e = document.getElementById("
+                "'editorPanel'); return !!e && !e.hidden && "
+                "e.checkVisibility() === true; })()",
+             "desc": "More->Editor: editor actually visible from Home"},
+
+            {"python": {"hook": "check_shell_visibility",
+                        "visible": "resumeView", "hidden": "gameView",
+                        "action_js": "document.getElementById("
+                            "'backToLives').click(); true"}},
+            {"python": "resume_first_life"},
+
+            {"python": "refresh_state"},
+            {"python": "surrender_to_death"},
+            {"js": "sessionStorage.setItem('game_id', "
+                "window.CTX.game_id); true"},
+            {"js": "window.location.href = '/game?game=' + "
+                   "window.CTX.game_id; true"},
+            {"wait_js": "!!document.getElementById('legacyView') && "
+                "!document.getElementById('legacyView').hidden",
+             "desc": "legacy view shown after death"},
+            {"python": {"hook": "check_shell_visibility",
+                        "visible": "legacyView", "hidden": "gameView"}},
+        ],
+    },
 ]

@@ -1,0 +1,481 @@
+/* v2 visual tokens + shell chrome (Kimi B, redesign-v2).
+ * Sole source of the frozen §Tokens contract
+ * (docs/collab/redesign-v2/contracts.md). Loaded AFTER all v2 module
+ * stylesheets so equal-specificity restatements here win over module
+ * fallbacks (e.g. person.css's .v2p-root defaults).
+ *
+ * Hard rules honoured (codex-review.md §5):
+ *  - dynamic viewport + safe-area insets; no fixed 390x844, no page
+ *    overflow:hidden; scrolls at 320px / landscape / text-zoom;
+ *  - tab bar never covers the last entry (scroll-padding-bottom);
+ *  - focus-visible outline everywhere in v2 scope;
+ *  - stat colour is never the only signal (modules render numeric labels);
+ *  - Nunito is progressive enhancement, never a play prerequisite. */
+
+:root {
+  --v2-font: "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --v2-accent: #2a63e6;
+  --v2-accent-2: #3a7bfd;
+  --v2-ink: #16203a;
+  --v2-ink-soft: #2b3550;
+  --v2-muted: #6b7690;
+  --v2-faint: #69718a;
+  --v2-page: #eef2f9;
+  --v2-card: #ffffff;
+  --v2-track: #e7ebf3;
+  --v2-bar-good: #15803d;
+  --v2-bar-mid: #b45309;
+  --v2-bar-bad: #dc2626;
+  --v2-bar-1: #2a63e6;
+  --v2-bar-2: #15803d;
+  --v2-bar-3: #a16207;
+  --v2-bar-4: #be185d;
+  --v2-radius: 16px;
+  --v2-shadow: 0 4px 16px rgba(22, 32, 58, .10);
+  --v2-gap: 10px;
+  --v2-header-h: 64px;
+  --v2-tabbar-h: 64px;
+  --v2-age-good: #1fb35a;
+  --v2-age-good-dark: #10783a;
+  --v2-age-grad: radial-gradient(circle at 35% 30%, #4ee08a 0%,
+                                #1fb35a 60%, #169247 100%);
+  --v2-danger: #b91c1c;
+  --v2-focus: #2f6fed;
+}
+
+/* Theme restatement over module fallbacks (same names, later order wins).
+ * Only needed where a module defines its own defaults on its root. */
+.v2p-root {
+  --v2-accent: #2a63e6;
+  --v2-accent-2: #3a7bfd;
+  --v2-ink: #16203a;
+  --v2-ink-soft: #2b3550;
+  --v2-muted: #6b7690;
+  --v2-faint: #69718a;
+  --v2-page: #eef2f9;
+  --v2-card: #ffffff;
+  --v2-track: #e7ebf3;
+  --v2-bar-good: #15803d;
+  --v2-bar-mid: #b45309;
+  --v2-bar-bad: #dc2626;
+  --v2-radius: 16px;
+  --v2-shadow: 0 4px 16px rgba(22, 32, 58, .10);
+}
+
+/* ---- v2 scope ------------------------------------------------------- */
+.v2-scope {
+  font-family: var(--v2-font);
+  background: var(--v2-page);
+  color: var(--v2-ink);
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Preserve semantic hiding despite flex/grid component layouts. */
+.v2-scope[hidden],
+.v2-scope [hidden] {
+  display: none !important;
+}
+
+.v2-scope :focus-visible {
+  outline: 3px solid var(--v2-focus);
+  outline-offset: 2px;
+}
+
+/* The scroll region: all screens live here, tab bar is outside it so it
+ * can never cover the last journal entry. */
+.v2-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 12px 14px
+           calc(var(--v2-tabbar-h) + env(safe-area-inset-bottom, 0px) + 12px);
+}
+
+.v2-scope .screen[hidden] { display: none; }
+
+/* ---- header --------------------------------------------------------- */
+.v2-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+  background: linear-gradient(180deg, var(--v2-accent-2) 0%,
+                              var(--v2-accent) 100%);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(42, 99, 230, .30);
+}
+
+.v2-header-id { flex: 1 1 auto; min-width: 0; }
+.v2-header-name {
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.v2-header-sub {
+  font-size: 12.5px;
+  font-weight: 700;
+  opacity: .9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.v2-header-cash {
+  text-align: right;
+  font-weight: 900;
+  font-size: 16px;
+  flex: 0 0 auto;
+}
+.v2-header-cash small {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .4px;
+  opacity: .85;
+}
+
+.v2-header-btn {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .16);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.v2-home-link {
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-weight: 900;
+  font-size: 17px;
+  cursor: pointer;
+  padding: 8px 4px;
+  border-radius: 10px;
+}
+.v2-home-link[aria-current="page"] {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* More (secondary routes) menu */
+.v2-more {
+  position: absolute;
+  right: 10px;
+  top: calc(100% + 4px);
+  background: var(--v2-card);
+  color: var(--v2-ink);
+  border-radius: 12px;
+  box-shadow: var(--v2-shadow);
+  min-width: 200px;
+  padding: 6px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.v2-more[hidden] { display: none; }
+.v2-more button {
+  border: 0;
+  background: transparent;
+  color: var(--v2-ink-soft);
+  text-align: left;
+  font: inherit;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.v2-more button:hover { background: var(--v2-page); }
+
+/* ---- tab bar -------------------------------------------------------- */
+.v2-tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-around;
+  align-items: stretch;
+  background: var(--v2-card);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -4px 16px rgba(22, 32, 58, .10);
+  padding: 6px 4px
+           calc(6px + env(safe-area-inset-bottom, 0px));
+  min-height: var(--v2-tabbar-h);
+}
+
+.v2-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--v2-muted);
+  font: inherit;
+  font-weight: 800;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 4px 2px;
+}
+.v2-tab .v2-tab-ic {
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1;
+}
+.v2-tab[aria-current="page"] {
+  color: var(--v2-accent);
+}
+.v2-tab[aria-current="page"] .v2-tab-ic {
+  transform: translateY(-1px);
+}
+
+/* Age button is owned by the Home screen (Stage 2); shell styles only the
+ * frozen tokens it consumes. */
+
+/* ---- person overlay host -------------------------------------------- */
+.v2-person-host[hidden] { display: none; }
+.v2-person-host {
+  position: fixed;
+  inset: 0;
+  /* above the decision sheet (modal z-index 100) so a person opened from a
+   * sheet chip sits on top; Back returns to the still-open sheet */
+  z-index: 110;
+  background: var(--v2-page);
+  overflow-y: auto;
+}
+
+/* ---- misc states ----------------------------------------------------- */
+.v2-loading, .v2-error {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--v2-muted);
+  font-weight: 700;
+}
+
+/* ---- v2 Home (contracts.md §Home) ------------------------------------ */
+.v2h-root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--v2-gap);
+}
+
+.v2h-agebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0 2px;
+}
+
+.v2h-age {
+  width: 88px;
+  height: 88px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--v2-age-grad);
+  box-shadow: 0 5px 0 var(--v2-age-good-dark),
+              0 8px 20px rgba(31, 179, 90, .40);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-family: inherit;
+}
+.v2h-age-plus { font-size: 30px; font-weight: 900; }
+.v2h-age-word { font-size: 14px; font-weight: 900; letter-spacing: .5px; }
+.v2h-age:disabled {
+  cursor: not-allowed;
+  filter: grayscale(.55) brightness(.96);
+  box-shadow: none;
+}
+.v2h-age-note {
+  min-height: 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--v2-muted);
+  text-align: center;
+}
+
+.v2h-stats {
+  background: var(--v2-card);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -4px 16px rgba(22, 32, 58, .08);
+  padding: 14px 16px
+           calc(14px + env(safe-area-inset-bottom, 0px));
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 18px;
+}
+.v2h-stat { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.v2h-stat-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 900;
+}
+.v2h-stat-label { color: var(--v2-ink); }
+.v2h-stat-value { color: var(--v2-ink-soft); }
+.v2h-stat-track {
+  height: 10px;
+  background: var(--v2-track);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.v2h-stat-fill { height: 10px; border-radius: 999px; }
+
+/* ---- v2 Choice sheet (contracts.md §Choice) --------------------------- */
+.v2-sheet {
+  max-height: 85vh;
+  max-height: 85dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 20px 20px 0 0;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+}
+@media (max-width: 520px) {
+  /* bottom-sheet presentation on phones; controls stay reachable above
+   * the software keyboard (inputs are 16px, §Choice rule 3) */
+  .modal-box.v2-sheet {
+    margin: 0;
+    max-width: none;
+    width: 100%;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+.v2c-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.v2c-title { margin: 0; flex: 1 1 auto; }
+.v2c-kind {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .4px;
+  color: var(--v2-accent);
+  background: var(--v2-page);
+  border-radius: 999px;
+  padding: 3px 10px;
+  text-transform: uppercase;
+}
+.v2c-text { color: var(--v2-ink-soft); line-height: 1.45; }
+.v2c-people { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+.v2c-form { display: flex; flex-direction: column; gap: 10px; margin: 8px 0; }
+.v2c-form .field { display: flex; flex-direction: column; gap: 4px;
+                   font-weight: 700; font-size: 13px; }
+.v2c-form input, .v2c-form select {
+  font-family: inherit;
+  font-size: 16px;   /* prevents iOS focus zoom so the sheet stays put */
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--v2-track);
+  background: #fff;
+  color: var(--v2-ink);
+}
+.v2c-opt-inputs { display: flex; flex-direction: column; gap: 6px;
+                  padding: 8px; border-radius: 10px;
+                  background: var(--v2-page); }
+.v2c-opt-inputs-for { font-size: 12px; font-weight: 900;
+                      color: var(--v2-muted); }
+.v2c-options { display: flex; flex-direction: column; gap: 8px; margin: 8px 0; }
+.v2c-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  text-align: left;
+  background: var(--v2-card);
+  border: 1.5px solid var(--v2-track);
+  color: var(--v2-ink);
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 14.5px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+.v2c-option:hover { border-color: var(--v2-accent); }
+.v2c-option:disabled { cursor: not-allowed; opacity: .75; }
+.v2c-effects { font-size: 12px; font-weight: 700; color: var(--v2-muted); }
+.v2c-reason { font-size: 12px; font-weight: 700; color: var(--v2-bar-bad); }
+.v2c-later {
+  align-self: center;
+  background: transparent;
+  color: var(--v2-muted);
+  font-family: inherit;
+  font-weight: 800;
+  border: 0;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+/* fatal/terminal choices */
+.modal-box.danger .v2c-option { border-color: var(--v2-danger); }
+.modal-box.danger .v2c-title { color: var(--v2-danger); }
+
+/* ---- Stage 3 responsive hardening (B; no navigation code) ------------- */
+/* 320px phones: keep the header compact and prevent any horizontal
+ * overflow; tab labels shrink before they wrap. */
+@media (max-width: 360px) {
+  .v2-header { gap: 6px; padding-left: 8px; padding-right: 8px; }
+  .v2-header-btn { width: 36px; height: 36px; }
+  .v2-home-link { font-size: 15px; padding: 8px 2px; }
+  .v2-header-name { font-size: 15px; }
+  .v2-header-cash { font-size: 14px; }
+  .v2-tab { font-size: 10px; }
+  .v2-tab .v2-tab-ic { font-size: 17px; }
+  .v2h-stats { grid-template-columns: 1fr; }
+  .v2h-age { width: 76px; height: 76px; }
+}
+
+/* Short landscape screens: the scroll region must own the overflow, the
+ * chrome stays fixed; reduce hero padding so content is reachable. */
+@media (max-height: 480px) {
+  .v2-header { padding-top: calc(4px + env(safe-area-inset-top, 0px));
+               padding-bottom: 4px; }
+  .v2-tabbar { min-height: 52px; }
+  .v2-scroll { padding-bottom: calc(52px + env(safe-area-inset-bottom, 0px) + 8px); }
+}
+
+/* Motion sensitivity: the Age press is the only animated affordance. */
+@media (prefers-reduced-motion: reduce) {
+  .v2h-age { box-shadow: 0 2px 0 var(--v2-age-good-dark); }
+  .v2-tab .v2-tab-ic { transform: none; }
+}
+
+/* Person overlay honours the same bottom-safe padding as other surfaces. */
+.v2p-root { padding-bottom: max(var(--v2-gap), env(safe-area-inset-bottom)); }
+
+/* Text zoom (200%): let one-column layouts breathe. */
+@media (min-resolution: 1.5dppx) and (max-width: 400px) {
+  .v2h-stats { gap: 12px 14px; }
+}

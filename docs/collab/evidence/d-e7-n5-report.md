@@ -152,3 +152,10 @@ Status: **running**.
 Interim observed progress: creation ledger through life index **86** / 500. Evidence failures so far: **6**, all typed 4xx with code `refused` (real NPC/refusal outcomes). Current-run 5xx so far: **0**. No invariant/soft-lock evidence files so far.
 
 This is not the final acceptance summary; final counts will be written only after the process exits.
+
+
+## Fresh current-tree 500-life robot — second interim snapshot
+
+Status: **running**, ~50m50s elapsed, high CPU.
+
+Observed progress: creation ledger through life index **179** / 500. Evidence failures so far: **16**, all typed 4xx with code `refused`. Current-run hard failures so far: **0** (`http_5xx`, `invariant`, and `soft_lock` evidence counts are all zero).

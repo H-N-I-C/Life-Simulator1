@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home v2</title>
+<script src="../support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}a{color:#1d4ed8}a:hover{color:#1e3a8a}</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#eef2f9;color:#16203a;font-family:Nunito,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+  <div style="background:linear-gradient(180deg,#3a7bfd 0%,#2a63e6 100%);padding:14px 16px 18px;color:#ffffff;display:flex;align-items:center;gap:12px;box-shadow:0 6px 18px rgba(42,99,230,.35)">
+    <div style="width:58px;height:58px;border-radius:50%;background:#dbe7ff;border:3px solid #ffffff;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
+      <img src="/_blob/22bebae477287026e809592ec43a441d" alt="Maya" style="width:48px;height:48px">
+    </div>
+    <div style="flex-grow:1;min-width:0">
+      <div style="font-weight:900;font-size:19px;line-height:1.1">Maya Okafor</div>
+      <div style="font-size:13px;opacity:.9;font-weight:700">Junior Architect · Lagos</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:11px;font-weight:800;opacity:.85;letter-spacing:.4px">BANK</div>
+      <div style="font-weight:900;font-size:18px">$48,210</div>
+    </div>
+  </div>
+
+  <div style="flex-grow:1;overflow:hidden;padding:14px 14px 6px;display:flex;flex-direction:column;gap:10px">
+    <sc-for list="{{years}}" as="y" hint-placeholder-count="3">
+      <div style="background:#ffffff;border-radius:16px;padding:12px 14px 12px;box-shadow:0 2px 8px rgba(22,32,58,.06);display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px"><span style="background:#e8efff;color:#2a63e6;font-weight:900;font-size:12px;border-radius:999px;padding:3px 10px">Age {{y.age}}</span><span style="font-size:12px;color:#6b7690;font-weight:700">{{y.year}}</span></div>
+        <sc-for list="{{y.lines}}" as="l" hint-placeholder-count="2">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span style="width:26px;height:26px;border-radius:8px;background:{{l.bg}};color:{{l.fg}};display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">{{l.ic}}</span>
+            <span style="font-size:14.5px;line-height:1.45;color:#2b3550;font-weight:600">{{l.t}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="position:relative;padding:4px 18px 8px;display:flex;align-items:flex-end;justify-content:space-between">
+    <sc-for list="{{navL}}" as="n" hint-placeholder-count="2">
+      <button style="width:64px;display:flex;flex-direction:column;align-items:center;gap:4px;background:transparent;border:0;font-family:inherit;cursor:pointer">
+        <span style="width:52px;height:52px;border-radius:50%;background:#ffffff;box-shadow:0 3px 10px rgba(22,32,58,.12);display:flex;align-items:center;justify-content:center;color:#2a63e6;font-size:20px;font-weight:900">{{n.ic}}</span>
+        <span style="font-size:11.5px;font-weight:800;color:#3a4766">{{n.l}}</span>
+      </button>
+    </sc-for>
+    <button onClick="{{ageUp}}" style="width:92px;height:92px;border-radius:50%;border:0;background:radial-gradient(circle at 35% 30%,#4ee08a 0%,#1fb35a 60%,#169247 100%);box-shadow:0 6px 0 #10783a,0 10px 24px rgba(31,179,90,.45);color:#ffffff;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;margin-bottom:18px">
+      <span style="font-size:34px;font-weight:900">+</span><span style="font-size:15px;font-weight:900;letter-spacing:.5px">AGE</span>
+    </button>
+    <sc-for list="{{navR}}" as="n" hint-placeholder-count="2">
+      <button style="width:64px;display:flex;flex-direction:column;align-items:center;gap:4px;background:transparent;border:0;font-family:inherit;cursor:pointer">
+        <span style="width:52px;height:52px;border-radius:50%;background:#ffffff;box-shadow:0 3px 10px rgba(22,32,58,.12);display:flex;align-items:center;justify-content:center;color:#2a63e6;font-size:20px;font-weight:900">{{n.ic}}</span>
+        <span style="font-size:11.5px;font-weight:800;color:#3a4766">{{n.l}}</span>
+      </button>
+    </sc-for>
+  </div>
+
+  <div style="background:#ffffff;border-radius:20px 20px 0 0;padding:14px 18px 22px;box-shadow:0 -4px 16px rgba(22,32,58,.08);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px">
+    <sc-for list="{{stats}}" as="s" hint-placeholder-count="4">
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:900"><span>{{s.label}}</span><span style="color:{{s.c}}">{{s.v}}%</span></div>
+        <div style="height:10px;background:#e7ebf3;border-radius:999px;overflow:hidden"><div style="height:10px;width:{{s.w}};background:{{s.grad}};border-radius:999px"></div></div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { age: 27, h: 78 }; }
+  renderVals() {
+    const { age, h } = this.state;
+    const L = (ic, bg, fg, t) => ({ ic, bg, fg, t });
+    const pool = [
+      [L('$','#e3f8ec','#15803d','I got a raise at work. My salary is now $64,500.'), L('♥','#fde8ee','#be123c','Mum and I went to the cinema. We laughed the whole way home.')],
+      [L('+','#fdecec','#b91c1c','I caught the flu and spent a week on the sofa.'), L('★','#fff4d6','#a16207','I started going to the gym three times a week.')],
+      [L('?','#ece9ff','#5b21b6','I bought a lottery ticket. Not even close.'), L('♥','#fde8ee','#be123c','My brother Tobi got married. I gave a speech.')]
+    ];
+    const col = v => v >= 60 ? ['#16a34a','linear-gradient(90deg,#34d17a,#16a34a)'] : v >= 35 ? ['#d97706','linear-gradient(90deg,#fbbf24,#d97706)'] : ['#dc2626','linear-gradient(90deg,#f87171,#dc2626)'];
+    const st = (label, v) => { const [c, grad] = col(v); return { label, v, w: v + '%', c, grad }; };
+    const nav = (ic, l) => ({ ic, l });
+    return {
+      years: [
+        { age, year: 'This year', lines: pool[age % 3] },
+        { age: age - 1, year: 'Last year', lines: [L('◇','#fff4d6','#a16207','Daniel proposed on the beach. I said yes!'), L('↑','#e3f8ec','#15803d','My performance review went really well.')] },
+        { age: age - 2, year: '', lines: [L('⌂','#e8efff','#2a63e6','I started my first job as a Junior Architect.')] }
+      ],
+      navL: [nav('▣','Job'), nav('⌂','Assets')],
+      navR: [nav('☺','People'), nav('✦','Activities')],
+      stats: [st('Happiness', h), st('Health', 64), st('Smarts', 83), st('Looks', 41)],
+      ageUp: () => this.setState({ age: age + 1, h: Math.max(5, Math.min(100, h + Math.round(Math.random()*20 - 10))) })
+    };
+  }
+}
+</script>
+</body>
+</html>

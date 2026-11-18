@@ -150,7 +150,7 @@ function renderDating(card) {
   find.addEventListener("click", async () => {
     find.disabled = true;
     setStatus("Looking for someone…");
-    hooks.sendAction("dating_app", {});
+    hooks.sendAction("dating_app", {}).catch(() => {});
     // The shell resolves the command and re-renders; give it a beat,
     // then adopt the fresh state and show the match.
     setTimeout(async () => {
@@ -186,7 +186,7 @@ function renderDating(card) {
       }
       b.addEventListener("click", () => {
         for (const x of box.querySelectorAll("button")) x.disabled = true;
-        hooks.sendAction(actionId, {}, a.targetId);
+        hooks.sendAction(actionId, {}, a.targetId).catch(() => {});
         setTimeout(async () => {
           await (hooks.refresh && hooks.refresh());
           await reload();
@@ -299,7 +299,7 @@ function renderDating(card) {
       if (!opt.enabled && opt.reason) b.title = opt.reason;
       b.addEventListener("click", () => {
         for (const x of optRow.querySelectorAll("button")) x.disabled = true;
-        hooks.resolveDecision(pending.id, opt.id, {});
+        hooks.resolveDecision(pending.id, opt.id, {}).catch(() => {});
       });
       optRow.appendChild(b);
     }

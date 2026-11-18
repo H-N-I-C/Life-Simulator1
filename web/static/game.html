@@ -6,6 +6,7 @@
 <title>Life — Life Simulator</title>
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="/static/v2/theme.css">
 </head>
 <body>
 <header class="topbar">
@@ -23,6 +24,9 @@
   <!-- resume / new life -->
   <section id="resumeView" hidden>
     <div class="card">
+      <div class="row" style="margin-bottom:10px;">
+        <button id="resumeBackBtn" hidden>‹ Back to your life</button>
+      </div>
       <h2>Your lives</h2>
       <div id="lifeList"><p>No lives yet.</p></div>
       <div class="row" style="margin-top:10px;">
@@ -34,29 +38,30 @@
   <!-- completed life / continuation -->
   <section id="legacyView" hidden></section>
 
-  <!-- active game -->
+  <!-- active game (v2 shell screens, docs/collab/redesign-v2/contracts.md §Shell) -->
   <section id="gameView" hidden>
-    <div class="card" id="playerCard"></div>
-    <div class="card" id="turnCard" hidden></div>
-
-    <section id="screen-summary" class="screen" hidden>
+    <section id="screen-home" class="screen" hidden>
+      <div class="card" id="turnCard" hidden></div>
       <div class="card" id="timelineCard">
         <h2>Timeline</h2>
         <ol id="journalList" class="journal"></ol>
       </div>
+      <div id="v2HomeMount"></div>
     </section>
 
-    <section id="screen-education" class="screen" hidden>
+    <section id="screen-job" class="screen" hidden>
       <div class="card" id="educationCard"></div>
       <div class="card"><h2>Education actions</h2><div id="actions-education" class="actionlist"></div></div>
-    </section>
-
-    <section id="screen-work" class="screen" hidden>
       <div class="card" id="workCard"></div>
       <div class="card"><h2>Work actions</h2><div id="actions-work" class="actionlist"></div></div>
     </section>
 
-    <section id="screen-relationships" class="screen" hidden>
+    <section id="screen-assets" class="screen" hidden>
+      <div class="card" id="financesCard"></div>
+      <div class="card"><h2>Finance actions</h2><div id="actions-finances" class="actionlist"></div></div>
+    </section>
+
+    <section id="screen-people" class="screen" hidden>
       <div class="card" id="familySectionCard" hidden></div>
       <div class="card"><h2>Family</h2><div id="familyList"></div></div>
       <div class="card"><h2>Relationship actions</h2><div id="actions-relationships" class="actionlist"></div></div>
@@ -67,49 +72,27 @@
       <div class="card"><h2>Activities</h2><div id="actions-activities" class="actionlist"></div></div>
       <div class="card"><h2>Health</h2><div id="healthCard"></div>
         <div id="actions-health" class="actionlist"></div></div>
-    </section>
-
-    <section id="screen-finances" class="screen" hidden>
-      <div class="card" id="financesCard"></div>
-      <div class="card"><h2>Finance actions</h2><div id="actions-finances" class="actionlist"></div></div>
-    </section>
-
-    <div class="card">
-      <h2>General</h2>
-      <div class="row" id="actionList"></div>
-      <div class="row" style="margin-top:8px;">
-        <button id="editorToggle">Character editor</button>
-        <button id="familyTreeToggle">Family tree</button>
-        <button id="m25Toggle">Dating &amp; weddings</button>
+      <div class="card">
+        <h2>General</h2>
+        <div class="row" id="actionList"></div>
+        <div class="row" style="margin-top:8px;">
+          <button id="editorToggle">Character editor</button>
+          <button id="familyTreeToggle">Family tree</button>
+          <button id="m25Toggle">Dating &amp; weddings</button>
+        </div>
       </div>
-    </div>
-    <div class="row" style="margin-bottom:24px;">
-      <button id="backToLives">All lives</button>
-    </div>
+      <div class="row" style="margin-bottom:24px;">
+        <button id="backToLives">All lives</button>
+      </div>
+    </section>
   </section>
-
-  <nav id="tabbar" class="tabbar" hidden aria-label="Game sections">
-    <button data-screen="summary" aria-current="page">◷<span>Life</span></button>
-    <button data-screen="education">✎<span>Study</span></button>
-    <button data-screen="work">⚒<span>Work</span></button>
-    <button data-screen="relationships">♡<span>Family</span></button>
-    <button data-screen="activities">✚<span>Health</span></button>
-    <button data-screen="finances">$<span>Money</span></button>
-  </nav>
 </main>
 
-<!-- pending decision / action form modal -->
+<!-- pending decision sheet / action form modal -->
 <div id="modal" class="modal" hidden role="dialog" aria-modal="true"
-     aria-labelledby="modalTitle">
-  <div class="modal-box">
-    <h2 id="modalTitle"></h2>
-    <p id="modalText"></p>
-    <div id="modalPeople" class="row"></div>
-    <form id="modalForm"></form>
-    <div id="modalOptions" class="row"></div>
-    <div class="row" style="margin-top:12px;">
-      <button type="button" id="modalCancel">Cancel</button>
-    </div>
+     aria-labelledby="v2SheetTitle">
+  <div class="modal-box v2-sheet">
+    <button type="button" id="modalCancel">Cancel</button>
   </div>
 </div>
 

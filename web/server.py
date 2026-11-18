@@ -11,6 +11,7 @@ import html
 import json
 import logging
 import os
+import re
 import sys
 import threading
 import uuid
@@ -494,6 +495,18 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 self._json(_relationships_view(self.server.service,
                                                game_id))
+            except GameError as exc:
+                self._error(exc.code, exc.message, exc.status)
+            except Exception as exc:
+                self._report_crash(exc)
+            return
+        m = re.match(r"^/api/games/([^/]+)/people/([^/]+)$", path)
+        if m:
+            # v2 person detail (frozen contracts.md §Shell/§Person); A owns
+            # the projection, B owns this exposure.
+            try:
+                self._json(self.server.service.get_person_view(
+                    unquote(m.group(1)), unquote(m.group(2))))
             except GameError as exc:
                 self._error(exc.code, exc.message, exc.status)
             except Exception as exc:

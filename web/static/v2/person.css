@@ -1,0 +1,204 @@
+/* v2 Person detail styles (Kimi C, redesign-v2). Scoped to .v2p-*, driven
+ * by shared visual tokens as CSS variables so B's theme can override them
+ * from one place. Layout mirrors the Person mockup but scrolls safely at
+ * 320px, landscape and short screens (no fixed 390x844 overflow:hidden). */
+
+.v2p-root {
+  --v2-accent: #2a63e6;
+  --v2-accent-2: #3a7bfd;
+  --v2-ink: #16203a;
+  --v2-ink-soft: #2b3550;
+  --v2-muted: #6b7690;
+  --v2-faint: #8a93a8;
+  --v2-page: #eef2f9;
+  --v2-card: #ffffff;
+  --v2-track: #e7ebf3;
+  --v2-bar-good: #16a34a;
+  --v2-bar-mid: #d97706;
+  --v2-bar-bad: #dc2626;
+  --v2-bar-1: #2a63e6;
+  --v2-bar-2: #15803d;
+  --v2-bar-3: #a16207;
+  --v2-bar-4: #be185d;
+  --v2-radius: 16px;
+  --v2-shadow: 0 4px 16px rgba(22, 32, 58, .10);
+  --v2-gap: 10px;
+
+  background: var(--v2-page);
+  color: var(--v2-ink);
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: max(var(--v2-gap), env(safe-area-inset-bottom));
+}
+
+.v2p-header {
+  background: linear-gradient(180deg, var(--v2-accent-2) 0%,
+                              var(--v2-accent) 100%);
+  padding: 12px 12px 56px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.v2p-header-btn {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .15);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.v2p-header-btn:focus-visible,
+.v2p-action:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--v2-accent);
+}
+
+.v2p-header-title {
+  flex: 1 1 auto;
+  text-align: center;
+  font-weight: 900;
+  font-size: 17px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.v2p-card {
+  margin: -46px 14px 0;
+  background: var(--v2-card);
+  border-radius: 20px;
+  padding: 0 16px 16px;
+  box-shadow: var(--v2-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.v2p-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: #fde2e4;
+  border: 4px solid #fff;
+  margin-top: -40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .12);
+  overflow: hidden;
+}
+
+.v2p-avatar img { width: 80px; height: 80px; }
+.v2p-avatar-fallback::after { content: "?"; font-weight: 900;
+                              color: var(--v2-muted); }
+
+.v2p-name { font-size: 21px; font-weight: 900; text-align: center; }
+.v2p-subtitle { font-size: 13px; color: var(--v2-muted); font-weight: 700;
+                text-align: center; }
+
+.v2p-bar { width: 100%; display: flex; flex-direction: column; gap: 4px;
+           margin-top: 6px; }
+
+.v2p-bar-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  font-weight: 900;
+}
+
+.v2p-bar-value { color: var(--v2-ink-soft); }
+
+.v2p-bar-track {
+  height: 9px;
+  background: var(--v2-track);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.v2p-bar-fill { height: 9px; border-radius: 999px; }
+
+.v2p-grid {
+  padding: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--v2-gap);
+}
+
+.v2p-action {
+  background: var(--v2-card);
+  border: 0;
+  border-radius: var(--v2-radius);
+  box-shadow: 0 2px 8px rgba(22, 32, 58, .06);
+  padding: 12px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+  cursor: pointer;
+  min-height: 86px;
+}
+
+.v2p-action:disabled { cursor: default; }
+
+.v2p-action-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 18px;
+}
+
+.v2p-action-label {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--v2-ink-soft);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.v2p-action-sub { font-size: 10.5px; font-weight: 700;
+                  color: var(--v2-faint); text-align: center; }
+
+/* Tile tints (background + glyph colour). Neutral by default; a tile only
+ * gets a colour because a real spec exists, never to fake eligibility. */
+.v2p-tint-blue   .v2p-action-icon { background: #e8efff; color: #2a63e6; }
+.v2p-tint-green  .v2p-action-icon { background: #e3f8ec; color: #15803d; }
+.v2p-tint-amber  .v2p-action-icon { background: #fff4d6; color: #a16207; }
+.v2p-tint-red    .v2p-action-icon { background: #fdecec; color: #b91c1c; }
+.v2p-tint-neutral .v2p-action-icon { background: #eef1f6; color: #4b5563; }
+
+/* Disabled = explicit state, not the mock's opacity. Reason stays visible
+ * in the sub line and the tile reads as inactive. */
+.v2p-action:disabled .v2p-action-icon { background: var(--v2-track); }
+.v2p-action:disabled .v2p-action-label { color: var(--v2-faint); }
+
+.v2p-deceased-note {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--v2-muted);
+}
+
+/* Stat colour is never the only signal: bars keep numeric labels (rendered
+ * in JS) and these foregrounds are kept at mock values pending the visual
+ * token audit in stage 4. */
+
+@media (max-width: 360px) {
+  .v2p-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .v2p-card { margin-left: 10px; margin-right: 10px; }
+}

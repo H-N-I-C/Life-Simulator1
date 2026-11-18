@@ -44,6 +44,50 @@ export function toggleEditor(state, hooks) {
   if (!panel.hidden) loadPolicyState();
 }
 
+/* Frozen §Shell secondary-route contract (redesign-v2): the shell can open
+ * the editor idempotently from the More menu — never toggle it closed. */
+export function isEditorOpen() {
+  const panel = $("editorPanel");
+  return !!panel && !panel.hidden;
+}
+
+/* §Editor navigation (A contract, FROZEN v1): openEditor(state, hooks,
+ * personId?) — the third parameter is optional and additive. When given,
+ * the editor opens with THAT exact person_id selected (roster row
+ * aria-pressed="true", form loaded, law pseudo-entry not selected).
+ * Unknown/deceased IDs open with NO selection and an honest status line —
+ * never a fabricated selection, never a blocked editor. */
+export async function openEditor(state, hooks, personId) {
+  gameState = state || gameState;
+  shellHooks = hooks || shellHooks;
+  const panel = initEditor(gameState, shellHooks);
+  panel.hidden = false;
+  await loadPolicyState();
+  if (personId === undefined || personId === null) return panel;
+  const people = (gameState.people || []).filter((p) => p.alive !== false);
+  const person = people.find((p) => p.id === personId);
+  if (!person) {
+    selectedPerson = null;
+    renderPeople();
+    setStatus("That person is not available for editing — opened " +
+              "without a selection.", true);
+    return panel;
+  }
+  selectedPerson = person.id;
+  renderPeople();
+  renderForm(person);
+  const box = $("editorPeople");
+  if (box && box.querySelectorAll) {
+    for (const b of box.querySelectorAll("button")) {
+      if (b.getAttribute("aria-pressed") === "true" &&
+          typeof b.scrollIntoView === "function") {
+        b.scrollIntoView({ block: "nearest" });
+      }
+    }
+  }
+  return panel;
+}
+
 function renderShell(panel) {
   panel.innerHTML = `
     <h2>Character editor <span class="muted">(out-of-character; changes

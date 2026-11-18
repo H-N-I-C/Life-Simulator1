@@ -109,6 +109,8 @@ export function normalizeDecision(d) {
     inputs: (d.inputs || []).map(normalizeInput),
     options: (d.options || []).map(normalizeOption),
     continuation: d.continuation_after_resolve || null,
+    // v2 §Choice (A, frozen v1): pure display metadata, null when unmapped.
+    displayCategory: d.display_category || null,
   };
 }
 

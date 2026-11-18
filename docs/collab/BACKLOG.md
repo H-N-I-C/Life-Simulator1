@@ -6,3 +6,8 @@
 - B: the intermittent /api/avatar.png failure on the creator page (D's flake)
 - A (after the fix round, small): a dev-only 'force_event' hook (only with --dev; scenario or command option) that offers a named event on the next decision_offer, so D can prove rare events (kidnapping row 69). Tell D.
 - Codex: THOROUGH M2.5 evaluation when M2.5 is finished (gate in docs/collab/M2.5/01-spec.md)
+
+## NEXT after v2 redesign fixes are verified (user-approved 2026-11-18): "Undo last year"
+- A: snapshot the full game state before each Age; restore = revert to that snapshot (ledger, graph, knowledge, pendings, RNG state). One level or N levels TBD in the contract; it must be replay-safe (request_id/revision); never lets an 18+ rule or a death be bypassed in a way the forward path wouldn't allow.
+- B: an "Undo year" button on Home (disabled with a reason when there is no snapshot), with confirmation.
+- D: browser test: age → undo → age gives a consistent state; money is conserved.

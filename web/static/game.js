@@ -2,17 +2,136 @@ import { renderAvatar, miniPersonChip, setErrorRetryHandler,
          hideCrashCard } from "./common.js";
 import { normalizeState, financeRows, journalPeople,
          ACTION_CATEGORIES, GENERAL_CATEGORIES } from "./adapter.js";
+import { buildInputRow, collectInputs } from "./v2/inputs.js";
+import { mountChoiceSheet } from "./v2/choice.js";
 
 const $ = (id) => document.getElementById(id);
 const resumeView = $("resumeView");
 const gameView = $("gameView");
 const legacyView = $("legacyView");
 const toast = $("toast");
-const tabbar = $("tabbar");
 
 let state = null;          // normalized adapter state
 let busy = false;
-let activeScreen = "summary";
+let activeScreen = "home";
+let v2Shell = null;        // v2 navigation chrome (contracts.md §Shell)
+
+/* ---------- v2 navigation history (USER BUG: visible + browser Back) -----
+ * Every user navigation pushes a tagged history entry; browser Back/Forward
+ * (popstate) applies it. In-app Back goes through history too, so both stay
+ * in lock-step. Entries: {v2:1, screen} | {person:id} | {panel:which} |
+ * {lives:1}. Scroll positions ride inside entries (captured on push via
+ * replaceState) so Back restores the previous screen's scroll. */
+let v2Depth = history.state?.v2 ? (history.state.v2Index || 1) : 0;
+let v2Restoring = 0;
+history.scrollRestoration = "manual";
+
+function currentV2Scroll() {
+  const sc = document.querySelector(".v2-scroll");
+  return sc ? sc.scrollTop : 0;
+}
+function v2SetScroll(v) {
+  const sc = document.querySelector(".v2-scroll");
+  if (sc) sc.scrollTop = v || 0;
+}
+function v2Push(s) {
+  try {
+    // Existing tabs may still contain the earlier unindexed base entry.
+    // Repair the entry we leave as well as the new destination.
+    const current = history.state?.v2
+      ? Object.assign({}, history.state, {
+          game: history.state.game || (state ? state.gameId : currentGameId()),
+          v2Index: history.state.v2Index || v2Depth || 1,
+        })
+      : { v2: 1, game: state ? state.gameId : currentGameId(),
+          v2Index: 1, screen: activeScreen };
+    const next = Object.assign({ v2: 1, game: state ? state.gameId : null }, s);
+    const sameRoute = ["screen", "person", "panel", "lives", "game"]
+      .every((key) => current[key] === next[key]);
+    if (current.v2 && sameRoute &&
+        (!("personId" in s) || current.personId === next.personId)) return;
+    history.replaceState(Object.assign({}, current,
+                                       { scroll: currentV2Scroll() }), "");
+    next.v2Index = (current.v2Index || v2Depth || 1) + 1;
+    history.pushState(next, "");
+    v2Depth = next.v2Index;
+  } catch (e) { /* storage-less context: in-app Back still works */ }
+}
+function v2Navigate(name) {
+  v2Push({ screen: name });
+  if (v2Shell) v2Shell.closeAux();
+  closeV2Panels();
+  selectScreen(name);
+}
+window.addEventListener("popstate", () => {
+  const s = history.state;
+  if (!s || !s.v2) return;
+  // Forward moves toward a larger index; do not treat every pop as Back.
+  v2Depth = s.v2Index || 1;
+  v2Apply(s).catch(() => showToast("Couldn't restore this view.", true));
+});
+async function v2Apply(s) {
+  if (s.game && (!state || state.gameId !== s.game) && !s.lives) {
+    v2Restoring++;
+    try {
+      setCurrentGameId(s.game);
+      await loadGame();
+    } finally { v2Restoring--; }
+    if (!state || state.gameId !== s.game ||
+        history.state?.v2Index !== s.v2Index) return;
+  }
+  if (s.screen !== undefined) {
+    if (state) { resumeView.hidden = true; gameView.hidden = false; }
+    if (v2Shell) v2Shell.closeAux();
+    closeV2Panels();
+    selectScreen(s.screen);
+    v2SetScroll(s.scroll);
+  } else if (s.person) {
+    if (state) { resumeView.hidden = true; gameView.hidden = false; }
+    if (v2Shell) v2Shell.closeAux();
+    closeV2Panels();
+    selectScreen("people");
+    if (v2Shell) await v2Shell.navigate("person", { personId: s.person });
+  } else if (s.panel) {
+    if (state) { resumeView.hidden = true; gameView.hidden = false; }
+    if (v2Shell) v2Shell.closeAux();
+    closeV2Panels();
+    selectScreen("activities");
+    await openV2PanelDispatch(s.panel, s.personId);
+  } else if (s.lives) {
+    setCurrentGameId(null);
+    await showResume();
+  }
+  if (v2Shell) v2Shell.sync();
+}
+
+/* ---------- feature panels (editor / family tree / dating & weddings) ----- */
+function isV2PanelOpen() {
+  const ep = $("editorPanel");
+  return Boolean((ep && !ep.hidden) ||
+                 (familyTreeCard && !familyTreeCard.hidden) ||
+                 (m25Card && !m25Card.hidden));
+}
+function closeV2Panels(except) {
+  const ep = $("editorPanel");
+  if (ep && except !== "editor") ep.hidden = true;
+  if (familyTreeCard && except !== "familyTree") familyTreeCard.hidden = true;
+  if (m25Card && except !== "m25") m25Card.hidden = true;
+}
+function openV2Panel(which) {
+  v2Push({ panel: which });
+  return Promise.resolve(openV2PanelDispatch(which)).then(() => {
+    if (v2Shell) v2Shell.sync();
+  }).catch(() => showToast("Couldn't open this panel.", true));
+}
+
+/* In-app Back for panels: prefer history (keeps browser Back in sync);
+ * fall back to a plain close when there is no entry to pop. */
+function closeTopPanel() {
+  if (v2Depth > 1) { history.back(); return; }
+  closeV2Panels();
+  if (v2Shell) v2Shell.sync();
+}
 
 /* current game id: per-tab so refresh/new tab resumes the intended game */
 function currentGameId() { return sessionStorage.getItem("game_id"); }
@@ -74,7 +193,13 @@ async function showResume() {
   resumeView.hidden = false;
   gameView.hidden = true;
   legacyView.hidden = true;
-  tabbar.hidden = true;
+  // USER BUG FIX: a visible Back out of "All lives" when we came from a
+  // game (the lives history entry knows which one).
+  const rb = $("resumeBackBtn");
+  if (rb) {
+    rb.hidden = v2Depth <= 1;
+    rb.onclick = () => { if (v2Depth > 1) history.back(); };
+  }
   const list = $("lifeList");
   list.innerHTML = "<p>Loading…</p>";
   try {
@@ -99,6 +224,8 @@ async function showResume() {
       btn.textContent = "Resume";
       btn.addEventListener("click", () => {
         setCurrentGameId(g.game_id);
+        v2Push({ screen: "home", game: g.game_id, scroll: 0 });
+        activeScreen = "home";
         loadGame();
       });
       row.appendChild(btn);
@@ -132,20 +259,14 @@ async function showResume() {
 
 /* ================= screens ================= */
 
-const SCREENS = ["summary", "education", "work", "relationships",
-                 "activities", "finances"];
+/* v2 destinations (frozen contracts.md §Shell). Every legacy panel lives
+ * inside exactly one of these sections in game.html. */
+const SCREENS = ["home", "job", "assets", "people", "activities"];
 
 function selectScreen(name) {
   activeScreen = name;
   for (const s of SCREENS) $("screen-" + s).hidden = s !== name;
-  for (const b of tabbar.querySelectorAll("button")) {
-    if (b.dataset.screen === name) b.setAttribute("aria-current", "page");
-    else b.removeAttribute("aria-current");
-  }
-}
-
-for (const b of tabbar.querySelectorAll("button")) {
-  b.addEventListener("click", () => selectScreen(b.dataset.screen));
+  if (v2Shell) v2Shell.sync();
 }
 
 /* ================= rendering ================= */
@@ -153,38 +274,12 @@ for (const b of tabbar.querySelectorAll("button")) {
 function render() {
   setPageLoading(false);
   const s = state;
-  const player = s.player;
   resumeView.hidden = true;
   legacyView.hidden = true;
   gameView.hidden = false;
-  tabbar.hidden = false;
 
-  // --- summary card ---
-  const pc = $("playerCard");
-  const dead = s.status === "dead";
-  pc.innerHTML = `
-    <div class="player-head">
-      <div class="avatar big" id="playerAvatar"></div>
-      <div>
-        <div class="name">${esc(player.name)}</div>
-        <div class="role">Age ${player.age} · ${esc(s.country)}` +
-        (s.generation > 1 ? ` · Generation ${s.generation}` : "") + `</div>
-        <div class="role cash">$${s.money.toLocaleString()}</div>
-      </div>
-    </div>
-    <div class="stats">
-      ${Object.entries(s.stats).map(([k, v]) => `
-        <div class="stat">
-          <span>${esc(k)}</span>
-          <div class="track"><div class="fill ${v >= 60 ? "good"
-            : v >= 35 ? "mid" : "low"}"
-            style="width:${Math.max(0, Math.min(100, v))}%"></div></div>
-          <b>${v}</b>
-        </div>`).join("")}
-    </div>
-    ${dead ? `<p class="dead-note">This life has ended at age ${player.age}.
-      The record remains.</p>` : ""}`;
-  renderAvatar($("playerAvatar"), player.appearance || {}, player.age, 168);
+  // --- Home module (v2): central Age control + real stats sheet ---
+  if (v2Home) v2Home.update(s);
 
   // --- turn progress (frozen cursor shape) ---
   const tc = $("turnCard");
@@ -207,10 +302,17 @@ function render() {
   renderActions();
   if (s.pending) {
     // Pending decisions block everything; if the dialog is not open (e.g.
-    // right after reload) reopen it so the choice is never stranded.
+    // right after reload) reopen it so the choice is never stranded. If it
+    // IS open but shows a DIFFERENT decision id (a resolve just advanced
+    // the chain, e.g. surrender_confirm → surrender_final), re-render the
+    // sheet — a stale sheet must never sit over a new server decision.
+    const box = document.querySelector(".modal-box");
+    const openId = box && box._v2SheetDecisionId;
     if (modal.hidden) {
       const pill = $("decisionPill");
       if (!pill || pill.hidden) openDecisionModal();
+    } else if (openId && openId !== s.pending.id) {
+      openDecisionModal();
     }
   } else {
     closeModal();
@@ -219,6 +321,16 @@ function render() {
   }
   const op = loadPendingOp();
   if (op) showPendingPill(op);
+  if (v2Shell) v2Shell.sync();
+  else {
+    // A page can load straight into the legacy view (dead life) where
+    // renderGame never ran — mount the chrome lazily so a continuation
+    // (or archive view) still lands in the v2 shell.
+    ensureV2Shell().then(async () => {
+      await ensureV2Home();
+      if (v2Shell) v2Shell.sync();
+    }).catch(() => {});
+  }
 }
 
 function firstPerson(text) {
@@ -273,6 +385,27 @@ function sentenceCaseConditions(text) {
   return text;
 }
 
+/* Stage 3 (frozen §Shell): an inline person chip that opens the Person
+ * overlay for that exact ID — used by the timeline and the choice sheet.
+ * Keyboard reachable (Enter/Space), textContent-only. */
+function linkedPersonChip(person, size = 22) {
+  const chip = miniPersonChip(person, size);
+  chip.classList.add("v2-person-link");
+  chip.setAttribute("role", "button");
+  chip.tabIndex = 0;
+  chip.setAttribute("aria-label", person.name + " — view person");
+  const open = () =>
+    shellHooks.navigate("person", { personId: person.id });
+  chip.addEventListener("click", open);
+  chip.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      open();
+    }
+  });
+  return chip;
+}
+
 function renderTimeline() {
   // group entries per age into cards; drop "I turned N" filler (the card
   // header already gives the age); collapse runs of quiet years; first
@@ -287,7 +420,10 @@ function renderTimeline() {
     if (last && last.age === e.age) last.entries.push({ e, text });
     else groups.push({ age: e.age, entries: [{ e, text }] });
   }
+  // Frozen §Home: the card list renders NEWEST FIRST; the underlying
+  // chronological journal is never mutated.
   const frag = document.createDocumentFragment();
+  const items = [];
   let quietFrom = null, quietTo = null;
   const flushQuiet = () => {
     if (quietFrom === null) return;
@@ -296,7 +432,7 @@ function renderTimeline() {
     li.textContent = quietFrom === quietTo
       ? "Age " + quietFrom + ": a quiet year"
       : "Ages " + quietFrom + "-" + quietTo + ": quiet years";
-    frag.appendChild(li);
+    items.push(li);
     quietFrom = quietTo = null;
   };
   let prevAge = null;
@@ -322,13 +458,13 @@ function renderTimeline() {
         const chips = document.createElement("span");
         chips.className = "jchips";
         for (const person of others) {
-          chips.appendChild(miniPersonChip(person, 22));
+          chips.appendChild(linkedPersonChip(person));
         }
         line.appendChild(chips);
       }
       card.appendChild(line);
     }
-    frag.appendChild(card);
+    items.push(card);
     prevAge = g.age;
   }
   flushQuiet();
@@ -337,13 +473,14 @@ function renderTimeline() {
     li.className = "jquiet";
     li.textContent = "Nothing has happened yet — age up to live your " +
       "first year.";
-    frag.appendChild(li);
+    items.push(li);
   } else if (!groups.length) {
     const li = document.createElement("li");
     li.className = "jquiet";
     li.textContent = "A quiet life so far.";
-    frag.appendChild(li);
+    items.push(li);
   }
+  for (let i = items.length - 1; i >= 0; i--) frag.appendChild(items[i]);
   j.appendChild(frag);
 }
 
@@ -512,6 +649,20 @@ function renderFamily() {
     chip.appendChild(who);
     fam.appendChild(chip);
     renderAvatar(av, p.appearance, p.age, 96);
+    // v2: the roster opens the Person detail overlay for this exact ID.
+    chip.classList.add("v2-person-link");
+    chip.setAttribute("role", "button");
+    chip.tabIndex = 0;
+    chip.setAttribute("aria-label", p.name + " — view person");
+    const open = () =>
+      shellHooks.navigate("person", { personId: p.id });
+    chip.addEventListener("click", open);
+    chip.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        open();
+      }
+    });
   }
 }
 
@@ -579,7 +730,7 @@ function actionButton(a) {
 
 function onAction(a) {
   if (a.inputs && a.inputs.length) openActionModal(a);
-  else sendAction(a.id, {}, a.targetId);
+  else sendAction(a.id, {}, a.targetId).catch(() => {});
 }
 
 /* ---------- modals ---------- */
@@ -588,89 +739,32 @@ const modal = $("modal");
 
 function closeModal() {
   modal.hidden = true;
-  $("modalForm").innerHTML = "";
-  $("modalOptions").innerHTML = "";
+  const box = document.querySelector(".modal-box");
+  if (box && box._v2Sheet) {
+    box._v2Sheet.unmount();
+    delete box._v2Sheet;
+    delete box._v2SheetDecisionId;
+  } else if (box) {
+    for (const n of [...box.children]) {
+      if (n.id !== "modalCancel") n.remove();
+    }
+  }
+  const cancel = $("modalCancel");
+  if (cancel) cancel.hidden = false;
 }
 
 $("modalCancel").addEventListener("click", closeModal);
 
-function buildInputRow(input, doc) {
-  const wrap = document.createElement("label");
-  wrap.className = "field";
-  const id = "in-" + input.id;
-  let control;
-  if (input.type === "choice" && input.choices) {
-    control = document.createElement("select");
-    for (const c of input.choices) {
-      const o = document.createElement("option");
-      o.value = typeof c === "object" ? c.id : c;
-      o.textContent = typeof c === "object" ? c.label : c;
-      control.appendChild(o);
-    }
-  } else if (input.type === "boolean") {
-    control = document.createElement("input");
-    control.type = "checkbox";
-  } else {
-    control = document.createElement("input");
-    control.type = input.type === "number" ? "number" : "text";
-    if (input.type === "number") {
-      if (input.min != null) control.min = input.min;
-      if (input.max != null) control.max = input.max;
-    } else if (input.max != null) {
-      control.maxLength = input.max;
-    }
-  }
-  control.id = id;
-  control.required = !!input.required;
-  wrap.appendChild(document.createTextNode(input.label +
-    (input.required ? " *" : "")));
-  wrap.appendChild(control);
-  doc[input.id] = { control, input };
-  return wrap;
-}
-
-function collectInputs(doc) {
-  const payload = {};
-  for (const [key, { control, input }] of Object.entries(doc)) {
-    let v;
-    if (input.type === "boolean") v = control.checked;
-    else if (input.type === "number") {
-      if (control.value === "") {
-        if (input.required) throw new Error(input.label + " is required");
-        continue;
-      }
-      v = Number(control.value);
-      if (!Number.isFinite(v)) throw new Error(input.label + " must be a number");
-      if (input.min != null && v < input.min) {
-        throw new Error(input.label + " must be at least " + input.min);
-      }
-      if (input.max != null && v > input.max) {
-        throw new Error(input.label + " must be at most " + input.max);
-      }
-    } else {
-      v = control.value.trim();
-      if (input.required && !v) throw new Error(input.label + " is required");
-      if (v && input.min != null && v.length < input.min) {
-        throw new Error(input.label + " must be at least " + input.min +
-                        " characters");
-      }
-      if (v && input.max != null && v.length > input.max) {
-        throw new Error(input.label + " must be at most " + input.max +
-                        " characters");
-      }
-    }
-    payload[key] = v;
-  }
-  return payload;
-}
-
 function openActionModal(a) {
-  $("modalTitle").textContent = a.label;
-  $("modalText").textContent = "";
-  $("modalPeople").innerHTML = "";
-  $("modalOptions").innerHTML = "";
-  const form = $("modalForm");
-  form.innerHTML = "";
+  const box = document.querySelector(".modal-box");
+  for (const n of [...box.children]) {
+    if (n.id !== "modalCancel") n.remove();
+  }
+  const title = document.createElement("h2");
+  title.id = "v2SheetTitle";
+  title.textContent = a.label;
+  box.appendChild(title);
+  const form = document.createElement("form");
   const doc = {};
   for (const input of a.inputs) form.appendChild(buildInputRow(input, doc));
   const submit = document.createElement("button");
@@ -685,12 +779,13 @@ function openActionModal(a) {
       // re-enabled.
       submit.disabled = true;
       closeModal();
-      sendAction(a.id, payload, a.targetId);
+      sendAction(a.id, payload, a.targetId).catch(() => {});
     } catch (err) {
       showToast(err.message, true);
     }
   });
   form.appendChild(submit);
+  box.appendChild(form);
   modal.hidden = false;
   const first = form.querySelector("input, select");
   if (first) first.focus();
@@ -720,76 +815,46 @@ document.addEventListener("keydown", (e) => {
     collapseDecisionModal();
   }
 });
-
-const DANGER_KINDS = new Set(["surrender_final"]);
+/* Escape on v2 surfaces where it is SAFE: it never discards a pending
+ * server decision (the sheet branch above wins while a decision is open). */
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape" || !modal.hidden) return;
+  if (v2Shell) v2Shell.escape();
+});
 
 function openDecisionModal() {
   const d = state.pending;
   const pill = $("decisionPill");
   if (pill) pill.hidden = true;
   lastFocusedBeforeModal = document.activeElement;
-  $("modalTitle").textContent = stripTokens(d.title);
-  // fatal/terminal choices get distinct danger styling
-  document.querySelector(".modal-box").classList.toggle(
-    "danger", DANGER_KINDS.has(d.kind));
-  $("modalText").textContent = stripTokens(d.text);
-  const pp = $("modalPeople");
-  pp.innerHTML = "";
+  const box = document.querySelector(".modal-box");
+  const people = [];
   for (const pid of d.personIds) {
     const p = state.peopleById[pid];
-    if (!p) continue;
-    pp.appendChild(miniPersonChip(p, 26));
+    if (p) people.push(p);
   }
-  const form = $("modalForm");
-  form.innerHTML = "";
-  const doc = {};
-  for (const input of d.inputs) form.appendChild(buildInputRow(input, doc));
-  const box = $("modalOptions");
-  box.innerHTML = "";
-  for (const opt of d.options) {
-    const b = document.createElement("button");
-    b.innerHTML = esc(opt.label) +
-      (opt.knownEffects && opt.knownEffects.length
-        ? `<span class="cost">${opt.knownEffects.map(esc).join(" · ")}</span>`
-        : "");
-    b.disabled = busy || !opt.enabled;
-    if (!opt.enabled && opt.reason) b.title = opt.reason;
-    b.addEventListener("click", () => {
-      try {
-        const inputs = collectInputs({ ...doc,
-                                       ...(opt._doc || {}) });
-        // Duplicate-submit guard: freeze every option while the one
-        // command is in flight (busy also gates it globally).
-        for (const x of box.querySelectorAll("button")) x.disabled = true;
-        closeModal();
-        resolveDecision(d.id, opt.id, inputs);
-      } catch (err) {
-        showToast(err.message, true);
-      }
-    });
-    box.appendChild(b);
-  }
-  // disabled options show their reason as a note
-  const reasons = d.options.filter((o) => !o.enabled && o.reason)
-    .map((o) => `${o.label}: ${o.reason}`);
-  if (reasons.length) {
-    const note = document.createElement("p");
-    note.className = "muted";
-    note.textContent = reasons.join("  ·  ");
-    box.appendChild(note);
-  }
-  // The pending decision blocks all other gameplay, so the dialog gets a
-  // complete modal lifecycle: initial focus on the first enabled choice,
-  // Tab/Shift-Tab trapped inside, Escape/Cancel collapse it to a visible
-  // reopening pill instead of losing it.
-  const later = document.createElement("button");
-  later.textContent = "Decide later";
-  later.addEventListener("click", collapseDecisionModal);
-  box.appendChild(later);
+  // v2 Choice sheet (contracts.md §Choice): presentation only — resolution
+  // stays on the retry-stable op machinery below. The sheet never invents
+  // options, reasons, or effects; collapse never discards the decision.
+  const sheet = mountChoiceSheet(box, {
+    decision: { ...d, title: stripTokens(d.title || ""),
+                text: stripTokens(d.text || "") },
+    people,
+    playerAge: state.player ? state.player.age : null,
+    onResolve: (optId, inputs) => {
+      closeModal();
+      resolveDecision(d.id, optId, inputs).catch(() => {});
+    },
+    onCollapse: collapseDecisionModal,
+    onError: (m) => showToast(m, true),
+    onPersonClick: (pid) =>
+      shellHooks.navigate("person", { personId: pid }),
+  });
+  box._v2Sheet = sheet;
+  box._v2SheetDecisionId = d.id;
   modal.hidden = false;
   $("modalCancel").hidden = true;
-  const firstEnabled = box.querySelector("button:not([disabled])");
-  if (firstEnabled) firstEnabled.focus();
+  if (sheet.firstEnabled) sheet.firstEnabled.focus();
 }
 
 function collapseDecisionModal() {
@@ -871,25 +936,30 @@ function showPendingPill(op) {
 }
 
 function startOperation(actionId, payload) {
-  if (busy) return;
+  if (busy) {
+    return Promise.reject(Object.assign(
+      new Error("Another action is still in flight"), { code: "busy" }));
+  }
   busy = true;
   const op = { game_id: state.gameId, expected_revision: state.revision,
                action: actionId, payload: payload || {},
                request_id: crypto.randomUUID() };
   savePendingOp(op);
-  sendOperation(op);
+  return sendOperation(op);
 }
 
 function retryPendingOp() {
   const op = loadPendingOp();
-  if (!op || busy) return;
+  if (!op || busy) return Promise.resolve(null);
   busy = true;
-  sendOperation(op);
+  // sendOperation surfaces errors via the pill/toast; swallow the rejection
+  // here so the click handler never trips the global error boundary.
+  return sendOperation(op).catch(() => {});
 }
 
 function sendOperation(op) {
   render();
-  post(`/api/games/${encodeURIComponent(op.game_id)}/actions`, {
+  return post(`/api/games/${encodeURIComponent(op.game_id)}/actions`, {
     expected_revision: op.expected_revision,
     request_id: op.request_id,
     action: op.action,
@@ -899,6 +969,7 @@ function sendOperation(op) {
     clearPendingOp();          // definitive success
     state = normalizeState(raw);
     render();
+    return state;              // frozen §Shell: resolve with fresh state
   }).catch((err) => {
     busy = false;
     if (err.status === 409 && err.code === "stale_revision") {
@@ -911,13 +982,13 @@ function sendOperation(op) {
       showToast("State changed elsewhere — refreshed. Retry from the pill.",
                 true);
       loadGameKeepOp();
-      return;
+      throw err;               // definitive: rejected per frozen §Shell
     }
     if (err.status === 409 && err.code === "pending_decision") {
       showToast("A decision is waiting for you first.", true);
       clearPendingOp();
       loadGame();
-      return;
+      throw err;               // definitive: rejected per frozen §Shell
     }
     if (err.status && err.status < 500 && err.code !== "conflict" &&
         err.code !== "replay_conflict") {
@@ -926,14 +997,44 @@ function sendOperation(op) {
       clearPendingOp();
       showToast(err.message, true);
       render();
-      return;
+      throw err;               // definitive: rejected per frozen §Shell
     }
     // Transport failure or unexpected error: outcome uncertain — keep the
-    // operation and offer the safe retry pill.
+    // operation, offer the safe retry pill, and settle as null (the pill
+    // owns the outcome; this dispatch itself did not fail definitively).
     showPendingPill(loadPendingOp() || op);
     showToast(err.message || "Network error — result uncertain.", true);
     render();
+    return null;
   });
+}
+
+let v2Home = null;
+async function ensureV2Home() {
+  if (v2Home) return v2Home;
+  const mod = await import("./v2/home.js");
+  v2Home = mod.mountHome($("v2HomeMount"), shellHooks);
+  return v2Home;
+}
+
+async function renderGame() {
+  await ensureV2Shell();
+  await ensureV2Home();
+  render();
+  selectScreen(activeScreen);
+  // Seed the history stack once so Back/Forward (and the header Back) have
+  // a base entry and in-app Back can never eject the player from the page.
+  if (!history.state || !history.state.v2) {
+    try {
+      history.replaceState({ v2: 1, v2Index: 1, game: state.gameId,
+                             screen: activeScreen, scroll: 0 }, "");
+      v2Depth = 1;
+    } catch (e) { /* history unavailable (test hosts) */ }
+  }
+  if (history.state?.v2) {
+    v2Depth = history.state.v2Index || 1;
+    if (!v2Restoring) await v2Apply(history.state);
+  }
 }
 
 async function loadGameKeepOp() {
@@ -943,7 +1044,7 @@ async function loadGameKeepOp() {
     const raw = await api("/api/games/" + encodeURIComponent(gid));
     state = normalizeState(raw);
     if (state.status === "dead" && state.continuation) renderLegacy();
-    else { render(); selectScreen(activeScreen); }
+    else { await renderGame(); }
   } catch (err) {
     showToast(err.message, true);
   }
@@ -953,12 +1054,13 @@ function sendAction(actionId, payload, targetId) {
   const body = {};
   if (targetId) body.target_id = targetId;
   Object.assign(body, payload);
-  startOperation(actionId, body);
+  return startOperation(actionId, body);
 }
 
 function resolveDecision(decisionId, optionId, inputs) {
-  startOperation("resolve_decision",
-                 { decision_id: decisionId, option_id: optionId, inputs });
+  return startOperation("resolve_decision",
+                        { decision_id: decisionId, option_id: optionId,
+                          inputs });
 }
 
 /* ---------- legacy / continuation ---------- */
@@ -968,7 +1070,6 @@ function renderLegacy() {
   const s = state;
   gameView.hidden = true;
   resumeView.hidden = true;
-  tabbar.hidden = true;
   legacyView.hidden = false;
   const eligible = (s.succession && s.succession.eligible) || [];
   const generationNext = s.succession && s.succession.generation_next;
@@ -1023,8 +1124,7 @@ function renderLegacy() {
   $("viewArchive").addEventListener("click", () => {
     gameView.hidden = false;
     legacyView.hidden = true;
-    tabbar.hidden = false;
-    selectScreen("summary");
+    selectScreen("home");
     render();
   });
 }
@@ -1033,7 +1133,7 @@ function continueAs(childId) {
   // Same retry-stable path as every other command: persisted op, replay
   // ledger, safe retry. (The old ad-hoc helper was not defined and would
   // have crashed here.)
-  startOperation("continue_as", { target_id: childId });
+  startOperation("continue_as", { target_id: childId }).catch(() => {});
 }
 
 /* ---------- loading ---------- */
@@ -1061,8 +1161,7 @@ async function loadGame() {
         (state.succession || state.continuation)) {
       renderLegacy();
     } else {
-      render();
-      selectScreen(activeScreen);
+      await renderGame();
     }
   } catch (err) {
     if (err.status === 404) {
@@ -1081,7 +1180,6 @@ function showFatalLoadError(err) {
   state = null;
   gameView.hidden = true;
   legacyView.hidden = true;
-  tabbar.hidden = true;
   resumeView.hidden = false;
   const list = $("lifeList");
   list.innerHTML = "";
@@ -1114,6 +1212,9 @@ function showFatalLoadError(err) {
 }
 
 $("backToLives").addEventListener("click", () => {
+  // USER BUG FIX: "All lives" is a place, not an exit — Back returns to the
+  // game (the history entry remembers which one).
+  v2Push({ lives: 1, game: currentGameId() });
   setCurrentGameId(null);
   showResume();
 });
@@ -1141,72 +1242,158 @@ const shellHooks = {
     sendAction(actionId, payload || {}, targetId),
   resolveDecision: (decisionId, optionId, inputs) =>
     resolveDecision(decisionId, optionId, inputs || {}),
+  // v2 navigation (frozen contracts.md §Shell).
+  navigate: (screen, params) => {
+    if (screen === "person" && params && params.personId) {
+      v2Push({ person: params.personId });
+    }
+    v2Shell && v2Shell.navigate(screen, params);
+  },
+  // USER BUG FIX: header Back for plain screens; the shell handles menu /
+  // overlay / panels itself. History-driven so browser Back matches.
+  onNavBack: () => {
+    if (v2Depth > 1) { history.back(); return; }
+    if (activeScreen !== "home") selectScreen("home");
+  },
+  onOverlayBack: () => {
+    if (v2Depth > 1) { history.back(); return; }
+    if (v2Shell) v2Shell.backFromPerson();
+  },
 };
 
-/* M2.5 in-play character editor (relationship_policy feature, B). Lazy
- * import so the game page pays nothing when the panel stays closed. */
-let editorModule = null;
-$("editorToggle").addEventListener("click", async () => {
+/* v2 shell chrome (Kimi B, redesign-v2): header + tab bar + More routes +
+ * person overlay host, per the frozen §Shell contract. Chrome only — game.js
+ * keeps owning state, panel rendering and the command machinery. Secondary
+ * routes reuse the existing toggles so every M2.5 surface stays reachable. */
+async function openEditorFromShell(personId, fromHistory) {
+  // Frozen §Shell/§Editor navigation: the editor's owning surface is the
+  // Activities screen (General card). More → Editor must reveal it and open
+  // idempotently; an exact personId pre-selects that person (never toggles
+  // an open panel shut, never fabricates a selection).
+  if (!fromHistory) v2Push({ panel: "editor", ...(personId ? { personId } : {}) });
+  closeV2Panels("editor");
+  selectScreen("activities");
   try {
     if (!editorModule) {
       editorModule = await import(
         "/static/features/relationship_policy/editor.js");
     }
-    editorModule.toggleEditor(state, shellHooks);
+    if (typeof editorModule.openEditor === "function") {
+      await editorModule.openEditor(state, shellHooks, personId);
+    } else {
+      if (!editorModule.isEditorOpen()) {
+        editorModule.toggleEditor(state, shellHooks);
+      }
+    }
+    if (v2Shell) v2Shell.sync();
   } catch (err) {
     showToast("Editor failed to load.", true);
   }
+}
+
+function openV2PanelDispatch(which, personId) {
+  // Restoring any panel must not push another navigation entry.
+  if (which === "editor") return openEditorFromShell(personId, true);
+  if (which === "familyTree") return openFamilyTreePanel();
+  if (which === "m25") return openM25Panel();
+  return Promise.resolve();
+}
+
+async function ensureV2Shell() {
+  if (v2Shell) return v2Shell;
+  const mod = await import("./v2/shell.js");
+  v2Shell = mod.mountShell(gameView, shellHooks, {
+    selectScreen: v2Navigate,
+    getActiveScreen: () => activeScreen,
+    onAllLives: () => $("backToLives").click(),
+    onEditor: () => openEditorFromShell(undefined, false),
+    onFamilyTree: () => openV2Panel("familyTree"),
+    onM25: () => openV2Panel("m25"),
+    // §Editor navigation: exact person ID from the Person module.
+    onEdit: (pid) => openEditorFromShell(pid, false),
+    onError: (m) => showToast(m, true),
+    isPanelOpen: () => isV2PanelOpen(),
+    closeTopPanel: () => closeTopPanel(),
+    closePanels: () => closeV2Panels(),
+  });
+  return v2Shell;
+}
+
+/* M2.5 in-play character editor (relationship_policy feature, B). Lazy
+ * import so the game page pays nothing when the panel stays closed. */
+let editorModule = null;
+$("editorToggle").addEventListener("click", () => {
+  if (editorModule && editorModule.isEditorOpen()) closeTopPanel();
+  else openEditorFromShell();
 });
 
 /* M2.5 family tree (family_graph feature, A's module; B owns the shell
  * hook). Lazy-import and mount into a toggleable card. */
 let familyTreeModule = null;
 let familyTreeCard = null;
+async function openFamilyTreePanel() {
+  selectScreen("activities");
+  closeV2Panels("familyTree");
+  if (familyTreeCard && !familyTreeCard.hidden) return;
+  if (!familyTreeCard) {
+    familyTreeCard = document.createElement("section");
+    familyTreeCard.className = "card";
+    familyTreeCard.id = "familyTreeCard";
+    familyTreeCard.hidden = true;
+    $("actionList").parentElement.appendChild(familyTreeCard);
+  }
+  if (!familyTreeModule) {
+    familyTreeModule = await import(
+      "/static/features/family_graph/family_tree.js");
+  }
+  familyTreeCard.hidden = false;
+  await familyTreeModule.mountFamilyTree(familyTreeCard, state.gameId);
+}
 $("familyTreeToggle").addEventListener("click", async () => {
   try {
-    if (!familyTreeCard) {
-      familyTreeCard = document.createElement("section");
-      familyTreeCard.className = "card";
-      familyTreeCard.id = "familyTreeCard";
-      familyTreeCard.hidden = true;
-      $("actionList").parentElement.appendChild(familyTreeCard);
+    if (familyTreeCard && !familyTreeCard.hidden) {
+      closeTopPanel();
+      return;
     }
-    if (!familyTreeModule) {
-      familyTreeModule = await import(
-        "/static/features/family_graph/family_tree.js");
-    }
-    familyTreeCard.hidden = !familyTreeCard.hidden;
-    if (!familyTreeCard.hidden) {
-      await familyTreeModule.mountFamilyTree(familyTreeCard,
-                                             state.gameId);
-    }
+    v2Push({ panel: "familyTree" });
+    await openFamilyTreePanel();
+    if (v2Shell) v2Shell.sync();
   } catch (err) {
     showToast("Family tree failed to load.", true);
   }
 });
 
 /* M2.5 dating & weddings screens (Kimi B's relationship_policy feature
- * module). Lazy-import and mount into a toggleable card, same pattern as
- * the editor and the family tree. */
+ * module). Lazy-import and mount into a toggleable card, same pattern. */
 let m25Module = null;
 let m25Card = null;
+async function openM25Panel() {
+  selectScreen("activities");
+  closeV2Panels("m25");
+  if (m25Card && !m25Card.hidden) return;
+  if (!m25Card) {
+    m25Card = document.createElement("section");
+    m25Card.className = "card";
+    m25Card.id = "m25Card";
+    m25Card.hidden = true;
+    $("actionList").parentElement.appendChild(m25Card);
+  }
+  if (!m25Module) {
+    m25Module = await import(
+      "/static/features/relationship_policy/m25_screens.js");
+  }
+  m25Card.hidden = false;
+  await m25Module.mountM25(m25Card, shellHooks);
+}
 $("m25Toggle").addEventListener("click", async () => {
   try {
-    if (!m25Card) {
-      m25Card = document.createElement("section");
-      m25Card.className = "card";
-      m25Card.id = "m25Card";
-      m25Card.hidden = true;
-      $("actionList").parentElement.appendChild(m25Card);
+    if (m25Card && !m25Card.hidden) {
+      closeTopPanel();
+      return;
     }
-    if (!m25Module) {
-      m25Module = await import(
-        "/static/features/relationship_policy/m25_screens.js");
-    }
-    m25Card.hidden = !m25Card.hidden;
-    if (!m25Card.hidden) {
-      await m25Module.mountM25(m25Card, shellHooks);
-    }
+    v2Push({ panel: "m25" });
+    await openM25Panel();
+    if (v2Shell) v2Shell.sync();
   } catch (err) {
     showToast("Dating & weddings failed to load.", true);
   }

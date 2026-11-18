@@ -758,62 +758,11 @@ class GameService:
             if isinstance(person, Person):
                 add_person(person)
 
-        actions = []
         pending = env.get("pending")
         from src.game.features.knowledge.core import pending_visible
         if pending and not pending_visible(env, pending):
             pending = None
-        if env["status"] == "alive" and not pending:
-            actions.append({"id": "age_up", "label": "Age up",
-                            "category": "life", "inputs": [],
-                            "known_costs": [], "limits": [],
-                            "enabled": True, "reason": None})
-            from src.menus import rule_actions
-            from src.game.context import RuleContext
-            covered_targets = set()
-            try:
-                for spec in rule_actions.action_specs(
-                        RuleContext(env, self)):
-                    spec.setdefault("inputs", [])
-                    spec.setdefault("known_costs", [])
-                    spec.setdefault("enabled", True)
-                    spec.setdefault("reason", None)
-                    actions.append(spec)
-                    if spec.get("id") == "spend_time" and spec.get(
-                            "target_id"):
-                        covered_targets.add(spec["target_id"])
-            except Exception:
-                pass  # rule projection must never break state reads
-            # Once-per-year state lives ONLY on the relation object
-            # (relation.spent_time, set by rule_actions.spend_time and reset
-            # by the yearly relation phase). env["year_actions"] is a legacy
-            # envelope field kept for old saves, not a source of truth —
-            # the advertised spec and dispatch read the same flag. The
-            # fallback fires only for a parent the rule projection failed
-            # to cover AND who is a real relation (dispatch refuses anyone
-            # outside player.relations, so advertising them would be a
-            # spec/dispatch disagreement).
-            relation_ids = {p.person_id for p in
-                            getattr(player, "relations", [])}
-            for person in self._walk_people(player):
-                # Same eligibility the rule enforces in
-                # rule_actions.spend_time / _relationship_specs: never
-                # advertise what dispatch will refuse.
-                if player.age < 5 or getattr(person, "age", 0) < 5:
-                    continue
-                if isinstance(person, Parent) and not getattr(
-                        person, "spent_time", False) \
-                        and person.person_id not in covered_targets \
-                        and person.person_id in relation_ids:
-                    actions.append({
-                        "id": "spend_time",
-                        "label": f"Spend time with {person.firstname}",
-                        "category": "relationships",
-                        "target_id": person.person_id,
-                        "inputs": [], "known_costs": [],
-                        "limits": ["once_per_year"],
-                        "enabled": True, "reason": None,
-                    })
+        actions = self._advertised_actions(env, player)
 
         pending_out = None
         if pending:
@@ -847,6 +796,10 @@ class GameService:
                 "id": pending["id"],
                 "kind": pending.get("kind"),
                 "event_id": pending.get("event_id"),
+                # §Choice v1: observer-safe display chip for the v2 choice
+                # header ("AGE 27 · FAMILY"); null -> age only, no chip.
+                "display_category": self._display_category(
+                    pending.get("kind")),
                 "title": pending["title"],
                 "text": pending["text"],
                 "person_ids": list(pending.get("person_ids", [])) or
@@ -909,6 +862,101 @@ class GameService:
             "completed_lives": list(env.get("completed_lives", [])),
             "succession": self._succession_view(env),
         }
+
+    # §Choice v1 (contracts.md): pure mapping from the already-public
+    # pending kind to a display chip category; unknown/absent kind -> None
+    # (UI shows the age only). Never an error, never a guess.
+    _DISPLAY_CATEGORIES = {
+        "baby_naming": "family",
+        "date_offer": "dating", "dating_offer": "dating",
+        "wedding_plan": "weddings",
+        "university_application": "education",
+        "university_funding": "education",
+        "retirement_offer": "work",
+    }
+
+    @classmethod
+    def _display_category(cls, kind):
+        if not kind:
+            return None
+        return cls._DISPLAY_CATEGORIES.get(kind)
+
+    def _advertised_actions(self, env, player):
+        """The exact advertised-spec list for the current moment: age_up +
+        rule specs + the once-per-year relation fallback, gated on alive
+        status and a visible pending decision. Single source for _state and
+        the §Person detail projection so advertised eligibility always
+        equals dispatch. Pure read."""
+        actions = []
+        pending = env.get("pending")
+        from src.game.features.knowledge.core import pending_visible
+        if pending and not pending_visible(env, pending):
+            pending = None
+        if env["status"] == "alive" and not pending:
+            actions.append({"id": "age_up", "label": "Age up",
+                            "category": "life", "inputs": [],
+                            "known_costs": [], "limits": [],
+                            "enabled": True, "reason": None})
+            from src.menus import rule_actions
+            from src.game.context import RuleContext
+            covered_targets = set()
+            try:
+                for spec in rule_actions.action_specs(
+                        RuleContext(env, self)):
+                    spec.setdefault("inputs", [])
+                    spec.setdefault("known_costs", [])
+                    spec.setdefault("enabled", True)
+                    spec.setdefault("reason", None)
+                    actions.append(spec)
+                    if spec.get("id") == "spend_time" and spec.get(
+                            "target_id"):
+                        covered_targets.add(spec["target_id"])
+            except Exception:
+                pass  # rule projection must never break state reads
+            # Once-per-year state lives ONLY on the relation object
+            # (relation.spent_time, set by rule_actions.spend_time and reset
+            # by the yearly relation phase); kept verbatim from _state —
+            # see git history for the full rationale.
+            relation_ids = {p.person_id for p in
+                            getattr(player, "relations", [])}
+            for person in self._walk_people(player):
+                # Same eligibility the rule enforces in
+                # rule_actions.spend_time / _relationship_specs: never
+                # advertise what dispatch will refuse.
+                if player.age < 5 or getattr(person, "age", 0) < 5:
+                    continue
+                if isinstance(person, Parent) and not getattr(
+                        person, "spent_time", False) \
+                        and person.person_id not in covered_targets \
+                        and person.person_id in relation_ids:
+                    actions.append({
+                        "id": "spend_time",
+                        "label": f"Spend time with {person.firstname}",
+                        "category": "relationships",
+                        "target_id": person.person_id,
+                        "inputs": [], "known_costs": [],
+                        "limits": ["once_per_year"],
+                        "enabled": True, "reason": None,
+                    })
+        return actions
+
+    def get_person_view(self, game_id, person_id):
+        """§Person additive detail projection (contracts.md §Person):
+        observer-safe basics + target-filtered advertised specs for one
+        person id. Unknown ids raise the typed not_found error; deceased
+        people remain viewable with actions []."""
+        from src.game.features.person_view.projection import person_detail
+        with self._lock:
+            env = self._load(game_id)
+            people = self._all_people(env)
+            person = people.get(person_id)
+            if person is None:
+                raise GameError("person_not_found", "unknown person", 404)
+            return person_detail(env, person,
+                                 self._advertised_actions(env,
+                                                          env["player"]),
+                                 role_of=self._role)
+
 
     def _succession_view(self, env):
         if env.get("status") != "dead":
