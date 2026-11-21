@@ -70,7 +70,61 @@ const ACTION_PRESENTATION = {
   compliment:    { glyph: "★", tint: "amber" },
   insult:        { glyph: "!", tint: "red" },
   ask_for_money: { glyph: "$", tint: "green" },
+  // M4 social actions (C-owned ids; presentation hints only — eligibility
+  // and reasons always arrive on the spec)
+  social_spend_time: { glyph: "☕", tint: "blue" },
+  social_befriend:   { glyph: "🤝", tint: "green" },
+  social_stand_up:   { glyph: "🛡", tint: "red" },
+  social_tell_someone: { glyph: "🗣", tint: "amber" },
 };
+
+const SOCIAL_KIND_LABELS = {
+  best_friend: "Best friend",
+  friend: "Friend",
+  acquaintance: "Acquaintance",
+  rival: "Rival",
+  bully: "Bully",
+};
+
+/* M4 social block: the person's social edge (kind + closeness + visible
+ * memory lines) lives on the adapter-enriched people entry
+ * (state.peopleById[id].social, populated from the M4 social projection)
+ * — never faked here. Styled like the Relationships-tab chips: a
+ * labelled "Relationship" bar coloured green/amber/red by value, with
+ * the kind text beside it. */
+function personSocialEdge(hooks, detail) {
+  if (typeof hooks.getState !== "function") return null;
+  const state = hooks.getState();
+  const person = state && state.peopleById
+    ? state.peopleById[detail.id] : null;
+  return person && person.social ? person.social : null;
+}
+
+function socialBlock(hooks, detail) {
+  const soc = personSocialEdge(hooks, detail);
+  if (!soc) return null;
+  const block = el("div", "v2p-social");
+  const head = el("div", "v2p-social-head");
+  const kindLabel = soc.kind && SOCIAL_KIND_LABELS[soc.kind];
+  if (kindLabel) head.append(el("span", "v2p-social-kind", kindLabel));
+  if (typeof soc.closeness === "number") {
+    head.append(el("span", "v2p-social-rel",
+                   "Relationship " + soc.closeness + "%"));
+  }
+  block.append(head);
+  if (typeof soc.closeness === "number") {
+    const track = el("div", "v2p-bar-track");
+    const fill = el("div", "v2p-bar-fill");
+    fill.style.width = Math.max(0, Math.min(100, soc.closeness)) + "%";
+    fill.style.background = barColor(soc.closeness, 0);
+    track.append(fill);
+    block.append(track);
+  }
+  for (const m of soc.memory || []) {
+    block.append(el("div", "v2p-social-memory", m));
+  }
+  return block;
+}
 
 const BAR_COLOR_ORDER = ["var(--v2-bar-1)", "var(--v2-bar-2)",
                          "var(--v2-bar-3)", "var(--v2-bar-4)"];
@@ -101,7 +155,7 @@ function validateDetail(detail) {
 
 function subtitleFrom(detail) {
   const parts = [];
-  if (typeof detail.age === "number") parts.push(String(detail.age));
+  if (typeof detail.age === "number") parts.push("Age " + detail.age);
   const d = detail.descriptors || {};
   // Only observer-public descriptors; unknown fields are omitted, not faked.
   for (const key of ["job", "faith", "city"]) {
@@ -175,7 +229,17 @@ function render(root, detail, ctx) {
     if (typeof ctx.hooks.onBack === "function") ctx.hooks.onBack();
   });
   const title = el("div", "v2p-header-title",
-                   detail.role || detail.relationship || "Person");
+                   // M4: the social kind (Acquaintance/Friend/…) is the
+                   // honest label when the projection carries one (the
+                   // server role word "relative" is wrong for classmates
+                   // — A's role fix is backlogged); fall back to role.
+                   (() => {
+                     const soc = personSocialEdge(ctx.hooks, detail);
+                     const kindLabel = soc && soc.kind &&
+                       SOCIAL_KIND_LABELS[soc.kind];
+                     return kindLabel || detail.role ||
+                            detail.relationship || "Person";
+                   })());
   const edit = el("button", "v2p-header-btn", "✎");
   edit.type = "button";
   edit.setAttribute("aria-label", "Edit");
@@ -242,7 +306,13 @@ function render(root, detail, ctx) {
     grid.append(el("div", "v2p-deceased-note", "This person has died."));
   }
 
-  root.append(header, card, grid);
+  // M4: social edge (kind + closeness bar + memory) when the projection
+  // carries one for this person; absent edge -> no block, never faked
+  const social = socialBlock(ctx.hooks, detail);
+
+  root.append(header, card);
+  if (social) root.append(social);
+  root.append(grid);
 
   const paint = ctx.hooks.renderAvatar || defaultRenderAvatar;
   if (paint) {

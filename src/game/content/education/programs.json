@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "programs": [
+    {
+      "id": "app_electrical",
+      "label": "Electrical apprenticeship",
+      "credential_id": "electrical_trade_cert",
+      "credential_label": "Electrical trade certificate",
+      "duration_years": 4,
+      "tuition_per_year": 0,
+      "fee_per_year": 400,
+      "min_age": 17,
+      "requires_secondary": true,
+      "admission": {"min_smarts": null, "qualifications": []},
+      "study_skill": "practical",
+      "funding": ["self"],
+      "apprentice_role": {"role_id": "app_electrician", "employer_id": "voltworks"},
+      "events": []
+    },
+    {
+      "id": "care_diploma",
+      "label": "Care diploma",
+      "credential_id": "care_diploma_cert",
+      "credential_label": "Care diploma",
+      "duration_years": 2,
+      "tuition_per_year": 3500,
+      "fee_per_year": 0,
+      "min_age": 17,
+      "requires_secondary": true,
+      "admission": {"min_smarts": null, "qualifications": []},
+      "study_skill": "care",
+      "funding": ["self", "student_loan", "parents", "scholarship"],
+      "apprentice_role": null,
+      "events": []
+    },
+    {
+      "id": "business_bachelors",
+      "label": "Business bachelor's",
+      "credential_id": "business_degree",
+      "credential_label": "Bachelor of Business",
+      "duration_years": 4,
+      "tuition_per_year": 9000,
+      "fee_per_year": 0,
+      "min_age": 17,
+      "requires_secondary": true,
+      "admission": {"min_smarts": 40, "qualifications": []},
+      "study_skill": "organization",
+      "funding": ["self", "student_loan", "parents", "scholarship"],
+      "apprentice_role": null,
+      "events": []
+    },
+    {
+      "id": "nursing_bachelors",
+      "label": "Nursing bachelor's",
+      "credential_id": "nursing_degree",
+      "credential_label": "Bachelor of Nursing",
+      "duration_years": 4,
+      "tuition_per_year": 8500,
+      "fee_per_year": 0,
+      "min_age": 18,
+      "requires_secondary": true,
+      "admission": {"min_smarts": null, "qualifications": ["care_diploma_cert"]},
+      "study_skill": "care",
+      "funding": ["self", "student_loan", "parents", "scholarship"],
+      "apprentice_role": null,
+      "events": []
+    }
+  ]
+}

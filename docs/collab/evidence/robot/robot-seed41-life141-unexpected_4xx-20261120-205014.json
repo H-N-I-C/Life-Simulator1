@@ -1,0 +1,76 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 141,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Archon at Adrick\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alvira",
+    "last_name": "Singer",
+    "gender": "female",
+    "country": "Japan",
+    "seed": 1952891409,
+    "request_id": "robot-41-141-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_6e5bad9722",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r6479",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_6e5bad9722",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r6480",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_6e5bad9722",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r6481",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_6e5bad9722",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Archon",
+    "employer_id": "Adrick"
+   },
+   "request_id": "robot-41-r6482",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Archon at Adrick\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 142 --seed 41 --from-life 141 --fail-fast"
+}

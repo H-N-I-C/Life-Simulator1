@@ -1,0 +1,70 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 48,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at Aldis\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Abelard",
+    "last_name": "McAllister",
+    "gender": "male",
+    "country": "Japan",
+    "seed": 1300497644,
+    "request_id": "robot-41-48-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 733579058,
+     "base": "woman",
+     "skin_tone": "light",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_556b36c959",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r2559",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_556b36c959",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+    "employer_id": "Aldis"
+   },
+   "request_id": "robot-41-r2560",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at Aldis\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 49 --seed 41 --from-life 48 --fail-fast"
+}

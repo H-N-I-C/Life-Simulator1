@@ -1,0 +1,141 @@
+{
+ "schema_version": 3,
+ "_comment": "M4 invite events (Kimi C). Kind social_invite: venue_label + adults_only are load-validated and consumed by A's pending/applier; the resolve applier enforces the 18+ gate on accept even if content forgets it. All options free; decline always legal.",
+ "events": [
+  {
+   "id": "soc_inv_birthday_party",
+   "title": "Birthday Party",
+   "text": "{person:host} is having a birthday party at the rec centre and has asked me to come, promising cake and questionable music.",
+   "interaction": {"kind": "social_invite", "romantic": false},
+   "venue_label": "Rec centre hall", "adults_only": false,
+   "conditions": {"min_age": 6, "max_age": 17,
+                  "all": [{"kind": "social_kind", "role_b": "host",
+                           "kinds": ["friend", "best_friend",
+                                     "acquaintance"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "host": {"kind": "person", "select": "predicate",
+                      "predicate": "social_host_of_actor"}},
+   "choices": [
+    {"id": "accept", "label": "Go to the party",
+     "effects": {"relationship": {"role": "host", "delta": 5},
+                 "stats": {"happiness": 3}, "money": -8},
+     "outcome_text": "I went to the birthday party with a gift and left with cake on my shoes and a genuinely good time."},
+    {"id": "decline", "label": "Send your regrets",
+     "effects": {"relationship": {"role": "host", "delta": -1}},
+     "outcome_text": "I sent my regrets to the birthday party with a gift and a polite note, and heard about the cake second-hand."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_inv_study_group_inv",
+   "title": "Study Group Invite",
+   "text": "{person:host} has invited me to join their after-school study group at the library, snacks apparently provided.",
+   "interaction": {"kind": "social_invite", "romantic": false},
+   "venue_label": "Public library", "adults_only": false,
+   "conditions": {"min_age": 11, "max_age": 17,
+                  "all": [{"kind": "in_circle", "circle": "school"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "host": {"kind": "person", "select": "predicate",
+                      "predicate": "social_classmate_of_actor"}},
+   "choices": [
+    {"id": "accept", "label": "Join the session",
+     "effects": {"relationship": {"role": "host", "delta": 4},
+                 "stats": {"smarts": 2}},
+     "outcome_text": "I joined the library study group and actually learned things between the snacks; an efficient sort of fun."},
+    {"id": "decline", "label": "Not this week",
+     "effects": {},
+     "outcome_text": "I begged off the study group that week and studied alone, which was quieter and only slightly less effective."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_inv_team_practice",
+   "title": "Extra Practice",
+   "text": "The club captain {person:host} has invited me to an extra practice session before the big meet.",
+   "interaction": {"kind": "social_invite", "romantic": false},
+   "venue_label": "Club grounds", "adults_only": false,
+   "conditions": {"min_age": 6,
+                  "all": [{"kind": "in_club", "club_id": "school_soccer"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "host": {"kind": "person", "select": "predicate",
+                      "predicate": "social_host_of_actor"}},
+   "choices": [
+    {"id": "accept", "label": "Train with the club",
+     "effects": {"relationship": {"role": "host", "delta": 3},
+                 "stats": {"health": 2, "happiness": 1}},
+     "outcome_text": "I went to the club's extra practice and trained until my legs filed a complaint; the captain nodded approval."},
+    {"id": "decline", "label": "Skip this one",
+     "effects": {},
+     "outcome_text": "I skipped the club's extra practice and rested, watching the meet approach with mixed confidence."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "soc_inv_afterwork",
+   "title": "After-work drinks",
+   "text": "{person:host} has invited me to drinks with the team after shift on Friday at the pub around the corner.",
+   "interaction": {"kind": "social_invite", "romantic": false},
+   "venue_label": "The Harbour Bar", "adults_only": true,
+   "conditions": {"min_age": 18,
+                  "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "host": {"kind": "person", "select": "predicate",
+                      "predicate": "social_host_of_actor"}},
+   "choices": [
+    {"id": "accept", "label": "Go for one drink",
+     "effects": {"relationship": {"role": "host", "delta": 5},
+                 "stats": {"happiness": 3, "stress": -2}, "money": -15},
+     "outcome_text": "I went for after-work drinks at the pub with my team and left after one, cheerful and exactly as charming as one drink allows."},
+    {"id": "decline", "label": "Beg off politely",
+     "effects": {},
+     "outcome_text": "I begged off after-work drinks with a polite excuse and a quiet night, and nobody held it against me."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_inv_book_club",
+   "title": "Book Club Night",
+   "text": "{person:host} has saved me a seat at book club, where apparently this month's book divided the room into armed camps.",
+   "interaction": {"kind": "social_invite", "romantic": false},
+   "venue_label": "A member's lounge room", "adults_only": false,
+   "conditions": {"min_age": 18,
+                  "all": [{"kind": "in_club", "club_id": "book_club"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "host": {"kind": "person", "select": "predicate",
+                      "predicate": "social_host_of_actor"}},
+   "choices": [
+    {"id": "accept", "label": "Take the saved seat",
+     "effects": {"relationship": {"role": "host", "delta": 4},
+                 "stats": {"smarts": 1, "happiness": 2}},
+     "outcome_text": "I took the saved seat at book club and defended an unpopular opinion about the ending until I was outnumbered and happy."},
+    {"id": "decline", "label": "Skip this month",
+     "effects": {},
+     "outcome_text": "I skipped book club that month and read the book alone, forming my unpopular opinions in private."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "soc_inv_house_party",
+   "title": "House Party",
+   "text": "{person:host} is throwing a house party and has told me to bring nothing but opinions and comfortable shoes.",
+   "interaction": {"kind": "social_invite", "romantic": false},
+   "venue_label": "Harbour Street flat", "adults_only": true,
+   "conditions": {"min_age": 18,
+                  "all": [{"kind": "social_kind", "role_b": "host",
+                           "kinds": ["friend", "best_friend"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "host": {"kind": "person", "select": "predicate",
+                      "predicate": "social_host_of_actor"}},
+   "choices": [
+    {"id": "accept", "label": "Go to the party",
+     "effects": {"relationship": {"role": "host", "delta": 4},
+                 "stats": {"happiness": 2, "stress": 1}},
+     "outcome_text": "I went to the house party and stayed until the opinions ran out, which took considerably longer than expected."},
+    {"id": "decline", "label": "Send your regrets",
+     "effects": {},
+     "outcome_text": "I sent my regrets to the house party and had an early night, which I described to no one as 'self-care'."}
+   ],
+   "weight": 1
+  }
+ ]
+}

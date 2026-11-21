@@ -1,0 +1,57 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 26,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aidan",
+    "last_name": "Teague",
+    "gender": "female",
+    "country": "Germany",
+    "seed": 72277014,
+    "request_id": "robot-7-26-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_b345afef5c",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r684",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_b345afef5c",
+   "action": "careers_apply",
+   "payload": {
+    "opening": null
+   },
+   "request_id": "robot-7-r685",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 27 --seed 7 --from-life 26 --fail-fast"
+}

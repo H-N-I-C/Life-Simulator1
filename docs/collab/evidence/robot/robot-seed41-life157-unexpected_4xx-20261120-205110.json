@@ -1,0 +1,115 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 157,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Alfonzo at Aamir\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Althea",
+    "last_name": "Golden",
+    "gender": "female",
+    "country": "USA",
+    "seed": 498731891,
+    "request_id": "robot-41-157-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 753555583,
+     "base": "woman",
+     "skin_tone": "default",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses",
+      "cap"
+     ],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_a82a129769",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r6797",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_a82a129769",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r6798",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_a82a129769",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r6799",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_a82a129769",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r6800",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_a82a129769",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r6801",
+   "expected_revision": 4
+  },
+  {
+   "n": 7,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_a82a129769",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Alfonzo",
+    "employer_id": "Aamir"
+   },
+   "request_id": "robot-41-r6802",
+   "expected_revision": 4
+  },
+  {
+   "n": 9,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Alfonzo at Aamir\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 158 --seed 41 --from-life 157 --fail-fast"
+}

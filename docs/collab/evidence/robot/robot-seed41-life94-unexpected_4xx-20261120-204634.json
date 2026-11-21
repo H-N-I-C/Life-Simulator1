@@ -1,0 +1,145 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 94,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Alonzo at Allan\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Amalita",
+    "last_name": "Clapp",
+    "gender": "female",
+    "country": "Canada",
+    "seed": 877122887,
+    "request_id": "robot-41-94-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 557123773,
+     "base": "man",
+     "skin_tone": "light",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "crown"
+     ],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_f08fd92bd2",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r4975",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_f08fd92bd2",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-41-r4976",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_f08fd92bd2",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-41-r4977",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_f08fd92bd2",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r4978",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_f08fd92bd2",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-41-r4979",
+   "expected_revision": 3
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_f08fd92bd2",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "continue",
+    "inputs": null
+   },
+   "request_id": "robot-41-r4980",
+   "expected_revision": 4
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_f08fd92bd2",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r4981",
+   "expected_revision": 5
+  },
+  {
+   "n": 10,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_f08fd92bd2",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Alonzo",
+    "employer_id": "Allan"
+   },
+   "request_id": "robot-41-r4982",
+   "expected_revision": 5
+  },
+  {
+   "n": 12,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Alonzo at Allan\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 95 --seed 41 --from-life 94 --fail-fast"
+}

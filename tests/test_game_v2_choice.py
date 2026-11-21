@@ -43,7 +43,10 @@ class DisplayCategoryMappingTests(unittest.TestCase):
                              "kind %r" % (kind,))
 
     def test_mapping_values_are_from_the_frozen_vocab(self):
-        vocab = {"family", "dating", "weddings", "education", "work"}
+        # 'social' added per the M4 contract (social_invite ->
+        # display_category "social"), Claude-approved
+        vocab = {"family", "dating", "weddings", "education", "work",
+                 "social"}
         for kind, cat in GameService._DISPLAY_CATEGORIES.items():
             self.assertIn(cat, vocab, "kind %r" % (kind,))
         # table never invents kinds: every key is a str

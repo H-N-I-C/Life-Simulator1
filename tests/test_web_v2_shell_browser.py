@@ -26,6 +26,17 @@ sys.path.insert(0, os.path.join(ROOT, "tests"))
 from test_web_m1 import make_profile  # noqa: E402
 from tools.cdp_client import launch_chrome  # noqa: E402
 
+# M4: when state.social exists the social module owns the Relationships
+# roster (.v2so-chip with data-person-id) and the legacy #familyList
+# roster never populates (fresh lives) or stays hidden (aged lives).
+# Tests drive whichever surface the game actually renders.
+_PERSON_CHIP_WAIT = (
+    "(document.querySelectorAll('#familyList .chip').length > 0 || "
+    "!!document.querySelector('.v2so-chip[data-person-id]'))")
+_PERSON_CHIP_CLICK = (
+    "(document.querySelector('#familyList .chip') || "
+    "document.querySelector('.v2so-chip[data-person-id]')).click()")
+
 
 class V2ShellBrowserCase(unittest.TestCase):
     @classmethod
@@ -60,13 +71,10 @@ class V2ShellBrowserCase(unittest.TestCase):
                 self.base + "/game?game=" + self.game["game_id"])
             sess.wait_js("document.querySelector('.v2-tabbar') !== null",
                          desc="v2 tabbar renders")
-            sess.js("document.querySelectorAll('.v2-tab')[3].click()")  # People
-            sess.wait_js(
-                "document.getElementById('familyList').children.length > 0",
-                desc="roster renders")
+            sess.js("document.querySelectorAll('.v2-tab')[2].click()")  # Relationships
+            sess.wait_js(_PERSON_CHIP_WAIT, desc="person chips render")
             names = [p["name"] for p in self.game["people"]]
-            sess.js("document.querySelectorAll('#familyList .chip')[0]"
-                    ".click()")
+            sess.js(_PERSON_CHIP_CLICK)
             sess.wait_js(
                 "!document.querySelector('.v2-person-host').hidden && "
                 "document.querySelector('.v2-person-host')"
@@ -121,35 +129,87 @@ class V2ShellBrowserCase(unittest.TestCase):
         # Shell chrome mounts before the async Home import completes.
         # Callers may click Age immediately, so wait for that actual control.
         sess.wait_js("document.querySelector('.v2-tabbar') !== null && "
-                     "document.querySelector('.v2h-age') !== null",
+                     "document.querySelector('.v2-agebtn') !== null",
                      desc="v2 shell and Home control render")
         return proc, conn, sess
 
-    def test_home_stats_age_and_newest_first_timeline(self):
+    def test_home_stats_age_and_chronological_feed(self):
         game = self._create("v2-home-journey")
         gid = game["game_id"]
         proc, conn, sess = self._launch(gid)
         try:
             # real stats with numeric labels
             sess.wait_js(
-                "document.querySelectorAll('.v2h-stat-value').length >= 4",
+                "document.querySelectorAll('.v2-stat-value').length >= 4",
                 desc="stats render")
-            vals = sess.js("[...document.querySelectorAll('.v2h-stat-value')]"
+            vals = sess.js("[...document.querySelectorAll('.v2-stat-value')]"
                            ".map(e => e.textContent)")
             self.assertTrue(all(v.endswith("%") for v in vals), vals)
+            # header carries the ticking age chip
+            sess.wait_js(
+                "!!document.querySelector('.v2-header-age') && "
+                "document.querySelector('.v2-header-age')"
+                ".textContent.includes('0')",
+                desc="header age chip renders")
             # central Age drives the real command
             before = self._state(gid)["revision"]
-            sess.js("document.querySelector('.v2h-age').click()")
+            sess.js("document.querySelector('.v2-agebtn').click()")
             import time
             time.sleep(2.0)
             after = self._state(gid)
             self.assertGreater(after["revision"], before)
             self.assertEqual(after["people"][0]["age"], 1)
-            # newest-first: card ages are in descending order
+            # F4/F12: chronological feed, oldest → newest
             heads = sess.js(
                 "[...document.querySelectorAll('#journalList .jcard-head')]"
-                ".map(e => Number(e.textContent.replace('Age ', '')))")
-            self.assertEqual(heads, sorted(heads, reverse=True), heads)
+                ".map(e => parseInt(e.textContent.replace(/[^0-9]/g, ''), 10) || 0)")
+            self.assertEqual(heads, sorted(heads), heads)
+            # live several more years so the feed overflows the viewport;
+            # resolve any pending decision through the sheet
+            for _ in range(6):
+                if sess.js("!document.getElementById('modal').hidden"):
+                    sess.js("Array.from(document.querySelectorAll("
+                            "'.v2c-option, .v2e-option'))"
+                            ".find(b => !b.disabled).click()")
+                    time.sleep(1.5)
+                if sess.js("document.querySelector('.v2-agebtn').disabled"):
+                    break
+                sess.js("document.querySelector('.v2-agebtn').click()")
+                time.sleep(1.5)
+            # the feed is viewport-constrained: the scroll region owns the
+            # overflow (the document must not grow beneath it)
+            geo = sess.js(
+                "(function(){var s = document.querySelector('.v2-scroll');"
+                "return {sh: s.scrollHeight, ch: s.clientHeight};})()")
+            self.assertGreater(geo["sh"], geo["ch"],
+                               "feed content exceeds the viewport region")
+            sess.wait_js(
+                "(function(){var s = document.querySelector('.v2-scroll');"
+                "return s.scrollHeight - s.scrollTop - s.clientHeight < 48;})()",
+                desc="feed pinned to the newest year")
+            heads = sess.js(
+                "[...document.querySelectorAll('#journalList .jcard-head')]"
+                ".map(e => parseInt(e.textContent.replace(/[^0-9]/g, ''), 10) || 0)")
+            self.assertEqual(heads, sorted(heads), heads)
+            # A resumed Home must be visible before its first scroll
+            # measurement; no animation-frame re-pinning may mask a reset.
+            sess.call("Page.reload")
+            sess.wait_js(
+                "!!document.querySelector('.v2-scroll') && "
+                "document.querySelectorAll('.jcard-head').length > 1 && "
+                "document.querySelector('.v2-scroll').scrollHeight - "
+                "document.querySelector('.v2-scroll').scrollTop - "
+                "document.querySelector('.v2-scroll').clientHeight < 48",
+                desc="reloaded journal opens at newest year")
+            # and an older reading position survives the next age-up:
+            # scrolled up, the feed must NOT follow the bottom
+            sess.js("document.querySelector('.v2-scroll').scrollTop = 0")
+            if not sess.js("document.querySelector('.v2-agebtn').disabled"):
+                sess.js("document.querySelector('.v2-agebtn').click()")
+                time.sleep(2.0)
+                sess.wait_js(
+                    "document.querySelector('.v2-scroll').scrollTop < 48",
+                    desc="older reading position preserved")
             self.assertEqual(sess.console_errors, [])
         finally:
             proc.terminate()
@@ -200,25 +260,30 @@ class V2ShellBrowserCase(unittest.TestCase):
         self.assertEqual(d["kind"], "baby_naming")
         proc, conn, sess = self._launch(gid)
         try:
-            # sheet auto-opens (pending can never be stranded)
+            # sheet auto-opens (pending can never be stranded); C's event
+            # module renders .v2e-*, the Stage-2 fallback .v2c-*
             sess.wait_js(
                 "!document.getElementById('modal').hidden && "
-                "document.querySelector('.v2c-options') !== null",
+                "document.querySelector('.v2c-options, .v2e-options') "
+                "!== null",
                 desc="choice sheet opens for the yearly pending")
             # frozen chip: AGE <n> · FAMILY
             chip = sess.js(
-                "document.querySelector('.v2c-kind') && "
-                "document.querySelector('.v2c-kind').textContent || ''")
+                "(document.querySelector('.v2c-kind') || "
+                "document.querySelector('.v2e-kind') || {textContent: ''})"
+                ".textContent")
             self.assertIn("AGE", chip)
             self.assertIn("FAMILY", chip)
             # the naming input is a real text control
-            inp = sess.js("!!document.querySelector('.v2c-form input')")
+            inp = sess.js("!!document.querySelector('.v2c-form input, "
+                          ".v2e-form input')")
             self.assertTrue(inp)
-            # paid/$0 knownEffects: options advertise costs verbatim
-            eff = sess.js("[...document.querySelectorAll('.v2c-effects')]"
-                          ".map(e => e.textContent)")
-            if eff:
-                self.assertTrue(all("·" in e or e for e in eff))
+            # real costs stay visible pre-choice (F5 hides only effects);
+            # the Stage-2 fallback also renders knownEffects verbatim
+            costs = sess.js("[...document.querySelectorAll('.v2e-costs, "
+                            ".v2c-effects')].map(e => e.textContent)")
+            for c in costs:
+                self.assertTrue(c.strip())
             # collapse via Escape → pill; reopen; resolve with a name
             sess.js("document.dispatchEvent(new KeyboardEvent('keydown',"
                     "{key:'Escape'}))")
@@ -231,10 +296,12 @@ class V2ShellBrowserCase(unittest.TestCase):
             sess.wait_js(
                 "!document.getElementById('modal').hidden",
                 desc="Show reopens the sheet")
-            sess.js("var i = document.querySelector('.v2c-form input');"
+            sess.js("var i = document.querySelector('.v2c-form input, "
+                    ".v2e-form input');"
                     "i.value = 'Robin';")
             before = self._state(gid)["revision"]
-            sess.js("[...document.querySelectorAll('.v2c-option')]"
+            sess.js("[...document.querySelectorAll('.v2c-option, "
+                    ".v2e-option')]"
                     ".find(b => !b.disabled).click()")
             import time
             time.sleep(2.0)
@@ -247,10 +314,11 @@ class V2ShellBrowserCase(unittest.TestCase):
             names = [p["name"] for p in after["people"]]
             self.assertTrue(any(n.startswith("Robin") for n in names),
                             "child was named via the sheet: %r" % names)
-            # paid choice knownEffects render verbatim in the live sheet
+            # pre-choice cost/effect lines in any re-opened sheet render
+            # verbatim (event module: real costs only, per F5)
             if pend:
-                eff = sess.js("[...document.querySelectorAll('.v2c-effects')]"
-                              ".map(e => e.textContent)")
+                eff = sess.js("[...document.querySelectorAll('.v2e-costs, "
+                              ".v2c-effects')].map(e => e.textContent)")
                 for e in eff:
                     self.assertTrue(e.strip())
             self.assertEqual(sess.console_errors, [])
@@ -264,7 +332,7 @@ class V2ShellBrowserCase(unittest.TestCase):
         try:
             sess.js("Object.defineProperty(navigator, 'onLine', "
                     "{value:false, configurable:true});")
-            sess.js("document.querySelector('.v2h-age').click()")
+            sess.js("document.querySelector('.v2-agebtn').click()")
             sess.wait_js(
                 "document.getElementById('pendingPill') && "
                 "!document.getElementById('pendingPill').hidden",
@@ -300,13 +368,13 @@ class V2ShellBrowserCase(unittest.TestCase):
                 # Poll until the next sheet's option is enabled (the sheet
                 # briefly re-renders mid-flight with all options frozen).
                 sess.wait_js(
-                    "[...document.querySelectorAll('.v2c-option')]"
+                    "[...document.querySelectorAll('.v2c-option, .v2e-option')]"
                     ".some(b => !b.disabled && (%s).test(b.textContent))"
                     % pred_json,
                     timeout=8,
                     desc="sheet offers an option matching %s" % pred_json)
                 sess.js(
-                    "[...document.querySelectorAll('.v2c-option')]"
+                    "[...document.querySelectorAll('.v2c-option, .v2e-option')]"
                     ".find(b => !b.disabled && (%s).test(b.textContent))"
                     ".click(); true" % pred_json)
                 import time
@@ -370,12 +438,9 @@ class V2ShellBrowserCase(unittest.TestCase):
                      if p["id"] != self.game["player_id"])
         proc, conn, sess = self._launch(gid)
         try:
-            sess.js("document.querySelectorAll('.v2-tab')[3].click()")  # People
-            sess.wait_js(
-                "document.getElementById('familyList').children.length > 0",
-                desc="roster renders")
-            sess.js("document.querySelectorAll('#familyList .chip')[0]"
-                    ".click()")
+            sess.js("document.querySelectorAll('.v2-tab')[2].click()")  # Relationships
+            sess.wait_js(_PERSON_CHIP_WAIT, desc="person chips render")
+            sess.js(_PERSON_CHIP_CLICK)
             sess.wait_js(
                 "!document.querySelector('.v2-person-host').hidden && "
                 "!!document.querySelector('.v2-person-host "
@@ -391,6 +456,13 @@ class V2ShellBrowserCase(unittest.TestCase):
                 "['home','job','assets','people','activities']"
                 ".find(s => !document.getElementById('screen-'+s).hidden)")
             self.assertEqual(active, "activities")
+            # The panel becomes visible before its policy fetch completes.
+            # Wait for the real asynchronous target selection, then verify
+            # the same identity and form assertions below.
+            sess.wait_js(
+                "document.querySelectorAll('#editorPeople "
+                "button[aria-pressed=true]').length === 1",
+                desc="editor target selection loaded")
             pressed = sess.js(
                 "[...document.querySelectorAll('#editorPeople button')]"
                 ".filter(b => b.getAttribute('aria-pressed') === 'true')"
@@ -411,9 +483,10 @@ class V2ShellBrowserCase(unittest.TestCase):
             proc.terminate()
 
     def test_person_chips_from_journal_and_decision_sheet(self):
-        gid = self.game["game_id"]
-        parent = next(p for p in self.game["people"]
-                      if p["id"] != self.game["player_id"])
+        game = self._create("v2-npc-event-chip", seed=42)
+        gid = game["game_id"]
+        parent = next(p for p in game["people"]
+                      if p["id"] != game["player_id"])
         proc, conn, sess = self._launch(gid)
         try:
             # --- journal chip → person overlay ---
@@ -437,14 +510,28 @@ class V2ShellBrowserCase(unittest.TestCase):
                          desc="Back closes the overlay")
 
             # --- decision sheet chip → overlay above the sheet ---
-            sess.js("[...document.querySelectorAll('#actionList button')]"
-                    ".find(b => /surrender/i.test(b.textContent)).click()")
+            # Use a real stored NPC decision. Surrender is player-only and
+            # must no longer supply a chip for this navigation regression.
+            env = self.httpd.service._load(gid)
+            env["pending"] = {
+                "id": "d_parent_chip", "title": "A family decision",
+                "text": "Talk with your parent.",
+                "person_ids": [game["player_id"], parent["id"]],
+                "options": [{"id": "talk", "label": "Talk", "known_effects": [],
+                             "_effects": {}, "_outcome": "I talked."}],
+            }
+            self.httpd.service._save(env)
+            sess.call("Page.reload")
             sess.wait_js(
-                "document.querySelectorAll('.v2c-people .v2-person-link')"
+                "document.querySelectorAll('.v2c-people .v2-person-link, "
+                ".v2e-people .v2-person-link')"
                 ".length > 0",
                 desc="sheet person chips render")
-            sess.js("document.querySelector('.v2c-people "
-                    ".v2-person-link').click()")
+            self.assertEqual(sess.js(
+                "[...document.querySelectorAll('.v2e-people .v2-person-link')]"
+                ".map(e => e.textContent.trim())"), [parent["name"]])
+            sess.js("document.querySelector('.v2c-people .v2-person-link, "
+                    ".v2e-people .v2-person-link').click()")
             sess.wait_js(
                 "!document.querySelector('.v2-person-host').hidden && "
                 "!!document.querySelector('.v2-person-host "
@@ -455,7 +542,8 @@ class V2ShellBrowserCase(unittest.TestCase):
             sess.wait_js(
                 "document.querySelector('.v2-person-host').hidden && "
                 "!document.getElementById('modal').hidden && "
-                "document.querySelectorAll('.v2c-option').length > 0",
+                "document.querySelectorAll('.v2c-option, .v2e-option')"
+                ".length > 0",
                 desc="Back returns to the still-open decision sheet")
             self.assertEqual(sess.console_errors, [])
         finally:
@@ -536,7 +624,7 @@ class V2ShellBrowserCase(unittest.TestCase):
                       and p["age"] >= 18)
         proc, conn, sess = self._launch(gid)
         try:
-            sess.js("document.querySelectorAll('.v2-tab')[3].click()")  # People
+            sess.js("document.querySelectorAll('.v2-tab')[2].click()")  # Relationships
             sess.wait_js(
                 "document.getElementById('familyList').children.length > 0",
                 desc="roster renders")
@@ -671,12 +759,14 @@ class V2ShellBrowserCase(unittest.TestCase):
                 sess.js("document.querySelectorAll('.v2-tab')[%d]"
                         ".click()" % i)
 
+            sess.wait_js("!document.getElementById('screen-home').hidden",
+                         desc="home screen selected")
             self.assertEqual(active_screen(), "home")
             self.assertTrue(back_hidden(), "Back hidden on plain Home")
 
             # every top-level destination: open → Back → Home again
-            for i, name in [(1, "job"), (2, "assets"), (3, "people"),
-                            (4, "activities")]:
+            for i, name in [(0, "job"), (1, "assets"), (2, "people"),
+                            (3, "activities")]:
                 tab(i)
                 sess.wait_js("!document.querySelector('.v2-back').hidden",
                              desc="Back visible on %s" % name)
@@ -692,11 +782,11 @@ class V2ShellBrowserCase(unittest.TestCase):
             sess.js("document.querySelector('.v2-scroll').scrollTop = 500;")
             home_scroll = sess.js(
                 "document.querySelector('.v2-scroll').scrollTop")
-            tab(1)                       # job
+            tab(0)                       # job
             sess.js("document.querySelector('.v2-scroll').scrollTop = 0;")
             job_scroll = sess.js(
                 "document.querySelector('.v2-scroll').scrollTop")
-            tab(2)                       # assets
+            tab(1)                       # assets
             header_back()
             sess.wait_js("!document.getElementById('screen-job').hidden",
                          desc="chained Back lands on job")
@@ -713,7 +803,7 @@ class V2ShellBrowserCase(unittest.TestCase):
                              (sc, home_scroll))
 
             # browser Back (popstate) matches in-app Back
-            tab(3)                       # people
+            tab(2)                       # people (relationships)
             sess.wait_js("!document.getElementById('screen-people')"
                          ".hidden", desc="people via tab")
             sess.js("history.back()")
@@ -721,11 +811,9 @@ class V2ShellBrowserCase(unittest.TestCase):
                          desc="browser Back returns Home")
 
             # person overlay → Back returns to the People list
-            tab(3)
-            sess.wait_js("document.getElementById('familyList')"
-                         ".children.length > 0", desc="roster")
-            sess.js("document.querySelectorAll('#familyList .chip')[0]"
-                    ".click()")
+            tab(2)
+            sess.wait_js(_PERSON_CHIP_WAIT, desc="person chips render")
+            sess.js(_PERSON_CHIP_CLICK)
             sess.wait_js("!document.querySelector('.v2-person-host').hidden",
                          desc="overlay opens")
             header_back()
@@ -783,7 +871,7 @@ class V2ShellBrowserCase(unittest.TestCase):
                       {"url": self.base + "/game?game=" + gid})
             sess.wait_js("location.href.indexOf('/game') !== -1 && "
                          "document.readyState === 'complete' && "
-                         "document.querySelector('.v2h-age') !== null && "
+                         "document.querySelector('.v2-agebtn') !== null && "
                          "document.querySelector('.v2-tabbar') !== null",
                          timeout=20,
                          desc="shell renders at 320px")
@@ -796,17 +884,17 @@ class V2ShellBrowserCase(unittest.TestCase):
                 "document.querySelector('.v2-back').hidden !== true && "
                 "false || document.querySelector('.v2-header-name')"
                 ".offsetWidth > 320"))
-            # all five tabs visible and labelled at 320px
+            # all four tabs visible and labelled at 320px
             self.assertEqual(sess.js(
-                "document.querySelectorAll('.v2-tab').length"), 5)
+                "document.querySelectorAll('.v2-tab').length"), 4)
             self.assertTrue(sess.js(
                 "[...document.querySelectorAll('.v2-tab')].every(t => "
                 "t.getBoundingClientRect().width > 0)"))
             # Age control and stats render
             self.assertTrue(sess.js(
-                "!!document.querySelector('.v2h-age')"))
+                "!!document.querySelector('.v2-agebtn')"))
             self.assertTrue(sess.js(
-                "document.querySelectorAll('.v2h-stat-value').length >= 1"))
+                "document.querySelectorAll('.v2-stat-value').length >= 1"))
             # decision sheet covers the viewport width on phones
             sess.wait_js(
                 "[...document.querySelectorAll('#actionList button')]"
@@ -820,8 +908,14 @@ class V2ShellBrowserCase(unittest.TestCase):
                 "(function(){var b = document.querySelector('.modal-box')"
                 ".getBoundingClientRect(); return {left: b.left, "
                 "width: b.width};})()")
-            self.assertLessEqual(box["left"], 1.0, box)
-            self.assertGreaterEqual(box["width"], 319.0, box)
+            # bottom sheet hugs the viewport edges; C's centered event card
+            # sits inside the overlay's 16px padding — either way it must
+            # be fully on-screen and nearly full-width, with no page
+            # horizontal overflow
+            self.assertGreaterEqual(box["left"], -0.1, box)
+            self.assertLessEqual(box["left"], 16.1, box)
+            self.assertGreaterEqual(box["width"], 250.0, box)
+            self.assertLessEqual(box["left"] + box["width"], 320.1, box)
             self.assertEqual(sess.console_errors, [])
         finally:
             proc.terminate()

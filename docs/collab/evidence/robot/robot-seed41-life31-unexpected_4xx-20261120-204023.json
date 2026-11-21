@@ -1,0 +1,70 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 31,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: N at N\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adolphus",
+    "last_name": "Watson",
+    "gender": "male",
+    "country": "Brazil",
+    "seed": 999411178,
+    "request_id": "robot-41-31-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1516082765,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_6f88399a2d",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r1944",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_6f88399a2d",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "N",
+    "employer_id": "N"
+   },
+   "request_id": "robot-41-r1945",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: N at N\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 32 --seed 41 --from-life 31 --fail-fast"
+}

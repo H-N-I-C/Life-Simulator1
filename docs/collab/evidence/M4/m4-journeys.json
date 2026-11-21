@@ -1,0 +1,115 @@
+{
+ "counts": {
+  "PASS": 9,
+  "PENDING": 3,
+  "SKIP": 2,
+  "FAIL": 1
+ },
+ "rows": [
+  {
+   "journey": "m4_j1_school_friend",
+   "step": "classmates_surface",
+   "title": "Classmates circle lists real people",
+   "status": "PASS",
+   "detail": "6 classmates, all canonical person ids"
+  },
+  {
+   "journey": "m4_j1_school_friend",
+   "step": "befriend",
+   "title": "social_befriend grows closeness",
+   "status": "PASS",
+   "detail": "closeness 0 -> 10 (kind friend)"
+  },
+  {
+   "journey": "m4_j1_school_friend",
+   "step": "invite",
+   "title": "Stored social_invite offer, accepted via the pending envelope",
+   "status": "PENDING",
+   "detail": "C: no social_invite served to a school life in 8 years (invite content/route pending)"
+  },
+  {
+   "journey": "m4_j1_school_friend",
+   "step": "fallout_reconcile",
+   "title": "No-contact fade, then reconcile",
+   "status": "SKIP",
+   "detail": "no friendship to fade (befriend/invite steps cover creation)"
+  },
+  {
+   "journey": "m4_j2_bully",
+   "step": "bully_surface",
+   "title": "A bully/rival appears in the circle",
+   "status": "PENDING",
+   "detail": "C: no bullying arc served to a school life in 10 years (bully content/route pending)"
+  },
+  {
+   "journey": "m4_j2_bully",
+   "step": "respond",
+   "title": "stand_up + tell_someone dispatch, memory recorded",
+   "status": "SKIP",
+   "detail": "no bully in the circle (bully_surface covers it)"
+  },
+  {
+   "journey": "m4_j2_bully",
+   "step": "minor_content",
+   "title": "Nothing adult served to a minor",
+   "status": "FAIL",
+   "detail": "minor can join adults_only clubs ['harbour_run_club']"
+  },
+  {
+   "journey": "m4_j3_coworker",
+   "step": "coworkers_surface",
+   "title": "Coworker circle from the assignment",
+   "status": "PASS",
+   "detail": "3 coworkers in the circle (all canonical)"
+  },
+  {
+   "journey": "m4_j3_coworker",
+   "step": "befriend",
+   "title": "Befriend a coworker",
+   "status": "PASS",
+   "detail": "coworker aaa50196-9868-4ad1-8499-1fbcdbbe8616 is now kind=friend"
+  },
+  {
+   "journey": "m4_j3_coworker",
+   "step": "job_change",
+   "title": "Resign; ex-coworker contact is kept (faded), never auto-deleted",
+   "status": "PASS",
+   "detail": "after resign, ex-coworker friends remain real people in the projection (faded keep-contact)"
+  },
+  {
+   "journey": "m4_j4_privacy_venues",
+   "step": "adult_club_refusal",
+   "title": "club_join on adults_only refused with the 18+ reason",
+   "status": "PASS",
+   "detail": "adults_only join refused: you must be 18 or older to join"
+  },
+  {
+   "journey": "m4_j4_privacy_venues",
+   "step": "minor_invite_watch",
+   "title": "8 years: no adults_only invite served",
+   "status": "PASS",
+   "detail": "8 minor years: no adults_only invite ever served"
+  },
+  {
+   "journey": "m4_j4_privacy_venues",
+   "step": "romance_18_gate",
+   "title": "M2.5 regression: minors cannot find_partner",
+   "status": "PASS",
+   "detail": "17-year-old find_partner refused: both participants must be 18 or older"
+  },
+  {
+   "journey": "m4_j4_privacy_venues",
+   "step": "memory_privacy",
+   "title": "social.memory well-formed per person",
+   "status": "PENDING",
+   "detail": "A/C: no memory fact recorded after befriend + 8 years of contact (memory pipeline not landed yet) \u2014 privacy probe has no subject"
+  },
+  {
+   "journey": "m4_j5_contrasting_starts",
+   "step": "starts",
+   "title": "Child/graduate/adult: groups + free actions + aging",
+   "status": "PASS",
+   "detail": "social projection + free actions + legal aging: Child, Graduate, Employed adult"
+  }
+ ]
+}

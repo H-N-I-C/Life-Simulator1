@@ -792,7 +792,10 @@ class SurrenderFlowTests(unittest.TestCase):
         st = svc.command(gid, st["revision"], "s5", "resolve_decision",
                          {"decision_id": d2["id"], "option_id": end["id"]})
         self.assertEqual(st["status"], "dead")
-        self.assertEqual(st["available_actions"], [])
+        # §Undo v1: the only action on death is undo_year (advertised even
+        # when no snapshot exists — disabled with the precise reason)
+        self.assertEqual([a["id"] for a in st["available_actions"]],
+                         ["undo_year"])
         self.assertTrue(any(e["kind"] == "death"
                             for e in st["journal"]))
         # durable across restart
@@ -850,6 +853,9 @@ class SuccessionTests(unittest.TestCase):
 
     def test_continue_as_preserves_identity_and_balances_cash(self):
         svc, gid, before, names, money_before = self._dead_with_children()
+        env = svc._load(gid)
+        env["wrk_stu_seen"] = ["wrk_skill_refresh", "stu_group_project"]
+        svc._save(env)
         st = svc.get_state(gid)
         target = st["succession"]["eligible"][0]
         rev = st["revision"]
@@ -857,6 +863,8 @@ class SuccessionTests(unittest.TestCase):
                          {"target_id": target["person_id"]})
         self.assertEqual(st["status"], "alive")
         self.assertEqual(st["generation"], 2)
+        self.assertFalse(svc._load(gid).get("wrk_stu_seen"),
+                         "work/study cadence must start fresh for this life")
         # successor IS the same person
         player = next(p for p in st["people"]
                       if p["id"] == st["player_id"])

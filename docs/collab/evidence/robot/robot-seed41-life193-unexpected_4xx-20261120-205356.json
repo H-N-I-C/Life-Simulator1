@@ -1,0 +1,67 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 193,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at Ali\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Archy",
+    "last_name": "Perkins",
+    "gender": "male",
+    "country": "USA",
+    "seed": 1766453970,
+    "request_id": "robot-41-193-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_4d2d123205",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r8234",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_4d2d123205",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r8235",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_4d2d123205",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+    "employer_id": "Ali"
+   },
+   "request_id": "robot-41-r8236",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at Ali\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 194 --seed 41 --from-life 193 --fail-fast"
+}

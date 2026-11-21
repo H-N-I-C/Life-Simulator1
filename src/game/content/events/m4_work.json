@@ -1,0 +1,133 @@
+{
+ "schema_version": 3,
+ "_comment": "M4 work social events (Kimi C). Gate: active named assignment (M3 leaf). All options free; outcomes M3c-audited.",
+ "events": [
+  {
+   "id": "soc_wrk_lunch_invite",
+   "title": "The Lunch Invitation",
+   "text": "{person:coworker} has asked if I want to join the regular lunch crowd at the food court instead of eating at my desk.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 18,
+                  "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "coworker": {"kind": "person", "select": "predicate",
+                          "predicate": "social_coworker_of_actor"}},
+   "choices": [
+    {"id": "go", "label": "Join them",
+     "effects": {"relationship": {"role": "coworker", "delta": 4},
+                 "stats": {"happiness": 2}, "money": -12},
+     "outcome_text": "I joined my coworkers at the food court and paid for my own lunch and several of their opinions about the boss."},
+    {"id": "desk", "label": "Eat at my desk",
+     "effects": {"stats": {"happiness": -1, "stress": -1}},
+     "outcome_text": "I stayed at my desk for lunch and got ahead on work, which was productive and quietly lonely."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_wrk_cover_shift",
+   "title": "Cover For Me?",
+   "text": "{person:coworker} needs someone to cover their shift on Friday for a family thing, and they are asking me with hope in their eyes.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 18,
+                  "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "coworker": {"kind": "person", "select": "predicate",
+                          "predicate": "social_coworker_of_actor"}},
+   "choices": [
+    {"id": "cover", "label": "Cover the shift",
+     "effects": {"relationship": {"role": "coworker", "delta": 5},
+                 "karma": 1, "stats": {"stress": 2}},
+     "outcome_text": "I covered my coworker's Friday shift for their family thing; my weekend shrank and my standing in the team grew."},
+    {"id": "sorry", "label": "Sorry, I can't",
+     "effects": {"relationship": {"role": "coworker", "delta": -1}},
+     "outcome_text": "I told my coworker I could not cover their shift, and spent Friday feeling slightly guilty about my free evening."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_wrk_project_help",
+   "title": "The Rescue",
+   "text": "{person:coworker} is drowning in their project and has asked, very quietly, if I know anything about the part that is beating them.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 18,
+                  "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "coworker": {"kind": "person", "select": "predicate",
+                          "predicate": "social_coworker_of_actor"}},
+   "choices": [
+    {"id": "help", "label": "Help them untangle it",
+     "effects": {"relationship": {"role": "coworker", "delta": 5},
+                 "stats": {"smarts": 1, "stress": 1}},
+     "outcome_text": "I spent an hour untangling my coworker's project mess with them, and we both left knowing more than we started."},
+    {"id": "point", "label": "Point them to the manual",
+     "effects": {"relationship": {"role": "coworker", "delta": -2}},
+     "outcome_text": "I pointed my coworker at the manual and got back to my own desk; correct, ungenerous, and noted."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_wrk_rumor_work",
+   "title": "Office Gossip",
+   "text": "A rumour about layoffs is going around, and {person:coworker} has cornered me by the printer to trade theories.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 18,
+                  "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "coworker": {"kind": "person", "select": "predicate",
+                          "predicate": "social_coworker_of_actor"}},
+   "choices": [
+    {"id": "speculate", "label": "Speculate together",
+     "effects": {"relationship": {"role": "coworker", "delta": 3},
+                 "stats": {"stress": 2}},
+     "outcome_text": "My coworker and I traded layoff theories by the printer until we had thoroughly scared ourselves for no confirmed reason."},
+    {"id": "dismiss", "label": "Refuse to gossip",
+     "effects": {"relationship": {"role": "coworker", "delta": -1},
+                 "stats": {"stress": -1}},
+     "outcome_text": "I refused to trade layoff gossip by the printer and got back to real work, calmer and slightly less popular."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "soc_wrk_desk_plant",
+   "title": "The Desk Plant",
+   "text": "{person:coworker} has gifted me a small cactus for my desk 'to liven the place up', and it is somehow already judging me.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 18,
+                  "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "coworker": {"kind": "person", "select": "predicate",
+                          "predicate": "social_coworker_of_actor"}},
+   "choices": [
+    {"id": "keep", "label": "Name it and keep it",
+     "effects": {"relationship": {"role": "coworker", "delta": 3},
+                 "stats": {"happiness": 2}},
+     "outcome_text": "I named the desk cactus something ridiculous and watered it on schedule; my coworker approves of my new colleague."},
+    {"id": "regift", "label": "Regift it politely",
+     "effects": {"relationship": {"role": "coworker", "delta": -1}},
+     "outcome_text": "I passed the desk cactus along to someone with a sunnier window, and my coworker pretended not to notice."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "soc_wrk_farewell_card",
+   "title": "The Farewell Card",
+   "text": "A popular colleague is leaving, and {person:coworker} is passing around a card that everyone is signing with actual feeling.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 18,
+                  "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "coworker": {"kind": "person", "select": "predicate",
+                          "predicate": "social_coworker_of_actor"}},
+   "choices": [
+    {"id": "write", "label": "Write something real",
+     "effects": {"relationship": {"role": "coworker", "delta": 2},
+                 "stats": {"happiness": 1}},
+     "outcome_text": "I wrote something genuine in the farewell card, and the leaving colleague read it twice at their party."},
+    {"id": "initials", "label": "Just add my initials",
+     "effects": {},
+     "outcome_text": "I added my initials to the farewell card and left the eloquence to everyone else at the party."}
+   ],
+   "weight": 1
+  }
+ ]
+}

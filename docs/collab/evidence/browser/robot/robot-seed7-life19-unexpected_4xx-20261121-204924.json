@@ -1,0 +1,288 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 19,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'education_enroll' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown program: Ashish\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Allyson",
+    "last_name": "Vick",
+    "gender": "female",
+    "country": "China",
+    "seed": 777,
+    "request_id": "robot-7-19-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 188084427,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "white",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "cap",
+      "glasses"
+     ],
+     "background": "bg_05",
+     "look_override": "none"
+    },
+    "scenario": "graduating_18"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r470",
+   "expected_revision": 36
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_18",
+    "option_id": "d_18_confront"
+   },
+   "request_id": "robot-7-r471",
+   "expected_revision": 37
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_19",
+    "option_id": "d_19_walk"
+   },
+   "request_id": "robot-7-r472",
+   "expected_revision": 38
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "9793e216-083b-41e1-b1c3-1262ece9c60b"
+   },
+   "request_id": "robot-7-r473",
+   "expected_revision": 39
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r474",
+   "expected_revision": 40
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_20",
+    "option_id": "d_20_embrace",
+    "inputs": null
+   },
+   "request_id": "robot-7-r475",
+   "expected_revision": 41
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "read_book",
+   "payload": {},
+   "request_id": "robot-7-r476",
+   "expected_revision": 42
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_21",
+    "option_id": "book:Becoming"
+   },
+   "request_id": "robot-7-r477",
+   "expected_revision": 43
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r478",
+   "expected_revision": 44
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_22",
+    "option_id": "d_22_say_something",
+    "inputs": null
+   },
+   "request_id": "robot-7-r479",
+   "expected_revision": 45
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_23",
+    "option_id": "d_23_reject"
+   },
+   "request_id": "robot-7-r480",
+   "expected_revision": 46
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r481",
+   "expected_revision": 47
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_24",
+    "option_id": "d_24_trust_gut",
+    "inputs": null
+   },
+   "request_id": "robot-7-r482",
+   "expected_revision": 48
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_25",
+    "option_id": "d_25_o2"
+   },
+   "request_id": "robot-7-r483",
+   "expected_revision": 49
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r484",
+   "expected_revision": 50
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_26",
+    "option_id": "d_26_listen"
+   },
+   "request_id": "robot-7-r485",
+   "expected_revision": 51
+  },
+  {
+   "n": 17,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r486",
+   "expected_revision": 51
+  },
+  {
+   "n": 18,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 51 does not match current revision 52\"}}"
+  },
+  {
+   "n": 19,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r487",
+   "expected_revision": 52
+  },
+  {
+   "n": 20,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r488",
+   "expected_revision": 53
+  },
+  {
+   "n": 21,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r489",
+   "expected_revision": 54
+  },
+  {
+   "n": 22,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_27",
+    "option_id": "d_27_avoid"
+   },
+   "request_id": "robot-7-r490",
+   "expected_revision": 55
+  },
+  {
+   "n": 23,
+   "kind": "command",
+   "game_id": "g_d600370e2a",
+   "action": "education_enroll",
+   "payload": {
+    "program_id": "Ashish"
+   },
+   "request_id": "robot-7-r491",
+   "expected_revision": 56
+  },
+  {
+   "n": 24,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown program: Ashish\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 20 --seed 7 --from-life 19 --fail-fast"
+}

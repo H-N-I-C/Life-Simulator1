@@ -1,0 +1,80 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 4,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alameda",
+    "last_name": "Marsh",
+    "gender": "female",
+    "country": "Nigeria",
+    "seed": 1326964601,
+    "request_id": "robot-7-4-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 989646141,
+     "base": "person",
+     "skin_tone": "light",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "crown"
+     ],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_61e99596b3",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r220",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_61e99596b3",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r221",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_61e99596b3",
+   "action": "careers_apply",
+   "payload": {
+    "opening": null
+   },
+   "request_id": "robot-7-r222",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 5 --seed 7 --from-life 4 --fail-fast"
+}

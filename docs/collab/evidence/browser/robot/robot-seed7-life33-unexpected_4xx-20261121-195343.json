@@ -1,0 +1,111 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 33,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Arvind",
+    "last_name": "Hall",
+    "gender": "male",
+    "country": "Brazil",
+    "seed": 1452959619,
+    "request_id": "robot-7-33-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 2072441081,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "earrings",
+      "crown"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_c1eb038e8e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r987",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_c1eb038e8e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r988",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_c1eb038e8e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_tantrum"
+   },
+   "request_id": "robot-7-r989",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_c1eb038e8e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r990",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_c1eb038e8e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r991",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_c1eb038e8e",
+   "action": "careers_apply",
+   "payload": {
+    "opening": null
+   },
+   "request_id": "robot-7-r992",
+   "expected_revision": 5
+  },
+  {
+   "n": 8,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 34 --seed 7 --from-life 33 --fail-fast"
+}

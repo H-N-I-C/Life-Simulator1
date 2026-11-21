@@ -1,0 +1,130 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 194,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Abdullah at N\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alexina",
+    "last_name": "Joyce",
+    "gender": "female",
+    "country": "UK",
+    "seed": 949001697,
+    "request_id": "robot-41-194-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_62f0a83892",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r8237",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_62f0a83892",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r8238",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_62f0a83892",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r8239",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_62f0a83892",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r8240",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_62f0a83892",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-41-r8241",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_62f0a83892",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r8242",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_62f0a83892",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r8243",
+   "expected_revision": 6
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_62f0a83892",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r8244",
+   "expected_revision": 7
+  },
+  {
+   "n": 10,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_62f0a83892",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Abdullah",
+    "employer_id": "N"
+   },
+   "request_id": "robot-41-r8245",
+   "expected_revision": 7
+  },
+  {
+   "n": 12,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Abdullah at N\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 195 --seed 41 --from-life 194 --fail-fast"
+}

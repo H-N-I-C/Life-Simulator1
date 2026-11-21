@@ -1,0 +1,269 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 14,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alberta",
+    "last_name": "Norman",
+    "gender": "female",
+    "country": "India",
+    "seed": 1823640416,
+    "request_id": "robot-7-14-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1656211587,
+     "base": "man",
+     "skin_tone": "default",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r322",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r323",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r324",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r325",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_watch"
+   },
+   "request_id": "robot-7-r326",
+   "expected_revision": 4
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-7-r327",
+   "expected_revision": 5
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r328",
+   "expected_revision": 6
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_sail"
+   },
+   "request_id": "robot-7-r329",
+   "expected_revision": 7
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r330",
+   "expected_revision": 8
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r331",
+   "expected_revision": 9
+  },
+  {
+   "n": 12,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-7-r332",
+   "expected_revision": 9
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r333",
+   "expected_revision": 10
+  },
+  {
+   "n": 15,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "conversation",
+   "payload": {
+    "target_id": "5a8fb4c0-5396-44df-b085-14bf01dd6977"
+   },
+   "request_id": "robot-7-r334",
+   "expected_revision": 10
+  },
+  {
+   "n": 17,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r335",
+   "expected_revision": 11
+  },
+  {
+   "n": 18,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 19,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r336",
+   "expected_revision": 11
+  },
+  {
+   "n": 20,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_o2"
+   },
+   "request_id": "robot-7-r337",
+   "expected_revision": 12
+  },
+  {
+   "n": 21,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r338",
+   "expected_revision": 13
+  },
+  {
+   "n": 22,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "d_3_ask"
+   },
+   "request_id": "robot-7-r339",
+   "expected_revision": 14
+  },
+  {
+   "n": 23,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r340",
+   "expected_revision": 15
+  },
+  {
+   "n": 24,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 25,
+   "kind": "command",
+   "game_id": "g_f93eb46872",
+   "action": "careers_apply",
+   "payload": {
+    "opening": null
+   },
+   "request_id": "robot-7-r341",
+   "expected_revision": 15
+  },
+  {
+   "n": 26,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 15 --seed 7 --from-life 14 --fail-fast"
+}

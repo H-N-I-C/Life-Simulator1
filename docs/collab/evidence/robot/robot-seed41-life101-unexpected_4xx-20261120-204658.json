@@ -1,0 +1,73 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 101,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Andrew at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alexandrina",
+    "last_name": "Hall",
+    "gender": "female",
+    "country": "Germany",
+    "seed": 161962430,
+    "request_id": "robot-41-101-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1753009565,
+     "base": "person",
+     "skin_tone": "default",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "crown",
+      "glasses"
+     ],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_e0531c2dd2",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r5181",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_e0531c2dd2",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Andrew",
+    "employer_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+   },
+   "request_id": "robot-41-r5182",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Andrew at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 102 --seed 41 --from-life 101 --fail-fast"
+}

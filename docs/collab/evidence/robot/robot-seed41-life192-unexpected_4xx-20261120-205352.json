@@ -1,0 +1,118 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 192,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adrianne",
+    "last_name": "Floyd",
+    "gender": "female",
+    "country": "Australia",
+    "seed": 1872774669,
+    "request_id": "robot-41-192-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 990821484,
+     "base": "man",
+     "skin_tone": "default",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_616fcb5f35",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r8227",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_616fcb5f35",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r8228",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_616fcb5f35",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r8229",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_616fcb5f35",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r8230",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_616fcb5f35",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-41-r8231",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_616fcb5f35",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r8232",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_616fcb5f35",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+    "employer_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+   },
+   "request_id": "robot-41-r8233",
+   "expected_revision": 6
+  },
+  {
+   "n": 9,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 193 --seed 41 --from-life 192 --fail-fast"
+}

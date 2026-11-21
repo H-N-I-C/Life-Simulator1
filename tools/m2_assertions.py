@@ -22,7 +22,8 @@ API_EXAMPLES = os.path.join(ROOT, "docs", "collab", "M2", "api-examples.json")
 
 PHASE_ORDER = [
     "year_start", "relations_age", "player_stats", "mortality",
-    "work_income", "debt_service", "education", "family_events",
+    "work_income", "education", "workplace_events", "debt_service",
+    "family_events", "parenting_events", "drama_events", "romance_events",
     "illness", "annual_events", "decision_offer", "year_close",
 ]
 

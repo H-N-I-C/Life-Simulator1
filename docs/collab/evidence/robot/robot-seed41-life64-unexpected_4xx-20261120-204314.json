@@ -1,0 +1,110 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 64,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Alec at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Angelo",
+    "last_name": "Boswell",
+    "gender": "male",
+    "country": "China",
+    "seed": 777,
+    "request_id": "robot-41-64-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1447320635,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_01",
+     "look_override": "none"
+    },
+    "scenario": "graduating_18"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_e10680ca2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3668",
+   "expected_revision": 32
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_e10680ca2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_14",
+    "option_id": "d_14_confront"
+   },
+   "request_id": "robot-41-r3669",
+   "expected_revision": 33
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_e10680ca2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_15",
+    "option_id": "d_15_say_something"
+   },
+   "request_id": "robot-41-r3670",
+   "expected_revision": 34
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_e10680ca2e",
+   "action": "doctor",
+   "payload": {},
+   "request_id": "robot-41-r3671",
+   "expected_revision": 35
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_e10680ca2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_16",
+    "option_id": "back"
+   },
+   "request_id": "robot-41-r3672",
+   "expected_revision": 36
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_e10680ca2e",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Alec",
+    "employer_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+   },
+   "request_id": "robot-41-r3673",
+   "expected_revision": 37
+  },
+  {
+   "n": 7,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Alec at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 65 --seed 41 --from-life 64 --fail-fast"
+}

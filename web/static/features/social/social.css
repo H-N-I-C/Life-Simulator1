@@ -1,0 +1,205 @@
+/* v2 Social module styles (Kimi B, M4). Namespace: v2so-*. Consumes the
+ * frozen §Tokens (theme.css loads after module stylesheets); fallback
+ * defaults keep a bare test host working. No !important on tokens. */
+
+.v2so-scope {
+  --v2so-fallback-accent: #2a63e6;
+  --v2so-fallback-ink: #16203a;
+  --v2so-fallback-muted: #6b7690;
+  --v2so-fallback-card: #ffffff;
+  --v2so-fallback-track: #e7ebf3;
+  --v2so-fallback-good: #15803d;
+  --v2so-fallback-bad: #b3261e;
+  display: flex;
+  flex-direction: column;
+  gap: var(--v2-gap, 10px);
+  color: var(--v2-ink, var(--v2so-fallback-ink));
+  margin-bottom: 12px;
+}
+
+.v2so-pop {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  background: var(--v2-card, var(--v2so-fallback-card));
+  border-radius: var(--v2-radius, 16px);
+  box-shadow: var(--v2-shadow, 0 4px 16px rgba(22, 32, 58, .10));
+  padding: 10px 14px;
+}
+.v2so-pop-label {
+  font-size: .85rem;
+  color: var(--v2-muted, var(--v2so-fallback-muted));
+}
+.v2so-pop-value { font-weight: 800; }
+.v2so-pop-delta { color: var(--v2-bar-good, var(--v2so-fallback-good)); }
+.v2so-pop-delta.v2so-pop-down {
+  color: var(--v2-bad, var(--v2so-fallback-bad));
+}
+
+.v2so-group {
+  background: var(--v2-card, var(--v2so-fallback-card));
+  border-radius: var(--v2-radius, 16px);
+  box-shadow: var(--v2-shadow, 0 4px 16px rgba(22, 32, 58, .10));
+  padding: 12px 14px;
+}
+.v2so-group-title { margin: 0 0 8px; font-size: 1.05rem; }
+
+.v2so-chips { display: flex; flex-direction: column; gap: 8px; }
+
+.v2so-chip {
+  appearance: none;
+  border: 1px solid rgba(127, 127, 127, .25);
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  padding: 8px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+.v2so-chip:disabled { cursor: default; opacity: .75; }
+
+.v2so-avatar {
+  flex: 0 0 auto;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1.05rem;
+  color: #fff;
+  background: var(--v2-accent, var(--v2so-fallback-accent));
+  overflow: hidden;
+}
+.v2so-avatar img { display: block; border-radius: 50%; }
+/* badge overlays must stay inside the chip (no document overflow at 320) */
+.v2so-avatar .badge-corner {
+  top: auto;
+  right: -1px;
+  bottom: -1px;
+  transform: scale(.85);
+}
+
+.v2so-chip-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.v2so-chip-head { display: flex; align-items: baseline; gap: 8px; }
+.v2so-chip-name { font-weight: 700; }
+
+.v2so-rel {
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--v2-muted, var(--v2so-fallback-muted));
+}
+.v2so-rel-hostile { color: var(--v2-bad, var(--v2so-fallback-bad)); }
+
+.v2so-chip-bar { display: flex; align-items: center; gap: 8px; }
+.v2so-bar {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--v2-track, var(--v2so-fallback-track));
+  overflow: hidden;
+}
+.v2so-bar-fill {
+  height: 100%;
+  background: var(--v2-bar-good, var(--v2so-fallback-good));
+  border-radius: 4px;
+  transition: width 160ms ease;
+}
+.v2so-bar-fill.v2so-bar-mid { background: #b45309; }
+.v2so-bar-fill.v2so-bar-low { background: var(--v2-bad, var(--v2so-fallback-bad)); }
+.v2so-chip-pct {
+  flex: 0 0 auto;
+  font-size: .8rem;
+  font-weight: 800;
+  color: var(--v2-muted, var(--v2so-fallback-muted));
+}
+
+.v2so-memory {
+  font-size: .8rem;
+  color: var(--v2-muted, var(--v2so-fallback-muted));
+}
+
+/* ---- invites inbox */
+.v2so-invites {
+  background: var(--v2-card, var(--v2so-fallback-card));
+  border-radius: var(--v2-radius, 16px);
+  box-shadow: var(--v2-shadow, 0 4px 16px rgba(22, 32, 58, .10));
+  padding: 12px 14px;
+}
+.v2so-invite {
+  border-top: 1px solid rgba(127, 127, 127, .2);
+  padding: 10px 0;
+}
+.v2so-invite:first-of-type { border-top: 0; }
+.v2so-invite-head { display: flex; align-items: baseline; gap: 8px; }
+.v2so-invite-title { font-weight: 700; }
+.v2so-invite-status {
+  font-size: .72rem;
+  font-weight: 800;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(127, 127, 127, .15);
+  color: var(--v2-muted, var(--v2so-fallback-muted));
+}
+.v2so-invite-open .v2so-invite-status {
+  background: rgba(42, 99, 230, .14);
+  color: var(--v2-accent, var(--v2so-fallback-accent));
+}
+.v2so-invite-accepted .v2so-invite-status {
+  background: rgba(21, 128, 61, .15);
+  color: var(--v2-bar-good, var(--v2so-fallback-good));
+}
+.v2so-18 {
+  font-size: .72rem;
+  font-weight: 900;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(179, 38, 30, .12);
+  color: var(--v2-bad, var(--v2so-fallback-bad));
+}
+.v2so-invite-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-top: 4px;
+}
+.v2so-host { padding: 4px 8px; }
+.v2so-venue { font-size: .85rem; }
+.v2so-invite-actions { display: flex; gap: 8px; margin-top: 8px; }
+.v2so-invite-btn {
+  padding: 6px 12px;
+  border-radius: var(--v2-radius-sm, 8px);
+  border: 1px solid rgba(127, 127, 127, .4);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.v2so-invite-btn:disabled { opacity: .55; cursor: not-allowed; }
+.v2so-busy { opacity: .7; }
+
+.v2so-empty { color: var(--v2-muted, var(--v2so-fallback-muted)); }
+.v2so-invite-reason {
+  display: block;
+  font-size: .8rem;
+  font-weight: 400;
+  color: var(--v2-bad, var(--v2so-fallback-bad));
+  margin-top: 2px;
+}

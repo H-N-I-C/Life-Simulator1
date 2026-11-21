@@ -1,0 +1,303 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 0,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Abelard at Amos\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Anton",
+    "last_name": "Rodgers",
+    "gender": "male",
+    "country": "France",
+    "seed": 777,
+    "request_id": "robot-41-0-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1210069803,
+     "base": "person",
+     "skin_tone": "light",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_10",
+     "look_override": "none"
+    },
+    "scenario": "university_pending_17"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_11",
+    "option_id": "decline"
+   },
+   "request_id": "robot-41-r1",
+   "expected_revision": 28
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2",
+   "expected_revision": 29
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r3",
+   "expected_revision": 30
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r4",
+   "expected_revision": 31
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_12",
+    "option_id": "d_12_absent"
+   },
+   "request_id": "robot-41-r5",
+   "expected_revision": 32
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_13",
+    "option_id": "d_13_sulk"
+   },
+   "request_id": "robot-41-r6",
+   "expected_revision": 33
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r7",
+   "expected_revision": 34
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_14",
+    "option_id": "d_14_confront"
+   },
+   "request_id": "robot-41-r8",
+   "expected_revision": 35
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_15",
+    "option_id": "d_15_say_something"
+   },
+   "request_id": "robot-41-r9",
+   "expected_revision": 36
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "meditate",
+   "payload": {},
+   "request_id": "robot-41-r10",
+   "expected_revision": 37
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r11",
+   "expected_revision": 38
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r12",
+   "expected_revision": 39
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r13",
+   "expected_revision": 40
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_16",
+    "option_id": "d_16_reschedule"
+   },
+   "request_id": "robot-41-r14",
+   "expected_revision": 41
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r15",
+   "expected_revision": 42
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r16",
+   "expected_revision": 43
+  },
+  {
+   "n": 17,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r17",
+   "expected_revision": 44
+  },
+  {
+   "n": 18,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_17",
+    "option_id": "d_17_walk"
+   },
+   "request_id": "robot-41-r18",
+   "expected_revision": 45
+  },
+  {
+   "n": 19,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_18",
+    "option_id": "d_18_avoid"
+   },
+   "request_id": "robot-41-r19",
+   "expected_revision": 46
+  },
+  {
+   "n": 20,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "conversation",
+   "payload": {
+    "target_id": "85f540b0-2bc4-4b14-8202-5a4522acabd3"
+   },
+   "request_id": "robot-41-r20",
+   "expected_revision": 47
+  },
+  {
+   "n": 21,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "conversation",
+   "payload": {
+    "target_id": "85f540b0-2bc4-4b14-8202-5a4522acabd3"
+   },
+   "request_id": "robot-41-r20",
+   "expected_revision": 47
+  },
+  {
+   "n": 22,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "arts_and_crafts",
+   "payload": {},
+   "request_id": "robot-41-r22",
+   "expected_revision": 48
+  },
+  {
+   "n": 23,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "read_book",
+   "payload": {},
+   "request_id": "robot-41-r23",
+   "expected_revision": 49
+  },
+  {
+   "n": 24,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_19",
+    "option_id": "book:Becoming"
+   },
+   "request_id": "robot-41-r24",
+   "expected_revision": 50
+  },
+  {
+   "n": 25,
+   "kind": "command",
+   "game_id": "g_63fd5f9534",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Abelard",
+    "employer_id": "Amos"
+   },
+   "request_id": "robot-41-r25",
+   "expected_revision": 51
+  },
+  {
+   "n": 26,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Abelard at Amos\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 1 --seed 41 --from-life 0 --fail-fast"
+}

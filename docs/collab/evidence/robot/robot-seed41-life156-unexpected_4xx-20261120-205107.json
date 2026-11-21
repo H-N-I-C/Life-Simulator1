@@ -1,0 +1,263 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 156,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Aguinaldo at Anurag\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alisha",
+    "last_name": "Robertson",
+    "gender": "female",
+    "country": "Germany",
+    "seed": 164340178,
+    "request_id": "robot-41-156-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 841617732,
+     "base": "woman",
+     "skin_tone": "medium-dark",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r6779",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-41-r6780",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "ask_final"
+   },
+   "request_id": "robot-41-r6781",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "cancel"
+   },
+   "request_id": "robot-41-r6782",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r6783",
+   "expected_revision": 4
+  },
+  {
+   "n": 7,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r6784",
+   "expected_revision": 4
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r6785",
+   "expected_revision": 5
+  },
+  {
+   "n": 10,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r6786",
+   "expected_revision": 5
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "d_3_tantrum",
+    "inputs": null
+   },
+   "request_id": "robot-41-r6787",
+   "expected_revision": 6
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r6788",
+   "expected_revision": 7
+  },
+  {
+   "n": 14,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r6789",
+   "expected_revision": 7
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r6790",
+   "expected_revision": 8
+  },
+  {
+   "n": 17,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 18,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r6791",
+   "expected_revision": 8
+  },
+  {
+   "n": 19,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "d_3_stay_calm"
+   },
+   "request_id": "robot-41-r6792",
+   "expected_revision": 9
+  },
+  {
+   "n": 20,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r6793",
+   "expected_revision": 10
+  },
+  {
+   "n": 21,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 22,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r6794",
+   "expected_revision": 10
+  },
+  {
+   "n": 23,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r6795",
+   "expected_revision": 11
+  },
+  {
+   "n": 24,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 25,
+   "kind": "command",
+   "game_id": "g_33d048fec1",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Aguinaldo",
+    "employer_id": "Anurag"
+   },
+   "request_id": "robot-41-r6796",
+   "expected_revision": 11
+  },
+  {
+   "n": 26,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Aguinaldo at Anurag\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 157 --seed 41 --from-life 156 --fail-fast"
+}

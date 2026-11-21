@@ -82,9 +82,25 @@ class EditorBrowserSmokeTests(unittest.TestCase):
             session.wait_js(
                 "(document.getElementById('gameView')||{}).hidden === "
                 "false", timeout=15, desc="game view renders")
+            # Delay only the policy-fetch boundary to force a fast click
+            # window. The real server still supplies all policy data.
+            session.js("const editorFetch=window.fetch;let gateEditor=true;"
+                       "window.fetch=async(...args)=>{if(gateEditor && "
+                       "String(args[0]).endsWith('/policy-state')){"
+                       "gateEditor=false;await new Promise(r=>"
+                       "window.releaseEditorPolicy=r);}return editorFetch(...args);};")
             # open the editor panel
             session.js("document.getElementById('editorToggle').click();"
                        " true")
+            session.wait_js(
+                "typeof window.releaseEditorPolicy === 'function' && "
+                "(document.getElementById('editorPanel')||{}).hidden === false",
+                desc="editor policy request is waiting")
+            self.assertEqual(session.js(
+                "document.querySelectorAll('#editorPeople button').length"), 0,
+                "no clickable person rows before policy catalogs arrive")
+            self.assertIsNone(session.js("document.getElementById('edOpenness')"))
+            session.js("window.releaseEditorPolicy()")
             session.wait_js(
                 "(document.getElementById('editorPanel')||{}).hidden === "
                 "false && document.querySelectorAll("

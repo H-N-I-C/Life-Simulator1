@@ -156,6 +156,19 @@ function test(name, fn) {
 
 /* ---------- tests ---------- */
 
+test("M4: header title prefers the social kind over the wrong role word",
+     () => {
+  const root = new El("div");
+  const h = hooks([]);
+  h.getState = () => ({ peopleById: { p1: { id: "p1", name: "Ada",
+    social: { kind: "acquaintance", closeness: 10, circles: [],
+              memory: [] } } } });
+  mountPerson(root, h, detail());
+  const texts = root.findText(() => true);
+  assert.ok(texts.includes("Acquaintance"), "kind text in header");
+  assert.ok(!texts.includes("Mother"), "wrong role word replaced");
+});
+
 test("mount renders name, role title, descriptors and bar values", () => {
   const root = new El("div");
   mountPerson(root, hooks([]), detail());
@@ -328,6 +341,63 @@ test("normalized dialect: object limits render as used/max", () => {
   ] }));
   const tile = tiles(root)[0];
   assert.ok(tile.textContent.includes("1/1"));
+});
+
+/* ---------- M4 social (B round): edge block + social action tiles ------ */
+
+test("M4: social kind + closeness + memory render from the people entry",
+     () => {
+  const root = new El("div");
+  const h = hooks([]);
+  h.getState = () => ({ peopleById: { p1: { id: "p1", name: "Ada",
+    social: { kind: "best_friend", closeness: 62,
+              circles: ["classmates"],
+              memory: ["We got detention together."] } } } });
+  mountPerson(root, h, detail());
+  const texts = root.findText(() => true);
+  assert.ok(texts.includes("Best friend"), "social kind label");
+  assert.ok(texts.some((t) => t.includes("Relationship") &&
+                             t.includes("62%")), "labelled Relationship bar");
+  assert.ok(texts.some((t) => t.indexOf("Age 54") === 0), "age labelled");
+  assert.ok(texts.includes("We got detention together."),
+            "memory line verbatim");
+  const block = root.findAll((n) => n._classes.has("v2p-social"))[0];
+  const fill = block.findAll((n) => n._classes.has("v2p-bar-fill"))[0];
+  assert.equal(fill.style.width, "62%", "closeness bar width");
+});
+
+test("M4: no social edge -> no social block (never faked)", () => {
+  const root = new El("div");
+  mountPerson(root, hooks([]), detail());
+  assert.equal(root.findAll((n) => n._classes.has("v2p-social")).length, 0);
+});
+
+test("M4: social action tiles render with server reasons and dispatch",
+     async () => {
+  const root = new El("div");
+  const calls = [];
+  const specs = [
+    { id: "social_befriend", label: "Befriend Ada", targetId: "p1",
+      inputs: [], knownCosts: [], limits: ["once ever"],
+      enabled: true, reason: "" },
+    { id: "social_stand_up", label: "Stand up to Ada", targetId: "p1",
+      inputs: [], knownCosts: [], limits: [],
+      enabled: false, reason: "the bullying has not started" },
+  ];
+  mountPerson(root, hooks(calls), detail({ actions: specs }));
+  const socialTiles = tiles(root);
+  assert.equal(socialTiles.length, 2);
+  assert.ok(socialTiles[0].textContent.includes("Befriend Ada"));
+  assert.ok(socialTiles[0].textContent.includes("once ever"),
+            "server limit shown");
+  assert.equal(socialTiles[1].disabled, true, "server-disabled tile");
+  assert.equal(socialTiles[1].getAttribute("aria-disabled"), "true");
+  assert.ok(socialTiles[1].textContent.includes(
+    "the bullying has not started"), "server reason visible");
+  socialTiles[0].click();
+  await Promise.resolve(); await Promise.resolve();
+  assert.deepEqual(calls, [{ hook: "send", id: "social_befriend",
+                             payload: {}, targetId: "p1" }]);
 });
 
 console.log(passed + " v2-person DOM tests passed" +

@@ -1,0 +1,8 @@
+{"schema_version": 1,
+ "stages": ["targeted", "escalated", "resolving", "ended"],
+ "responses": {
+   "tell_someone": {"to_stage": "resolving", "karma": 1,
+                    "fact": "sought_help"},
+   "stand_up": {"to_stage": "resolving", "health_min": 40,
+                "fail_to_stage": "escalated"},
+   "befriend": {"to_stage": "ended", "edge_to": "acquaintance"}}}

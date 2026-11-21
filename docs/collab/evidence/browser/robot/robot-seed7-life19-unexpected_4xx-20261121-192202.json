@@ -1,0 +1,314 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 19,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'try_for_baby' -> HTTP 409: {\"error\": {\"code\": \"refused\", \"message\": \"Your partner doesn't want to have a baby with you.\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Allyson",
+    "last_name": "Vick",
+    "gender": "female",
+    "country": "China",
+    "seed": 777,
+    "request_id": "robot-7-19-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 188084427,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "white",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "cap",
+      "glasses"
+     ],
+     "background": "bg_05",
+     "look_override": "none"
+    },
+    "scenario": "graduating_18"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r545",
+   "expected_revision": 34
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_16",
+    "option_id": "d_16_text"
+   },
+   "request_id": "robot-7-r546",
+   "expected_revision": 35
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_17",
+    "option_id": "d_17_deny"
+   },
+   "request_id": "robot-7-r547",
+   "expected_revision": 36
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_18",
+    "option_id": "d_18_laugh_it_off"
+   },
+   "request_id": "robot-7-r548",
+   "expected_revision": 37
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_19",
+    "option_id": "d_19_help"
+   },
+   "request_id": "robot-7-r549",
+   "expected_revision": 38
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "courtship_offer",
+   "payload": {
+    "target_id": "96bfdaed-caa9-4c9d-a3cd-d8fafb64745d"
+   },
+   "request_id": "robot-7-r550",
+   "expected_revision": 39
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_20",
+    "option_id": "d_0_back_out"
+   },
+   "request_id": "robot-7-r551",
+   "expected_revision": 40
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_20",
+    "option_id": "d_0_back_out"
+   },
+   "request_id": "robot-7-r551",
+   "expected_revision": 40
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "read_book",
+   "payload": {},
+   "request_id": "robot-7-r553",
+   "expected_revision": 41
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_21",
+    "option_id": "book:The Little Engine That Could"
+   },
+   "request_id": "robot-7-r554",
+   "expected_revision": 42
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r555",
+   "expected_revision": 43
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_22",
+    "option_id": "d_22_help_move",
+    "inputs": null
+   },
+   "request_id": "robot-7-r556",
+   "expected_revision": 44
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_23",
+    "option_id": "d_23_move_on"
+   },
+   "request_id": "robot-7-r557",
+   "expected_revision": 45
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r558",
+   "expected_revision": 46
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_24",
+    "option_id": "d_24_apologise",
+    "inputs": null
+   },
+   "request_id": "robot-7-r559",
+   "expected_revision": 47
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_25",
+    "option_id": "d_25_embrace"
+   },
+   "request_id": "robot-7-r560",
+   "expected_revision": 48
+  },
+  {
+   "n": 17,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r561",
+   "expected_revision": 49
+  },
+  {
+   "n": 18,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_26",
+    "option_id": "d_26_concede"
+   },
+   "request_id": "robot-7-r562",
+   "expected_revision": 50
+  },
+  {
+   "n": 19,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_27",
+    "option_id": "d_27_walk"
+   },
+   "request_id": "robot-7-r563",
+   "expected_revision": 51
+  },
+  {
+   "n": 20,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r564",
+   "expected_revision": 52
+  },
+  {
+   "n": 21,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_28",
+    "option_id": "d_28_decline"
+   },
+   "request_id": "robot-7-r565",
+   "expected_revision": 53
+  },
+  {
+   "n": 22,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "find_partner",
+   "payload": {},
+   "request_id": "robot-7-r566",
+   "expected_revision": 54
+  },
+  {
+   "n": 23,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_29",
+    "option_id": "ask_out"
+   },
+   "request_id": "robot-7-r567",
+   "expected_revision": 55
+  },
+  {
+   "n": 24,
+   "kind": "command",
+   "game_id": "g_6767471f85",
+   "action": "try_for_baby",
+   "payload": {
+    "target_id": "91917ca6-8678-45ad-a885-db7352a83e86"
+   },
+   "request_id": "robot-7-r568",
+   "expected_revision": 56
+  },
+  {
+   "n": 25,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"refused\", \"message\": \"Your partner doesn't want to have a baby with you.\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 20 --seed 7 --from-life 19 --fail-fast"
+}

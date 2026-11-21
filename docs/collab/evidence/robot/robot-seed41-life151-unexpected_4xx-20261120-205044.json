@@ -1,0 +1,79 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 151,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aleen",
+    "last_name": "Joyce",
+    "gender": "female",
+    "country": "Nigeria",
+    "seed": 711752090,
+    "request_id": "robot-41-151-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_431cdb5570",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-41-r6606",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_431cdb5570",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-41-r6607",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_431cdb5570",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r6608",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_431cdb5570",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+    "employer_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+   },
+   "request_id": "robot-41-r6609",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 152 --seed 41 --from-life 151 --fail-fast"
+}

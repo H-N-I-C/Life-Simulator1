@@ -1,0 +1,43 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 124,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at Anselm\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aindrea",
+    "last_name": "Teague",
+    "gender": "female",
+    "country": "Japan",
+    "seed": 1862609541,
+    "request_id": "robot-41-124-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_58069fcafa",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+    "employer_id": "Anselm"
+   },
+   "request_id": "robot-41-r5871",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at Anselm\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 125 --seed 41 --from-life 124 --fail-fast"
+}

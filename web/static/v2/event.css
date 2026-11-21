@@ -1,0 +1,278 @@
+/* v2 Event modal + outcome popup styles (Kimi C, redesign-v2 F5/F6).
+ * Scoped to .v2e-*; §Tokens (theme.css) may restate any token at
+ * equal-or-greater specificity (later order wins) — no !important here.
+ * Fallback defaults on the module root keep this working in a bare test
+ * host without the theme (same pattern as person.css).
+ */
+
+.v2e-scope, .v2e-card {
+  --v2-accent: #2a63e6;
+  --v2-ink: #16203a;
+  --v2-ink-soft: #2b3550;
+  --v2-muted: #6b7690;
+  --v2-card: #ffffff;
+  --v2-page: #eef2f9;
+  --v2-bar-good: #15803d;
+  --v2-bar-bad: #dc2626;
+  --v2-radius: 16px;
+  --v2-shadow: 0 4px 16px rgba(22, 32, 58, .10);
+  --v2-font: "Nunito", "Segoe UI", system-ui, sans-serif;
+}
+
+/* F6 fallback: when the module card is inside the legacy #modal overlay,
+ * center it as a modal card (B's theme.css owns the real chrome). */
+#modal:has(.v2e-card) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(22, 32, 58, .45);
+}
+
+.v2e-card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 420px;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  background: var(--v2-card);
+  color: var(--v2-ink);
+  font-family: var(--v2-font);
+  border-radius: var(--v2-radius);
+  box-shadow: var(--v2-shadow);
+  padding: 18px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.v2e-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.v2e-avatar {
+  position: relative;
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--v2-page);
+}
+
+.v2e-avatar > canvas,
+.v2e-avatar > img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.v2e-head-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.v2e-title {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.25;
+  color: var(--v2-ink);
+}
+
+.v2e-kind {
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  color: var(--v2-muted);
+}
+
+.v2e-text {
+  margin: 0;
+  font-size: .95rem;
+  line-height: 1.45;
+  color: var(--v2-ink-soft);
+}
+
+.v2e-people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.v2e-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.v2e-opt-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border-radius: calc(var(--v2-radius) - 6px);
+  background: var(--v2-page);
+}
+
+.v2e-opt-inputs-for {
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--v2-muted);
+}
+
+.v2e-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.v2e-option,
+.v2e-later,
+.v2e-continue {
+  font-family: inherit;
+  font-size: .95rem;
+  border-radius: calc(var(--v2-radius) - 4px);
+  cursor: pointer;
+}
+
+.v2e-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 14px;
+  border: 2px solid var(--v2-accent);
+  background: var(--v2-card);
+  color: var(--v2-accent);
+  font-weight: 800;
+  text-align: left;
+}
+
+.v2e-option:active {
+  transform: scale(.98);
+}
+
+.v2e-costs {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--v2-muted);
+}
+
+.v2e-reason {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--v2-muted);
+}
+
+.v2e-option[disabled] {
+  border-color: var(--v2-muted);
+  color: var(--v2-muted);
+  cursor: not-allowed;
+}
+
+.v2e-busy {
+  opacity: .7;
+}
+
+.v2e-later {
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: var(--v2-muted);
+  font-weight: 700;
+}
+
+.v2e-continue {
+  padding: 12px 14px;
+  border: none;
+  background: var(--v2-accent);
+  color: #ffffff;
+  font-weight: 800;
+}
+
+/* danger (frozen surrender_final semantics, same as the old sheet) */
+#modal .modal-box.danger .v2e-option,
+.modal-box.danger .v2e-option {
+  border-color: var(--v2-bar-bad);
+  color: var(--v2-bar-bad);
+}
+
+/* outcome popup (F5) */
+.v2e-outcome .v2e-text {
+  font-size: 1rem;
+}
+
+.v2e-deltas {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.v2e-delta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: calc(var(--v2-radius) - 6px);
+  background: var(--v2-page);
+}
+
+.v2e-delta-label {
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--v2-ink-soft);
+}
+
+.v2e-delta-value {
+  font-size: .95rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Contrast (§Tokens rule 2, audited on #ffffff): good 5.0:1, bad 4.8:1. */
+.v2e-delta-up { color: var(--v2-bar-good); }
+.v2e-delta-down { color: var(--v2-bar-bad); }
+
+:focus-visible {
+  outline: 3px solid var(--v2-focus, #2f6fed);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .v2e-card {
+    animation: v2e-pop .16s ease-out;
+  }
+  .v2e-delta-value {
+    transition: transform .15s ease-out;
+  }
+}
+
+@keyframes v2e-pop {
+  from { transform: translateY(8px) scale(.97); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+/* Keep hidden collapsed events hidden even while their card remains mounted. */
+#modal[hidden] { display: none; }
+#modal .modal-box:has(.v2e-card) {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: hidden;
+}
+.v2e-card > * { flex-shrink: 0; }
+.v2e-title, .v2e-text, .v2e-option, .v2e-delta-label {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.v2e-delta { gap: 10px; }
+.v2e-delta-value { flex-shrink: 0; }
+.v2e-form .field { display: flex; flex-direction: column; gap: 4px; }
+.v2e-form input, .v2e-form select { max-width: 100%; min-width: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .v2e-option:active { transform: none; }
+}

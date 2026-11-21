@@ -1,0 +1,12 @@
+{"schema_version": 3, "events": [{
+ "id": "fix_no_free_exit", "title": "Every choice costs money",
+ "text": "Both options charge; the soft-lock rule requires a free exit.",
+ "interaction": {"kind": "flavor", "romantic": false},
+ "roles": {"actor": {"kind": "person", "select": "player"}},
+ "choices": [
+  {"id": "pay1", "label": "Pay 10", "cost": {"money": 10},
+   "effects": {}, "outcome_text": "Paid."},
+  {"id": "pay2", "label": "Pay 20", "cost": {"money": 20},
+   "effects": {}, "outcome_text": "Paid more."}
+ ]
+}]}

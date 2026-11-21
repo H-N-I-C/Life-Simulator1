@@ -162,7 +162,7 @@ def _drive_romance_step_sess(sess, spec, i, state):
                                        ("decline", "no", "not", "skip"))
         if kind == "wedding_plan":
             venues = [o for o in d["options"] if o["id"] != "cancel"]
-            venues.sort(key=lambda o: o.get("known_costs", [{}])[0].get(
+            venues.sort(key=lambda o: (o.get("known_costs") or [{}])[0].get(
                 "amount", 10 ** 9))
             ordered = venues + [o for o in d["options"]
                                 if o["id"] == "cancel"]
@@ -295,7 +295,7 @@ def _drive_romance_step(svc, game_id, st, spec, i, state):
             # resolve_wedding_plan rejects unaffordable venues with 409 and
             # the loop continues to the next cheapest
             venues = [o for o in d["options"] if o["id"] != "cancel"]
-            venues.sort(key=lambda o: o.get("known_costs", [{}])[0].get(
+            venues.sort(key=lambda o: (o.get("known_costs") or [{}])[0].get(
                 "amount", 10 ** 9))
             ordered = venues + [o for o in d["options"]
                                 if o["id"] == "cancel"]

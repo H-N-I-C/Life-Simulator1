@@ -1,6 +1,15 @@
 /* Shared helpers: catalog load, sequenced avatar preview, person chip. */
 "use strict";
 
+/* The ONE money formatter for every surface (M3a polish): sign before
+ * the dollar ("-$8,095"), thousands separators, "$0" for zero. */
+export function formatMoney(n) {
+  const v = Number(n);
+  if (!Number.isFinite(v)) return String(n);
+  const abs = Math.abs(Math.round(v)).toLocaleString();
+  return (v < 0 ? "-$" : "$") + abs;
+}
+
 let CATALOG = null;
 
 export async function loadCatalog() {
@@ -292,7 +301,9 @@ function installErrorBoundary() {
     showCrashCard((r && r.message) || String(r));
   });
 }
-installErrorBoundary();
+/* Guarded: node-based DOM tests import this module for helpers (e.g.
+ * formatMoney) without a browser environment. */
+if (typeof window !== "undefined") installErrorBoundary();
 
 /* ---- offline banner: visible on every page whenever the connection
  * drops, so a failing action is never a mystery. ---- */
@@ -313,9 +324,11 @@ function updateOfflineBanner() {
   }
   b.hidden = false;
 }
-window.addEventListener("online", updateOfflineBanner);
-window.addEventListener("offline", updateOfflineBanner);
-updateOfflineBanner();
+if (typeof window !== "undefined") {
+  window.addEventListener("online", updateOfflineBanner);
+  window.addEventListener("offline", updateOfflineBanner);
+  updateOfflineBanner();
+}
 
 /* Simple seeded RNG (mulberry32) for randomize. */
 export function rng(seed) {

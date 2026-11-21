@@ -122,8 +122,12 @@ FLOWS = [
             {"wait_js": """document.querySelectorAll(
                 '#actionList button').length > 0""",
              "desc": "actions available"},
-            {"check_js": """document.querySelector('#playerCard .name')
-                .textContent.includes('QA')""",
+            {"check_js": """(() => {
+                const v2 = document.querySelector('[aria-label^="Home"]');
+                const legacy = document.querySelector('#playerCard .name');
+                const n = v2 ? v2.textContent
+                             : (legacy ? legacy.textContent : '');
+                return n.includes('QA'); })()""",
              "desc": "player name shown"},
             {"shot": "game-born"},
 
@@ -135,10 +139,9 @@ FLOWS = [
             {"js": "location.reload(); true"},
             {"wait_js": "!document.getElementById('gameView').hidden",
              "desc": "game view visible after reload"},
-            {"check_js": """(() => { const m = document.querySelector(
-                '#playerCard .role').textContent.match(/Age (\\d+)/);
-                return m && +m[1] >= 2; })()""",
-             "desc": "age persisted across reload (>= 2)"},
+            {"python": {"hook": "assert_age_at_least",
+                        "minimum": 2,
+                        "desc": "age persisted across reload (>= 2)"}},
 
             # Player avatar renders from /api/render (known B outage
             # mid-migration -> WARN; hard wait otherwise).
@@ -201,9 +204,12 @@ FLOWS = [
                         "as_": "gid_b"}},
             {"js": "sessionStorage.clear(); true"},
             {"js": "location.href = '/game?game=' + CTX.gid_a; true"},
-            {"wait_js": """(() => { const n = document.querySelector(
-                '#playerCard .name');
-                return !!n && n.textContent === 'Alpha Life'; })()""",
+            {"wait_js": """(() => {
+                const v2 = document.querySelector('[aria-label^="Home"]');
+                const legacy = document.querySelector('#playerCard .name');
+                const n = v2 ? v2.textContent
+                             : (legacy ? legacy.textContent : '');
+                return n.trim() === 'Alpha Life' || n.includes('Alpha Life'); })()""",
              "desc": "deep link opens game Alpha"},
             {"js": "document.getElementById('backToLives').click(); true"},
             {"wait_js": "!document.getElementById('resumeView').hidden",
@@ -215,16 +221,22 @@ FLOWS = [
             {"js": """[...document.querySelectorAll('#lifeList .chip')].find(
                 r => r.textContent.includes('Beta')).querySelector(
                 'button').click(); true"""},
-            {"wait_js": """(() => { const n = document.querySelector(
-                '#playerCard .name');
-                return !!n && n.textContent === 'Beta Life'; })()""",
+            {"wait_js": """(() => {
+                const v2 = document.querySelector('[aria-label^="Home"]');
+                const legacy = document.querySelector('#playerCard .name');
+                const n = v2 ? v2.textContent
+                             : (legacy ? legacy.textContent : '');
+                return n.trim() === 'Beta Life' || n.includes('Beta Life'); })()""",
              "desc": "Resume selects Beta"},
             {"check_js": "location.search === ''",
              "desc": "query param consumed"},
             {"js": "location.reload(); true"},
-            {"wait_js": """(() => { const n = document.querySelector(
-                '#playerCard .name');
-                return !!n && n.textContent === 'Beta Life'; })()""",
+            {"wait_js": """(() => {
+                const v2 = document.querySelector('[aria-label^="Home"]');
+                const legacy = document.querySelector('#playerCard .name');
+                const n = v2 ? v2.textContent
+                             : (legacy ? legacy.textContent : '');
+                return n.trim() === 'Beta Life' || n.includes('Beta Life'); })()""",
              "desc": "refresh keeps selected game Beta"},
             {"js": "sessionStorage.clear(); true"},
             {"js": "location.href = '/game?game=nope-invalid'; true"},

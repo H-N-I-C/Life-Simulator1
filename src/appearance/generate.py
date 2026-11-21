@@ -20,22 +20,41 @@ def random_appearance(rng, age, gender=None):
     """Fully independent random appearance, age-appropriate.
 
     `base` defaults from gameplay gender ('person' when unknown).
+    Accessories are gender/age-fitting (§Avatar defaults, contracts.md):
+    beards only on man-based adults (25%), headscarf only on woman-based
+    adults (15%) — never a bearded woman or a hooded man.
     """
     if not isinstance(rng, random.Random):
         raise TypeError("random_appearance requires a random.Random instance")
+    base = _default_base(gender)
+    facial_hair, headwear = _gendered_accessories(rng, base, age)
     app = Appearance(
         seed=rng.randrange(1, 2**31),
-        base=_default_base(gender),
+        base=base,
         skin_tone=_pick(rng, "skin_tone"),
         hair=_pick(rng, "hair"),
-        facial_hair=_pick(rng, "facial_hair"),
-        headwear=_pick(rng, "headwear"),
+        facial_hair=facial_hair,
+        headwear=headwear,
         badges=_random_badges(rng),
         background=_pick(rng, "background"),
         look_override="none",
     )
     age_appropriate(app, age, gender)
     return app
+
+
+def _gendered_accessories(rng, base, age):
+    """§Avatar defaults: beard = man-based adult only (25%); headscarf =
+    woman-based adult only (15%); everyone else none."""
+    from .aging import age_stage
+    adult = age_stage(age) not in ("baby", "child")
+    if not adult:
+        return "none", "none"
+    facial_hair = "beard" if base == "man" and rng.random() < 0.25 \
+        else "none"
+    headwear = "headscarf" if base == "woman" and rng.random() < 0.15 \
+        else "none"
+    return facial_hair, headwear
 
 
 def _default_base(gender):

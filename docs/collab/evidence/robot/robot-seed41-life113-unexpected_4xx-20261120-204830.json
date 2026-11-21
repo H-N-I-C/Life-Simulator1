@@ -1,0 +1,70 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 113,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Allen at N\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Al",
+    "last_name": "Beasley",
+    "gender": "male",
+    "country": "India",
+    "seed": 887106436,
+    "request_id": "robot-41-113-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1942523333,
+     "base": "man",
+     "skin_tone": "default",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_a712fb4f10",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r5707",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_a712fb4f10",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Allen",
+    "employer_id": "N"
+   },
+   "request_id": "robot-41-r5708",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Allen at N\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 114 --seed 41 --from-life 113 --fail-fast"
+}

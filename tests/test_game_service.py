@@ -84,14 +84,14 @@ def age_up_once(svc, game_id, request_id):
         st = resolve_pending(svc, game_id, st["revision"],
                              f"{request_id}-d{n}", st)
         n += 1
-        if n > 10:
+        if n > 25:
             raise AssertionError("pending chain did not drain")
     st = svc.command(game_id, st["revision"], request_id, "age_up", {})
     while st["pending_decision"]:
         st = resolve_pending(svc, game_id, st["revision"],
                              f"{request_id}-d{n}", st)
         n += 1
-        if n > 10:
+        if n > 25:
             raise AssertionError("pending chain did not drain")
     return st
 
@@ -112,7 +112,7 @@ def _session_resolve(sess, st, rid):
     raise AssertionError("no resolvable option")
 
 
-def age_until(svc, game_id, cap=130, stop_at_decision=False):
+def age_until(svc, game_id, cap=600, stop_at_decision=False):
     """Age the game; returns (state, saw_decision). Pending decisions are
     resolved with an enabled option so aging can continue. Uses an
     in-memory session for speed and saves once at the end."""
@@ -180,8 +180,21 @@ class CreationTests(unittest.TestCase):
         self.assertEqual(state["journal"][0]["kind"], "birth")
         actions = {a["id"] for a in state["available_actions"]}
         # spend_time needs age >= 5 (rule gate); a newborn only sees these
+        # (undo_year always advertised, disabled until the first age;
+        # careers/education/skills specs advertise with precise
+        # enabled/reason, mostly age-gated disabled)
         self.assertEqual(actions,
-                         {"age_up", "surrender"})
+                         {"age_up", "surrender", "undo_year",
+                          "careers_apply", "careers_promote",
+                          "careers_resign",
+                          "education_enroll", "education_study",
+                          "education_leave",
+                          # R4 dialect: one train_skill action advertised
+                          # per option (target_id carries the option)
+                          "train_skill"})
+        self.assertEqual(state["can_undo"],
+                         {"enabled": False,
+                          "reason": "there is no year to undo"})
         self.assertEqual(state["country"], "Australia")
 
     def test_profile_validation(self):
@@ -865,10 +878,14 @@ class LifespanTests(unittest.TestCase):
         svc = make_service()
         state = svc.new_game(PROFILE, "req-create-001")
         gid = state["game_id"]
-        st, _ = age_until(svc, gid, cap=140)
+        st, _ = age_until(svc, gid, cap=600)
         self.assertEqual(st["status"], "dead")
         self.assertGreater(st["people"][0]["age"], 49)
-        self.assertEqual(st["available_actions"], [])
+        # §Undo v1: a dead life offers ONLY undo_year ('undo the year you
+        # died'); everything else is empty
+        self.assertEqual([a["id"] for a in st["available_actions"]],
+                         ["undo_year"])
+        self.assertTrue(st["available_actions"][0]["enabled"])
         self.assertEqual(st["pending_decision"], None)
         kinds = [e["kind"] for e in st["journal"]]
         self.assertIn("birth", kinds)
@@ -938,7 +955,7 @@ class M1FixRound1Tests(unittest.TestCase):
         svc = make_service()
         state = svc.new_game(PROFILE, "req-create-001")
         gid = state["game_id"]
-        st, _ = age_until(svc, gid, cap=140)
+        st, _ = age_until(svc, gid, cap=600)
         self.assertEqual(st["status"], "dead")
         by_id = {p["id"]: p for p in st["people"]}
         self.assertIn(st["player_id"], by_id)

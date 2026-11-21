@@ -1,0 +1,73 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 138,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: N at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Abagael",
+    "last_name": "Hinton",
+    "gender": "female",
+    "country": "Germany",
+    "seed": 1484489461,
+    "request_id": "robot-41-138-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 93204898,
+     "base": "man",
+     "skin_tone": "medium-dark",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "flower",
+      "crown"
+     ],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_19e1ac6621",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r6391",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_19e1ac6621",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "N",
+    "employer_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+   },
+   "request_id": "robot-41-r6392",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: N at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 139 --seed 41 --from-life 138 --fail-fast"
+}

@@ -17,6 +17,7 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => (
 
 let gameState = null;   // normalized adapter state (for the people list)
 let policyState = null; // /policy-state payload
+let policyLoadVersion = 0;
 let selectedPerson = null;
 let shellHooks = null;  // B1: {getState, refresh} published by the shell
 
@@ -63,6 +64,7 @@ export async function openEditor(state, hooks, personId) {
   const panel = initEditor(gameState, shellHooks);
   panel.hidden = false;
   await loadPolicyState();
+  if (!policyState) return panel;
   if (personId === undefined || personId === null) return panel;
   const people = (gameState.people || []).filter((p) => p.alive !== false);
   const person = people.find((p) => p.id === personId);
@@ -122,18 +124,26 @@ async function api(path, body) {
 }
 
 async function loadPolicyState() {
+  const version = ++policyLoadVersion;
+  const gameId = gameState.gameId;
+  policyState = null;
   setStatus("Loading…");
+  renderPeople();
   try {
-    const gid = encodeURIComponent(gameState.gameId);
-    policyState = await fetch("/api/games/" + gid + "/policy-state")
+    const gid = encodeURIComponent(gameId);
+    const loaded = await fetch("/api/games/" + gid + "/policy-state")
       .then(async (res) => {
         if (!res.ok) throw new Error("policy-state failed");
         return res.json();
       });
+    if (version !== policyLoadVersion || gameState.gameId !== gameId) return;
+    policyState = loaded;
     setStatus("Policy revision " + policyState.policy_revision + ".");
     renderPeople();
   } catch (err) {
-    setStatus("Editor unavailable: " + err.message, true);
+    if (version === policyLoadVersion) {
+      setStatus("Editor unavailable: " + err.message, true);
+    }
   }
 }
 
@@ -141,6 +151,12 @@ function renderPeople() {
   const box = $("editorPeople");
   if (!box) return;
   box.innerHTML = "";
+  // Controls depend on the policy catalogs. Do not expose clickable rows
+  // while those catalogs are still loading (or a request has failed).
+  if (!policyState) {
+    box.innerHTML = '<p class="muted">Waiting for editor data…</p>';
+    return;
+  }
   const people = (gameState.people || []).filter((p) => p.alive !== false);
   if (!people.length) {
     box.innerHTML = '<p class="muted">No one to edit.</p>';

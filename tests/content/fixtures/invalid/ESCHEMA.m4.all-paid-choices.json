@@ -1,0 +1,17 @@
+{"events": [
+  {"id": "soc_adt_test_paid_only", "schema_version": 3,
+   "title": "Fundraiser dinner",
+   "text": "My friends booked a table at a fundraiser dinner.",
+   "interaction": {"kind": "date", "romantic": false},
+   "conditions": {"min_age": 18, "max_age": 99},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+     {"id": "go", "label": "Buy a ticket",
+      "cost": {"money": 80},
+      "effects": {"stats": {"happiness": {"randint": [2, 5]}}},
+      "outcome_text": "I bought a ticket and took my seat by the window."},
+     {"id": "vip", "label": "Buy the VIP table",
+      "cost": {"money": 200},
+      "effects": {"stats": {"happiness": {"randint": [4, 8]}}},
+      "outcome_text": "I bought the VIP table and waved at everyone."}],
+   "weight": 1}]}

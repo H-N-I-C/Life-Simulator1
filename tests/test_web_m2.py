@@ -658,7 +658,9 @@ class TestSurrenderFlow(WebCase):
             {"decision_id": d2["id"], "option_id": end["id"]})
         self.assertEqual(status, 200, st)
         self.assertEqual(st["status"], "dead")
-        self.assertEqual(st["available_actions"], [])
+        # §Undo v1: dead life advertises exactly undo_year (nothing else)
+        self.assertEqual([a["id"] for a in st["available_actions"]],
+                         ["undo_year"])
 
 
 class TestSuccessionFlow(WebCase):

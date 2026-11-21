@@ -35,7 +35,7 @@
 .v2p-header {
   background: linear-gradient(180deg, var(--v2-accent-2) 0%,
                               var(--v2-accent) 100%);
-  padding: 12px 12px 56px;
+  padding: 12px 12px 76px;
   color: #fff;
   display: flex;
   align-items: center;
@@ -85,6 +85,7 @@
 }
 
 .v2p-avatar {
+  position: relative;
   width: 96px;
   height: 96px;
   border-radius: 50%;
@@ -98,7 +99,7 @@
   overflow: hidden;
 }
 
-.v2p-avatar img { width: 80px; height: 80px; }
+.v2p-avatar > img { width: 80px; height: 80px; }
 .v2p-avatar-fallback::after { content: "?"; font-weight: 900;
                               color: var(--v2-muted); }
 
@@ -201,4 +202,44 @@
 @media (max-width: 360px) {
   .v2p-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .v2p-card { margin-left: 10px; margin-right: 10px; }
+}
+
+.v2p-name, .v2p-subtitle { overflow-wrap: anywhere; min-width: 0; max-width: 100%; }
+
+/* ---- M4 social edge block (kind + Relationship bar +
+ * memory, projection-sourced). Sits in the page gutter like the
+ * other cards (matches .v2p-grid padding; 10px at <=360px). */
+.v2p-social {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 14px;
+  padding: 10px 14px;
+  background: var(--v2-card, #fff);
+  border-radius: var(--v2-radius, 16px);
+  box-shadow: var(--v2-shadow, 0 4px 16px rgba(22, 32, 58, .10));
+}
+.v2p-social-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.v2p-social-kind {
+  font-size: .8rem;
+  font-weight: 800;
+  color: var(--v2-ink-soft, #2b3550);
+}
+.v2p-social-rel {
+  font-size: .8rem;
+  font-weight: 800;
+  color: var(--v2-muted, #6b7690);
+}
+.v2p-social-memory {
+  font-size: .82rem;
+  color: var(--v2-muted, #6b7690);
+  font-style: italic;
+}
+@media (max-width: 360px) {
+  .v2p-social { margin-left: 10px; margin-right: 10px; }
 }

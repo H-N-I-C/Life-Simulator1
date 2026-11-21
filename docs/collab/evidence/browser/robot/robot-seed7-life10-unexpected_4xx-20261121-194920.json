@@ -1,0 +1,244 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 10,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alic",
+    "last_name": "Finch",
+    "gender": "male",
+    "country": "Australia",
+    "seed": 777,
+    "request_id": "robot-7-10-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1007452435,
+     "base": "man",
+     "skin_tone": "default",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_09",
+     "look_override": "none"
+    },
+    "scenario": "graduating_18"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "find_job",
+   "payload": {},
+   "request_id": "robot-7-r313",
+   "expected_revision": 32
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_14",
+    "option_id": "walk_away",
+    "inputs": null
+   },
+   "request_id": "robot-7-r314",
+   "expected_revision": 33
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r315",
+   "expected_revision": 34
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_15",
+    "option_id": "d_15_reach_out"
+   },
+   "request_id": "robot-7-r316",
+   "expected_revision": 35
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_15",
+    "option_id": "d_15_reach_out"
+   },
+   "request_id": "robot-7-r316",
+   "expected_revision": 35
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_16",
+    "option_id": "d_16_absent"
+   },
+   "request_id": "robot-7-r318",
+   "expected_revision": 36
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_17",
+    "option_id": "d_17_walk"
+   },
+   "request_id": "robot-7-r319",
+   "expected_revision": 37
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "social_spend_time",
+   "payload": {
+    "target_id": "18e611e0-c07e-4241-97ba-7cf2c03e1565"
+   },
+   "request_id": "robot-7-r320",
+   "expected_revision": 38
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r321",
+   "expected_revision": 39
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_18",
+    "option_id": "d_18_apologise"
+   },
+   "request_id": "robot-7-r322",
+   "expected_revision": 40
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_19",
+    "option_id": "d_19_say_something"
+   },
+   "request_id": "robot-7-r323",
+   "expected_revision": 41
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_20",
+    "option_id": "d_20_accept"
+   },
+   "request_id": "robot-7-r324",
+   "expected_revision": 42
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r325",
+   "expected_revision": 43
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_21",
+    "option_id": "d_21_help_move"
+   },
+   "request_id": "robot-7-r326",
+   "expected_revision": 44
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_22",
+    "option_id": "d_22_sulk"
+   },
+   "request_id": "robot-7-r327",
+   "expected_revision": 45
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "find_partner",
+   "payload": {},
+   "request_id": "robot-7-r328",
+   "expected_revision": 46
+  },
+  {
+   "n": 17,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_23",
+    "option_id": "decline"
+   },
+   "request_id": "robot-7-r329",
+   "expected_revision": 47
+  },
+  {
+   "n": 18,
+   "kind": "command",
+   "game_id": "g_9e0168d67a",
+   "action": "careers_apply",
+   "payload": {
+    "opening": null
+   },
+   "request_id": "robot-7-r330",
+   "expected_revision": 48
+  },
+  {
+   "n": 19,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 11 --seed 7 --from-life 10 --fail-fast"
+}

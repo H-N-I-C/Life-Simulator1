@@ -1,0 +1,52 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 52,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Archie at Amery\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Archie",
+    "last_name": "Wu",
+    "gender": "male",
+    "country": "Brazil",
+    "seed": 18628465,
+    "request_id": "robot-41-52-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_67eb9d80d3",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3062",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_67eb9d80d3",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Archie",
+    "employer_id": "Amery"
+   },
+   "request_id": "robot-41-r3063",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Archie at Amery\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 53 --seed 41 --from-life 52 --fail-fast"
+}

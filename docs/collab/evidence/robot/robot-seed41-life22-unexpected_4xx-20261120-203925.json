@@ -1,0 +1,115 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 22,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Alic at Antonius\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Arvie",
+    "last_name": "Terrell",
+    "gender": "male",
+    "country": "Brazil",
+    "seed": 1295360691,
+    "request_id": "robot-41-22-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_1ebbf84adb",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r1345",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_1ebbf84adb",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-41-r1346",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_1ebbf84adb",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-41-r1347",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_1ebbf84adb",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r1348",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_1ebbf84adb",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-41-r1349",
+   "expected_revision": 3
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_1ebbf84adb",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "continue"
+   },
+   "request_id": "robot-41-r1350",
+   "expected_revision": 4
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_1ebbf84adb",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Alic",
+    "employer_id": "Antonius"
+   },
+   "request_id": "robot-41-r1351",
+   "expected_revision": 5
+  },
+  {
+   "n": 10,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Alic at Antonius\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 23 --seed 41 --from-life 22 --fail-fast"
+}

@@ -170,18 +170,31 @@ V3_INTERACTION_KINDS = {
     "flirt", "date", "propose_courtship", "propose_union",
     "propose_plural_union", "convert_request", "repair_attempt",
     "parenting_request",  # nonromantic
+    "social",             # M4 nonromantic social (C schema; B sign-off
+                          # requested via the M4 contracts open item)
+    "social_invite",      # M4 nonromantic social record (C schema)
 }
 V3_ROLE_KINDS = {"person", "relationship", "union", "household"}
 V3_DOMAIN_EFFECTS = {
     "offer", "respond", "end_relationship", "end_union", "reveal_fact",
     "reputation", "chemistry", "convert_profile", "set_personal_tenet",
     "reproject_recognition", "milestone", "sample_conception",
+    # M4 social transitions (applied by A's resolve appliers / C's rule
+    # actions through the frozen applier set — never raw content writes)
+    "bullying_response",
 }
 V3_CONDITION_KINDS = CONDITION_KINDS | {
     "relationship_state", "union_state", "expectation",
     "recognition_status", "tenet_stance", "faith_id", "jurisdiction_id",
     "attraction_band", "openness_band", "monogamy_band", "known_fact",
     "reputation_at_least", "kinship", "milestone", "bound",
+    # M3 feature gates (read-only envelope probes through A/B accessors)
+    "active_assignment", "active_enrollment",
+    # M4 social gates (read-only probes of A's env["social_state"])
+    "social_kind", "min_closeness", "in_circle", "popularity_band",
+    "social_arc", "in_club",
+    # generic stat floor for the v3 tree (legacy requires-clause parity)
+    "min_stat",
 }
 V3_AUDIENCE_SCOPES = {"public", "player_known", "private"}
 V3_SELECTS = {"player", "predicate"}
@@ -274,6 +287,95 @@ register_predicate("dependent_child_age_13_17",
                    lambda actor_id, context: next(
                        (pid for pid, p in _v3_people(context).items()
                         if 13 <= getattr(p, "age", 0) <= 17), None))
+
+
+# ---------------------------------------------------------------------------
+# M4 social predicates (C-owned): bind v3 roles to A's social envelope
+# (env["social_state"]). Read-only; fall back to None when the envelope
+# is empty (A's engine not landed yet / no circles) so events never
+# bind wrong people. A re-registers richer versions at integration.
+# ---------------------------------------------------------------------------
+
+def _v3_social_state(context):
+    env = getattr(context, "_env", None)
+    if not isinstance(env, dict):
+        return {}
+    st = env.get("social_state")
+    return st if isinstance(st, dict) else {}
+
+
+def _v3_social_pick(actor_id, context, *, kinds=None, circle=None,
+                    min_closeness=0):
+    st = _v3_social_state(context)
+    people = st.get("people") or {}
+    circles = st.get("circles") or {}
+    candidates = []
+    if circle == "school":
+        candidates = list((circles.get("school") or {})
+                          .get("member_ids") or [])
+    elif circle == "work":
+        for grp in (circles.get("work") or {}).values():
+            candidates.extend(grp.get("member_ids") or [])
+    else:
+        candidates = [pid for pid, rec in people.items()
+                      if rec.get("status", "active") == "active"]
+    best = None
+    best_score = -1
+    for pid in candidates:
+        if pid == actor_id:
+            continue
+        rec = people.get(pid) or {}
+        if kinds and rec.get("kind") not in kinds:
+            continue
+        if not kinds and not rec.get("kind"):
+            continue
+        score = rec.get("closeness") or 0
+        if score >= min_closeness and score > best_score:
+            best, best_score = pid, score
+    return best
+
+
+def _v3_social_bully(actor_id, context):
+    st = _v3_social_state(context)
+    people = st.get("people") or {}
+    for pid, rec in people.items():
+        if pid == actor_id or rec.get("kind") != "bully":
+            continue
+        if rec.get("status", "active") != "active":
+            continue
+        if rec.get("arc") in ("ended", "resolving"):
+            continue
+        return pid
+    return None
+
+
+def _v3_social_host(actor_id, context):
+    # the host of the actor's newest open invite, else a close friend —
+    # invite content binds WHO is asking
+    st = _v3_social_state(context)
+    invites = st.get("invites") or {}
+    open_invites = [i for i in invites.values()
+                    if i.get("status") == "open"
+                    and i.get("host_id")]
+    if open_invites:
+        open_invites.sort(key=lambda i: i.get("offered_turn") or "",
+                          reverse=True)
+        return open_invites[0]["host_id"]
+    return _v3_social_pick(actor_id, context,
+                           kinds=("friend", "best_friend"))
+
+
+register_predicate("social_classmate_of_actor",
+                   lambda a, c: _v3_social_pick(a, c, circle="school"))
+register_predicate("social_coworker_of_actor",
+                   lambda a, c: _v3_social_pick(a, c, circle="work"))
+register_predicate("social_friend_of_actor",
+                   lambda a, c: _v3_social_pick(
+                       a, c, kinds=("friend", "best_friend")))
+register_predicate("social_acquaintance_of_actor",
+                   lambda a, c: _v3_social_pick(a, c))
+register_predicate("school_bully_of_actor", _v3_social_bully)
+register_predicate("social_host_of_actor", _v3_social_host)
 register_predicate("active_union_between_actor_and_spouse_a",
                    lambda actor_id, context: None)  # union role: A's query
 
@@ -332,6 +434,16 @@ def validate_event3(ev):
             raise EventValidationError(
                 f"{ev['id']}: romantic interaction with conditions.min_age "
                 f"< 18 (fixed rule: content cannot make a minor eligible)")
+        # M4 social invites: A's pending/applier consumes these verbatim —
+        # fail loud at load when an invite record forgets them.
+        if interaction["kind"] == "social_invite":
+            if not isinstance(ev.get("venue_label"), str) \
+                    or not ev["venue_label"]:
+                raise EventValidationError(
+                    f"{ev['id']}: social_invite needs a venue_label")
+            if not isinstance(ev.get("adults_only"), bool):
+                raise EventValidationError(
+                    f"{ev['id']}: social_invite needs adults_only (bool)")
     roles, person_roles = _v3_role_names(ev)
     for name, cfg in roles.items():
         if not isinstance(cfg, dict):
@@ -907,6 +1019,11 @@ class EventEngine:
                     bound = actor_id
                 else:
                     bound = PREDICATES[cfg["predicate"]](actor_id, context)
+                    if bound is not None and _v3_event_romantic(ev) and \
+                            _v3_romance_bind_rejected(
+                                bound, actor_id, context,
+                                _v3_people(context)):
+                        bound = None
                     if bound is None and not cfg.get("optional"):
                         raise EventValidationError(
                             f"{ev['id']}: required role {name!r} "
@@ -1118,6 +1235,123 @@ def _v3_node(node, context, bindings, people, pid):
     if kind == "bound":
         return (bindings or {}).get(node.get("role")) is not None
 
+    if kind == "active_assignment":
+        # M3 workplace events: gated by an ACTIVE named-career assignment
+        # through A's frozen envelope accessor (read-only). Optional
+        # role_id / role_ids narrows to specific roles.
+        from src.game.features.careers import core as careers_core
+        asn = careers_core.active_assignment(env, pid)
+        if asn is None:
+            return False
+        want = node.get("role_ids", node.get("role_id"))
+        if want is None:
+            return True
+        if isinstance(want, str):
+            want = [want]
+        return asn.get("role_id") in want
+
+    if kind == "active_enrollment":
+        # M3 study events: gated by an ACTIVE education enrollment
+        # through B's frozen envelope accessor (read-only). Optional
+        # program_id / program_ids narrows to specific programs.
+        from src.game.features.education import core as education_core
+        enr = education_core.active_enrollment(env, pid)
+        if enr is None:
+            return False
+        want = node.get("program_ids", node.get("program_id"))
+        if want is None:
+            return True
+        if isinstance(want, str):
+            want = [want]
+        return enr.get("program_id") in want
+
+    if kind in ("social_kind", "min_closeness", "social_arc"):
+        # M4 social gates: read-only probes of A's env["social_state"]
+        # people records (player-centric: keyed by the OTHER person's
+        # id). role_b defaults to the bound role, else the actor.
+        st = env.get("social_state") or {}
+        people = st.get("people") or {}
+        role_b = node.get("role_b")
+        b_id = (bindings or {}).get(role_b) if role_b else pid
+        rec = people.get(b_id) or {}
+        active = rec.get("status", "active") == "active"
+        if kind == "social_kind":
+            want = node.get("kinds", node.get("kind_names"))
+            if isinstance(want, str):
+                want = [want]
+            return active and rec.get("kind") in (want or [])
+        if kind == "min_closeness":
+            floor = node.get("min", 0)
+            if role_b:
+                return active and (rec.get("closeness") or 0) >= floor
+            return any(r.get("status", "active") == "active"
+                       and (r.get("closeness") or 0) >= floor
+                       for r in people.values())
+        # social_arc: bullying arc stage; A's arcs store is authoritative
+        # when landed, with the implicit "a live bully edge is targeted"
+        # fallback for envelopes that only carry kind records
+        arc = None
+        try:
+            from src.game.features.social import state as _social_state
+            arc = _social_state.arc_stage(env, pid, b_id)
+        except Exception:
+            arc = None
+        if arc is None:
+            arc = rec.get("arc")
+        if arc is None:
+            arc = "targeted" if rec.get("kind") == "bully" else None
+        if arc is None:
+            return False
+        want = node.get("stages", node.get("stage"))
+        if isinstance(want, str):
+            want = [want]
+        return arc in (want or [])
+
+    if kind == "in_circle":
+        # M4 circle presence. A's circles hold the PEOPLE AROUND the
+        # actor (never the actor's own id), so presence = a non-empty
+        # circle — delegate to A's frozen group buckets (its docstring
+        # names this leaf as the consumer). "clubs" stays local: club
+        # membership DOES include the actor's id.
+        st = env.get("social_state") or {}
+        circle = node.get("circle")
+        if circle == "clubs":
+            clubs = (st.get("circles") or {}).get("clubs") or {}
+            return any(pid in (c.get("member_ids") or [])
+                       for c in clubs.values())
+        try:
+            from src.game.features.social import circles as circles_mod
+            group = {"school": "classmates", "classmates": "classmates",
+                     "work": "coworkers", "coworkers": "coworkers",
+                     "friends": "friends"}.get(circle, circle)
+            return bool(circles_mod.group_member_ids(env, group))
+        except Exception:
+            return False
+
+    if kind == "popularity_band":
+        st = env.get("social_state") or {}
+        score = (st.get("popularity") or {}).get("score") or 0
+        return node.get("lo", 0) <= score <= node.get("hi", 100)
+
+    if kind == "in_club":
+        st = env.get("social_state") or {}
+        clubs = (st.get("circles") or {}).get("clubs") or {}
+        want = node.get("club_ids", node.get("club_id"))
+        if isinstance(want, str):
+            want = [want]
+        for cid in want or []:
+            if pid in (clubs.get(cid) or {}).get("member_ids", []):
+                return True
+        return False
+
+    if kind == "min_stat":
+        person = people.get(pid) or {}
+        value = getattr(person, node.get("stat"), None)
+        if not isinstance(value, (int, float)):
+            return False
+        return value >= node.get("value", 0)
+
+
     if kind in ("relationship_state", "union_state", "expectation"):
         a_id = _v3_bound_id(bindings, people, node.get("role_a", "actor"))
         b_id = _v3_bound_id(bindings, people, node.get("role_b"))
@@ -1281,12 +1515,77 @@ def evaluate_v3_conditions(conditions, context, bindings=None, actor_id=None):
     return _v3_node(tree, context, bindings, people, pid)
 
 
+def _v3_event_romantic(ev):
+    interaction = ev.get("interaction") or {}
+    if interaction.get("romantic"):
+        return True
+    # repair_attempt is deliberately excluded: it can be non-romantic
+    # (family estrangement repair), and kin may be its whole point.
+    return interaction.get("kind") in (
+        "flirt", "date", "propose_courtship", "propose_union",
+        "propose_plural_union", "convert_request")
+
+
+def _v3_close_kin(graph, a_id, b_id):
+    """True when a and b are close family: parent/child, grandparent/
+    grandchild, sibling, aunt/uncle/niece/nephew, first cousin — counted
+    over ALL parentage roles (biological/adoptive/step/guardian/social),
+    unlike graph_relatedness which is biological only."""
+    if a_id == b_id:
+        return True
+    parentage = graph.get("parentage") or []
+
+    def parents(pid):
+        return {e["parent_id"] for e in parentage
+                if e["child_id"] == pid}
+
+    def ancestors(pid, depth):
+        found = {}
+        frontier = [(pid, 0)]
+        while frontier:
+            cur, d = frontier.pop()
+            if d >= depth:
+                continue
+            for par in parents(cur):
+                if par not in found:
+                    found[par] = d + 1
+                    frontier.append((par, d + 1))
+        return found
+
+    anc_a = ancestors(a_id, 2)
+    anc_b = ancestors(b_id, 2)
+    if b_id in anc_a or a_id in anc_b:
+        return True
+    # shared ancestor within two generations each way: sibling (2),
+    # aunt/uncle/niece/nephew (3), first cousin (4)
+    return any(anc_a[s] + anc_b[s] <= 4 for s in set(anc_a) & set(anc_b))
+
+
+def _v3_romance_bind_rejected(bound_id, actor_id, context, people):
+    """Auto-served romance must never bind close kin or a minor. Kinship
+    is a modifier for choices the PLAYER makes (explicit dating/proposal
+    actions, the editor) — romance-tagged events the game serves itself
+    bind neither family nor minors."""
+    if bound_id is None:
+        return False
+    person = people.get(bound_id)
+    if person is not None and getattr(person, "age", 0) < 18:
+        return True
+    env = getattr(context, "_env", None)
+    graph = env.get("graph") if isinstance(env, dict) else None
+    if not isinstance(graph, dict) or not actor_id or bound_id == actor_id:
+        return False
+    return _v3_close_kin(graph, actor_id, bound_id)
+
+
 def v3_bindable(ev, actor_id, context):
     """Probe every required role once against THIS envelope (read-only).
     Returns the bindings dict, or None when a required role cannot bind.
     The returned ids can prebind instantiate3 so the pending names the
     same people the selector validated — never a resolve-time re-pick."""
     roles, _ = _v3_role_names(ev)
+    romantic = _v3_event_romantic(ev)
+    people = _v3_people(context)
     bindings = {}
     for name, cfg in roles.items():
         select = cfg.get("select", "player" if name == "actor" else None)
@@ -1297,6 +1596,9 @@ def v3_bindable(ev, actor_id, context):
             if fn is None:
                 return None
             bound = fn(actor_id, context)
+            if romantic and _v3_romance_bind_rejected(
+                    bound, actor_id, context, people):
+                bound = None
             if bound is None and not cfg.get("optional"):
                 return None
         bindings[name] = bound

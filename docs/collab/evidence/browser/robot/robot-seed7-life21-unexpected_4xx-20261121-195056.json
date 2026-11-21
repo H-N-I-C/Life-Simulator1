@@ -1,0 +1,66 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 21,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aristotle",
+    "last_name": "Willis",
+    "gender": "male",
+    "country": "Indonesia",
+    "seed": 1589162701,
+    "request_id": "robot-7-21-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 2119816833,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "flower",
+      "cap"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_62bc4cd9fe",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r594",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_62bc4cd9fe",
+   "action": "careers_apply",
+   "payload": {
+    "opening": null
+   },
+   "request_id": "robot-7-r595",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 22 --seed 7 --from-life 21 --fail-fast"
+}

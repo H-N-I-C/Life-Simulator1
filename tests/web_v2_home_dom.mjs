@@ -1,6 +1,7 @@
 /* v2 Home DOM tests (Kimi B). Exercises web/static/v2/home.js against a
- * minimal DOM stub with no server: real stats + numeric labels, Age
- * eligibility from the advertised spec, busy state, dead state, unmount.
+ * minimal DOM stub with no server. The Age button and stats dock moved into
+ * the shell chrome (feel-pass F3/F7) — those behaviors are tested in
+ * web_v2_shell_dom.mjs. This module only owns the ended-life note.
  * Run: node tests/web_v2_home_dom.mjs */
 
 import assert from "node:assert/strict";
@@ -97,155 +98,43 @@ function state(over = {}) {
   };
 }
 
-function hooks(calls, send) {
-  return {
-    getState: () => state(),
-    sendAction: send ||
-      ((id, payload, targetId) =>
-        calls.push({ id, payload, targetId }) ?? Promise.resolve({})),
-  };
-}
-
 const tests = [];
 function test(name, fn) { tests.push({ name, fn }); }
-const settled = () => new Promise((resolve) => setImmediate(resolve));
 
-test("real stats render with numeric % labels (colour never sole signal)",
-     () => {
+test("alive life: no dead note", () => {
   const root = new El("div");
-  mountHome(root, hooks([]));
-  const texts = root.findText(() => true);
-  for (const [k, v] of Object.entries(state().stats)) {
-    assert.ok(texts.includes(v + "%"), k + " numeric label");
-    assert.ok(texts.includes(k[0].toUpperCase() + k.slice(1)), k + " label");
-  }
-  // bars carry the semantic token colours
-  const fills = root.findAll((n) => n._classes.has("v2h-stat-fill"));
-  assert.equal(fills.length, 4);
-  assert.equal(fills[0].style.background, "var(--v2-bar-good)");  // 78
-  assert.equal(fills[3].style.background, "var(--v2-bar-mid)");   // 41
+  mountHome(root, { getState: () => state() });
+  assert.equal(root.findText((t) => t.includes("life has ended")).length, 0);
 });
 
-test("Age click sends the exact age_up action; spec gates with reason", () => {
+test("dead life: honest ended-life note", () => {
   const root = new El("div");
-  const calls = [];
-  mountHome(root, hooks(calls));
-  const age = root.findAll((n) => n._classes.has("v2h-age"))[0];
-  age.click();
-  assert.deepEqual(calls, [{ id: "age_up", payload: {}, targetId: null }]);
-});
-
-test("disabled spec disables Age with the server reason visible", () => {
-  const root = new El("div");
-  const st = state({ actions: [{ id: "age_up", label: "Age up",
-                                 enabled: false,
-                                 reason: "A decision is waiting for you." }] });
-  mountHome(root, { getState: () => st, sendAction: () => {} });
-  const age = root.findAll((n) => n._classes.has("v2h-age"))[0];
-  assert.equal(age.disabled, true);
-  assert.equal(age.getAttribute("aria-disabled"), "true");
-  assert.ok(root.findText((t) => t.includes("decision is waiting")).length >= 1);
-  const calls = [];
-  age.click();  // disabled buttons don't dispatch, but guard anyway
-  assert.equal(calls.length, 0);
-});
-
-test("busy settles after the shell renders; two consecutive Age clicks work", async () => {
-  const root = new El("div");
-  let current = state(), finish, calls = 0, h;
-  h = mountHome(root, { getState: () => current, sendAction: () => {
-    calls++;
-    return new Promise((resolve) => { finish = (next) => {
-      current = next;
-      h.update(current); // production renders BEFORE resolving transport
-      resolve(current);
-    }; });
-  } });
-  const age = root.findAll((n) => n._classes.has("v2h-age"))[0];
-  for (let n = 0; n < 2; n++) {
-    age.click();
-    assert.equal(age.disabled, true);
-    finish(state());
-    assert.equal(age.disabled, true, "local busy remains set during shell render");
-    await settled();
-    assert.equal(age.disabled, false, "settlement must repaint the current spec");
-    assert.equal(age.getAttribute("aria-disabled"), "false");
-    assert.equal(root.findText((t) => t.includes("Ageing")).length, 0);
-  }
-  assert.equal(calls, 2);
-});
-
-for (const outcome of ["pending", "rejected", "uncertain"]) {
-  test("settlement uses authoritative state: " + outcome, async () => {
-    const root = new El("div");
-    let current = state(), finish, h;
-    h = mountHome(root, { getState: () => current, sendAction: () =>
-      new Promise((resolve, reject) => { finish = () => {
-        current = outcome === "pending" ? state({ actions: [], pending: { id: "d_1" } }) : state();
-        h.update(current);
-        if (outcome === "rejected") reject({ code: "not_allowed" });
-        else resolve(outcome === "uncertain" ? null : current);
-      }; }) });
-    const age = root.findAll((n) => n._classes.has("v2h-age"))[0];
-    age.click(); finish(); await settled();
-    assert.equal(age.disabled, outcome === "pending");
-    assert.equal(root.findText((t) => t.includes("Ageing")).length, 0);
-  });
-}
-
-for (const viaExport of [false, true]) {
-  test("settling after unmount never reads or changes the former root: " + viaExport, async () => {
-    const root = new El("div");
-    let finish, unmounted = false;
-    const h = mountHome(root, { getState: () => {
-      assert.equal(unmounted, false, "must not read shell state after unmount");
-      return state();
-    }, sendAction: () => new Promise((resolve) => { finish = resolve; }) });
-    root.findAll((n) => n._classes.has("v2h-age"))[0].click();
-    if (viaExport) unmountHome(root); else h.unmount();
-    unmounted = true;
-    finish(state()); await settled();
-    assert.equal(root.children.length, 0);
-  });
-}
-
-
-test("late settlement and old unmount cannot overwrite a remounted Home", async () => {
-  const root = new El("div");
-  let finish;
-  const old = mountHome(root, { getState: () => state(),
-    sendAction: () => new Promise((resolve) => { finish = resolve; }) });
-  root.findAll((n) => n._classes.has("v2h-age"))[0].click();
-  const freshState = state({ stats: { health: 37 } });
-  mountHome(root, { getState: () => freshState, sendAction: () => Promise.resolve(freshState) });
-  old.unmount();
-  finish(state()); await settled();
-  assert.ok(root.findText((t) => t === "37%").length);
-  assert.equal(root.findText((t) => t === "78%").length, 0);
-});
-
-test("dead life: no Age control, honest ended-life note", () => {
-  const root = new El("div");
-  mountHome(root, { getState: () => state({ status: "dead" }),
-                    sendAction: () => {} });
-  assert.equal(root.findAll((n) => n._classes.has("v2h-agebar"))[0].hidden,
-               true);
+  mountHome(root, { getState: () => state({ status: "dead" }) });
+  assert.equal(root.findAll((n) => n._classes.has("v2h-dead"))[0].hidden,
+               false);
   assert.ok(root.findText((t) => t.includes("life has ended")).length >= 1);
+});
+
+test("alive → dead update reveals the note", () => {
+  const root = new El("div");
+  const h = mountHome(root, { getState: () => state() });
+  h.update(state({ status: "dead" }));
+  assert.equal(root.findAll((n) => n._classes.has("v2h-dead"))[0].hidden,
+               false);
 });
 
 test("unmount clears the root", () => {
   const root = new El("div");
-  const h = mountHome(root, hooks([]));
+  const h = mountHome(root, { getState: () => state() });
   h.unmount();
   assert.equal(root.children.length, 0);
-  mountHome(root, hooks([]));
+  mountHome(root, { getState: () => state() });
   unmountHome(root);
   assert.equal(root.children.length, 0);
 });
 
 if (process.argv.includes("--async-failure-probe")) {
   test("awaited async failure probe", async () => {
-    await settled();
     assert.fail("intentional async harness negative control");
   });
 }

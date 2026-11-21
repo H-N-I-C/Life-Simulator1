@@ -16,7 +16,9 @@ from src.game import rule_adapter
 
 PHASE_ORDER = [
     "year_start", "relations_age", "player_stats", "mortality",
-    "work_income", "education", "debt_service", "family_events",
+    "work_income", "education", "workplace_events",
+    "social_events", "debt_service",
+    "family_events",
     "parenting_events", "drama_events", "romance_events", "illness",
     "annual_events",
     "decision_offer", "year_close",
@@ -58,13 +60,91 @@ def _relations_age(env, ctx, service, rng):
     # update; one primitive call per relation (no composite age_up, so
     # child schooling/income/social cannot double-run in family_events)
     snapshot = env["turn"].get("snapshot") or []
+    strongest = None  # (abs_delta, relation, delta) — M3c cap: one line
     for relation in list(player.relations):
         if snapshot and relation.person_id not in snapshot:
             continue
+        # §Journal flavour (M3 amendment 5): yearly parent-relationship
+        # drift becomes a varied first-person line through C's frozen
+        # selector machinery (passed pool + no-repeat recents window);
+        # draws ONLY from the cosmetic stream and persists recents in
+        # env, so it is undo-safe via the snapshot
+        before_rel = getattr(relation, "relationship", None)
+        parent = isinstance(relation, Parent)
         rule_actions.relation_year(relation, player.age, rng)
+        if parent and before_rel is not None:
+            delta = relation.relationship - before_rel
+            if delta and (strongest is None
+                          or abs(delta) > strongest[0]):
+                strongest = (abs(delta), relation, delta)
+    # M3c Amendment 5: at most ONE parent-drift flavour line per year —
+    # the strongest notable change (|delta| >= 1; strict greater-than
+    # keeps the earliest snapshot relation on ties, so the pick is
+    # deterministic). The actual deltas still apply to every relation.
+    if strongest is not None:
+        _, relation, delta = strongest
+        text = _relationship_drift_line(env, player, relation, delta)
+        service._journal(
+            env, "relationship", text,
+            [relation.person_id], {"relationship": delta})
     return {"events": [], "money_entries": [], "pending_decision": None,
             "continuation": {"phase_id": "player_stats", "item_cursor": 0},
             "finished_turn": False}
+
+
+def _relation_role(relation):
+    """The real relation role for C's role-specific drift pools (R7)."""
+    from src.people.classes.parent import Parent
+    from src.people.classes.partner import Partner
+    from src.people.classes.sibling import Sibling
+    from src.people.classes.child import Child
+    from src.lifesim_lib.lifesim_lib import Gender
+    if isinstance(relation, Parent):
+        return "father" if relation.gender == Gender.Male else "mother"
+    if isinstance(relation, Partner):
+        return "partner"
+    if isinstance(relation, Sibling):
+        return "sibling"
+    if isinstance(relation, Child):
+        return "child"
+    return "sibling"  # unknown role -> C's generic fallback set, never None
+
+
+def _relationship_drift_line(env, player, relation, delta):
+    """R7: role-specific first-person drift line. The pool is C's
+    relationship_flavour.lines_for(delta, role) (mother/father get their
+    own lines; unknown roles use the generic set), drawn through C's
+    frozen cosmetic selector. Recents are a PER-RELATION rolling
+    three-pick window (the requested rolling three-year rule: a line may
+    recur once three yearly picks have rolled past); they persist in
+    env, so they are undo-safe via the snapshot. The plain sentence is
+    kept only for pool exhaustion within the window."""
+    from src.game.content.journal import relationship_flavour
+    from src.game.content.journal.yearly_lines import pick_year_line
+    from src.appearance import integration
+    recents_all = env.setdefault("relationship_line_recents", {})
+    if not isinstance(recents_all, dict):
+        # legacy list shape from pre-R7 saves: start the per-relation map
+        recents_all = {}
+        env["relationship_line_recents"] = recents_all
+    recents = recents_all.setdefault(relation.person_id, [])
+    pool = relationship_flavour.lines_for(delta, _relation_role(relation))
+    # The same sentence has a different ID in each age band. Exclude
+    # every alias of recent text so a birthday cannot repeat it early.
+    recent_texts = {line["text"] for line in pool
+                    if line["id"] in recents}
+    excluded = list(recents) + [line["id"] for line in pool
+                                if line["text"] in recent_texts]
+    picked = pick_year_line(player, None, excluded,
+                            integration._APP_RNG,
+                            pool=pool)
+    if picked:
+        line_id, text = picked
+        recents.append(line_id)
+        del recents[:-3]  # rolling three-year window per relation
+        return text.format(name=relation.firstname)
+    direction = "improved" if delta > 0 else "worsened"
+    return f"My relationship with {relation.firstname} {direction}."
 
 
 def _player_stats(env, ctx, service, rng):
@@ -171,6 +251,28 @@ def _decision_offer(env, ctx, service, rng):
     if engine_events:
         engine = event_mod.EventEngine(engine_events)
         context = event_mod.GameContext(env, service)
+        # BACKLOG fix (A-owned seam): the M1 template pool only runs when
+        # the flavor sampler comes up empty, so the childhood new_friend
+        # template starved in real play (0/5 lives). At age 5 the
+        # guaranteed offer REPLACES event content for that year (the
+        # resolve seam mints a real friend via social.mint_friend).
+        if player.age == 5 and "new_friend" not in env["used_decisions"]:
+            from src.game import decisions
+            decisions.validate_templates()
+            template = next(t for t in decisions.TEMPLATES
+                            if t["id"] == "new_friend")
+            env["next_decision_num"] += 1
+            env["used_decisions"].append(template["id"])
+            pending = decisions.instantiate(
+                template, env["next_decision_num"] - 1,
+                player.firstname,
+                parent_ids if template["person_ids"] == "parents"
+                else [])
+            return {"events": [], "money_entries": [],
+                    "pending_decision": pending,
+                    "continuation": {"phase_id": "year_close",
+                                     "item_cursor": 0},
+                    "finished_turn": False}
         # independent legacy chances (chance_n) execute separately from
         # the flavor pool: roll once per year, serve one queued
         # occurrence per decision_offer invocation so unrelated flavor
@@ -327,6 +429,12 @@ _DEFAULT_IMPLS = {
     "drama_events": lambda env, ctx, service, rng: __import__(
         "src.game.features.knowledge.engine", fromlist=["engine"]
     ).advance_drama_phase(env, ctx, service, rng),
+    "workplace_events": lambda env, ctx, service, rng: __import__(
+        "src.game.features.workplace.engine", fromlist=["engine"]
+    ).advance_workplace_phase(env, ctx, service, rng),
+    "social_events": lambda env, ctx, service, rng: __import__(
+        "src.game.features.social.events_route", fromlist=["events_route"]
+    ).advance_social_events_phase(env, ctx, service, rng),
     "decision_offer": _decision_offer,
     "year_close": _year_close,
 }
@@ -347,6 +455,8 @@ _NOOP_NEXT = {
     "debt_service": "family_events",
     "family_events": "illness",
     "drama_events": "illness",
+    "workplace_events": "debt_service",
+    "social_events": "debt_service",
     "illness": "annual_events",
     "annual_events": "decision_offer",
 }
@@ -422,6 +532,35 @@ def run_turn(env, service, rng):
             env, service, turn["turn_id"], env["player"].age,
             result.get("money_entries"))
         rule_adapter.journal_events(env, result.get("events"))
+        if phase_id == "work_income":
+            # M3 annual hook registry (A-owned, frozen order): runs after
+            # work_income is journaled and BEFORE education. Careers
+            # tenure accrues first; C's job-practice skill gain reads the
+            # active role declared by careers data. No hook posts money —
+            # M2 work_income legs stay the only wage payer.
+            from src.game.features.careers import core as careers_core
+            from src.game.features.skills import training as skills_training
+            careers_core.annual_hook(env, service, rng)
+            skills_training.annual_hook(env, rng, service)
+        if phase_id == "relations_age":
+            # M4 social yearly hook (A-owned, frozen slot after
+            # relations_age): closeness drift, kind fall-out, popularity
+            # recompute, invite expiry, circle reconciliation. No phase
+            # reorder — one registry line.
+            from src.game.features.social import drift as social_drift
+            social_drift.annual_hook(env, service, rng)
+        if phase_id == "education":
+            # §Education (M3): B's annual progress hook runs after the
+            # legacy education phase result is journaled (frozen order:
+            # work_income < careers/skills < education < education hook).
+            # Tuition/fee legs return through the same one poster; the
+            # hook never posts wage legs.
+            from src.game.features.education import core as education_core
+            edu_result = education_core.annual_hook(env, service, rng)
+            rule_adapter.post_money_entries(
+                env, service, turn["turn_id"], env["player"].age,
+                edu_result.get("money_entries"))
+            rule_adapter.journal_events(env, edu_result.get("events"))
         finished = rule_adapter.apply_cursor_update(env, result)
         from src.game.features.knowledge.core import pending_visible
         if env.get("pending") and not pending_visible(env, env["pending"]):

@@ -1,0 +1,118 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 165,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Alfonse at N\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alidia",
+    "last_name": "Powers",
+    "gender": "female",
+    "country": "Japan",
+    "seed": 1073392872,
+    "request_id": "robot-41-165-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 182396679,
+     "base": "woman",
+     "skin_tone": "default",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_05",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_3b328a4726",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r7220",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_3b328a4726",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r7221",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_3b328a4726",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-41-r7222",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_3b328a4726",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-41-r7223",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_3b328a4726",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r7224",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_3b328a4726",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r7225",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_3b328a4726",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Alfonse",
+    "employer_id": "N"
+   },
+   "request_id": "robot-41-r7226",
+   "expected_revision": 6
+  },
+  {
+   "n": 9,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Alfonse at N\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 166 --seed 41 --from-life 165 --fail-fast"
+}

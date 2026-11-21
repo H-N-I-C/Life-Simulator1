@@ -1,0 +1,56 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 58,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Andy",
+    "last_name": "Kaplan",
+    "gender": "male",
+    "country": "India",
+    "seed": 1703213114,
+    "request_id": "robot-7-58-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1504415310,
+     "base": "man",
+     "skin_tone": "default",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "earrings"
+     ],
+     "background": "bg_05",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_fd36e33ccd",
+   "action": "careers_apply",
+   "payload": {
+    "opening": null
+   },
+   "request_id": "robot-7-r1823",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 59 --seed 7 --from-life 58 --fail-fast"
+}

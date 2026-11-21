@@ -121,6 +121,8 @@ class _Caller:
         self._load_fired = False
 
     def _record_event(self, msg):
+        if self.session_id and msg.get("sessionId") != self.session_id:
+            return  # a shared websocket also carries the other tabs' events
         m = msg.get("method")
         p = msg.get("params", {})
         if m == "Runtime.consoleAPICalled" and p.get("type") == "error":
@@ -136,9 +138,21 @@ class _Caller:
             self.exceptions.append(str(ex.get("description") or
                                        d.get("text", "exception"))[:400])
         elif m == "Network.requestWillBeSent":
-            # Document requests: the load event marks completion and
-            # loadingFinished for the top document is not always emitted.
-            if p.get("type") != "Document":
+            # A navigation invalidates outstanding work from the previous
+            # document. Chromium need not emit completion for each aborted
+            # portrait fetch on reload; retaining those IDs makes wait_idle
+            # time out even though the new page has fully rendered.
+            if p.get("type") == "Document":
+                self._inflight.clear()
+                self._load_fired = False
+            # The load event marks document completion; loadingFinished for
+            # the top document is not always emitted.
+            # Locally-created blob portraits are not network work and
+            # Chromium can omit their terminal event when a render replaces
+            # them. Track only actual HTTP requests for network-idle.
+            request_url = p.get("request", {}).get("url", "")
+            if p.get("type") != "Document" and request_url.startswith(
+                    ("http://", "https://")):
                 self._inflight.add(p["requestId"])
             self._req_urls[p["requestId"]] = p.get("request", {}).get("url", "")
         elif m == "Network.loadingFinished":
@@ -160,6 +174,9 @@ class _Caller:
             self._load_fired = True
 
     def call(self, method, params=None, timeout=20):
+        if method in ("Page.navigate", "Page.reload"):
+            self._inflight.clear()
+            self._load_fired = False
         mid = self.next_id
         self.next_id += 1
         msg = {"id": mid, "method": method, "params": params or {}}
@@ -212,6 +229,10 @@ class _Caller:
         """Wait until page loaded and no network request in flight."""
         deadline = time.time() + timeout
         quiet_since = None
+        # Target.createTarget(url) may finish loading before Page.enable.
+        # In that case no load event can arrive for this attached session.
+        if self.js("document.readyState === 'complete'"):
+            self._load_fired = True
         while time.time() < deadline:
             # Pump events: idle state only updates as messages are read.
             msg = self.ws.recv_nowait()
@@ -265,12 +286,22 @@ class Session(_Caller):
     pass
 
 
-def launch_chrome():
-    """Launch headless chromium; returns (proc, browser Connection)."""
+def launch_chrome(user_data_dir=None):
+    """Launch headless chromium; returns (proc, browser Connection).
+
+    user_data_dir: optional isolated profile dir (pass a per-run temp dir
+    and delete it after the run — QA rule, TMPDIR-based profiles must not
+    leak between runs)."""
+    argv = [CHROMIUM, "--headless=new", "--disable-gpu", "--no-sandbox",
+            "--remote-debugging-port=0", "about:blank"]
+    if user_data_dir:
+        argv.insert(1, "--user-data-dir=%s" % user_data_dir)
     proc = subprocess.Popen(
-        [CHROMIUM, "--headless=new", "--disable-gpu", "--no-sandbox",
-         "--remote-debugging-port=0", "about:blank"],
-        stderr=subprocess.PIPE, stdout=subprocess.DEVNULL, text=True)
+        argv,
+        stderr=subprocess.PIPE, stdout=subprocess.DEVNULL, text=True,
+        # Own process group so callers can kill the whole chromium tree
+        # (headless spawns children that outlive a plain terminate()).
+        start_new_session=True)
     ws_url = None
     deadline = time.time() + 20
     line = ""

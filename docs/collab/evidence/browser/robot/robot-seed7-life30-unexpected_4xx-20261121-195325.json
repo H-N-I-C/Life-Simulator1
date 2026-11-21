@@ -1,0 +1,137 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 30,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Althea",
+    "last_name": "Morse",
+    "gender": "female",
+    "country": "Indonesia",
+    "seed": 515380058,
+    "request_id": "robot-7-30-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 690815685,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "white",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "flower"
+     ],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_b78e8b912c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r961",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_b78e8b912c",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r962",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_b78e8b912c",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-7-r963",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_b78e8b912c",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "ask_final"
+   },
+   "request_id": "robot-7-r964",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_b78e8b912c",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "cancel"
+   },
+   "request_id": "robot-7-r965",
+   "expected_revision": 4
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_b78e8b912c",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r966",
+   "expected_revision": 5
+  },
+  {
+   "n": 8,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_b78e8b912c",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-7-r967",
+   "expected_revision": 5
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_b78e8b912c",
+   "action": "careers_apply",
+   "payload": {
+    "opening": null
+   },
+   "request_id": "robot-7-r968",
+   "expected_revision": 6
+  },
+  {
+   "n": 11,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 31 --seed 7 --from-life 30 --fail-fast"
+}

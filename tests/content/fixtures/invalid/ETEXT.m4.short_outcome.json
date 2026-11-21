@@ -1,0 +1,15 @@
+{"events": [
+  {"id": "soc_sch_test_short", "schema_version": 3,
+   "title": "Borrowed pen",
+   "text": "A classmate asks to borrow a pen in the middle of class.",
+   "interaction": {"kind": "date", "romantic": false},
+   "conditions": {"min_age": 6, "max_age": 17},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+     {"id": "lend", "label": "Lend it",
+      "effects": {},
+      "outcome_text": "I lent it."},
+     {"id": "keep", "label": "Keep it",
+      "effects": {},
+      "outcome_text": "I pretended not to hear the question at all."}],
+   "weight": 1}]}

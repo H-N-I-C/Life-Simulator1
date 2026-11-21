@@ -15,7 +15,7 @@ import uuid
 KNOWLEDGE_SCHEMA_VERSION = 1
 
 FACT_KINDS = ("affair", "secret_union", "discovery", "disclosure",
-              "forgiveness", "breakup", "conversion")
+              "forgiveness", "breakup", "conversion", "social_memory")
 
 KNOWLEDGE_SOURCES = ("witnessed", "told", "discovered", "rumor")
 

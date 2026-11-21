@@ -1,0 +1,198 @@
+{
+ "schema_version": 3,
+ "_comment": "M3 study events (Kimi C, 2026-11-21). Gated by the shared v3 condition path: every event requires an ACTIVE program enrollment (active_enrollment); several narrow to a program via program_ids. Actor-only, all options free, outcome lines carry their context.",
+ "events": [
+  {
+   "id": "stu_group_project",
+   "title": "The Vanishing Group",
+   "text": "My group project teammates have gone mysteriously silent and the deadline is a week away.",
+   "conditions": {"min_age": 17, "all": [{"kind": "active_enrollment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "carry", "label": "Carry the project yourself",
+     "effects": {"stats": {"stress": 4, "smarts": 3, "happiness": -2}},
+     "outcome_text": "I carried the whole group project alone through the final week; we passed, and I quietly resolved to pick better teammates."},
+    {"id": "delegate", "label": "Round them up firmly",
+     "effects": {"stats": {"stress": 2, "happiness": 1}},
+     "outcome_text": "I hunted down my silent teammates and divided the work with unusual firmness; the project got done by all of us, more or less."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "stu_library_seat",
+   "title": "The Seat Wars",
+   "text": "My usual library seat has been taken by a stranger who is clearly settled in for the long haul.",
+   "conditions": {"min_age": 17, "all": [{"kind": "active_enrollment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "new_spot", "label": "Find a new spot",
+     "effects": {"stats": {"happiness": 1, "stress": -1}},
+     "outcome_text": "I gave up my library seat without a fight and found a quieter corner; the new spot turned out to be better anyway."},
+    {"id": "stare", "label": "Stare until they leave",
+     "effects": {"stats": {"stress": 2, "happiness": -1}},
+     "outcome_text": "I waged a silent staring campaign against the seat thief in the library; they never even looked up, and I studied angry."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "stu_tutor_question",
+   "title": "The Dumb Question",
+   "text": "I am completely stuck on this week's material and the tutor's office hours end in twenty minutes.",
+   "conditions": {"min_age": 17, "all": [{"kind": "active_enrollment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "ask", "label": "Swallow pride and ask",
+     "effects": {"stats": {"smarts": 3, "stress": -1, "happiness": 1}},
+     "outcome_text": "I swallowed my pride and asked the tutor my 'dumb' question; it was not dumb, and the answer unlocked the whole topic."},
+    {"id": "struggle", "label": "Struggle alone tonight",
+     "effects": {"stats": {"smarts": 1, "stress": 3}},
+     "outcome_text": "I skipped the tutor and wrestled the material alone all evening; I got there eventually, the long way round."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "stu_all_nighter",
+   "title": "The Night Before",
+   "text": "The big assignment is due tomorrow and I am further behind than I would like to admit.",
+   "conditions": {"min_age": 17, "all": [{"kind": "active_enrollment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "all_nighter", "label": "Pull an all-nighter",
+     "effects": {"stats": {"stress": 4, "health": -3, "smarts": 2}},
+     "outcome_text": "I pulled an all-nighter to finish the assignment, watching the sunrise through the window with dry eyes and a submitted file."},
+    {"id": "sleep", "label": "Sleep and submit what you have",
+     "effects": {"stats": {"health": 2, "stress": -2, "happiness": -1}},
+     "outcome_text": "I chose sleep over the all-nighter and submitted the assignment as it was; my body thanked me and my grade might not."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "stu_practical_exam",
+   "title": "The Practical",
+   "text": "The practical assessment is today: real equipment, a watching assessor, and no notes to hide behind.",
+   "conditions": {"min_age": 17, "all": [{"kind": "active_enrollment", "program_ids": ["app_electrical", "care_diploma", "nursing_bachelors"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "breathe", "label": "Breathe and begin",
+     "effects": {"stats": {"stress": 2, "happiness": 2, "smarts": 1}},
+     "outcome_text": "I walked into the practical exam, breathed, and worked through it step by step; the assessor nodded at the end, which I choose to read as praise."},
+    {"id": "panic", "label": "Rush and fumble",
+     "effects": {"stats": {"stress": 3, "happiness": -2}},
+     "outcome_text": "I rushed the practical assessment and fumbled the second step; the assessor was kind about it, which somehow felt worse."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "stu_bursary_forms",
+   "title": "The Bureaucracy",
+   "text": "The education office says my funding forms are 'incomplete', which apparently means three more signatures.",
+   "conditions": {"min_age": 17, "all": [{"kind": "active_enrollment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "chase", "label": "Chase every signature",
+     "effects": {"stats": {"stress": 2}, "money": 100},
+     "outcome_text": "I chased down all three missing signatures across campus in one grim afternoon, and the funding office finally stamped my forms."},
+    {"id": "postpone", "label": "Deal with it next week",
+     "effects": {"stats": {"stress": 1, "happiness": 1}},
+     "outcome_text": "I shelved the incomplete funding forms for next week; the paperwork mountain waited patiently, as paperwork does."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "stu_class_debate",
+   "title": "The Debate",
+   "text": "My class is running a debate and the lecturer has just called on me to argue the side I secretly disagree with.",
+   "conditions": {"min_age": 17, "all": [{"kind": "active_enrollment", "program_ids": ["business_bachelors"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "commit", "label": "Commit to the argument",
+     "effects": {"stats": {"smarts": 2, "happiness": 2}},
+     "outcome_text": "I argued the side I disagreed with in the class debate and won the room; my own convictions filed a formal complaint."},
+    {"id": "flounder", "label": "Flounder honestly",
+     "effects": {"stats": {"happiness": -1, "stress": 1}},
+     "outcome_text": "I half-heartedly argued a side I did not believe in during the class debate; the lecturer saw straight through me."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "stu_lab_spill",
+   "title": "The Spill",
+   "text": "A practical session has gone sideways and there is a mess on the bench that was definitely not in the instructions.",
+   "conditions": {"min_age": 17, "all": [{"kind": "active_enrollment", "program_ids": ["app_electrical"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "handle", "label": "Handle it calmly and safely",
+     "effects": {"stats": {"smarts": 2, "stress": 1}, "karma": 1},
+     "outcome_text": "I dealt with the spilled practical mess calmly and by the book; the instructor said my cleanup was the best part of my work."},
+    {"id": "freeze", "label": "Freeze and call for help",
+     "effects": {"stats": {"stress": 2, "happiness": -1}},
+     "outcome_text": "I froze at the bench mess until the instructor took over; embarrassing, but at least nobody got hurt."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "stu_placement_review",
+   "title": "The Mid-Placement Review",
+   "text": "My placement supervisor has asked to sit down and talk about how my training is going so far.",
+   "conditions": {"min_age": 17, "all": [{"kind": "active_enrollment", "program_ids": ["app_electrical", "care_diploma", "nursing_bachelors"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "honest", "label": "Ask for blunt feedback",
+     "effects": {"stats": {"smarts": 2, "stress": 1, "happiness": 1}},
+     "outcome_text": "I asked my placement supervisor for blunt feedback in the review and got it; the list was long, but now I know exactly what to fix."},
+    {"id": "smile_nod", "label": "Smile and nod",
+     "effects": {"stats": {"stress": -1, "happiness": 1}},
+     "outcome_text": "I smiled and nodded through the placement review and learned very little; comfortable, which is exactly the danger."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "stu_motivation_dip",
+   "title": "The Mid-Course Slump",
+   "text": "Somewhere around the middle of the course, the readings have stopped making sense and my motivation has quietly left the building.",
+   "conditions": {"min_age": 17, "all": [{"kind": "active_enrollment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "routine", "label": "Rebuild a small daily routine",
+     "effects": {"stats": {"stress": -2, "smarts": 1, "happiness": 2}},
+     "outcome_text": "I rebuilt a tiny daily study routine to climb out of the mid-course slump; small sessions, kept promises, slowly returning momentum."},
+    {"id": "coast", "label": "Coast for a while",
+     "effects": {"stats": {"stress": -1, "happiness": 1, "smarts": -1}},
+     "outcome_text": "I let myself coast through the mid-course slump; the rest did me good, though the readings did not read themselves."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "stu_study_group",
+   "title": "The Invitation",
+   "text": "A classmate has invited me to join their study group, which meets every Thursday with snacks and ruthless flashcards.",
+   "conditions": {"min_age": 17, "all": [{"kind": "active_enrollment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "join", "label": "Join the group",
+     "effects": {"stats": {"smarts": 2, "happiness": 2, "stress": -1}},
+     "outcome_text": "I joined the Thursday study group and survived their ruthless flashcards; my grades noticed before I did."},
+    {"id": "decline", "label": "Politely decline",
+     "effects": {"stats": {"happiness": -1}},
+     "outcome_text": "I politely declined the study group invitation and kept studying solo; quieter Thursdays, lonelier flashcards."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "stu_final_portfolio",
+   "title": "The Portfolio",
+   "text": "Everything I have learned this course comes down to one final portfolio due by the end of the month.",
+   "conditions": {"min_age": 17, "all": [{"kind": "active_enrollment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "curate", "label": "Curate it carefully",
+     "effects": {"stats": {"smarts": 3, "stress": 3, "happiness": 2}},
+     "outcome_text": "I curated the final course portfolio piece by piece, choosing quality over panic; submitting it felt like handing over a piece of my year."},
+    {"id": "dash", "label": "Throw it together at the end",
+     "effects": {"stats": {"stress": 2, "smarts": -1, "happiness": -1}},
+     "outcome_text": "I assembled the final portfolio in one frenzied weekend; it passed, but I know exactly what it could have been."}
+   ],
+   "weight": 2
+  }
+ ]
+}

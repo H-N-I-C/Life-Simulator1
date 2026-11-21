@@ -1,0 +1,17 @@
+{"events": [
+  {"id": "soc_inv_test_bar_party", "schema_version": 3,
+   "title": "Party at the bar",
+   "text": "{person:host} invited me to a party at the harbour bar.",
+   "interaction": {"kind": "date", "romantic": false},
+   "venue_label": "The Harbour Bar", "adults_only": true,
+   "conditions": {"min_age": 16, "max_age": 17},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "host": {"kind": "person", "select": "player"}},
+   "choices": [
+     {"id": "attend", "label": "Go",
+      "effects": {"stats": {"happiness": {"randint": [1, 3]}}},
+      "outcome_text": "I went along and kept my head down near the docks."},
+     {"id": "decline", "label": "Not tonight",
+      "effects": {},
+      "outcome_text": "I made an excuse and stayed home instead."}],
+   "weight": 1}]}

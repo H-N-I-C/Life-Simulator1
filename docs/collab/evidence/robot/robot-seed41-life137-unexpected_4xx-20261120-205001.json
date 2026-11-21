@@ -1,0 +1,79 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 137,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: N at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alisa",
+    "last_name": "Rowe",
+    "gender": "female",
+    "country": "China",
+    "seed": 47212978,
+    "request_id": "robot-41-137-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 679591851,
+     "base": "woman",
+     "skin_tone": "default",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_256c37cc45",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r6388",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_256c37cc45",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r6389",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_256c37cc45",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "N",
+    "employer_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+   },
+   "request_id": "robot-41-r6390",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: N at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 138 --seed 41 --from-life 137 --fail-fast"
+}

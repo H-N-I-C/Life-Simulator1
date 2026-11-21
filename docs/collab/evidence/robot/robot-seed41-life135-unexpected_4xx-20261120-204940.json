@@ -1,0 +1,222 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 135,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Alexander at Adams\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alayne",
+    "last_name": "Cowan",
+    "gender": "female",
+    "country": "Germany",
+    "seed": 777,
+    "request_id": "robot-41-135-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 78669860,
+     "base": "woman",
+     "skin_tone": "medium-light",
+     "hair": "default",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [
+      "earrings"
+     ],
+     "background": "bg_09",
+     "look_override": "none"
+    },
+    "scenario": "university_pending_17"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_11",
+    "option_id": "decline"
+   },
+   "request_id": "robot-41-r6216",
+   "expected_revision": 28
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "ask_for_money",
+   "payload": {
+    "target_id": "870f1d3e-485e-4c9d-99a8-887ac3f561e7"
+   },
+   "request_id": "robot-41-r6217",
+   "expected_revision": 29
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r6218",
+   "expected_revision": 30
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_12",
+    "option_id": "d_12_ignore"
+   },
+   "request_id": "robot-41-r6219",
+   "expected_revision": 31
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_13",
+    "option_id": "d_13_reschedule"
+   },
+   "request_id": "robot-41-r6220",
+   "expected_revision": 32
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r6221",
+   "expected_revision": 33
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_14",
+    "option_id": "d_14_deny"
+   },
+   "request_id": "robot-41-r6222",
+   "expected_revision": 34
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_15",
+    "option_id": "d_15_say_something"
+   },
+   "request_id": "robot-41-r6223",
+   "expected_revision": 35
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_16",
+    "option_id": "d_16_wave"
+   },
+   "request_id": "robot-41-r6224",
+   "expected_revision": 36
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r6225",
+   "expected_revision": 37
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_17",
+    "option_id": "d_17_trust_gut"
+   },
+   "request_id": "robot-41-r6226",
+   "expected_revision": 38
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r6227",
+   "expected_revision": 39
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_18",
+    "option_id": "d_18_sulk"
+   },
+   "request_id": "robot-41-r6228",
+   "expected_revision": 40
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "find_job",
+   "payload": {},
+   "request_id": "robot-41-r6229",
+   "expected_revision": 41
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_19",
+    "option_id": "apply"
+   },
+   "request_id": "robot-41-r6230",
+   "expected_revision": 42
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_7fcb138492",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Alexander",
+    "employer_id": "Adams"
+   },
+   "request_id": "robot-41-r6231",
+   "expected_revision": 43
+  },
+  {
+   "n": 17,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Alexander at Adams\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 136 --seed 41 --from-life 135 --fail-fast"
+}

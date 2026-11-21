@@ -1,0 +1,73 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 97,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Adolphus at N\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aimil",
+    "last_name": "McKenzie",
+    "gender": "female",
+    "country": "UK",
+    "seed": 660426454,
+    "request_id": "robot-41-97-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 479502186,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses",
+      "flower"
+     ],
+     "background": "bg_08",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_47b86b070f",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r5009",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_47b86b070f",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Adolphus",
+    "employer_id": "N"
+   },
+   "request_id": "robot-41-r5010",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Adolphus at N\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 98 --seed 41 --from-life 97 --fail-fast"
+}

@@ -1,0 +1,196 @@
+{
+ "counts": {
+  "PASS": 27
+ },
+ "rows": [
+  {
+   "journey": "j1_electrical_trade",
+   "step": "finish_school",
+   "title": "Finish secondary school (baseline)",
+   "status": "PASS",
+   "detail": "already graduated (age 18)"
+  },
+  {
+   "journey": "j1_electrical_trade",
+   "step": "work_tab",
+   "title": "Open Occupation/Work at 390+320",
+   "status": "PASS",
+   "detail": "work tab at 390/320"
+  },
+  {
+   "journey": "j1_electrical_trade",
+   "step": "enroll_apprenticeship",
+   "title": "Enroll paid electrical apprenticeship",
+   "status": "PASS",
+   "detail": "enroll flow started (kind=None)"
+  },
+  {
+   "journey": "j1_electrical_trade",
+   "step": "apprentice_assignment",
+   "title": "Training \u2192 eligibility \u2192 stored apprentice offer",
+   "status": "PASS",
+   "detail": "joint apprentice assignment active at voltworks (one commitment via the apprenticeship bridge)"
+  },
+  {
+   "journey": "j1_electrical_trade",
+   "step": "apprentice_wage",
+   "title": "Apprentice year: exactly one ledger wage",
+   "status": "PASS",
+   "detail": "one payroll income leg in t_000027, delta 10534"
+  },
+  {
+   "journey": "j1_electrical_trade",
+   "step": "promotion",
+   "title": "Promotion to electrician",
+   "status": "PASS",
+   "detail": "promotion gate enforced: you need 2 years in your current role first"
+  },
+  {
+   "journey": "j1_electrical_trade",
+   "step": "dismissal_recovery",
+   "title": "Dismissal and recovery actions",
+   "status": "PASS",
+   "detail": "resigned; assignment cleared"
+  },
+  {
+   "journey": "j2_healthcare",
+   "step": "finish_school",
+   "title": "Finish secondary school (baseline)",
+   "status": "PASS",
+   "detail": "already graduated (age 18)"
+  },
+  {
+   "journey": "j2_healthcare",
+   "step": "nurse_gate",
+   "title": "Nurse role gated by nursing_degree (exact reason)",
+   "status": "PASS",
+   "detail": "qualification gate enforced: this role requires age 21 or older; you need Bachelor of Nursing + experience as Qualified care worker or 8 years as a Q"
+  },
+  {
+   "journey": "j2_healthcare",
+   "step": "education_ui",
+   "title": "Education UI on Occupation (programs + reasons)",
+   "status": "PASS",
+   "detail": "programs listed at 390/320; ineligibility reason visible (nursing_bachelors: you need the Care diploma)"
+  },
+  {
+   "journey": "j2_healthcare",
+   "step": "education_ui_enroll",
+   "title": "UI-driven enroll starts the real flow",
+   "status": "PASS",
+   "detail": "UI enroll started (pending=education_funding, enrollment=False)"
+  },
+  {
+   "journey": "j2_healthcare",
+   "step": "education_progress",
+   "title": "Study + age through to completion (award once)",
+   "status": "PASS",
+   "detail": "completed care_diploma: care_diploma_cert awarded once, history row completed (2/2 years)"
+  },
+  {
+   "journey": "j2_healthcare",
+   "step": "education_reload",
+   "title": "Qualification persists across reload",
+   "status": "PASS",
+   "detail": "qualification 'Care diploma' persisted across reload"
+  },
+  {
+   "journey": "j3_skills",
+   "step": "train_skill",
+   "title": "Train a skill with real state change",
+   "status": "PASS",
+   "detail": "trained practical: uses 0->1 value 7->16"
+  },
+  {
+   "journey": "j3_skills",
+   "step": "skills_ui",
+   "title": "Skills UI on Activities (values + options)",
+   "status": "PASS",
+   "detail": "skills UI mounted; 4 values, 5 training options advertised"
+  },
+  {
+   "journey": "j3_skills",
+   "step": "skills_ui_train",
+   "title": "UI-driven training changes real state",
+   "status": "PASS",
+   "detail": "UI training applied: train_practical uses 1 -> 2"
+  },
+  {
+   "journey": "j4_zero_money",
+   "step": "zero_money_legal",
+   "title": "Age legally at $0",
+   "status": "PASS",
+   "detail": "aged legally at $0"
+  },
+  {
+   "journey": "j5_old_save",
+   "step": "strip_and_load",
+   "title": "Resume a pre-M3 legacy save",
+   "status": "PASS",
+   "detail": "pre-M3 save resumed: age 30, legacy job 'Generic job' at $42000"
+  },
+  {
+   "journey": "j5_old_save",
+   "step": "no_invented_records",
+   "title": "No invented assignments/employers/degrees",
+   "status": "PASS",
+   "detail": "no invented assignments/employers/enrollments/degrees"
+  },
+  {
+   "journey": "j5_old_save",
+   "step": "legacy_pay_preserved",
+   "title": "Legacy generic job still pays one wage",
+   "status": "PASS",
+   "detail": "legacy wage paid once (t_000048, delta 24814)"
+  },
+  {
+   "journey": "j5_old_save",
+   "step": "legacy_transition_gate",
+   "title": "Transition only via the shared commitment decision",
+   "status": "PASS",
+   "detail": "legacy->named transition: app_electrician at voltworks, pay $26246 via the one adapter"
+  },
+  {
+   "journey": "j6_m3b_careers",
+   "step": "named_employment",
+   "title": "Named employment via the approved apply->offer->accept route",
+   "status": "PASS",
+   "detail": "named employment: app_electrician at voltworks, salary $27379"
+  },
+  {
+   "journey": "j6_m3b_careers",
+   "step": "employer_change",
+   "title": "Real resign -> apply -> offer -> accept at a different employer",
+   "status": "PASS",
+   "detail": "employer change: voltworks (app_electrician) -> meridian (office_assistant), pay $32982, history [('voltworks', 'left')]"
+  },
+  {
+   "journey": "j6_m3b_careers",
+   "step": "dismissal_forced",
+   "title": "Engine-triggered dismissal + legal recovery (forced fixture)",
+   "status": "PASS",
+   "detail": "engine dismissal closed office_assistant (meridian) with a 'dismissed' history row; recovery actions legal"
+  },
+  {
+   "journey": "j6_m3b_careers",
+   "step": "retirement_direct",
+   "title": "Direct retire closes the named assignment; pension pays next year",
+   "status": "PASS",
+   "detail": "retired from voltworks; pension $32384 paid once in t_000105 (money delta 22407)"
+  },
+  {
+   "journey": "j6_m3b_careers",
+   "step": "retirement_offered",
+   "title": "Stored retirement_offer accept closes the assignment; pension pays next year",
+   "status": "PASS",
+   "detail": "offered path: retired from voltworks; pension $32384 paid once in t_000113 (money delta 12198)"
+  },
+  {
+   "journey": "j6_m3b_careers",
+   "step": "salary_pension_reload",
+   "title": "Pension/history/ledger identical across a fresh reload",
+   "status": "PASS",
+   "detail": "pension $32384, history [('voltworks', 'retired')] and 51 ledger rows identical after fresh reload"
+  }
+ ]
+}

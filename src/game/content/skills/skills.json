@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "_comment": "C skills content (M3 §Skills PROPOSED v1). Declarative vocabulary only: new skills/training options need no engine branch.",
+  "skills": [
+    {"id": "practical", "label": "Practical", "min": 0, "max": 100,
+     "default": 5,
+     "description": "Hands-on trade and repair ability."},
+    {"id": "organization", "label": "Organization", "min": 0, "max": 100,
+     "default": 5,
+     "description": "Planning, order and reliability."},
+    {"id": "communication", "label": "Communication", "min": 0, "max": 100,
+     "default": 5,
+     "description": "Working with and through people."},
+    {"id": "care", "label": "Care", "min": 0, "max": 100, "default": 5,
+     "description": "Patience and skill in helping others."}
+  ],
+  "training_options": [
+    {"id": "train_practical", "skill": "practical",
+     "label": "Tinker with old machines",
+     "cost": {"money": 0}, "annual_limit": 2,
+     "progress": {"min": 3, "max": 6},
+     "requires": {"min_age": 10}},
+    {"id": "train_organization", "skill": "organization",
+     "label": "Volunteer to plan a neighbourhood event",
+     "cost": {"money": 0}, "annual_limit": 2,
+     "progress": {"min": 3, "max": 6},
+     "requires": {"min_age": 12}},
+    {"id": "train_communication", "skill": "communication",
+     "label": "Join a public speaking circle",
+     "cost": {"money": 25}, "annual_limit": 2,
+     "progress": {"min": 3, "max": 6},
+     "requires": {"min_age": 12}},
+    {"id": "train_care", "skill": "care",
+     "label": "Help out at a community kitchen",
+     "cost": {"money": 0}, "annual_limit": 2,
+     "progress": {"min": 3, "max": 6},
+     "requires": {"min_age": 10}},
+    {"id": "train_evening_course", "skill": null,
+     "label": "Take an evening skills course",
+     "cost": {"money": 60}, "annual_limit": 1,
+     "progress": {"min": 5, "max": 9},
+     "requires": {"min_age": 16},
+     "choose_skill": true}
+  ],
+  "rules": {
+    "smarts_learning_bonus": {"per_10_smarts": 0.5, "cap": 4},
+    "job_practice_per_year": {"min": 1, "max": 2},
+    "study_contribution_per_year": {"min": 1, "max": 2}
+  }
+}

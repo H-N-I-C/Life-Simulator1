@@ -1,0 +1,81 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 43,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adoree",
+    "last_name": "Harvey",
+    "gender": "female",
+    "country": "Brazil",
+    "seed": 1009633193,
+    "request_id": "robot-7-43-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 474009973,
+     "base": "man",
+     "skin_tone": "medium-dark",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "flower",
+      "glasses"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_676a47e610",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1480",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_676a47e610",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1481",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_676a47e610",
+   "action": "careers_apply",
+   "payload": {
+    "opening": null
+   },
+   "request_id": "robot-7-r1482",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 44 --seed 7 --from-life 43 --fail-fast"
+}

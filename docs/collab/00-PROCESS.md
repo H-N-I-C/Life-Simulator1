@@ -37,3 +37,4 @@ Branch guard (2026-11-17): before starting any task, run `git branch --show-curr
 Messaging limit (user, 2026-11-17): agents don't message each other for routine coordination. Put open questions in the relevant README's 'Open items' list; Claude reviews and routes them in batches. Direct agent-to-agent messages are only for genuine blockers.
 
 Fix-round protocol (user, 2026-11-17): after each Codex review, SMALL fixes are done by Codex and BIG fixes by the Kimi agents (Claude splits them, keeping the work even and the files non-overlapping). When both are done, Codex re-evaluates. Claude does the final evaluation before anything goes to the user.
+- 2026-11-21 (user): gate for every finished Kimi task: Codex evaluates → Codex approves → Claude evaluates → only then Claude sends the next task. No next task before both approvals.

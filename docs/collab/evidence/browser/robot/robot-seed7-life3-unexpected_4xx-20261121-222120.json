@@ -1,0 +1,65 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 3,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Archon",
+    "last_name": "Adkins",
+    "gender": "male",
+    "country": "Germany",
+    "seed": 58604311,
+    "request_id": "robot-7-3-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 436475777,
+     "base": "person",
+     "skin_tone": "medium-dark",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "glasses"
+     ],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_780ad037b2",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r184",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_780ad037b2",
+   "action": "careers_apply",
+   "payload": {
+    "opening": null
+   },
+   "request_id": "robot-7-r185",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 4 --seed 7 --from-life 3 --fail-fast"
+}

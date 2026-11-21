@@ -1,0 +1,150 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 47,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Anurag at N\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Allen",
+    "last_name": "Graves",
+    "gender": "male",
+    "country": "Nigeria",
+    "seed": 1017886651,
+    "request_id": "robot-41-47-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 463806507,
+     "base": "person",
+     "skin_tone": "medium-dark",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_5613a0c34b",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r2550",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_5613a0c34b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2551",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_5613a0c34b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2552",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_5613a0c34b",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-41-r2553",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_5613a0c34b",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r2554",
+   "expected_revision": 4
+  },
+  {
+   "n": 7,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_5613a0c34b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2555",
+   "expected_revision": 4
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_5613a0c34b",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r2556",
+   "expected_revision": 5
+  },
+  {
+   "n": 10,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_5613a0c34b",
+   "action": "conversation",
+   "payload": {
+    "target_id": "66cfda0a-b5dc-4221-a1ce-0bdc201dff6d"
+   },
+   "request_id": "robot-41-r2557",
+   "expected_revision": 5
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_5613a0c34b",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Anurag",
+    "employer_id": "N"
+   },
+   "request_id": "robot-41-r2558",
+   "expected_revision": 6
+  },
+  {
+   "n": 13,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Anurag at N\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 48 --seed 41 --from-life 47 --fail-fast"
+}

@@ -99,10 +99,10 @@
       "choices": [
         {"id": "trust_gut", "label": "Trust my gut and step back",
          "effects": {"stats": {"stress": -2}, "relationship": -2},
-         "outcome_text": "I politely pulled away. Something in me unclenched the same evening."},
+         "outcome_text": "I politely pulled away from the almost-kiss and said goodnight. Something in me unclenched the same evening."},
         {"id": "give_chance", "label": "Give it one more chance",
          "effects": {"stats": {"happiness": {"randint": [-3, 6]}}, "relationship": 3},
-         "outcome_text": "I gave it one more evening. I am still not sure if it was patience or stubbornness."}
+         "outcome_text": "I gave our relationship one more evening. I am still not sure if it was patience or stubbornness."}
       ],
       "weight": 1
     },
@@ -120,7 +120,7 @@
       "choices": [
         {"id": "lean_in", "label": "Lean into the moment",
          "effects": {"chemistry": {"between": ["actor", "lover"], "delta": {"randint": [3, 7]}}, "stats": {"happiness": 4}},
-         "outcome_text": "The air crackled like the first week all over again."},
+         "outcome_text": "The air between us crackled like the first week all over again."},
         {"id": "playful", "label": "Make a joke of it",
          "effects": {"stats": {"happiness": 2}, "relationship": 2},
          "outcome_text": "I joked, they chased me with a dishcloth, and the kitchen rang with laughing."}
@@ -186,7 +186,7 @@
          "outcome_text": "I smiled back, and the whole evening tilted a few degrees brighter."},
         {"id": "look_away", "label": "Look away politely",
          "effects": {"stats": {"stress": -1}},
-         "outcome_text": "I studied my glass very hard for the rest of the night."}
+         "outcome_text": "I studied my drink very hard for the rest of our first date."}
       ],
       "weight": 1
     },
@@ -207,7 +207,7 @@
          "outcome_text": "I commented on the tragic state of the tomatoes. They laughed. Progress."},
         {"id": "move_on", "label": "Keep shopping",
          "effects": {},
-         "outcome_text": "I let the moment pass and wondered about it all the way home."}
+         "outcome_text": "I let the chance to ask them out pass, and wondered about it all the way home."}
       ],
       "weight": 1
     },
@@ -225,10 +225,10 @@
       "choices": [
         {"id": "grace", "label": "Accept it with grace",
          "effects": {"stats": {"happiness": -2, "karma": 2, "stress": -2}},
-         "outcome_text": "I said I understood and meant it. A kind no still stings, but it heals clean."},
+         "outcome_text": "When they turned me down, I said I understood and meant it. A kind no still stings, but it heals clean."},
         {"id": "press", "label": "Push a little harder",
          "effects": {"stats": {"happiness": -5, "stress": 3}, "relationship": -4},
-         "outcome_text": "I pushed, and watched their patience close like a shop shutter. I deserved that."}
+         "outcome_text": "I pushed them for an answer, and watched their patience close like a shop shutter. I deserved that."}
       ],
       "weight": 1
     },
@@ -270,7 +270,7 @@
          "outcome_text": "I found my person across the market and squeezed their hand. The flicker stayed a flicker."},
         {"id": "enjoy", "label": "Enjoy the attention a little too long",
          "effects": {"stats": {"happiness": 3, "karma": -3, "stress": 2}, "relationship": -3},
-         "outcome_text": "I let it go on a beat too long. Nothing happened, but I did not love how it felt after."}
+         "outcome_text": "I let the flirty moment run a beat too long. Nothing happened, but I did not love how it felt after."}
       ],
       "weight": 1
     },
@@ -291,7 +291,7 @@
          "outcome_text": "We traded a few careful messages. Some doors are better left as doors."},
         {"id": "ignore", "label": "Leave it unread",
          "effects": {"stats": {"stress": -2}},
-         "outcome_text": "I left it unread and went to make tea with shaking hands."}
+         "outcome_text": "I left their message unread and went to make tea with shaking hands."}
       ],
       "weight": 1
     },
@@ -418,7 +418,7 @@
       "choices": [
         {"id": "honest_talk", "label": "Ask for the whole truth",
          "effects": {"stats": {"stress": -3, "happiness": 1}, "relationship": 4},
-         "outcome_text": "It was shame, not malice. Ugly to find, easier to carry together."},
+         "outcome_text": "The hidden debt came from shame, not malice. Ugly to find, easier to carry together."},
         {"id": "cold", "label": "Go cold and quiet",
          "effects": {"stats": {"stress": 5, "happiness": -6}, "relationship": -6},
          "outcome_text": "I went quiet for days. The silence cost more than the debt."}
@@ -481,7 +481,7 @@
       "choices": [
         {"id": "let_go", "label": "Let it slide off",
          "effects": {"stats": {"stress": -2, "happiness": 1}, "relationship": 2},
-         "outcome_text": "I let it slide off me like rain off a roof. Their family, their weather."},
+         "outcome_text": "I let the in-laws' jab slide off me like rain off a roof. Their family, their weather."},
         {"id": "vent", "label": "Vent the whole car ride home",
          "effects": {"stats": {"stress": 3, "happiness": -3}, "relationship": -2},
          "outcome_text": "I replayed the comment with commentary for forty minutes. My partner took it like a saint."}
@@ -571,7 +571,7 @@
       "choices": [
         {"id": "receive", "label": "Receive it warmly",
          "effects": {"stats": {"happiness": 3, "stress": -3}, "relationship": 4},
-         "outcome_text": "I drank the coffee and said thank you like it meant everything. It did."},
+         "outcome_text": "I drank the apology coffee and said thank you like it meant everything. It did."},
         {"id": "bring_pastry", "label": "Bring home a pastry tonight",
          "effects": {"stats": {"happiness": 3}, "relationship": 4, "money": -6},
          "outcome_text": "A pastry on the table said what we were both too stubborn to. We are getting there."}

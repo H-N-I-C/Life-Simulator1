@@ -1,0 +1,169 @@
+{
+ "schema_version": 3,
+ "_comment": "M4 bullying events (Kimi C). Target events gate on social_arc (actor is the target); observer events gate on a bully edge the actor sees but is not the target of (content uses social_kind to a bound bully + not the arc). All non-graphic, no slurs, target never blamed; every event offers >=2 real responses; tell_someone always works (no rng gate). Responses resolve through C's apply_bullying_response table (bullying.json).",
+ "events": [
+  {
+   "id": "soc_bul_locker_note",
+   "title": "The Note",
+   "text": "Someone has taped a cruel note to my locker. {person:bully} is laughing at the end of the corridor.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 8, "max_age": 17,
+                  "all": [{"kind": "social_arc", "role_b": "bully",
+                           "stage": "targeted"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "bully": {"kind": "person", "select": "predicate",
+                       "predicate": "school_bully_of_actor"}},
+   "choices": [
+    {"id": "tell_someone", "label": "Tell a teacher",
+     "effects": {"bullying_response": "tell_someone"},
+     "outcome_text": "I took the note to a teacher and told them everything. It stopped being my secret to carry alone."},
+    {"id": "stand_up", "label": "Tell them to stop",
+     "effects": {"bullying_response": "stand_up"},
+     "outcome_text": "I told the note-taper to stop, voice shaking and words steady, and walked away before my courage ran out."},
+    {"id": "avoid", "label": "Take the long way round",
+     "effects": {"bullying_response": "avoid", "stats": {"stress": -2}},
+     "outcome_text": "I took the long way round to class to dodge the note-taper, and hated that I had to."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_bul_online",
+   "title": "The Group Chat",
+   "text": "A group chat I am in has turned on me, and {person:bully} keeps adding fuel whenever it dies down.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 10, "max_age": 17,
+                  "all": [{"kind": "social_arc", "role_b": "bully",
+                           "stages": ["targeted", "escalated"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "bully": {"kind": "person", "select": "predicate",
+                       "predicate": "school_bully_of_actor"}},
+   "choices": [
+    {"id": "tell_someone", "label": "Show a trusted adult",
+     "effects": {"bullying_response": "tell_someone"},
+     "outcome_text": "I showed the group chat to a trusted adult and we dealt with it together; the chat went very quiet very fast."},
+    {"id": "leave", "label": "Leave the chat and walk away",
+     "effects": {"bullying_response": "avoid", "stats": {"stress": -3,
+                 "happiness": -1}},
+     "outcome_text": "I left the group chat that had turned on me and muted the noise; my phone felt lighter for it."},
+    {"id": "stand_up", "label": "Reply once, firmly",
+     "effects": {"bullying_response": "stand_up"},
+     "outcome_text": "I replied once in the chat, firmly and without insults, and then put my phone in a drawer like a professional."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_bul_lunch_money",
+   "title": "The Shake-Down",
+   "text": "{person:bully} has started waiting by the school gates, and today they have asked, very casually, for my lunch money.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 8, "max_age": 14,
+                  "all": [{"kind": "social_arc", "role_b": "bully",
+                           "stages": ["targeted", "escalated"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "bully": {"kind": "person", "select": "predicate",
+                       "predicate": "school_bully_of_actor"}},
+   "choices": [
+    {"id": "tell_someone", "label": "Report it straight away",
+     "effects": {"bullying_response": "tell_someone"},
+     "outcome_text": "I reported the lunch-money business straight away, and an adult was at the gates the very next morning."},
+    {"id": "stand_up", "label": "Refuse loudly, where people can see",
+     "effects": {"bullying_response": "stand_up"},
+     "outcome_text": "I refused to hand over my lunch money loudly enough for everyone to hear, and something in the balance shifted."},
+    {"id": "avoid", "label": "Take the side gate",
+     "effects": {"bullying_response": "avoid", "money": -5},
+     "outcome_text": "I gave up my lunch money at the gates and took the side gate the rest of the week, quietly furious about it."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_bul_seat_taken",
+   "title": "My Seat, Taken",
+   "text": "{person:bully} has taken my usual seat in every class this week and seems to find my irritation a kind of sport.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 8, "max_age": 17,
+                  "all": [{"kind": "social_arc", "role_b": "bully",
+                           "stage": "targeted"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "bully": {"kind": "person", "select": "predicate",
+                       "predicate": "school_bully_of_actor"}},
+   "choices": [
+    {"id": "stand_up", "label": "Ask for it back, plainly",
+     "effects": {"bullying_response": "stand_up"},
+     "outcome_text": "I asked for my seat back plainly, no drama, and held the stare until the joke stopped being fun."},
+    {"id": "avoid", "label": "Take another seat",
+     "effects": {"bullying_response": "avoid", "stats": {"stress": -2}},
+     "outcome_text": "I took another seat all week and let the seat-thief have the victory, saving my energy for better fights."},
+    {"id": "tell_someone", "label": "Mention it to the teacher",
+     "effects": {"bullying_response": "tell_someone"},
+     "outcome_text": "I mentioned the seat business to the teacher, who moved the seating plan and the whole thing quietly ended."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "soc_bul_cooldown",
+   "title": "The Thaw",
+   "text": "Things with {person:bully} have been quiet for a while, and today they were almost polite to me in the corridor.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 8, "max_age": 17,
+                  "all": [{"kind": "social_arc", "role_b": "bully",
+                           "stage": "resolving"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "bully": {"kind": "person", "select": "predicate",
+                       "predicate": "school_bully_of_actor"}},
+   "choices": [
+    {"id": "befriend", "label": "Offer a truce",
+     "effects": {"bullying_response": "befriend"},
+     "outcome_text": "I offered the cold-war bully a truce over a shared assignment, and we ended up laughing about nothing in particular."},
+    {"id": "wait", "label": "Let it fade on its own",
+     "effects": {"bullying_response": "avoid", "stats": {"stress": -1}},
+     "outcome_text": "I let the thaw with the former bully happen on its own time, polite nods slowly becoming actual greetings."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_bulo_locker_note",
+   "title": "Someone Else's Note",
+   "text": "I watched {person:bully} tape a cruel note to another kid's locker, and the kid saw me seeing it.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 8, "max_age": 17,
+                  "all": [{"kind": "social_kind", "role_b": "bully",
+                           "kinds": ["bully"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "bully": {"kind": "person", "select": "predicate",
+                       "predicate": "school_bully_of_actor"}},
+   "choices": [
+    {"id": "support", "label": "Check on the kid",
+     "effects": {"karma": 2, "stats": {"happiness": 1}},
+     "outcome_text": "I found the kid from the locker note at lunch and sat with them; it cost me nothing and maybe helped a little."},
+    {"id": "report", "label": "Report what you saw",
+     "effects": {"karma": 1, "bullying_response": "tell_someone"},
+     "outcome_text": "I reported exactly what I saw on the locker, and told the kid afterwards so they did not feel alone in it."},
+    {"id": "stay_out", "label": "Stay out of it",
+     "effects": {"karma": -1, "stats": {"stress": 1}},
+     "outcome_text": "I stayed out of the locker-note business and walked past fast, then thought about it more than I wanted to."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "soc_bulo_cheer",
+   "title": "The Pile-On",
+   "text": "{person:bully} is mocking a classmate at lunch and the table is laughing along, waiting to see who joins in.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 9, "max_age": 17,
+                  "all": [{"kind": "social_kind", "role_b": "bully",
+                           "kinds": ["bully"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "bully": {"kind": "person", "select": "predicate",
+                       "predicate": "school_bully_of_actor"}},
+   "choices": [
+    {"id": "redirect", "label": "Change the subject loudly",
+     "effects": {"karma": 1, "relationship": {"role": "bully", "delta": -1}},
+     "outcome_text": "I changed the subject loudly at the lunch table and the pile-on lost its audience before it got properly started."},
+    {"id": "laugh_along", "label": "Laugh along uncomfortably",
+     "effects": {"karma": -2, "stats": {"stress": 2}},
+     "outcome_text": "I laughed along at the lunch-table mockery and felt smaller with every laugh, which was not a fair trade."}
+   ],
+   "weight": 1
+  }
+ ]
+}

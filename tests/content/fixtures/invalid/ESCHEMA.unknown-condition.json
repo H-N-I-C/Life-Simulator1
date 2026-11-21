@@ -1,0 +1,11 @@
+{"schema_version": 3, "events": [{
+ "id": "fix_unknown_condition", "title": "Bogus condition kind",
+ "text": "Uses a condition kind outside the frozen vocabulary.",
+ "interaction": {"kind": "flavor", "romantic": false},
+ "roles": {"actor": {"kind": "person", "select": "player"}},
+ "conditions": {"any": [{"kind": "bogus_condition"}]},
+ "choices": [
+  {"id": "ok", "label": "OK", "effects": {}, "outcome_text": "Fine."},
+  {"id": "no", "label": "No", "effects": {}, "outcome_text": "Nope."}
+ ]
+}]}

@@ -1,0 +1,156 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 14,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at Armando\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alvera",
+    "last_name": "Dougherty",
+    "gender": "female",
+    "country": "Canada",
+    "seed": 1153184759,
+    "request_id": "robot-41-14-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1177218002,
+     "base": "woman",
+     "skin_tone": "default",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "crown"
+     ],
+     "background": "bg_09",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_5177e63575",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r1122",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_5177e63575",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r1123",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_5177e63575",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r1124",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_5177e63575",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r1125",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_5177e63575",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r1126",
+   "expected_revision": 4
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_5177e63575",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r1127",
+   "expected_revision": 5
+  },
+  {
+   "n": 8,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_5177e63575",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r1128",
+   "expected_revision": 5
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_5177e63575",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r1129",
+   "expected_revision": 6
+  },
+  {
+   "n": 11,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_5177e63575",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r1130",
+   "expected_revision": 6
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_5177e63575",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+    "employer_id": "Armando"
+   },
+   "request_id": "robot-41-r1131",
+   "expected_revision": 7
+  },
+  {
+   "n": 14,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at Armando\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 15 --seed 41 --from-life 14 --fail-fast"
+}

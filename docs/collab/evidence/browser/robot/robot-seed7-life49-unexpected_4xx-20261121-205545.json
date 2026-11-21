@@ -1,0 +1,141 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 49,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aleksandrs",
+    "last_name": "Watson",
+    "gender": "male",
+    "country": "Japan",
+    "seed": 2046061714,
+    "request_id": "robot-7-49-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1798760617,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "glasses",
+      "flower"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_165e7eb6ac",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1202",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_165e7eb6ac",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1203",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_165e7eb6ac",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1204",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_165e7eb6ac",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1205",
+   "expected_revision": 2
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_165e7eb6ac",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_tantrum"
+   },
+   "request_id": "robot-7-r1206",
+   "expected_revision": 3
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_165e7eb6ac",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1207",
+   "expected_revision": 4
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_165e7eb6ac",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1208",
+   "expected_revision": 5
+  },
+  {
+   "n": 10,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_165e7eb6ac",
+   "action": "careers_apply",
+   "payload": {
+    "opening": null
+   },
+   "request_id": "robot-7-r1209",
+   "expected_revision": 5
+  },
+  {
+   "n": 12,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 50 --seed 7 --from-life 49 --fail-fast"
+}

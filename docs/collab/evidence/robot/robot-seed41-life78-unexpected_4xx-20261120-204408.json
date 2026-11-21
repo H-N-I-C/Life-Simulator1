@@ -1,0 +1,109 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 78,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Alfie at Augie\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Abbey",
+    "last_name": "Cassidy",
+    "gender": "female",
+    "country": "Spain",
+    "seed": 884880345,
+    "request_id": "robot-41-78-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1027069228,
+     "base": "person",
+     "skin_tone": "dark",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [
+      "earrings",
+      "glasses"
+     ],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_211a1cb29c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r4059",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_211a1cb29c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r4060",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_211a1cb29c",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r4061",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_211a1cb29c",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r4062",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_211a1cb29c",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r4063",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_211a1cb29c",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Alfie",
+    "employer_id": "Augie"
+   },
+   "request_id": "robot-41-r4064",
+   "expected_revision": 5
+  },
+  {
+   "n": 8,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Alfie at Augie\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 79 --seed 41 --from-life 78 --fail-fast"
+}

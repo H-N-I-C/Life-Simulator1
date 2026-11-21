@@ -28,9 +28,15 @@ overlay and a secondary "More" menu. Old panels are re-grouped, never dropped:
 | `activities` | activities actions, health card + health/treatment actions, General card (General actions + Character editor / Family tree / Dating & weddings toggles) |
 | overlay `person` | Person detail module (C), mounted by B in a host inside `people` |
 
+The turn-progress card (turnCard) shows player-facing text only — internal
+turn ids (`t_…`) and phase names (`year_close` etc.) never render in the
+player view (feel-pass F2; the shell never fabricates a dev panel).
+
 Secondary routes live in the v2 header "More" menu (frozen): All lives,
-Character editor, Family tree, Dating & weddings. The global topbar keeps
-Creator / Gallery links. Decision pill, retry pill, offline banner and the
+Character editor, Family tree, Dating & weddings. The global website topbar
+(Creator / Gallery links) belongs to the lives list / creator only — inside a
+running life the game is full-screen and the topbar is hidden (feel-pass F1).
+Decision pill, retry pill, offline banner and the
 modal render above the v2 chrome (z-order contract: chrome never covers them).
 Secondary-route entries are IDEMPOTENT and reveal their owning surface: More →
 Character editor selects the Activities screen (the General card owns the
@@ -38,8 +44,24 @@ editor toggle) and opens the editor only if closed — never toggles it shut.
 
 game.html groups the existing panels into `<section id="screen-{home,job,
 assets,people,activities}" class="screen">`; the legacy `tabbar` is replaced
-by the v2 tab bar (the old screen *content* is fully preserved inside the new
-sections — no panel is removed).
+by the v2 bottom bar (the old screen *content* is fully preserved inside the
+new sections — no panel is removed).
+
+### Bottom bar + stats dock (feel-pass F3/F7, 2026-11-20)
+
+The v2 bottom bar is **Occupation · Assets · AGE · Relationships ·
+Activities**: four section tabs with ONE big round Age button centred between
+Assets and Relationships (`.v2-agebtn`). The Age button is shell chrome, not
+Home content; Home is reached via the header "Life" link. Age eligibility and
+its gate reason come from the server's advertised `age_up` spec; the reason
+renders as a one-line note in the stats dock (`.v2-agenote`) so the button
+never dead-ends silently.
+
+A compact stats dock (`.v2-dock`: Happy/Health/Smarts/Looks, colour + % label)
+is pinned above the bottom bar, always visible while alive; it hides honestly
+when the projection carries no stats. Bars animate to new values and flash
+green/red on change (120–200 ms transitions; `prefers-reduced-motion`
+collapses everything to instant state changes — feel-pass F8).
 
 ### Navigation API (shell-owned, frozen)
 
@@ -357,9 +379,226 @@ guess; no other display metadata is added without A/C sign-off (codex
 lives server-side (`GameService._display_category`) so every client
 shares one source.
 
+```jsonc
+{
+  "id": "d_4",
+  "kind": "vaccination_age2",
+  "event_id": "vaccination_age2",
+  "display_category": null,
+  "title": "…", "text": "…",
+  "person_ids": ["…"],
+  "options": [
+    { "id": "d_4_yes", "label": "Yes",
+      "known_effects": [],              // stat spoilers (F5: hidden pre-choice)
+      "known_costs": [                  // §Choice costs v2 (2026-11-20): REAL,
+                                        //   already-public money costs only
+        {"kind": "money", "amount": 120}
+      ],                                // [] when the option is free — free is
+                                        //   real; never null, never omitted
+      "enabled": true, "reason": null,
+      "inputs": [] }
+  ]
+}
+```
+
+- **`known_costs` (FROZEN v2, A, 2026-11-20 — Codex feel-eval #2):** every
+  projected pending option carries `known_costs` — a list (never null,
+  never omitted; `[]` when free — free is real). Two dialects, both real
+  money charges: rule-owned options keep their **authored**
+  `known_costs` (`{"label", "amount"}`), e.g. wedding venues and lottery
+  tickets; event-file/M1 options get it **derived** from the option's
+  public money charge — the same figure the affordability gate enforces —
+  as `{"kind": "money", "amount": N}`. Stat effects stay in
+  `known_effects` and remain hidden pre-choice (F5); no invented prices,
+  no time/eligibility pseudo-costs (those stay in `reason`). Consumers
+  must tolerate both dialects and an empty list (never index `[0]`
+  blindly). The adapter passes the field through normalization verbatim
+  (B/C plumbing); clients format structured money costs, never
+  `String(object)`.
+
 Sheet behaviour (frozen by B): capped scrollable body, controls above the
 software keyboard, backdrop/Escape collapse to the "Decide later" pill —
 never discarding a server decision.
+
+## §Journal v2 (A, FROZEN v1, 2026-11-20 — feel-pass F4 + F2 server side)
+
+Two additive, server-owned pieces for the BitLife-style scrolling feed.
+
+### `journal_feed` (new field on `_state`, additive)
+
+The flat `journal` field is UNCHANGED (frozen §Home rendering keeps working).
+`journal_feed` is a **derived** regrouping of the same player-known-filtered
+entries — no new persistence, same chronological order, never mutated:
+
+```jsonc
+"journal_feed": [
+  {
+    "age": 2,                       // in-game age for the whole block
+    "header": "Age 2",              // server-authored header text (age only,
+                                    //   no year/turn/calendar — none exists)
+    "entries": [                    // every journal line of that age, in order
+      {"id": "j_12", "kind": "year"|"event"|"education"|"relationship"|
+             "decision"|"death"|...,
+       "text": "…", "person_ids": ["…"], "changes": {"happiness": -3}}
+    ]
+  }
+]
+```
+
+Guarantees (pinned by tests):
+
+- Every year the player lives through produces at least one block with the
+  aging line (`kind: "year"`, e.g. "Maya turned 6.") — including years
+  interrupted by a pending decision.
+- Blocks contain lines from all engine sources: aging, events, education
+  (school transitions/graduations), relationships (spend-time, and yearly
+  parent-relationship drift when it actually moved), decisions, deaths.
+- Blocks are keyed by `age` and ordered oldest → newest (feed scrolls up).
+- Client renders `header` per block and auto-scrolls to the newest block;
+  grouping never requires client-side age math over the flat journal.
+
+### F2 server side (player-facing text purity)
+
+Server-authored player-facing strings — journal/feed `text`, pending
+`title`/`text`, option `label`s and `reason`s — NEVER contain internal ids
+(`t_000003`), phase names (`year_close`), or cursor state. Machine fields
+(`turn`, `finances.last_closed_turn`) remain for dev/ledger use but are not
+player text and B's dev-only panel is their only renderer. Pinned by a test
+scanning the projected player-facing strings against
+`/\bt_\d{6}\b/|year_start|year_close|phase_id|item_cursor`.
+
+## §Decision outcome (A, FROZEN v1, 2026-11-20 — feel-pass F5, consumed by C)
+
+One additive field on `_state`, set by every successful `resolve_decision`
+(both the M1 template path and C's rule path), carrying ONLY what actually
+happened (capped values included):
+
+```jsonc
+"last_decision_outcome": null | {
+  "decision_id": "d_4",
+  "option_id": "take_it",
+  "text": "I took the offer.",            // first-person outcome line, same
+                                          //   text journaled for the choice
+  "person_ids": ["…player…", "…target…"],
+  "changes": {"happiness": -5, "money": -120},   // actual applied deltas
+  "relationship_changes": {"<person_id>": 4}     // optional, only when a
+                                                  //   relation moved
+}
+```
+
+Rules: `null` when nothing has been resolved (new game / legacy saves use
+`env.get`, never a KeyError) and also when the resolved outcome event is not
+player-visible — the captured event must pass the SAME server-side
+`player_known` gate as journal serialization (`audience`/`fact_id`), so this
+raw-projected field can never bypass privacy. Defense in depth: the capture
+persists the event's visibility metadata on the stored outcome, and the
+`_state` projection re-applies the same gate at serialization
+(`GameService._visible_outcome`), stripping the internal metadata keys —
+stored private metadata is re-filtered even at read time. Each resolve REPLACES the
+previous value; other commands (age_up, rule actions) never invent or clear
+it — C shows the popup from the resolve response itself, so no client-side
+dedupe tracking is needed. Relationship deltas are mapped per target person
+in `relationship_changes` `{person_id: delta}` (both M1 and rule paths); the
+summed scalar `changes.relationship` is journal legacy and ambiguous with
+multiple targets — consumers should prefer `relationship_changes`. The
+event-file auto outcomes (no player choice) are NOT included — this is
+decision-resolve only. Costs/eligibility `known_effects` on pending
+options stay as-is (F5 hides them pre-choice client-side); this field is the
+post-choice source of truth for the popup.
+
+## §Avatar defaults (A, FROZEN v1, 2026-11-20 — feel-pass F9 / Codex feel-eval #3)
+
+Server-side generation rules for **default** (non-user-edited) appearances,
+pinned by tests/test_game_v2_avatar_defaults.py:
+
+- **Gender-fitting accessories:** `facial_hair` is `"beard"` only for
+  man-based adults (25% roll), otherwise `"none"` — women never get a
+  beard. `headwear` is `"headscarf"` only for woman-based adults (15%
+  roll), otherwise `"none"`. The baby/child guardrail (no badges, no
+  facial hair, no headwear) is unchanged (`aging.aged_view` + generation).
+- **Household variety:** each person rolls independently from the
+  dedicated cosmetic `_APP_RNG` stream; two adults in one household never
+  collapse to the same base+accessory look by construction (man/woman
+  bases differ; accessory rates are low and gendered).
+- **User edits preserved:** `ensure_appearance`/`migrate_appearances`
+  NEVER reroll a valid stored appearance (any schema_version the model
+  accepts); generation runs only for missing/unparseable data, and
+  biological children still inherit via `inherit_appearance`
+  (facial hair starts "none" there — unchanged).
+- Cosmetic generation consumes only the dedicated cosmetic RNG stream —
+  it never perturbs gameplay RNG.
+
+## §Undo (A, FROZEN v1, 2026-11-20 — BACKLOG 'Undo last year', engine side)
+
+One level of undo for the last aged year. Snapshot + restore of the FULL
+envelope; no re-roll lever.
+
+### Projection (additive)
+
+```jsonc
+"can_undo": { "enabled": true, "reason": null }
+// enabled=false, reason="there is no year to undo"      (fresh game /
+//   snapshot consumed / cleared by continue_as)
+// enabled=false, reason="only one year can be undone"   (undo just used)
+```
+
+`undo_year` is ALSO advertised in `available_actions` (category `life`,
+label "Undo last year") with the same enabled/reason — one source
+(`GameService._can_undo`).
+
+### Command
+
+`command(game_id, expected_revision, request_id, "undo_year", {})` — in the
+whitelist alongside age_up/resolve_decision; allowed while a pending
+decision is open (the pending belongs to the undone year and vanishes with
+it) and while dead (restores the pre-year, living state).
+
+Semantics (pinned by tests):
+
+- **Snapshot:** at the start of every `age_up` execution the server stores
+  a full serialized copy of the pre-age envelope (ledger, people graph,
+  journal/feed, pendings, knowledge/facts, flags, replay ledger as of then,
+  `rng_state` + `cosmetic_rng_state`). One snapshot — each successful
+  `age_up` REPLACES it, so undo is always exactly "the last year".
+- **Restore:** `undo_year` validates and restores the entire snapshot:
+  stats/money via the ledger, relations/partner/children/dead/archive
+  graph, journal (the undone year's entries disappear), pendings,
+  knowledge records, and BOTH RNG streams. The snapshot is deserialized
+  through the **restricted save loader** (`safe_save.load_save` over a
+  `BytesIO` of the snapshot bytes — `SaveUnpickler` blocks unapproved
+  globals), never bare `pickle.loads`; the restored envelope is validated
+  before it is applied.
+- **Monotonic revision (Codex undo review, 2026-11-20):** undo restores
+  gameplay state, NOT the concurrency token. The response revision is
+  always `pre-undo revision + 1` (fresh 1 → Age 2 → Undo **3**, never
+  back to 2). A client holding a pre-undo revision goes
+  `stale_revision` — stale tabs can never mutate the restored timeline.
+  This holds even when the undone year spanned multiple commands (age +
+  several resolves): the revision never rewinds.
+- **Ambient RNG:** undo never touches process-global streams or the
+  cosmetic RNG binding — the restored `rng_state` /
+  `cosmetic_rng_state` are the single source of truth; the next
+  `_GameRNG` entry rehydrates the globals from them. `random.getstate()`,
+  `_COSMETIC_RNG.getstate()` and `integration._APP_RNG` identity are
+  identical before and after an undo.
+- **Anti-bypass / 18+ parity:** restoring the RNG streams means the next
+  `age_up` consumes the identical stream — the redone year replays
+  EXACTLY (same events, same eligibility/18+ gating outcomes). Undo is
+  never a re-roll. One level only: the snapshot is consumed by undo;
+  `continue_as` clears it (no cross-generation undo).
+- **Retry vs redo (frozen distinction):** the undone year's request_ids
+  leave the replay ledger with the rollback. A delayed **retry** of the
+  original operation — same request_id AND its original
+  `expected_revision` — is rejected with `stale_revision` (never a
+  byte-identical success, never a mutation of the restored timeline). An
+  **explicit redo** — same request_id resubmitted with the CURRENT
+  revision — is a new operation and re-executes the identical year
+  (deterministic via the restored streams). `undo_year`'s own retry
+  stays idempotent: same request_id + payload returns the stored
+  response unchanged (replay ledger is authoritative, checked before
+  the revision check).
+- Definitive errors are typed as everywhere else (`stale_revision`,
+  `busy` via the shell).
 
 ## §Editor navigation (A contract, FROZEN v1, 2026-11-18 — B implements in editor.js/game.js)
 
@@ -381,3 +620,129 @@ Exact-person Edit by ID (Stage 3):
   filters `alive !== false`), so a dead id falls back to no-selection.
 - Editor semantics (preview/apply, pending supersession, stale-revision
   refresh) are unchanged.
+
+## §Event — event modal card + outcome popup (integrated v2, 2026-11-20)
+
+Scope: feel-pass F5 + F6. `web/static/v2/event.js` + `v2/event.css` (C) is a
+drop-in replacement for the §Choice sheet renderer: B swaps the
+`mountChoiceSheet` import in game.js for `mountEventModal`; the sheet's frozen
+behaviour (no invented options/reasons, collapse never discards, one in-flight
+resolve, initial focus, naming/per-option inputs) is retained unchanged.
+
+### Mount API (frozen for B)
+
+```js
+const sheet = mountEventModal(box, {
+  decision,          // normalized decision (§Choice shape, unchanged)
+  people,            // public resolved person objects for decision.personIds
+  playerId,          // excludes the player from main portrait and person chips
+  playerAge,
+  outcome,           // optional: show a safely retried resolution directly
+  onResolve(optId, inputs),  // MUST return a Promise resolving to the
+                             //   outcome object (§Outcome below) or null
+  onCollapse(),              // "Decide later" — NEVER discards the decision
+  onError(message),
+  onPersonClick?(id),
+  onClose(),                 // after the outcome popup's Continue (or when
+                             //   the outcome is absent)
+  renderAvatar?(el, appearance, age, size),  // default: common.js renderAvatar
+});
+// → { firstEnabled, unmount() }   — same return shape as mountChoiceSheet
+```
+
+- The adapter exposes `lastDecisionOutcome: raw.last_decision_outcome || null`.
+  game.js returns that outcome only when its decision_id and option_id match
+  the resolve being displayed. The shell preserves an outcome until Continue,
+  then opens any next authoritative pending decision. Safe retries can mount
+  the matching outcome directly; ordinary rerenders do not replay it. Frozen §Shell
+  promise semantics otherwise unchanged (rejections still typed; uncertain
+  failures still settle null with the pill owning the outcome).
+- The module renders into `box` (the existing `.modal-box`); it preserves any
+  child with `id === "modalCancel"` exactly like the old sheet.
+- **F5 pre-choice rule:** option buttons render `label` + real costs/reasons
+  only: `knownCosts` (money costs; `$0` renders "Free") on any option that
+  carries them, and the server `reason` on disabled options (title + visible
+  text). `knownEffects` (stat-effect ranges like "-happiness (25-35)") are
+  NEVER rendered before choosing. Nothing else is synthesized.
+- **F6:** the module renders a centered modal card (`v2e-card`), not a bottom
+  sheet: header = the OTHER person's avatar (first non-player in `people`,
+  via `renderAvatar`; omitted when no other participant is available) + title + the frozen §Choice age/category chip. B centers
+  `.modal-box` in `#modal` via theme.css (flex overlay, dimmed backdrop);
+  event.css carries a `#modal:has(.v2e-card)` fallback so a bare test host
+  also centers.
+
+### §Outcome (frozen for A — the resolve result C's popup shows)
+
+The authoritative shape is **§Decision outcome (FROZEN v1)** above.
+`last_decision_outcome` is retained on subsequent states; clients display it
+only for the matching successful resolution or safe retry:
+
+```jsonc
+"last_decision_outcome": {
+  "decision_id": "d_1", "option_id": "truth",
+  "text": "You told your mother the truth. She went quiet.",  // first-person
+                                                              // outcome line
+  "changes": { "happiness": -12, "money": -200, "relationship": -8 },
+  "person_ids": ["p_mom"],         // public people the event involved
+  "relationship_changes": {"p_mom": -8} // optional actual per-person deltas
+}
+```
+
+- `changes` keys ⊆ `money|happiness|health|smarts|looks|relationship`, int
+  deltas actually applied (post-cap), nonzero only, `{}` when nothing moved.
+  These are the same values `_cmd_resolve_decision` already computes for the
+  journal `changes`; the outcome just surfaces them (plus the formatted
+  outcome text) on the response instead of only in the journal.
+- `text` is the formatted `option["_outcome"]` line (player-known filtered).
+- The popup is skipped (module calls `onClose()`) when the field is absent
+  (older server, replay-ledger replay, or uncertain failure — the pill owns
+  that outcome). The module never fabricates deltas or text.
+- Client rendering: each change = label + signed value, green/red per sign
+  (`--v2-bar-good`/`--v2-bar-bad`, AA-compliant), numeric labels always
+  shown; `money` uses `$` formatting. relationship = "Relationship".
+
+### Codex integration invariants (F5/F10/F11)
+
+- Normalized option `knownCosts` preserves server `known_costs`; structured
+  `{kind:"money", amount:N}` renders a money amount, never an object string.
+  Stat-effect forecasts stay hidden.
+- `relationship_changes` renders signed rows per public participant name;
+  unknown IDs never appear as player-facing labels. It supersedes a generic
+  aggregate relationship row when both are present.
+- Main portrait and participant chips exclude `playerId`; other participants
+  retain their existing chip navigation. Modal/outcome controls own focus while the background is inert.
+- A resolution and its outcome block Age; Continue opens the next pending
+  choice without advancing time. Escape can collapse a pending decision but
+  cannot dismiss an in-flight resolution or its outcome.
+
+## §Journal flavour — yearly lines (C content + selector, FROZEN v1, 2026-11-20; A hook WIRED)
+
+C owns `src/game/content/journal/yearly_lines.py`: an original pool of 176
+first-person lines across six age bands (baby 0-1, toddler 2-4, child 5-12,
+teen 13-17, adult 18-64, elder 65+) plus the selection algorithm.
+Condition dialect (observer-safe, player-known only): stat min/max,
+flags (employed/partner/children/mother/father/ill/dropped_out/retired),
+school stage, role_relation min/max.
+
+### A hook (one call in `_cmd_age_up`, replacing the dull default)
+
+```python
+from src.game.content.journal.yearly_lines import year_journal_line
+text = year_journal_line(env, {
+    "education": self._education_view(player),
+    "work": self._work_view(player),
+})
+self._journal(env, "year", text or f"{player.firstname} turned {player.age}.",
+              [player.person_id], changes)
+```
+
+Guarantees the selector provides (pinned by tests/test_journal_yearly_lines.py):
+- Draws ONLY from the cosmetic stream (`integration._APP_RNG`, mounted per
+  command) — never consumes simulation randomness, so gameplay streams are
+  unchanged and picks are deterministic per save.
+- No repeats: `env["journal_line_recents"]` (additive env key, pickled with
+  the save) excludes the last 60 picks; a line id never repeats within the
+  window while its band has any other eligible line.
+- Age fit: only the line's own band is eligible for the player's age.
+- `None` when nothing fits → A keeps the existing default text (behaviour
+  unchanged for legacy saves; recents initialize empty).

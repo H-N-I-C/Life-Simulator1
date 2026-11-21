@@ -160,7 +160,7 @@ class LoaderOracleTest(unittest.TestCase):
             pending = EventEngine.instantiate(
                 ev, 1, "Test", rng=random.Random(seed), context=ctx)
             beg = pending["options"][1]
-            if beg["_outcome"].startswith("They dumped"):
+            if (beg["_structural"] or {}).get("lose_partner"):
                 insists += 1
         self.assertAlmostEqual(insists / trials, 0.75, delta=0.08)
 

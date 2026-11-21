@@ -11,3 +11,18 @@
 - A: snapshot the full game state before each Age; restore = revert to that snapshot (ledger, graph, knowledge, pendings, RNG state). One level or N levels TBD in the contract; it must be replay-safe (request_id/revision); never lets an 18+ rule or a death be bypassed in a way the forward path wouldn't allow.
 - B: an "Undo year" button on Home (disabled with a reason when there is no snapshot), with confirmation.
 - D: browser test: age → undo → age gives a consistent state; money is conserved.
+
+## Polish found in Claude's play check (2026-11-20, after the undo/journal round)
+- Event-outcome journal lines lack context ("I read all four and returned…", "I gave them nothing…"): prefix with or merge in the event's prompt (C).
+- The father's chip avatar renders as a dark-red blob at small size (appearance/web).
+- "I am starting middle school" has no period / tone mismatch with the new lines (legacy text).
+
+## M4, deferred from Kimi A's overloaded task (2026-11-21): A's NEXT task, one at a time
+- the person view for social-circle NPCs (Person page 404s for classmates/coworkers)
+- NPC surnames shouldn't reuse the family surname unless related
+- the legacy new_friend event → a real Friends-group friend
+- classmates fade to 'former classmates' after graduation
+- (C, next task) relationship drift lines are age-inappropriate for babies/toddlers: at age 1, 'I helped Mum out more around the house'. Baby/toddler bands need age-true lines, or none.
+- (A, later) A's relationship_lines.py also gives babies/toddlers grown-up lines ('My relationship with {name} grew stronger this year' at age 1); same age-fit treatment as C did.
+- (A, next) the person view labels a classmate as 'relative' in the Person page header; use the social kind/circle ('Classmate · Acquaintance').
+- (A, next) the social-NPC surname generator must exclude family surnames (D liveness: Wilfred Stafford collision, 1/20).

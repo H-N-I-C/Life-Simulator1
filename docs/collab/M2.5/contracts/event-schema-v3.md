@@ -83,6 +83,23 @@ composing only the following new leaf conditions:
 | `kinship` | A | `graph_relatedness(a, b).category` in `[]` / `coefficient_band` in `[]` |
 | `milestone` | C parenting | child bound at role has recorded milestone `id` |
 | `bound` | engine | role X was bound non-null |
+| `active_assignment` | A careers (M3) | actor has an ACTIVE named-career assignment; optional `role_id` / `role_ids` narrows to specific roles (read-only envelope probe) |
+| `active_enrollment` | B education (M3) | actor has an ACTIVE program enrollment; optional `program_id` / `program_ids` narrows to specific programs (read-only envelope probe) |
+| `social_kind` | A social (M4) | actor has an active social edge of a kind in `kinds[]` (`friend/best_friend/acquaintance/rival/bully`) to `role_b` (default: the actor's own record probe is invalid — `role_b` expected) |
+| `min_closeness` | A social (M4) | closeness of the actor↔`role_b` edge ≥ `min`; without `role_b`, any active social contact qualifies |
+| `in_circle` | A social (M4) | actor has ≥1 person in `circle` (`school`/`work`/`clubs`/`friends`) |
+| `popularity_band` | A social (M4) | actor popularity score within `[lo, hi]` |
+| `social_arc` | A social (M4) | bullying arc between actor and `role_b` is at a stage in `stage`/`stages[]` (`targeted/escalated/resolving/ended`); a live `bully` edge without an explicit arc field reads as `targeted` |
+| `in_club` | A social (M4) | actor is an active member of the club(s) `club_id`/`club_ids[]` |
+
+M4 also adds the non-romantic interaction kind `social_invite` (records
+carry `venue_label` and `adults_only`; the 18+ venue gate is enforced
+by the resolve applier even if content forgets it) and the domain effect
+`bullying_response` (one of `tell_someone/stand_up/avoid/befriend`,
+applied per `src/game/content/social/bullying.json`). A generic
+`min_stat` tree leaf (`{"kind": "min_stat", "stat": "happiness",
+"value": 40}`) mirrors the legacy requires-clause floor for the v3
+condition tree.
 
 The `18+` rule is NOT a condition: every v3 event with
 `interaction: romantic` (see §3) is tagged at validation and the engine

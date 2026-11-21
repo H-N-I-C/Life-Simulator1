@@ -1,0 +1,58 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 119,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Andrea at Aubert\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Amargo",
+    "last_name": "Carlton",
+    "gender": "female",
+    "country": "Japan",
+    "seed": 1514364845,
+    "request_id": "robot-41-119-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_f4c033b2f6",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r5790",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_f4c033b2f6",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Andrea",
+    "employer_id": "Aubert"
+   },
+   "request_id": "robot-41-r5791",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Andrea at Aubert\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 120 --seed 41 --from-life 119 --fail-fast"
+}

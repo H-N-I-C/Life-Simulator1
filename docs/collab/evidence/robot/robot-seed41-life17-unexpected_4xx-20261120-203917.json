@@ -1,0 +1,81 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 17,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alonzo",
+    "last_name": "Atkins",
+    "gender": "male",
+    "country": "Nigeria",
+    "seed": 1540721356,
+    "request_id": "robot-41-17-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 965844072,
+     "base": "man",
+     "skin_tone": "default",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "cap"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_5a71e81c91",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r1207",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_5a71e81c91",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r1208",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_5a71e81c91",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+    "employer_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+   },
+   "request_id": "robot-41-r1209",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 18 --seed 41 --from-life 17 --fail-fast"
+}

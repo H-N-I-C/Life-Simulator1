@@ -1,0 +1,306 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 73,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: N at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Anders",
+    "last_name": "Marsh",
+    "gender": "male",
+    "country": "USA",
+    "seed": 777,
+    "request_id": "robot-41-73-create",
+    "scenario": "graduating_18"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3905",
+   "expected_revision": 32
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r3906",
+   "expected_revision": 33
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3907",
+   "expected_revision": 34
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_14",
+    "option_id": "d_14_confront"
+   },
+   "request_id": "robot-41-r3908",
+   "expected_revision": 35
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_15",
+    "option_id": "d_15_say_something"
+   },
+   "request_id": "robot-41-r3909",
+   "expected_revision": 36
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "a25cde28-4893-4c35-ae03-b093924106c3"
+   },
+   "request_id": "robot-41-r3910",
+   "expected_revision": 37
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "doctor",
+   "payload": {},
+   "request_id": "robot-41-r3911",
+   "expected_revision": 38
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_16",
+    "option_id": "back"
+   },
+   "request_id": "robot-41-r3912",
+   "expected_revision": 39
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3913",
+   "expected_revision": 40
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r3914",
+   "expected_revision": 41
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3915",
+   "expected_revision": 42
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_17",
+    "option_id": "d_17_embrace"
+   },
+   "request_id": "robot-41-r3916",
+   "expected_revision": 43
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_18",
+    "option_id": "d_18_reject"
+   },
+   "request_id": "robot-41-r3917",
+   "expected_revision": 44
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3918",
+   "expected_revision": 45
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_19",
+    "option_id": "d_19_walk"
+   },
+   "request_id": "robot-41-r3919",
+   "expected_revision": 46
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "lottery",
+   "payload": {},
+   "request_id": "robot-41-r3920",
+   "expected_revision": 47
+  },
+  {
+   "n": 17,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "lottery",
+   "payload": {},
+   "request_id": "robot-41-r3920",
+   "expected_revision": 47
+  },
+  {
+   "n": 18,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_20",
+    "option_id": "back"
+   },
+   "request_id": "robot-41-r3922",
+   "expected_revision": 48
+  },
+  {
+   "n": 19,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "courtship_offer",
+   "payload": {
+    "target_id": "69e2006c-8cab-4413-af72-f02fbfcc27f6"
+   },
+   "request_id": "robot-41-r3923",
+   "expected_revision": 49
+  },
+  {
+   "n": 20,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_21",
+    "option_id": "d_0_back_out"
+   },
+   "request_id": "robot-41-r3924",
+   "expected_revision": 50
+  },
+  {
+   "n": 21,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_21",
+    "option_id": "d_0_back_out"
+   },
+   "request_id": "robot-41-r3924",
+   "expected_revision": 50
+  },
+  {
+   "n": 22,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3926",
+   "expected_revision": 51
+  },
+  {
+   "n": 23,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_22",
+    "option_id": "d_22_give_chance"
+   },
+   "request_id": "robot-41-r3927",
+   "expected_revision": 52
+  },
+  {
+   "n": 24,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3928",
+   "expected_revision": 53
+  },
+  {
+   "n": 25,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_23",
+    "option_id": "d_23_o2"
+   },
+   "request_id": "robot-41-r3929",
+   "expected_revision": 54
+  },
+  {
+   "n": 26,
+   "kind": "command",
+   "game_id": "g_a4e80a99c5",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "N",
+    "employer_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+   },
+   "request_id": "robot-41-r3930",
+   "expected_revision": 55
+  },
+  {
+   "n": 27,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: N at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 74 --seed 41 --from-life 73 --fail-fast"
+}

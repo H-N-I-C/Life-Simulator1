@@ -15,7 +15,7 @@
  * envelope. Numeric scores are never shown (frozen decision 4); reason
  * words are bounded phrases.
  */
-import { renderAvatar, miniPersonChip } from "../../common.js";
+import { renderAvatar, miniPersonChip, formatMoney } from "../../common.js";
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => (
@@ -328,7 +328,7 @@ function renderDating(card) {
 
 /* ------------------------------- weddings */
 
-function moneyFmt(n) { return "$" + Number(n).toLocaleString(); }
+function moneyFmt(n) { return formatMoney(n); }
 
 function renderWeddings(card) {
   const s = hooks.getState();

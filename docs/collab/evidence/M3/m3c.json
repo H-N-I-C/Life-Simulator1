@@ -1,0 +1,77 @@
+{
+ "counts": {
+  "PASS": 10
+ },
+ "rows": [
+  {
+   "check": "j7_contrasting_starts",
+   "step": "contrasting_starts",
+   "title": "Four scenario starts: legal actions + clean mount",
+   "status": "PASS",
+   "detail": "starts aged legally with free actions: graduating_18, unemployed_18, enrolled_child_10, employed_30"
+  },
+  {
+   "check": "j8_legacy_university",
+   "step": "legacy_university",
+   "title": "uv_years save: no invented records, gate lifts after the course",
+   "status": "PASS",
+   "detail": "legacy uv_years course resumed, finished and gated enrollment; then care_diploma enrolled via normal action, no invented credential"
+  },
+  {
+   "check": "ladder_electrical",
+   "step": "climb",
+   "title": "apprentice -> electrician -> senior -> site supervisor",
+   "status": "PASS",
+   "detail": "role site_supervisor reached in 8 years, history [('app_electrician', 'left'), ('app_electrician', 'promoted'), ('electrician', 'promoted'), ('senior_electrician', 'left')], money 141731"
+  },
+  {
+   "check": "ladder_office",
+   "step": "climb",
+   "title": "assistant -> coordinator -> specialist -> manager",
+   "status": "PASS",
+   "detail": "role operations_manager reached in 6 years, history [('app_electrician', 'left'), ('office_assistant', 'promoted'), ('coordinator', 'promoted'), ('operations_specialist', 'left')], money 147722"
+  },
+  {
+   "check": "ladder_healthcare",
+   "step": "climb",
+   "title": "care assistant -> qualified care worker -> nurse -> senior nurse",
+   "status": "PASS",
+   "detail": "role senior_nurse reached in 10 years, history [('care_assistant', 'left'), ('qualified_care_worker', 'left'), ('app_electrician', 'left'), ('nurse', 'left')], money 67503"
+  },
+  {
+   "check": "j11_promotion_unavailable",
+   "step": "unavailable_reason",
+   "title": "operations_manager@meridian probe (real-play climb first)",
+   "status": "PASS",
+   "detail": "unavailable promotion refused with the real reason: Meridian Office Group has no internal promotion to Operations manager \u2014 resign and apply there to change employer"
+  },
+  {
+   "check": "j12_alt_route_accumulates",
+   "step": "accumulates",
+   "title": "8 recorded qualified-care years admit the player",
+   "status": "PASS",
+   "detail": "nurse reached via the 8-year alternative route (5+3 recorded years across two stints, no degree)"
+  },
+  {
+   "check": "j12_alt_route_below_threshold",
+   "step": "below_threshold",
+   "title": "7 recorded years refuse with the 8-year reason",
+   "status": "PASS",
+   "detail": "7 recorded years refused with the exact alternative-route reason: you need Bachelor of Nursing + experience as Qualified care worker or 8 years as a Qualified care worker"
+  },
+  {
+   "check": "j9_money_conservation",
+   "step": "conservation",
+   "title": "Employed year: integer delta equals signed ledger sum",
+   "status": "PASS",
+   "detail": "t_000051: delta 16904 == sum of 3 legs {'income': 40959, 'tax': -4759, 'expenses': -19296}"
+  },
+  {
+   "check": "j10_visual_pass",
+   "step": "visual_pass",
+   "title": "4 screens at both widths",
+   "status": "PASS",
+   "detail": "Home + 4 tabs x 390/320: no overflow, no console errors, money format clean, screenshots captured"
+  }
+ ]
+}

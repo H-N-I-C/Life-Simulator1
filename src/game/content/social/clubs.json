@@ -1,0 +1,157 @@
+{
+ "schema_version": 1,
+ "_comment": "M4 club/team catalog (Kimi C). Content data only: membership state is A's env['social_state']['circles']['clubs'], written ONLY via social.join_club/leave_club. Card fields (label/category/meets_label/cost_per_year/adults_only) match B's projection; gate fields (school stages, min_age/max_age, popularity_delta, member_cap) are enforced by A's appliers with C's precise reasons before any mutation or spend.",
+ "clubs": [
+  {
+   "id": "chess_club",
+   "label": "Chess club",
+   "category": "school",
+   "school": {
+    "stages": [
+     "elementary",
+     "middle",
+     "high"
+    ]
+   },
+   "min_age": 6,
+   "max_age": 17,
+   "adults_only": false,
+   "meets_label": "Tuesdays after class",
+   "cost_per_year": 0,
+   "popularity_delta": 1,
+   "member_cap": 12
+  },
+  {
+   "id": "school_soccer",
+   "label": "School football team",
+   "category": "sport",
+   "school": {
+    "stages": [
+     "middle",
+     "high"
+    ]
+   },
+   "min_age": 10,
+   "max_age": 17,
+   "adults_only": false,
+   "meets_label": "Wednesday and Saturday training",
+   "cost_per_year": 20,
+   "popularity_delta": 3,
+   "member_cap": 18
+  },
+  {
+   "id": "drama_club",
+   "label": "Drama club",
+   "category": "arts",
+   "school": {
+    "stages": [
+     "elementary",
+     "middle",
+     "high"
+    ]
+   },
+   "min_age": 6,
+   "max_age": 17,
+   "adults_only": false,
+   "meets_label": "Thursdays in the hall",
+   "cost_per_year": 10,
+   "popularity_delta": 2,
+   "member_cap": 15
+  },
+  {
+   "id": "science_club",
+   "label": "Science club",
+   "category": "school",
+   "school": {
+    "stages": [
+     "middle",
+     "high"
+    ]
+   },
+   "min_age": 11,
+   "max_age": 17,
+   "adults_only": false,
+   "meets_label": "Monday lunch in lab 2",
+   "cost_per_year": 5,
+   "popularity_delta": 1,
+   "member_cap": 10
+  },
+  {
+   "id": "debate_club",
+   "label": "Debate club",
+   "category": "school",
+   "school": {
+    "stages": [
+     "high"
+    ]
+   },
+   "min_age": 13,
+   "max_age": 17,
+   "adults_only": false,
+   "meets_label": "Fridays after class",
+   "cost_per_year": 0,
+   "popularity_delta": 2,
+   "member_cap": 12
+  },
+  {
+   "id": "art_class",
+   "label": "Community art class",
+   "category": "arts",
+   "min_age": 16,
+   "max_age": 150,
+   "adults_only": false,
+   "meets_label": "Tuesday evenings at the community centre",
+   "cost_per_year": 60,
+   "popularity_delta": 1,
+   "member_cap": 15
+  },
+  {
+   "id": "harbour_run_club",
+   "label": "Harbour Runners",
+   "category": "sport",
+   "min_age": 18,
+   "max_age": 150,
+   "adults_only": true,
+   "meets_label": "Saturday mornings, meet at the harbour bar",
+   "cost_per_year": 50,
+   "popularity_delta": 2,
+   "member_cap": 20
+  },
+  {
+   "id": "book_club",
+   "label": "Book club",
+   "category": "social",
+   "min_age": 18,
+   "max_age": 150,
+   "adults_only": true,
+   "meets_label": "First Thursday of the month, members' homes",
+   "cost_per_year": 0,
+   "popularity_delta": 1,
+   "member_cap": 10
+  },
+  {
+   "id": "volunteer_kitchen",
+   "label": "Soup kitchen volunteers",
+   "category": "social",
+   "min_age": 14,
+   "max_age": 150,
+   "adults_only": false,
+   "meets_label": "Sunday afternoons downtown",
+   "cost_per_year": 0,
+   "popularity_delta": 3,
+   "member_cap": 15
+  },
+  {
+   "id": "bowling_league",
+   "label": "Weekend bowling league",
+   "category": "sport",
+   "min_age": 18,
+   "max_age": 150,
+   "adults_only": true,
+   "meets_label": "Sunday nights at the lanes",
+   "cost_per_year": 80,
+   "popularity_delta": 2,
+   "member_cap": 16
+  }
+ ]
+}

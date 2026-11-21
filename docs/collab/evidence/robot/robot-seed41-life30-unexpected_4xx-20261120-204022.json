@@ -1,0 +1,115 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 30,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: N at Alic\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aloysia",
+    "last_name": "Jones",
+    "gender": "female",
+    "country": "Canada",
+    "seed": 817872963,
+    "request_id": "robot-41-30-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1260142031,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_06",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_6444c7c443",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r1937",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_6444c7c443",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r1938",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_6444c7c443",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-41-r1939",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_6444c7c443",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r1940",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_6444c7c443",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r1941",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_6444c7c443",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_tantrum"
+   },
+   "request_id": "robot-41-r1942",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_6444c7c443",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "N",
+    "employer_id": "Alic"
+   },
+   "request_id": "robot-41-r1943",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: N at Alic\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 31 --seed 41 --from-life 30 --fail-fast"
+}

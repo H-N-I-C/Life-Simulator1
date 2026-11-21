@@ -1,0 +1,106 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 83,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Ambrosi at N\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alix",
+    "last_name": "Petersen",
+    "gender": "female",
+    "country": "Canada",
+    "seed": 1498396739,
+    "request_id": "robot-41-83-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1555710227,
+     "base": "person",
+     "skin_tone": "medium",
+     "hair": "default",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_d012e11703",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r4368",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_d012e11703",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r4369",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_d012e11703",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r4370",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_d012e11703",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r4371",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_d012e11703",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r4372",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_d012e11703",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Ambrosi",
+    "employer_id": "N"
+   },
+   "request_id": "robot-41-r4373",
+   "expected_revision": 5
+  },
+  {
+   "n": 8,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Ambrosi at N\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 84 --seed 41 --from-life 83 --fail-fast"
+}

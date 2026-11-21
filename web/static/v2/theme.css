@@ -15,7 +15,7 @@
 :root {
   --v2-font: "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
   --v2-accent: #2a63e6;
-  --v2-accent-2: #3a7bfd;
+  --v2-accent-2: #2865dd;
   --v2-ink: #16203a;
   --v2-ink-soft: #2b3550;
   --v2-muted: #6b7690;
@@ -34,11 +34,12 @@
   --v2-shadow: 0 4px 16px rgba(22, 32, 58, .10);
   --v2-gap: 10px;
   --v2-header-h: 64px;
-  --v2-tabbar-h: 64px;
-  --v2-age-good: #1fb35a;
-  --v2-age-good-dark: #10783a;
-  --v2-age-grad: radial-gradient(circle at 35% 30%, #4ee08a 0%,
-                                #1fb35a 60%, #169247 100%);
+  --v2-tabbar-h: 72px;
+  --v2-dock-h: 48px;
+  --v2-age-good: #15803d;
+  --v2-age-good-dark: #064e27;
+  --v2-age-grad: radial-gradient(circle at 35% 30%, #15803d 0%,
+                                #10783a 60%, #08632f 100%);
   --v2-danger: #b91c1c;
   --v2-focus: #2f6fed;
 }
@@ -47,7 +48,7 @@
  * Only needed where a module defines its own defaults on its root. */
 .v2p-root {
   --v2-accent: #2a63e6;
-  --v2-accent-2: #3a7bfd;
+  --v2-accent-2: #2865dd;
   --v2-ink: #16203a;
   --v2-ink-soft: #2b3550;
   --v2-muted: #6b7690;
@@ -63,12 +64,28 @@
 }
 
 /* ---- v2 scope ------------------------------------------------------- */
+/* Full-screen in-game (feel-pass F1): the website topbar is display:flex
+ * in style.css, which would beat the hidden attribute — force it off. */
+.topbar[hidden] { display: none !important; }
+/* A running life is a full-bleed mobile app, not a 480px website column. */
+main:has(> #gameView:not([hidden])) {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
 .v2-scope {
   font-family: var(--v2-font);
   background: var(--v2-page);
   color: var(--v2-ink);
   min-height: 100vh;
   min-height: 100dvh;
+  /* F4/F12: the app shell is viewport-constrained so the scroll region
+   * OWNS the overflow (a growing page broke feed-follow and the history
+   * scroll save/restore, which reads .v2-scroll.scrollTop). */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -84,13 +101,17 @@
   outline-offset: 2px;
 }
 
-/* The scroll region: all screens live here, tab bar is outside it so it
- * can never cover the last journal entry. */
+/* The scroll region: all screens live here; the fixed stats dock and tab
+ * bar sit below it so they can never cover the last journal entry. */
 .v2-scroll {
   flex: 1 1 auto;
+  min-height: 0;        /* flex child must be allowed to shrink so the
+                          * region owns overflow instead of growing (F4) */
+  min-width: 0;
   overflow-y: auto;
   padding: 12px 14px
-           calc(var(--v2-tabbar-h) + env(safe-area-inset-bottom, 0px) + 12px);
+           calc(var(--v2-tabbar-h) + var(--v2-dock-h) +
+                env(safe-area-inset-bottom, 0px) + 24px);
 }
 
 .v2-scope .screen[hidden] { display: none; }
@@ -112,6 +133,18 @@
 }
 
 .v2-header-id { flex: 1 1 auto; min-width: 0; }
+.v2-header-namerow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.v2-header-namerow:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
 .v2-header-name {
   font-size: 17px;
   font-weight: 900;
@@ -119,11 +152,12 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 0 1 auto;
 }
 .v2-header-sub {
   font-size: 12.5px;
   font-weight: 700;
-  opacity: .9;
+  opacity: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -139,7 +173,7 @@
   font-size: 10px;
   font-weight: 800;
   letter-spacing: .4px;
-  opacity: .85;
+  opacity: 1;
 }
 
 .v2-header-btn {
@@ -156,18 +190,7 @@
   font-family: inherit;
 }
 
-.v2-home-link {
-  border: 0;
-  background: transparent;
-  color: #fff;
-  font: inherit;
-  font-weight: 900;
-  font-size: 17px;
-  cursor: pointer;
-  padding: 8px 4px;
-  border-radius: 10px;
-}
-.v2-home-link[aria-current="page"] {
+.v2-header-namerow[aria-current="page"] .v2-header-name {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
@@ -203,7 +226,8 @@
 }
 .v2-more button:hover { background: var(--v2-page); }
 
-/* ---- tab bar -------------------------------------------------------- */
+/* ---- tab bar (feel-pass F3): Occupation · Assets · AGE · Relationships ·
+ * Activities; ONE big round Age button centred in the bar. */
 .v2-tabbar {
   position: fixed;
   left: 0;
@@ -218,6 +242,8 @@
   box-shadow: 0 -4px 16px rgba(22, 32, 58, .10);
   padding: 6px 4px
            calc(6px + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  height: calc(var(--v2-tabbar-h) + env(safe-area-inset-bottom, 0px));
   min-height: var(--v2-tabbar-h);
 }
 
@@ -229,7 +255,7 @@
   color: var(--v2-muted);
   font: inherit;
   font-weight: 800;
-  font-size: 11px;
+  font-size: 10.5px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -238,12 +264,17 @@
   cursor: pointer;
   border-radius: 12px;
   padding: 4px 2px;
+  transition: transform .14s ease, background-color .14s ease,
+              color .14s ease;
 }
 .v2-tab .v2-tab-ic {
   font-size: 19px;
   font-weight: 900;
   line-height: 1;
+  transition: transform .14s ease;
 }
+.v2-tab:hover { background: var(--v2-page); }
+.v2-tab:active { transform: scale(.92); background: var(--v2-page); }
 .v2-tab[aria-current="page"] {
   color: var(--v2-accent);
 }
@@ -251,8 +282,152 @@
   transform: translateY(-1px);
 }
 
-/* Age button is owned by the Home screen (Stage 2); shell styles only the
- * frozen tokens it consumes. */
+/* The one big Age button (F3/F8): pops up out of the bar, presses in with
+ * a 120 ms scale, ticks while a year resolves. */
+.v2-agebtn {
+  flex: 0 0 auto;
+  align-self: center;
+  width: 68px;
+  height: 68px;
+  margin: 0 2px;
+  transform: translateY(-16px);
+  border: 4px solid var(--v2-card);
+  border-radius: 50%;
+  background: var(--v2-age-grad);
+  box-shadow: 0 5px 0 var(--v2-age-good-dark),
+              0 10px 22px rgba(31, 179, 90, .45);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-family: inherit;
+  transition: transform .12s ease, box-shadow .12s ease, filter .16s ease;
+}
+.v2-agebtn-plus { font-size: 26px; font-weight: 900; }
+.v2-agebtn-word { font-size: 13px; font-weight: 900; letter-spacing: .5px; }
+.v2-agebtn:active {
+  transform: translateY(-11px) scale(.94);
+  box-shadow: 0 2px 0 var(--v2-age-good-dark),
+              0 5px 12px rgba(31, 179, 90, .40);
+}
+.v2-agebtn.busy { filter: saturate(.7) brightness(1.05); }
+.v2-agebtn:disabled {
+  cursor: not-allowed;
+  filter: grayscale(.55) brightness(.96);
+  box-shadow: 0 3px 0 var(--v2-age-good-dark);
+}
+
+/* ---- stats dock (feel-pass F7): pinned above the bottom bar ---------- */
+.v2-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--v2-tabbar-h) + env(safe-area-inset-bottom, 0px));
+  z-index: 19;
+  background: rgba(255, 255, 255, .92);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid var(--v2-track);
+  /* Keep tracks and gate reasons above the protruding Age circle. */
+  padding: 6px 10px 22px;
+}
+.v2-dock[hidden] { display: none; }
+
+.v2-statsbar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.v2-stat { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.v2-stat-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 900;
+}
+.v2-stat-label { color: var(--v2-ink); overflow: hidden;
+                 text-overflow: ellipsis; white-space: nowrap; }
+.v2-stat-value { color: var(--v2-ink-soft); }
+.v2-stat-track {
+  height: 6px;
+  background: var(--v2-track);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.v2-stat-fill { height: 6px; border-radius: 999px; }
+.v2-stat-fill.animate { transition: width .18s ease; }
+
+/* Brief green/red flash when a stat changes (F8); the number is the
+ * primary signal, colour never the only one. */
+@keyframes v2-stat-flash-up {
+  0% { background-color: rgba(21, 128, 61, .25); }
+  100% { background-color: transparent; }
+}
+@keyframes v2-stat-flash-down {
+  0% { background-color: rgba(220, 38, 38, .22); }
+  100% { background-color: transparent; }
+}
+.v2-stat.up { animation: v2-stat-flash-up .5s ease; border-radius: 8px; }
+.v2-stat.down { animation: v2-stat-flash-down .5s ease; border-radius: 8px; }
+
+/* One-line Age gate reason, directly above the bar. */
+.v2-agenote {
+  padding: 3px 2px 0;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--v2-muted);
+  text-align: center;
+}
+.v2-agenote[hidden] { display: none; }
+
+/* §Undo: slim row above the stats — spec-driven, two-tap confirm. */
+.v2-undorow {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 2px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 2px 4px;
+}
+.v2-undorow[hidden] { display: none; }
+.v2-undo {
+  flex-shrink: 0;
+  min-height: 32px;
+  border: 1.5px solid var(--v2-track);
+  background: var(--v2-card);
+  color: var(--v2-ink-soft);
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 11.5px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform .14s ease, background-color .14s ease,
+              border-color .14s ease;
+}
+.v2-undo:hover { border-color: var(--v2-accent); }
+.v2-undo:active { transform: scale(.95); }
+.v2-undo.confirm {
+  background: var(--v2-danger, #b91c1c);
+  border-color: transparent;
+  color: #fff;
+}
+.v2-undo:disabled {
+  cursor: not-allowed;
+  opacity: .65;
+}
+.v2-undo-reason {
+  min-width: 0;
+  text-align: center;
+  overflow-wrap: anywhere;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--v2-muted);
+}
 
 /* ---- person overlay host -------------------------------------------- */
 .v2-person-host[hidden] { display: none; }
@@ -274,82 +449,134 @@
   font-weight: 700;
 }
 
-/* ---- v2 Home (contracts.md §Home) ------------------------------------ */
+/* ---- v2 Home (F4/F12: viewport-filling chronological feed) ----------- */
 .v2h-root {
   display: flex;
   flex-direction: column;
   gap: var(--v2-gap);
 }
+.v2h-dead { margin-top: var(--v2-gap); }
 
-.v2h-agebar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 0 2px;
-}
-
-.v2h-age {
-  width: 88px;
-  height: 88px;
-  border: 0;
-  border-radius: 50%;
-  background: var(--v2-age-grad);
-  box-shadow: 0 5px 0 var(--v2-age-good-dark),
-              0 8px 20px rgba(31, 179, 90, .40);
-  color: #fff;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-  font-family: inherit;
-}
-.v2h-age-plus { font-size: 30px; font-weight: 900; }
-.v2h-age-word { font-size: 14px; font-weight: 900; letter-spacing: .5px; }
-.v2h-age:disabled {
-  cursor: not-allowed;
-  filter: grayscale(.55) brightness(.96);
+/* The home screen is the feed: the timeline card loses its boxed chrome
+ * and the year blocks read as one continuous scroll, oldest at the top,
+ * newest pinned just above the stats dock. */
+#screen-home { display: flex; flex-direction: column; }
+#timelineCard {
+  background: transparent;
   box-shadow: none;
+  border-radius: 0;
+  padding: 0;
 }
-.v2h-age-note {
-  min-height: 16px;
+#timelineCard > h2 {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 900;
+  letter-spacing: .6px;
+  text-transform: uppercase;
   color: var(--v2-muted);
+  margin: 2px 2px 6px;
+}
+#timelineCard .journal { display: flex; flex-direction: column; gap: 8px; }
+#timelineCard .journal .jcard {
+  background: var(--v2-card);
+  border-radius: var(--v2-radius);
+  box-shadow: var(--v2-shadow);
+  border-bottom: 0;
+  padding: 10px 12px;
+}
+#timelineCard .journal .jcard-head {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .5px;
+  color: var(--v2-accent);
+}
+#timelineCard .journal .jline { border-bottom: 0; padding: 3px 0; }
+/* M4 home-feed feel pass: per-line category icon + flexible text/chips,
+   newest-year highlight that fades to normal */
+#timelineCard .journal .jcard-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#timelineCard .journal .jcard-head-ic { font-size: 12px; }
+#timelineCard .journal .jline {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+}
+#timelineCard .journal .jline-ic {
+  flex: 0 0 auto;
+  font-size: 13px;
+  line-height: 1.35;
+}
+#timelineCard .journal .jline-text {
+  flex: 1 1 0;
+  min-width: 0;
+}
+#timelineCard .journal .jchips {
+  flex: 0 0 auto;
+  margin-left: 0;
+  display: inline-flex;
+  gap: 4px;
+}
+#timelineCard .journal .jchips-row {
+  flex: 1 0 100%;
+  margin-top: 3px;
+  padding-left: 19px; /* aligns with the line text (icon + gap) */
+}
+#timelineCard .journal .jchips .chip.mini .avatar.mini {
+  border-radius: 50%;
+  background: var(--v2-track, #e7ebf3);
+}
+@keyframes v2j-newest-fade {
+  0% { background: rgba(42, 99, 230, .14); }
+  100% { background: transparent; }
+}
+#timelineCard .journal .jcard-newest {
+  animation: v2j-newest-fade 2.6s ease-out 1 forwards;
+  border-radius: var(--v2-radius);
+}
+@media (prefers-reduced-motion: reduce) {
+  #timelineCard .journal .jcard-newest { animation: none; }
+}
+#timelineCard .journal .jquiet {
+  border-bottom: 0;
   text-align: center;
+  color: var(--v2-muted);
+  font-weight: 700;
+  padding: 2px 0;
 }
 
-.v2h-stats {
-  background: var(--v2-card);
-  border-radius: 18px 18px 0 0;
-  box-shadow: 0 -4px 16px rgba(22, 32, 58, .08);
-  padding: 14px 16px
-           calc(14px + env(safe-area-inset-bottom, 0px));
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px 18px;
-}
-.v2h-stat { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.v2h-stat-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 6px;
-  font-size: 13px;
+/* Header age chip + tick (F8). */
+.v2-header-age {
+  flex: 0 0 auto;
+  font-size: 11px;
   font-weight: 900;
-}
-.v2h-stat-label { color: var(--v2-ink); }
-.v2h-stat-value { color: var(--v2-ink-soft); }
-.v2h-stat-track {
-  height: 10px;
-  background: var(--v2-track);
+  letter-spacing: .4px;
+  color: #fff;
+  background: rgba(255, 255, 255, .18);
   border-radius: 999px;
-  overflow: hidden;
+  padding: 2px 8px;
 }
-.v2h-stat-fill { height: 10px; border-radius: 999px; }
 
 /* ---- v2 Choice sheet (contracts.md §Choice) --------------------------- */
+/* F6: when C's event card hosts the box it is a CENTERED modal card, not a
+ * bottom sheet — undo the sheet chrome inside the :has() fallback from
+ * event.css (which only restyles the #modal overlay). */
+.modal-box.v2-sheet:has(.v2e-card) {
+  position: static;
+  border-radius: var(--v2-radius);
+  padding-bottom: 16px;
+  max-height: calc(100dvh - 48px);
+}
+@media (max-width: 520px) {
+  .modal-box.v2-sheet:has(.v2e-card) {
+    margin: 0;
+    width: 100%;
+    max-width: 420px;
+  }
+}
+
 .v2-sheet {
   max-height: 85vh;
   max-height: 85dvh;
@@ -423,8 +650,11 @@
   padding: 12px 14px;
   border-radius: 14px;
   cursor: pointer;
+  transition: transform .14s ease, border-color .14s ease,
+              background-color .14s ease;
 }
 .v2c-option:hover { border-color: var(--v2-accent); }
+.v2c-option:active { transform: scale(.97); border-color: var(--v2-accent); }
 .v2c-option:disabled { cursor: not-allowed; opacity: .75; }
 .v2c-effects { font-size: 12px; font-weight: 700; color: var(--v2-muted); }
 .v2c-reason { font-size: 12px; font-weight: 700; color: var(--v2-bar-bad); }
@@ -448,27 +678,40 @@
 @media (max-width: 360px) {
   .v2-header { gap: 6px; padding-left: 8px; padding-right: 8px; }
   .v2-header-btn { width: 36px; height: 36px; }
-  .v2-home-link { font-size: 15px; padding: 8px 2px; }
   .v2-header-name { font-size: 15px; }
   .v2-header-cash { font-size: 14px; }
-  .v2-tab { font-size: 10px; }
+  .v2-tab { font-size: 9.5px; }
   .v2-tab .v2-tab-ic { font-size: 17px; }
-  .v2h-stats { grid-template-columns: 1fr; }
-  .v2h-age { width: 76px; height: 76px; }
+  .v2-agebtn { width: 58px; height: 58px; transform: translateY(-12px); }
+  .v2-agebtn-plus { font-size: 22px; }
+  .v2-agebtn-word { font-size: 11px; }
+  .v2-stat-top { font-size: 10px; }
+  .v2-statsbar { gap: 5px; }
 }
 
 /* Short landscape screens: the scroll region must own the overflow, the
- * chrome stays fixed; reduce hero padding so content is reachable. */
+ * chrome stays fixed; reduce chrome height so content is reachable. */
 @media (max-height: 480px) {
   .v2-header { padding-top: calc(4px + env(safe-area-inset-top, 0px));
                padding-bottom: 4px; }
-  .v2-tabbar { min-height: 52px; }
-  .v2-scroll { padding-bottom: calc(52px + env(safe-area-inset-bottom, 0px) + 8px); }
+  .v2-tabbar { min-height: 52px;
+    height: calc(52px + env(safe-area-inset-bottom, 0px)); }
+  .v2-dock { bottom: calc(52px + env(safe-area-inset-bottom, 0px)); }
+  .v2-scroll { padding-bottom: calc(52px + var(--v2-dock-h) +
+                env(safe-area-inset-bottom, 0px) + 16px); }
+  .v2-agebtn { transform: translateY(-8px); width: 56px; height: 56px; }
 }
 
-/* Motion sensitivity: the Age press is the only animated affordance. */
+/* Motion sensitivity: every press/flash/animation collapses to an
+ * instantaneous state change (F8 — reduced motion honoured). */
 @media (prefers-reduced-motion: reduce) {
-  .v2h-age { box-shadow: 0 2px 0 var(--v2-age-good-dark); }
+  .v2-tab, .v2-tab .v2-tab-ic, .v2-agebtn, .v2c-option {
+    transition: none;
+  }
+  .v2-tab:active, .v2-agebtn:active { transform: none; }
+  .v2-agebtn { box-shadow: 0 2px 0 var(--v2-age-good-dark); }
+  .v2-stat-fill.animate { transition: none; }
+  .v2-stat.up, .v2-stat.down { animation: none; }
   .v2-tab .v2-tab-ic { transform: none; }
 }
 
@@ -479,3 +722,9 @@
 @media (min-resolution: 1.5dppx) and (max-width: 400px) {
   .v2h-stats { gap: 12px 14px; }
 }
+
+/* Status notices take space inside the viewport-constrained flex shell. */
+.v2-scope > .pending-pill { flex-shrink: 0; margin: 0 8px 8px; }
+
+/* pending-pause: feature action controls withheld while a choice is open */
+.v2-paused button { cursor: not-allowed; }

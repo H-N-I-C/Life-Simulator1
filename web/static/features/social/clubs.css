@@ -1,0 +1,75 @@
+/* v2 Clubs module styles (Kimi B, M4). Namespace: v2cl-*. Consumes the
+ * frozen §Tokens with fallback defaults (bare test host safe). */
+
+.v2cl-scope {
+  --v2cl-fallback-ink: #16203a;
+  --v2cl-fallback-muted: #6b7690;
+  --v2cl-fallback-card: #ffffff;
+  --v2cl-fallback-good: #15803d;
+  --v2cl-fallback-bad: #b3261e;
+  display: block;
+  color: var(--v2-ink, var(--v2cl-fallback-ink));
+  margin-bottom: 12px;
+}
+
+.v2cl-card {
+  background: var(--v2-card, var(--v2cl-fallback-card));
+  border-radius: var(--v2-radius, 16px);
+  box-shadow: var(--v2-shadow, 0 4px 16px rgba(22, 32, 58, .10));
+  padding: 12px 14px;
+}
+.v2cl-title { margin: 0 0 8px; font-size: 1.05rem; }
+
+.v2cl-club {
+  border-top: 1px solid rgba(127, 127, 127, .2);
+  padding: 10px 0;
+}
+.v2cl-club:first-of-type { border-top: 0; }
+.v2cl-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.v2cl-name { font-weight: 700; }
+.v2cl-cat {
+  font-size: .72rem;
+  font-weight: 800;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(127, 127, 127, .15);
+  color: var(--v2-muted, var(--v2cl-fallback-muted));
+}
+.v2cl-18 {
+  font-size: .72rem;
+  font-weight: 900;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(179, 38, 30, .12);
+  color: var(--v2-bad, var(--v2cl-fallback-bad));
+}
+.v2cl-member {
+  font-size: .72rem;
+  font-weight: 800;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(21, 128, 61, .15);
+  color: var(--v2-bar-good, var(--v2cl-fallback-good));
+}
+.v2cl-meta {
+  margin: 4px 0 8px;
+  font-size: .85rem;
+  color: var(--v2-muted, var(--v2cl-fallback-muted));
+}
+.v2cl-btn {
+  padding: 6px 12px;
+  border-radius: var(--v2-radius-sm, 8px);
+  border: 1px solid rgba(127, 127, 127, .4);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  margin-right: 8px;
+}
+.v2cl-btn:disabled { opacity: .55; cursor: not-allowed; }
+.v2cl-reason {
+  display: block;
+  font-size: .8rem;
+  color: var(--v2-bad, var(--v2cl-fallback-bad));
+  margin-top: 2px;
+}
+.v2cl-busy { opacity: .7; }

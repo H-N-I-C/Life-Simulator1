@@ -333,6 +333,28 @@ def quit_job(player):
 
 # =============================================================== YEARLY PHASES
 
+def _milestone_line(player, situation):
+    """Variant line for a legacy life milestone: drawn through C's
+    frozen pick_year_line (cosmetic stream only, never the gameplay
+    rng); the no-repeat window persists on the player object, which
+    rides the envelope (undo/replay-safe)."""
+    from src.game.content.journal import milestone_lines
+    from src.game.content.journal.yearly_lines import pick_year_line
+    from src.appearance import integration
+    pool = milestone_lines.lines_for(situation)
+    recents = getattr(player, "_milestone_line_recents", None)
+    if recents is None:
+        recents = player._milestone_line_recents = []
+    picked = pick_year_line(player, None, recents,
+                            integration._APP_RNG, pool=pool)
+    if picked:
+        line_id, text = picked
+        recents.append(line_id)
+        del recents[:-40]
+        return text
+    return pool[0]["text"]
+
+
 def yearly_work_phase(player, turn_id, rng, year_start_happiness=None):
     """income phase (parity rows 47, 54, 55, 71, 72, 73, 74, 75).
 
@@ -480,11 +502,11 @@ def yearly_education_phase(player, turn_id, rng):
             player.change_happiness(rng.randint(14, 20))
             player.change_smarts(rng.randint(10, 15))
             events.append(_event("education",
-                                 "I graduated from university.", player))
+                                 _milestone_line(player, "graduate_university"), player))
             if player.chose_student_loan:
                 events.append(_event(
                     "education",
-                    "I now have to start paying back my student loan",
+                    _milestone_line(player, "loan_repayment"),
                     player))
         elif player.grades is not None \
                 and player.grades < rng.randint(10, 45):
@@ -493,7 +515,7 @@ def yearly_education_phase(player, turn_id, rng):
             player.change_happiness(-rng.randint(30, 50))
             events.append(_event(
                 "education",
-                "I was expelled from university after earning bad grades.",
+                _milestone_line(player, "expelled_university"),
                 player))
     if player.is_in_school():
         player.change_grades(rng.randint(-3, 3))
@@ -510,19 +532,22 @@ def yearly_education_phase(player, turn_id, rng):
         player.change_smarts(rng.randint(1, 2)
                              + 2 * player.has_trait("GENIUS"))
         player.calc_grades(rng.randint(4, 8))
-        events.append(_event("education", "I am starting elementary school",
+        events.append(_event("education",
+                             _milestone_line(player, "start_elementary"),
                              player))
     if player.age == 12:
         player.change_smarts(rng.randint(1, 3)
                              + 3 * player.has_trait("GENIUS"))
         player.calc_grades(rng.randint(0, 8))
-        events.append(_event("education", "I am starting middle school",
+        events.append(_event("education",
+                             _milestone_line(player, "start_middle"),
                              player))
     if player.age == 14:
         player.change_smarts(rng.randint(1, 4)
                              + 4 * player.has_trait("GENIUS"))
         player.calc_grades(rng.randint(-8, 8))
-        events.append(_event("education", "I am starting high school",
+        events.append(_event("education",
+                             _milestone_line(player, "start_high"),
                              player))
     if player.age == 17 and not player.dropped_out and player.is_in_school():
         # is_in_school guard: identical to legacy order (17-year-olds are
@@ -532,12 +557,14 @@ def yearly_education_phase(player, turn_id, rng):
         player.change_happiness(rng.randint(15, 20))
         player.change_smarts(rng.randint(6, 10))
         events.append(_event("education",
-                             "I graduated from high school.", player))
+                             _milestone_line(player, "graduate_high"),
+                             player))
         if player.smarts >= rng.randint(30, 44):
             pending = _sample_university_application(player, rng)
         else:
             events.append(_event(
-                "education", "Your application to university was rejected.",
+                "education",
+                _milestone_line(player, "university_rejected"),
                 player))
     return _result(events=events, pending_decision=pending,
                    continuation={"phase_id": "debt_service",
@@ -660,9 +687,10 @@ def resolve_university_funding(player, pending, option_id, rng):
                                      "item_cursor": 0})
     events.append(_event(
         "education",
-        {"scholarship": "Your scholarship application was rejected.",
-         "parents": "Your parents refused to pay for your university "
-                    "tuition."}.get(option_id, "Your request was refused."),
+        _milestone_line(player, {
+            "scholarship": "scholarship_rejected",
+            "parents": "parents_refused"}.get(option_id,
+                                               "funding_refused")),
         player))
     spent = list(sampled.get("spent", [])) + [option_id]
     sampled["spent"] = spent
@@ -677,8 +705,9 @@ def resolve_university_funding(player, pending, option_id, rng):
 def _enroll_university(player, rng, events):
     player.uv_years = 4
     player.calc_grades(rng.randint(-8, 10))
-    events.append(_event("education", "I am now enrolled in university.",
-                         player))
+    events.append(_event(
+        "education", _milestone_line(player, "enroll_university"),
+        player))
 
 
 # ================================================================== DISPATCH
@@ -912,9 +941,9 @@ def action_specs(context):
     p = _player(context)
     if p.is_in_school():
         return (_school_action_specs(p) + _relationship_specs(context, p)
-                + _activity_specs(p, context))
+                + _activity_specs(p, context) + _social_specs(context, p))
     specs = (_work_action_specs(p) + _relationship_specs(context, p)
-             + _activity_specs(p, context))
+             + _activity_specs(p, context) + _social_specs(context, p))
     if p.age >= 18 and p.marital_status == 0 and p.date_options > 0:
         specs.append({"id": "find_partner", "category": "relationships",
                       "label": "Find a Partner", "enabled": True,
@@ -969,6 +998,9 @@ ACTION_IDS = (
     # context-bound self actions dispatch through _CONTEXT_SELF_ACTIONS;
     # ACTION_IDS admits them to the service command allowlist
     "dating_app", "courtship_offer", "union_proposal",
+    # M4 social actions (C-owned; A's social appliers mutate state)
+    "club_join", "club_leave", "social_spend_time", "social_befriend",
+    "social_stand_up", "social_tell_someone", "social_reconcile",
 )
 
 _ACTIONS = {
@@ -1031,6 +1063,12 @@ def apply_action(context, action_id, payload, rng):
            "payload must be an object")
     _check(not (p.is_in_school() and action_id in _SCHOOL_BLOCKED_ACTIONS),
            "not_allowed", "not while enrolled in school")
+    if action_id in _SOCIAL_SELF_ACTIONS:
+        # M4 social actions (C-owned): the target_id names a SOCIAL
+        # envelope person (A's state), not necessarily a canonical
+        # relation — resolve it inside the handlers, before the
+        # relation-target interception below.
+        return _SOCIAL_SELF_ACTIONS[action_id](context, p, payload, rng)
     if action_id == "find_job":
         _check(p.age >= 18, "not_allowed", "you are too young to work")
         _check(not p.has_job, "not_allowed", "you already have a job")
@@ -1104,6 +1142,9 @@ def resolve_choice(context, pending, option_id, inputs, rng):
         if "inputs" in inspect.signature(resolver).parameters:
             return resolver(p, pending, option_id, inputs, rng)
         return resolver(p, pending, option_id, rng)
+    if kind == "social_reconcile":
+        return _resolve_social_reconcile(context, p, pending, option_id,
+                                         rng)
     if kind == "job_offer":
         options = [o["id"] for o in pending.get("options", [])]
         _check(option_id in options, "invalid_input", "unknown option")
@@ -2931,8 +2972,12 @@ def _resolve_event_v3(context, player, pending, option_id, rng):
         except RuleError:
             stale = True
     if stale:
+        title = pending.get("title") or "the offer"
         return _result(events=[_event(
-            "decision", "The moment has passed.", player)])
+            "decision",
+            f"I let the chance slip by: '{title}' is no longer "
+            f"possible, someone involved has moved on.",
+            player)])
 
     # 2. Domain effects must all be applicable before anything mutates.
     domain = dict(option.get("_domain") or {})
@@ -3380,6 +3425,554 @@ def sample_dating_app(context, player, payload, rng):
 
 # Self actions that need the duck-typed rule CONTEXT (not just the
 # player): offer creation binds and scores against the envelope.
+# ---------------------------------------------------------------------------
+# M4 social actions (Kimi C): clubs + person social actions. Social graph
+# state is A's env["social_state"] — mutations go ONLY through A's
+# appliers (join_club/leave_club, apply_kind, apply_closeness,
+# apply_popularity_delta, record_memory). The bullying outcome table is
+# C's (src/game/content/social/bullying.json), applied by
+# apply_bullying_response — A's social_invite resolve applier calls this
+# SAME helper for "bullying_response" domain effects, so event options
+# and the person-overlay actions share one outcome table.
+# ---------------------------------------------------------------------------
+
+def _social_env(context):
+    env = getattr(context, "_env", None)
+    _check(isinstance(env, dict) and "player" in env, "invalid_input",
+           "social actions need the game context")
+    return env
+
+
+def _social_appliers():
+    try:
+        from src.game.features.social import state as social_state
+    except ImportError:
+        return None
+    names = ("join_club", "leave_club", "apply_kind", "apply_closeness",
+             "apply_popularity_delta", "record_memory")
+    if not all(hasattr(social_state, n) for n in names):
+        return None
+    return social_state
+
+
+def _require_social_appliers():
+    appliers = _social_appliers()
+    _check(appliers is not None, "not_allowed",
+           "social circles are not open in this save yet")
+    return appliers
+
+
+def _school_stage(person):
+    if not person.is_in_school():
+        return None
+    if person.age <= 11:
+        return "elementary"
+    if person.age <= 14:
+        return "middle"
+    return "high"
+
+
+def club_eligibility(env, person, club, member_ids=None):
+    """Single source for advertised specs AND dispatch (and A's
+    join_club re-checks before any mutation). Pure read."""
+    age = getattr(person, "age", 0)
+    if club.get("adults_only") and age < 18:
+        return False, "you must be 18 or older to join"
+    if age < club["min_age"]:
+        return False, "you are too young to join this club"
+    if age > club["max_age"]:
+        return False, "this club is not for your age group"
+    sch = club.get("school")
+    if sch:
+        stage = _school_stage(person)
+        if stage is None:
+            return False, "this club meets at school"
+        if stage not in sch["stages"]:
+            return False, "this club is for other school years"
+    if member_ids is None:
+        circles = ((env.get("social_state") or {}).get("circles") or {})
+        member_ids = ((circles.get("clubs") or {})
+                      .get(club["id"]) or {}).get("member_ids") or []
+    if getattr(person, "person_id", None) in member_ids:
+        return False, "you are already a member of this club"
+    if len(member_ids) >= club["member_cap"]:
+        return False, "this club is full"
+    return True, None
+
+
+def club_specs(env, person):
+    """Per-club advertised action specs — A merges these into
+    state.social.clubs[].actions (B's card renders them verbatim)."""
+    from src.game.content import social as social_content
+    st = env.get("social_state") or {}
+    circles = (st.get("circles") or {}).get("clubs") or {}
+    specs = []
+    for club in social_content.load_clubs()["clubs"]:
+        members = ((circles.get(club["id"]) or {})
+                   .get("member_ids") or [])
+        cost = club["cost_per_year"]
+        base = {"club_id": club["id"], "category": "social", "inputs": [],
+                "limits": []}
+        if person.person_id in members:
+            specs.append({**base, "id": "club_leave",
+                          "label": "Leave the club",
+                          "known_costs": [], "enabled": True,
+                          "reason": None})
+        else:
+            ok, reason = club_eligibility(env, person, club, members)
+            label = "Join %s" % club["label"]
+            if cost:
+                label += " ($%d/year)" % cost
+            specs.append({**base, "id": "club_join", "label": label,
+                          "known_costs": ([{"kind": "money",
+                                            "amount": cost}] if cost
+                                          else []),
+                          "enabled": ok, "reason": reason})
+    return specs
+
+
+def cmd_club_join(context, p, payload, rng):
+    env = _social_env(context)
+    cid = (payload or {}).get("club_id")
+    _check(isinstance(cid, str) and cid, "invalid_input",
+           "club_id must be a non-empty string")
+    from src.game.content import social as social_content
+    club = social_content.club(cid)
+    _check(club is not None, "invalid_input", "unknown club: %r" % (cid,))
+    appliers = _require_social_appliers()
+    ok, reason = club_eligibility(env, p, club)
+    _check(ok, "not_allowed", reason)
+    try:
+        appliers.join_club(env, p, cid)
+    except ValueError as exc:
+        raise RuleError("invalid_input", str(exc)) from exc
+    except PermissionError as exc:
+        raise RuleError("not_allowed", str(exc)) from exc
+    return _result()
+
+
+def cmd_club_leave(context, p, payload, rng):
+    env = _social_env(context)
+    cid = (payload or {}).get("club_id")
+    _check(isinstance(cid, str) and cid, "invalid_input",
+           "club_id must be a non-empty string")
+    appliers = _require_social_appliers()
+    try:
+        appliers.leave_club(env, p, cid)
+    except ValueError as exc:
+        raise RuleError("invalid_input", str(exc)) from exc
+    except PermissionError as exc:
+        raise RuleError("not_allowed", str(exc)) from exc
+    return _result()
+
+
+def _social_book(env):
+    """C-owned action bookkeeping (caps/once-per-life), additive."""
+    book = env.setdefault("social_rules_state",
+                          {"spent_year": {}, "befriended": [],
+                           "reconcile_year": {}})
+    book.setdefault("spent_year", {})
+    book.setdefault("befriended", [])
+    book.setdefault("reconcile_year", {})
+    return book
+
+
+def _social_record(env, person_id):
+    st = env.get("social_state") or {}
+    rec = (st.get("people") or {}).get(person_id)
+    _check(rec is not None, "not_found",
+           "you have no social connection with that person")
+    _check(rec.get("status", "active") != "faded", "not_allowed",
+           "that connection has faded")
+    return rec
+
+
+def _arc_of(rec):
+    arc = rec.get("arc")
+    if arc is None and rec.get("kind") == "bully":
+        arc = "targeted"
+    return arc
+
+
+def _arc_stage(env, person, pid):
+    """Arc stage through A's accessor when landed (authoritative),
+    with the kind-record fallback for bare envelopes."""
+    try:
+        from src.game.features.social import state as social_state
+        arc = social_state.arc_stage(env, person.person_id, pid)
+        if arc is not None:
+            return arc
+    except Exception:
+        pass
+    rec = (env.get("social_state") or {}).get("people", {}).get(pid) or {}
+    return _arc_of(rec)
+
+
+def _social_name(context, person_id):
+    """A social person's display name: envelope NPCs live in
+    env['social_people'] (A's circles store canonical Persons there —
+    the same walk A's drift uses), NOT in the family-graph
+    people_by_id, so resolve both before falling back."""
+    env = getattr(context, "_env", None)
+    if isinstance(env, dict):
+        for person in env.get("social_people") or []:
+            if getattr(person, "person_id", None) == person_id:
+                name = getattr(person, "firstname", None)
+                if name:
+                    return name
+    lookup = getattr(context, "people_by_id", None) or {}
+    person = lookup.get(person_id)
+    return getattr(person, "firstname", None) or "them"
+
+
+def _spend_time_gate(env, p, rec, person_id):
+    # any acquaintance and up: shared time is HOW acquaintances become
+    # friends (t7 review) — not only existing friends
+    if rec.get("kind") not in ("acquaintance", "friend", "best_friend"):
+        return False, "befriend them first, then make time for them"
+    book = _social_book(env)
+    if book["spent_year"].get(person_id) == p.age:
+        return False, "you already made time for them this year"
+    return True, None
+
+
+def _befriend_gate(env, p, rec, person_id):
+    if rec.get("kind") not in (None, "acquaintance"):
+        return False, "you already have a relationship with them"
+    if _arc_stage(env, p, person_id) in ("targeted", "escalated"):
+        return False, "not while they are bullying you"
+    if person_id in _social_book(env)["befriended"]:
+        return False, "you already tried that with them"
+    return True, None
+
+
+def _stand_up_gate(env, p, rec, person_id):
+    if rec.get("kind") != "bully":
+        return False, "they are not bullying you"
+    if _arc_stage(env, p, person_id) not in ("targeted", "escalated"):
+        return False, "that trouble is already behind you"
+    return True, None
+
+
+def apply_bullying_response(env, person, target_id, response, rng,
+                            context=None):
+    """THE bullying outcome table application (C-owned). Used by C's
+    social_stand_up action and by A's resolve applier for the
+    "bullying_response" domain effect. Journals the ACTUAL outcome."""
+    from src.game.content import social as social_content
+    table_all = social_content.load_bullying()["responses"]
+    _check(response in table_all, "invalid_input",
+           "unknown bullying response: %r" % (response,))
+    table = table_all[response]
+    # ONE outcome table, TWO entry points: A's resolve applier owns the
+    # application when landed — delegate so event options and these
+    # proactive actions can never diverge.
+    try:
+        from src.game.features.social import bullying as social_bullying
+    except ImportError:
+        social_bullying = None
+    if social_bullying is not None and hasattr(social_bullying,
+                                               "apply_response"):
+        service = getattr(context, "_service", None)
+        result = social_bullying.apply_response(env, service, person,
+                                                response, target_id)
+        events = result.get("events") or []
+        if events:
+            return events[0]
+        return _event("social", "I %s." % response.replace("_", " "),
+                      person, {})
+    st = env.get("social_state") or {}
+    rec = (st.get("people") or {}).get(target_id) or {}
+    appliers = _require_social_appliers()
+    name = (_social_name(context, target_id)
+            if context is not None else "them")
+    old_arc = _arc_of(rec)
+    new_arc = table.get("to_stage")
+    if response == "stand_up" \
+            and getattr(person, "health", 0) < table.get("health_min", 0):
+        new_arc = table.get("fail_to_stage")
+    if new_arc:
+        rec["arc"] = new_arc
+    if table.get("karma"):
+        person.change_karma(table["karma"])
+    if table.get("stress"):
+        before = person.stress
+        person.change_stress(table["stress"])
+    if table.get("edge_to"):
+        try:
+            appliers.apply_kind(env, person, target_id, table["edge_to"])
+        except ValueError as exc:
+            raise RuleError("invalid_input", str(exc)) from exc
+    memory_lines = {
+        "tell_someone": "They reported my bullying. I backed off, "
+                        "mostly.",
+        "stand_up": "They looked me in the eye and said stop. I did, "
+                    "eventually.",
+        "avoid": "They started taking the long way round to avoid me.",
+        "befriend": "We made an unlikely peace. I was mostly bored, "
+                    "not evil.",
+    }
+    try:
+        appliers.record_memory(env, person, target_id,
+                               memory_lines[response])
+    except ValueError:
+        pass  # memory cap reached — the arc state still records it
+    if response == "stand_up" and new_arc == table.get("fail_to_stage"):
+        text = ("I tried to stand up to %s and it went wrong; things "
+                "got worse before they got better." % name)
+    else:
+        texts = {
+            "tell_someone": "I told someone in charge about the "
+                            "bullying. The weight of carrying it alone "
+                            "lifted the same day.",
+            "stand_up": "I stood up to %s and said my piece, voice "
+                        "shaking but words steady. It changed "
+                        "something." % name,
+            "avoid": "I kept my distance and my head down, and got "
+                     "through it one quiet day at a time.",
+            "befriend": "I made an unlikely peace with %s. Turns out "
+                        "they were mostly bored, not evil." % name,
+        }
+        text = texts[response]
+    changes = {}
+    if new_arc and new_arc != old_arc:
+        changes["bullying_arc"] = "%s->%s" % (old_arc, new_arc)
+    return _event("social", text, person, changes)
+
+
+def cmd_social_spend_time(context, p, payload, rng):
+    env = _social_env(context)
+    pid = (payload or {}).get("target_id")
+    _check(isinstance(pid, str) and pid, "invalid_input",
+           "target_id must be a non-empty string")
+    rec = _social_record(env, pid)
+    ok, reason = _spend_time_gate(env, p, rec, pid)
+    _check(ok, "not_allowed", reason)
+    appliers = _require_social_appliers()
+    try:
+        appliers.apply_closeness(env, p, pid, 6, "spent time together")
+    except ValueError as exc:
+        raise RuleError("invalid_input", str(exc)) from exc
+    _social_book(env)["spent_year"][pid] = p.age
+    return _result()
+
+
+def cmd_social_befriend(context, p, payload, rng):
+    env = _social_env(context)
+    pid = (payload or {}).get("target_id")
+    _check(isinstance(pid, str) and pid, "invalid_input",
+           "target_id must be a non-empty string")
+    rec = _social_record(env, pid)
+    ok, reason = _befriend_gate(env, p, rec, pid)
+    _check(ok, "not_allowed", reason)
+    appliers = _require_social_appliers()
+    name = _social_name(context, pid)
+    try:
+        appliers.apply_kind(env, p, pid, "friend")
+        appliers.apply_closeness(env, p, pid, 10, "became friends")
+    except ValueError as exc:
+        raise RuleError("invalid_input", str(exc)) from exc
+    _social_book(env)["befriended"].append(pid)
+    return _result(events=[_event(
+        "social",
+        "I made a proper friend of %s. Some friendships start with a "
+        "small brave hello." % name, p, {"kind": "friend"})])
+
+
+def cmd_social_stand_up(context, p, payload, rng):
+    env = _social_env(context)
+    pid = (payload or {}).get("target_id")
+    _check(isinstance(pid, str) and pid, "invalid_input",
+           "target_id must be a non-empty string")
+    rec = _social_record(env, pid)
+    ok, reason = _stand_up_gate(env, p, rec, pid)
+    _check(ok, "not_allowed", reason)
+    event = apply_bullying_response(env, p, pid, "stand_up", rng,
+                                    context)
+    return _result(events=[event])
+
+
+def cmd_social_tell_someone(context, p, payload, rng):
+    env = _social_env(context)
+    st = env.get("social_state") or {}
+    people = st.get("people") or {}
+    target_id = next(
+        (pid for pid, rec in people.items()
+         if rec.get("kind") == "bully"
+         and rec.get("status", "active") == "active"
+         and _arc_stage(env, p, pid) in ("targeted", "escalated")), None)
+    _check(target_id is not None, "not_allowed",
+           "there is no bullying to report right now")
+    event = apply_bullying_response(env, p, target_id, "tell_someone",
+                                    rng, context)
+    return _result(events=[event])
+
+
+def _social_specs(context, p):
+    """Person-overlay social actions (B renders them on the person
+    overlay with the server's enabled/reason). Pure read."""
+    env = getattr(context, "_env", None)
+    if not isinstance(env, dict):
+        return []
+    st = env.get("social_state") or {}
+    people = st.get("people") or {}
+    specs = []
+    any_arc = False
+    for pid, rec in people.items():
+        status = rec.get("status", "active")
+        if status == "faded":
+            continue  # keep-contact: faded people get no overlay actions
+        name = _social_name(context, pid)
+        base = {"target_id": pid, "target_label": name,
+                "category": "social", "inputs": [],
+                "known_costs": [], "limits": []}
+        kind = rec.get("kind")
+        if rec.get("status") == "estranged":
+            # a real falling-out (friend/best_friend only): reconcile
+            # is the ONLY overlay action an estranged person gets
+            if kind in ("friend", "best_friend"):
+                ok, reason = _reconcile_gate(env, p, rec, pid)
+                specs.append({**base, "id": "social_reconcile",
+                              "label": "Reach out to %s" % name,
+                              "enabled": ok, "reason": reason})
+            continue
+        if kind in ("acquaintance", "friend", "best_friend"):
+            ok, reason = _spend_time_gate(env, p, rec, pid)
+            specs.append({**base, "id": "social_spend_time",
+                          "label": "Spend time with %s" % name,
+                          "enabled": ok, "reason": reason})
+        if kind in (None, "acquaintance"):
+            ok, reason = _befriend_gate(env, p, rec, pid)
+            specs.append({**base, "id": "social_befriend",
+                          "label": "Befriend %s" % name,
+                          "enabled": ok, "reason": reason})
+        if kind == "bully":
+            arc = _arc_stage(env, p, pid)
+            if arc in ("targeted", "escalated"):
+                any_arc = True
+                ok, reason = _stand_up_gate(env, p, rec, pid)
+                specs.append({**base, "id": "social_stand_up",
+                              "label": "Stand up to %s" % name,
+                              "enabled": ok, "reason": reason})
+        if kind == "rival":
+            ok, reason = _reconcile_gate(env, p, rec, pid)
+            specs.append({**base, "id": "social_reconcile",
+                          "label": "Reach out to %s" % name,
+                          "enabled": ok, "reason": reason})
+    if any_arc:
+        specs.append({"id": "social_tell_someone",
+                      "label": "Tell someone about the bullying",
+                      "category": "social", "inputs": [],
+                      "known_costs": [], "limits": [],
+                      "enabled": True, "reason": None})
+    return specs
+
+
+def _reconcile_gate(env, p, rec, person_id):
+    """Amendment 1: reconcile is only for a REAL falling-out (estranged
+    friend/best_friend) or a rival edge; once per year per person."""
+    estranged = rec.get("status") == "estranged"         and rec.get("kind") in ("friend", "best_friend")
+    rival = rec.get("kind") == "rival"
+    if not (estranged or rival):
+        return False, "there is no falling-out to mend here"
+    if _social_book(env)["reconcile_year"].get(person_id) == p.age:
+        return False, "you already tried that this year"
+    return True, None
+
+
+def _social_pool_line(env, situation):
+    """Line from C's social journal pool ({name} placeholder left for
+    the caller): cosmetic-stream draw through the frozen selector with
+    a persisted no-repeat window."""
+    from src.game.content.journal import social_lines
+    from src.game.content.journal.yearly_lines import pick_year_line
+    from src.appearance import integration
+    pool = social_lines.lines_for(situation)
+    recents = env.setdefault("social_journal_recents", [])
+    picked = pick_year_line(env["player"], None, recents,
+                            integration._APP_RNG, pool=pool)
+    if picked:
+        line_id, text = picked
+        recents.append(line_id)
+        del recents[:-40]
+        return text
+    return pool[0]["text"]
+
+
+P_RECONCILE_ACCEPT = 0.5  # frozen stored-draw chance (Amendment 1)
+
+
+def cmd_social_reconcile(context, p, payload, rng):
+    env = _social_env(context)
+    pid = (payload or {}).get("target_id")
+    _check(isinstance(pid, str) and pid, "invalid_input",
+           "target_id must be a non-empty string")
+    rec = _social_record(env, pid)
+    ok, reason = _reconcile_gate(env, p, rec, pid)
+    _check(ok, "not_allowed", reason)
+    _require_social_appliers()
+    # ONE stored draw, resolved at the shared resolve boundary
+    p_accept = P_RECONCILE_ACCEPT
+    name = _social_name(context, pid)
+    pending = {
+        "kind": "social_reconcile",
+        "title": "Reach out to %s?" % name,
+        "text": ("%s and I have not been on good terms. Do I make the "
+                 "first move?" % name),
+        "person_ids": [p.person_id, pid],
+        "sampled": {"p_accept": p_accept, "target_id": pid},
+        "options": [
+            {"id": "reach_out", "label": "Reach out first",
+             "known_costs": [], "known_effects": []},
+            {"id": "let_it", "label": "Let it lie",
+             "known_costs": [], "known_effects": []}],
+    }
+    return _result(pending_decision=pending)
+
+
+def _resolve_social_reconcile(context, p, pending, option_id, rng):
+    env = _social_env(context)
+    sampled = pending.get("sampled") or {}
+    pid = sampled.get("target_id")
+    _check(isinstance(pid, str), "invalid_input", "missing target")
+    # any resolve consumes the once-per-year try (decline stays free of
+    # side effects but cannot be spammed for a re-roll)
+    _social_book(env)["reconcile_year"][pid] = p.age
+    name = _social_name(context, pid)
+    if option_id != "reach_out":
+        return _result(events=[_event(
+            "social",
+            "I let the falling-out with %s lie for now; some doors "
+            "keep." % name, p, {})])
+    appliers = _require_social_appliers()
+    rec = _social_record(env, pid)
+    ok = rng.random() < sampled.get("p_accept", P_RECONCILE_ACCEPT)
+    if ok:
+        target_kind = "acquaintance" if rec.get("kind") == "rival"             else (rec.get("kind") or "friend")
+        try:
+            appliers.apply_kind(env, p, pid, target_kind)
+            appliers.apply_closeness(env, p, pid, 10, "reconciled")
+        except ValueError as exc:
+            raise RuleError("invalid_input", str(exc)) from exc
+        text = _social_pool_line(env, "reconciled").format(name=name)
+        return _result(events=[_event("social", text, p,
+                                      {"reconciled": True})])
+    text = ("I reached out to %s and they were not ready to mend "
+            "things; I left the door open a crack." % name)
+    return _result(events=[_event("social", text, p,
+                                  {"reconciled": False})])
+
+
+_SOCIAL_SELF_ACTIONS = {
+    "club_join": cmd_club_join,
+    "club_leave": cmd_club_leave,
+    "social_spend_time": cmd_social_spend_time,
+    "social_befriend": cmd_social_befriend,
+    "social_stand_up": cmd_social_stand_up,
+    "social_tell_someone": cmd_social_tell_someone,
+    "social_reconcile": cmd_social_reconcile,
+}
+
 _CONTEXT_SELF_ACTIONS = {
     "dating_app": sample_dating_app,
     "courtship_offer": lambda c, p, payload, r: sample_targeted_offer(

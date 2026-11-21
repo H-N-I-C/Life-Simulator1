@@ -6,7 +6,14 @@
 <title>Life — Life Simulator</title>
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="/static/v2/person.css">
+<link rel="stylesheet" href="/static/v2/event.css">
 <link rel="stylesheet" href="/static/v2/theme.css">
+<link rel="stylesheet" href="/static/features/careers/careers.css">
+<link rel="stylesheet" href="/static/features/skills/skills.css">
+<link rel="stylesheet" href="/static/features/education/education.css">
+<link rel="stylesheet" href="/static/features/social/social.css">
+<link rel="stylesheet" href="/static/features/social/clubs.css">
 </head>
 <body>
 <header class="topbar">
@@ -50,10 +57,12 @@
     </section>
 
     <section id="screen-job" class="screen" hidden>
-      <div class="card" id="educationCard"></div>
-      <div class="card"><h2>Education actions</h2><div id="actions-education" class="actionlist"></div></div>
+      <div id="v2CareersMount"></div>
       <div class="card" id="workCard"></div>
       <div class="card"><h2>Work actions</h2><div id="actions-work" class="actionlist"></div></div>
+      <div id="v2EducationMount"></div>
+      <div class="card" id="educationCard"></div>
+      <div class="card"><h2>Education actions</h2><div id="actions-education" class="actionlist"></div></div>
     </section>
 
     <section id="screen-assets" class="screen" hidden>
@@ -62,13 +71,16 @@
     </section>
 
     <section id="screen-people" class="screen" hidden>
+      <div id="v2SocialMount"></div>
       <div class="card" id="familySectionCard" hidden></div>
-      <div class="card"><h2>Family</h2><div id="familyList"></div></div>
+      <div class="card" id="familyRosterCard"><h2>Family</h2><div id="familyList"></div></div>
       <div class="card"><h2>Relationship actions</h2><div id="actions-relationships" class="actionlist"></div></div>
       <div class="card"><h2>Family actions</h2><div id="actions-family" class="actionlist"></div></div>
     </section>
 
     <section id="screen-activities" class="screen" hidden>
+      <div id="v2ClubsMount"></div>
+      <div id="v2SkillsMount"></div>
       <div class="card"><h2>Activities</h2><div id="actions-activities" class="actionlist"></div></div>
       <div class="card"><h2>Health</h2><div id="healthCard"></div>
         <div id="actions-health" class="actionlist"></div></div>

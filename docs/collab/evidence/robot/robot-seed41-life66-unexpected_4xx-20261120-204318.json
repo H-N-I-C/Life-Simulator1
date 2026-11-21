@@ -1,0 +1,181 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 66,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Adolphe at N\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Amargo",
+    "last_name": "Wu",
+    "gender": "female",
+    "country": "Spain",
+    "seed": 1586109090,
+    "request_id": "robot-41-66-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_85d24a4e96",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3682",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_85d24a4e96",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r3683",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_85d24a4e96",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3684",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_85d24a4e96",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3685",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_85d24a4e96",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r3686",
+   "expected_revision": 4
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_85d24a4e96",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3687",
+   "expected_revision": 5
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_85d24a4e96",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r3688",
+   "expected_revision": 6
+  },
+  {
+   "n": 9,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_85d24a4e96",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3689",
+   "expected_revision": 6
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_85d24a4e96",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_ask"
+   },
+   "request_id": "robot-41-r3690",
+   "expected_revision": 7
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_85d24a4e96",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3691",
+   "expected_revision": 8
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_85d24a4e96",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r3692",
+   "expected_revision": 9
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_85d24a4e96",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3693",
+   "expected_revision": 10
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_85d24a4e96",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r3694",
+   "expected_revision": 11
+  },
+  {
+   "n": 16,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 17,
+   "kind": "command",
+   "game_id": "g_85d24a4e96",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Adolphe",
+    "employer_id": "N"
+   },
+   "request_id": "robot-41-r3695",
+   "expected_revision": 11
+  },
+  {
+   "n": 18,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Adolphe at N\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 67 --seed 41 --from-life 66 --fail-fast"
+}

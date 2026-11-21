@@ -34,6 +34,10 @@ from src.appearance.model import Appearance
 from src.appearance import catalog
 from src.game.features.family_graph.graph import GraphError
 from src.game.features.family_graph import new_graph
+# M4: register A's social v3 role predicates (C's stubs invite the
+# richer A-side registrations at integration; module import = register)
+from src.game.features.social import predicates as _social_predicates \
+    # noqa: F401
 from src.game.features.relationship_policy.editor import new_policy_state
 import src.game.features.parenting.effects  # noqa: F401,E402  (registers v3 domain appliers + child predicates)
 import src.game.features.family_graph.effects  # noqa: F401,E402  (graph offer/respond v3 domain appliers)
@@ -305,6 +309,14 @@ class GameService:
             dirty = True
         if backfill_all(env, self):
             dirty = True
+        # §Skills (M3): one-time deterministic baseline for pre-M3 saves
+        # (no rng; values persist after the first write, so this is a
+        # no-op once the player's entry exists)
+        from src.game.features.skills import state as skills_state
+        _before_people = len(env["skills"].get("people", {}))
+        skills_state.backfill(env)
+        if len(env["skills"].get("people", {})) != _before_people:
+            dirty = True
         # Backfill person identity/appearances before any projection;
         # persist once so repeated read-only loads are stable.
         from src.appearance.integration import ensure_appearance, ensure_person_id
@@ -547,6 +559,25 @@ class GameService:
             env.setdefault("generation", 1)
             env.setdefault("completed_lives", [])
             env.setdefault("turn", {})
+            # §Careers (M3): old saves validate to the empty feature state
+            env.setdefault("careers", {"schema_version": 1, "next_num": 1,
+                                       "assignments": {}, "offers": {},
+                                       "attempts": {}})
+            # §Education (M3): old saves validate to the empty feature state
+            env.setdefault("education_state",
+                           {"schema_version": 1, "next_num": 1,
+                            "enrollments": {}, "qualifications": []})
+            # §Skills (M3): additive envelope key (C-owned state)
+            env.setdefault("skills", {"schema_version": 1, "people": {}})
+            # §Social (M4): additive envelope + living social NPC list
+            env.setdefault("social_state",
+                           {"schema_version": 1, "next_num": 1,
+                            "people": {}, "best_friend": None,
+                            "popularity": {"score": 0, "phase": "child",
+                                           "last_score": 0, "bonus": 0,
+                                           "history": []},
+                            "invites": {}, "arcs": {}})
+            env.setdefault("social_people", [])
             if not isinstance(env["ledger"], list) \
                     or not isinstance(env["balances"], dict):
                 raise TypeError("ledger fields")
@@ -664,10 +695,16 @@ class GameService:
 
     def _all_people(self, env):
         """Everyone addressable by the graph: the living walk plus the
-        archived (deceased/ex) people history keeps referencing."""
+        archived (deceased/ex) people history keeps referencing, plus
+        the M4 social NPCs (classmates/coworkers/friends are canonical
+        people — the Person page must open for them too)."""
         people = {p.person_id: p for p in
                   self._walk_people(env["player"])}
         for person in env.get("archive", []):
+            if isinstance(person, Person) \
+                    and person.person_id not in people:
+                people[person.person_id] = person
+        for person in env.get("social_people", []):
             if isinstance(person, Person) \
                     and person.person_id not in people:
                 people[person.person_id] = person
@@ -680,6 +717,9 @@ class GameService:
         by_id = {}
         for person in self._walk_people(env["player"]):
             by_id[ensure_person_id(person)] = person
+        for person in env.get("social_people", []):
+            if isinstance(person, Person):
+                by_id[ensure_person_id(person)] = person
         return by_id
 
     def _make_resolver(self, env):
@@ -688,6 +728,9 @@ class GameService:
                 if person.person_id == owner_id:
                     return person
             for person in env.get("archive", []):
+                if getattr(person, "person_id", None) == owner_id:
+                    return person
+            for person in env.get("social_people", []):
                 if getattr(person, "person_id", None) == owner_id:
                     return person
             return None
@@ -728,6 +771,99 @@ class GameService:
         env["journal"].append(entry)
         return entry
 
+    def _journal_feed(self, env):
+        """§Journal v2 (contracts.md): the flat player-known-filtered journal
+        regrouped into per-age blocks (age header + lines), oldest -> newest.
+        Pure derivation over the same entries the flat `journal` exposes."""
+        feed = []
+        by_age = {}
+        for e in env["journal"]:
+            if not knowledge_journal_visible(env, e):
+                continue
+            block = by_age.get(e["age"])
+            if block is None:
+                block = {"age": e["age"],
+                         "header": f"Age {e['age']}",
+                         "entries": []}
+                by_age[e["age"]] = block
+                feed.append(block)
+            block["entries"].append(
+                dict(e, person_ids=list(e["person_ids"]),
+                     changes=dict(e["changes"])))
+        return feed
+
+    def _careers_view(self, env):
+        """§Careers (M3 contracts): named-careers projection (assignment,
+        openings with server-computed eligibility, history). Pure read."""
+        from src.game.features.careers import core as careers_core
+        try:
+            return careers_core.careers_view(env, env["player"])
+        except Exception:
+            return {"assignment": None, "openings": [], "history": []}
+
+    def _education_programs_view(self, env):
+        """§Education (M3 contracts, Amendment 6): B-owned feature
+        projection (enrollment/programs/qualifications/history), exposed
+        additively at state["education_programs"] — the legacy M2 view
+        keeps state["education"]. Pure read; guarded like careers."""
+        try:
+            from src.game.features.education import core as education_core
+            return education_core.education_view(env, env["player"])
+        except Exception:
+            return {}
+
+    def _social_view(self, env):
+        """§Social (M4 contracts): B's frozen shape; guarded like the
+        careers view so a projection failure degrades to honest
+        empties, never a state error."""
+        try:
+            from src.game.features.social import projection as \
+                social_projection
+            return social_projection.social_view(env, self)
+        except Exception:
+            return {"schema_version": 1, "groups": [], "invites": [],
+                    "popularity": {"score": 0, "band": "unknown",
+                                   "label": "Unknown",
+                                   "delta_last_year": 0}, "clubs": []}
+
+    def _skills_view(self, env):
+        """§Skills (M3 contracts): C-owned additive projection, exposed
+        by A. Pure read; C's module owns the shape."""
+        try:
+            from src.game.features.skills import projection as \
+                skills_projection
+            return skills_projection.project(env)
+        except Exception:
+            return {"schema_version": 1, "values": {}, "training": [],
+                    "uses_this_year": {}, "skills_meta": {}}
+
+    # §Undo (contracts.md): single source for the projection field and
+    # the advertised undo_year action spec
+    @staticmethod
+    def _can_undo(env):
+        if env.get("_undo_snapshot") is not None:
+            return {"enabled": True, "reason": None}
+        if env.get("_undo_consumed"):
+            return {"enabled": False,
+                    "reason": "only one year can be undone"}
+        return {"enabled": False, "reason": "there is no year to undo"}
+
+    @staticmethod
+    def _visible_outcome(env, outcome):
+        """§Decision outcome (contracts.md): the raw-projected field is
+        re-filtered at serialization with the SAME player_known gate as
+        journal entries — stored visibility metadata (audience/fact_id,
+        recorded at capture) decides; no metadata means public. Internal
+        metadata keys never leave the server."""
+        if not outcome:
+            return None
+        if not knowledge_journal_visible(env, {
+                "audience": outcome.get("audience", "public"),
+                "fact_id": outcome.get("fact_id")}):
+            return None
+        return {k: v for k, v in outcome.items()
+                if k not in ("audience", "fact_id")}
+
     def _state(self, env):
         player = env["player"]
         people = []
@@ -746,6 +882,11 @@ class GameService:
             }
             if isinstance(person, Relationship):
                 item["relationship"] = person.relationship
+            from src.game.features.social import projection as \
+                social_proj
+            social_delta = social_proj.person_social(env, person)
+            if social_delta is not None:
+                item["social"] = social_delta
             appearance = getattr(person, "appearance", None)
             item["appearance"] = (
                 appearance.to_dict() if isinstance(appearance, Appearance)
@@ -755,6 +896,10 @@ class GameService:
         for person in self._walk_people(player):
             add_person(person)
         for person in env.get("archive", []):
+            if isinstance(person, Person):
+                add_person(person)
+        from src.game.features.social import projection as social_proj
+        for person in env.get("social_people", []):
             if isinstance(person, Person):
                 add_person(person)
 
@@ -778,9 +923,22 @@ class GameService:
                         enabled = False
                         reason = (f"this choice costs ${cost} and you have "
                                   f"${player.money}")
+                # §Choice costs v2 (contracts.md): the option's real public
+                # money charge. Rule options keep their authored
+                # known_costs (label+amount dialect); event-file/M1
+                # options derive it from the same money figure the
+                # affordability gate enforces; [] when free
+                if isinstance(o.get("known_costs"), list):
+                    known_costs = list(o["known_costs"])
+                else:
+                    fx_money = (o.get("_effects") or {}).get("money", 0)
+                    known_costs = ([{"kind": "money",
+                                     "amount": -fx_money}]
+                                   if fx_money < 0 else [])
                 options_out.append({
                     "id": o["id"], "label": o["label"],
                     "known_effects": list(o.get("known_effects", [])),
+                    "known_costs": known_costs,
                     "enabled": enabled, "reason": reason,
                     "inputs": o.get("inputs", [])})
             # SOFT-LOCK GUARANTEE: at least one option stays available
@@ -810,7 +968,11 @@ class GameService:
             # decision 1): pass through untouched; resolve uses the
             # envelope copy, the client only needs them read-only
             for key in ("schema_dialect", "bindings", "interaction",
-                        "audience", "sampled", "policy_revision"):
+                        "audience", "sampled", "policy_revision",
+                        # M4 social invites: offer addressing for the
+                        # inbox + the adults_only gate badge
+                        "invite_id", "adults_only", "venue_label",
+                        "host_id", "template_id"):
                 if key in pending:
                     pending_out[key] = pending[key]
 
@@ -829,6 +991,9 @@ class GameService:
             },
             "money": player.money,
             "country": env["country"],
+            # §Journal v2 (contracts.md): flat journal unchanged; feed is a
+            # derived regrouping of the SAME player-known-filtered entries
+            # into per-age blocks (header + lines), oldest -> newest
             "journal": [dict(e, person_ids=list(e["person_ids"]),
                              changes=dict(e["changes"]))
                         for e in env["journal"]
@@ -837,9 +1002,30 @@ class GameService:
                         # private / not-player-known occurrences never
                         # leave the server
                         if knowledge_journal_visible(env, e)],
+            "journal_feed": self._journal_feed(env),
+            # §Decision outcome (contracts.md): actual deltas of the most
+            # recent resolve_decision, for C's outcome popup; null until
+            # the first resolve (legacy saves included). Serialized only
+            # after the SAME player_known re-filter as journal entries.
+            "last_decision_outcome": self._visible_outcome(
+                env, env.get("last_decision_outcome")),
             "available_actions": actions,
+            # §Undo (contracts.md): one-level undo availability for the
+            # shell's Undo control (same source as the advertised spec)
+            "can_undo": self._can_undo(env),
+            # §Careers (M3 contracts): additive named-careers view; legacy
+            # M2 work fields stay authoritative for payroll
+            "careers": self._careers_view(env),
+            # §Skills (M3 contracts, C-owned projection; A exposes)
+            "skills": self._skills_view(env),
+            # §Social (M4, A-owned projection per 02-contracts.md)
+            "social": self._social_view(env),
             "pending_decision": pending_out,
+            # §Education (M3): the legacy M2 education view stays on this
+            # key; B's feature projection is additive under
+            # state["education_programs"] (Amendment 6)
             "education": self._education_view(player),
+            "education_programs": self._education_programs_view(env),
             "work": self._work_view(player),
             "health": {"illnesses": [str(i) for i in player.illnesses],
                        "treatments_available": []},
@@ -872,7 +1058,10 @@ class GameService:
         "wedding_plan": "weddings",
         "university_application": "education",
         "university_funding": "education",
+        "education_funding": "education",
+        "social_invite": "social",
         "retirement_offer": "work",
+        "career_offer": "work",
     }
 
     @classmethod
@@ -892,6 +1081,28 @@ class GameService:
         from src.game.features.knowledge.core import pending_visible
         if pending and not pending_visible(env, pending):
             pending = None
+        # §Undo: advertised whenever the shell may render it; enabled +
+        # precise reason come from the single _can_undo source (allowed
+        # even with a pending open or while dead — the snapshot restores
+        # the state before all of that)
+        can_undo = self._can_undo(env)
+        actions.append({"id": "undo_year", "label": "Undo last year",
+                        "category": "life", "inputs": [],
+                        "known_costs": [], "limits": [],
+                        "enabled": can_undo["enabled"],
+                        "reason": can_undo["reason"]})
+        # §Careers (M3): advertised specs share the enabled/reason source
+        # with dispatch (single source)
+        if env["status"] == "alive" and not pending:
+            from src.game.features.careers import core as careers_core
+            actions.extend(careers_core.action_specs(env, player))
+            # §Education (M3): B-owned advertised specs share the
+            # enabled/reason source with dispatch (single source)
+            from src.game.features.education import core as education_core
+            actions.extend(education_core.action_specs(env, player))
+            # §Skills (M3): C-owned advertised training specs
+            from src.game.features.skills import training as skills_training
+            actions.extend(skills_training.action_specs(env))
         if env["status"] == "alive" and not pending:
             actions.append({"id": "age_up", "label": "Age up",
                             "category": "life", "inputs": [],
@@ -952,10 +1163,30 @@ class GameService:
             person = people.get(person_id)
             if person is None:
                 raise GameError("person_not_found", "unknown person", 404)
+
+            def role_of(p):
+                # M4: social people get their social role in the header
+                # (friend/bully/classmate/coworker), not 'relative'
+                rec = (env.get("social_state") or {}).get(
+                    "people", {}).get(p.person_id)
+                if rec:
+                    if rec.get("kind") in ("friend", "best_friend",
+                                           "rival", "bully"):
+                        return rec["kind"]
+                    from src.game.features.social import \
+                        circles as _circles
+                    if p.person_id in _circles.group_member_ids(
+                            env, "classmates"):
+                        return "classmate"
+                    if p.person_id in _circles.group_member_ids(
+                            env, "coworkers"):
+                        return "coworker"
+                return self._role(p)
+
             return person_detail(env, person,
                                  self._advertised_actions(env,
                                                           env["player"]),
-                                 role_of=self._role)
+                                 role_of=role_of)
 
 
     def _succession_view(self, env):
@@ -1911,9 +2142,16 @@ class GameService:
             rule_actions_set.add("find_partner")
             rule_actions_set.add("continue_as")
             rule_actions_set.add("lottery")
+            from src.game.features.careers import core as careers_core
+            for _aid in careers_core.ACTION_IDS:
+                rule_actions_set.add(_aid)
+            from src.game.features.education import core as education_core
+            for _aid in education_core.ACTION_IDS:
+                rule_actions_set.add(_aid)
+            rule_actions_set.add("train_skill")
             if not isinstance(action, str) or (
                     action not in ("age_up", "spend_time",
-                                   "resolve_decision")
+                                   "resolve_decision", "undo_year")
                     and action not in rule_actions_set):
                 raise _invalid("unknown action")
             if payload is None:
@@ -1965,25 +2203,40 @@ class GameService:
                 # saved cursor lets age_up continue the interrupted turn.
                 env["pending"] = None
             if env["pending"] and action not in (
-                    "resolve_decision", "continue_as"):
+                    "resolve_decision", "continue_as", "undo_year"):
                 raise _conflict(
                     "pending_decision",
                     "resolve the pending decision before other actions")
             if env["status"] != "alive" and action not in (
-                    "resolve_decision", "continue_as"):
+                    "resolve_decision", "continue_as", "undo_year"):
                 raise _conflict("game_over", "this life has ended")
 
             try:
-                with _GameRNG(self, env):
-                    if action == "age_up":
-                        self._cmd_age_up(env)
-                    elif action == "resolve_decision":
-                        self._cmd_resolve(env, payload, request_id)
-                    elif action == "continue_as":
-                        self._cmd_continue_as(env, payload)
-                    else:
-                        self._cmd_rule_action(env, action, payload,
-                                              request_id)
+                if action == "undo_year":
+                    # outside _GameRNG: the restore replaces the RNG
+                    # streams wholesale and rehydrates the globals from
+                    # the restored envelope (§Undo, contracts.md)
+                    self._cmd_undo_year(env)
+                else:
+                    with _GameRNG(self, env):
+                        if action == "age_up":
+                            self._snapshot_for_undo(env)
+                            self._cmd_age_up(env)
+                        elif action == "resolve_decision":
+                            self._cmd_resolve(env, payload, request_id)
+                        elif action == "continue_as":
+                            self._cmd_continue_as(env, payload)
+                        elif action in ("careers_apply", "careers_promote",
+                                        "careers_resign"):
+                            self._cmd_careers_action(env, action, payload)
+                        elif action in ("education_enroll", "education_study",
+                                        "education_leave"):
+                            self._cmd_education_action(env, action, payload)
+                        elif action == "train_skill":
+                            self._cmd_train_skill(env, payload)
+                        else:
+                            self._cmd_rule_action(env, action, payload,
+                                                  request_id)
             except LedgerConflict as exc:
                 # W1 (A half): a genuine posting-key collision is a
                 # typed conflict, never an unhandled 500; the save is
@@ -2001,6 +2254,56 @@ class GameService:
 
     # ------------------------------------------------------------- actions
 
+    # ------------------------------------------------------------- undo
+
+    @staticmethod
+    def _snapshot_for_undo(env):
+        """§Undo (contracts.md): full serialized copy of the pre-age
+        envelope (ledger, graph, journal, pendings, knowledge, RNG).
+        Replaced on every age_up; the previous snapshot (and _undo_consumed)
+        are dropped so undo is always exactly the last year."""
+        src = {k: v for k, v in env.items() if k != "_undo_snapshot"}
+        env["_undo_snapshot"] = pickle.dumps(src)
+        env.pop("_undo_consumed", None)
+
+    def _cmd_undo_year(self, env):
+        """§Undo (contracts.md): restore the full pre-age snapshot. Runs
+        OUTSIDE _GameRNG because it replaces the envelope wholesale —
+        but it does NOT touch process-global RNG state or bindings: the
+        restored rng_state/cosmetic_rng_state are the single source of
+        truth, and the next _GameRNG entry rehydrates the globals from
+        them, so the redone year replays exactly (anti-bypass: undo is
+        never a re-roll) while the caller's ambient state is unchanged.
+
+        The snapshot is deserialized through the RESTRICTED save loader
+        (SaveUnpickler), never bare pickle.loads. The transport revision
+        stays monotonic across restoration: we restore gameplay state,
+        not the concurrency token (Codex undo review, 2026-11-20)."""
+        snap = env.get("_undo_snapshot")
+        if snap is None:
+            raise _conflict("not_allowed", "there is no year to undo")
+        current_revision = env["revision"]
+        try:
+            import io
+            from src.lifesim_lib.safe_save import load_save
+            restored = load_save(io.BytesIO(snap))
+        except GameError:
+            raise
+        except Exception as e:
+            raise GameError(
+                "internal_error", "undo snapshot is corrupt", 500) from e
+        self._validate_envelope(restored)
+        # keep the caller's dict identity; replace contents
+        env.clear()
+        env.update(restored)
+        # monotonic revision: the restored snapshot's old transport
+        # token must not rewind the ledger — a client holding the
+        # post-age revision has to go stale, never write
+        env["revision"] = current_revision
+        # one level only: the snapshot is consumed; a fresh age_up sets a
+        # new one (and clears this marker)
+        env["_undo_consumed"] = True
+
     def _cmd_age_up(self, env):
         from src.game import coordinator
         player = env["player"]
@@ -2016,7 +2319,18 @@ class GameService:
             labels = ("happiness", "health", "smarts", "looks")
             changes = {label: new - old for label, old, new in
                        zip(labels, before, after) if new != old}
+            # §Journal flavour (contracts.md): C's flavour line replaces
+            # the dull default when one fits; draws ONLY from the cosmetic
+            # stream (mounted per command) and persists its recents window
+            # in env, so it is undo-safe via the snapshot
+            from src.game.content.journal.yearly_lines import \
+                year_journal_line
+            flavour = year_journal_line(env, {
+                "education": self._education_view(player),
+                "work": self._work_view(player),
+            })
             self._journal(env, "year",
+                          flavour or
                           f"{player.firstname} turned {player.age}.",
                           [player.person_id], changes)
             if completed:
@@ -2037,6 +2351,23 @@ class GameService:
         option = next((o for o in pending["options"] if o["id"] == option_id), None)
         if option is None:
             raise _invalid("unknown option")
+        if pending.get("kind") == "career_offer":
+            # §Careers (M3): A-owned offer resolve — accept/decline applies
+            # the assignment + legacy payroll adapter atomically here,
+            # then the interrupted year (if any) resumes normally
+            return self._resolve_career_offer(env, pending, option_id,
+                                              request_id)
+        if pending.get("kind") == "education_funding":
+            # §Education (M3): B-owned funding resolve — applies the
+            # enrollment/funding (+ A's apprenticeship bridge) atomically
+            # here; a refused option re-offers minus spent choices
+            return self._resolve_education_funding(env, pending, option_id,
+                                                   request_id)
+        if pending.get("kind") == "social_invite":
+            # §Social (M4): A-owned stored-offer resolve — accept/decline
+            # applies atomically here; adults_only venue gate enforced
+            return self._resolve_social_invite(env, pending, option_id,
+                                               request_id)
         if "kind" in pending:
             # rule-owned pending (M2): resolve through C's boundary with the
             # stored pre-sampled outcomes; never the M1 template path
@@ -2105,13 +2436,189 @@ class GameService:
                             for target, before in rel_before.items())
             if rel_delta:
                 changes["relationship"] = rel_delta
-        self._journal(env, "decision",
-                      option["_outcome"].format(name=player.firstname),
+        outcome_text = option["_outcome"].format(name=player.firstname)
+        self._journal(env, "decision", outcome_text,
                       [player.person_id] + person_ids, changes)
+        # §Decision outcome (contracts.md): actual applied deltas for C's
+        # outcome popup; decision-resolve only, replaced per resolve.
+        # Relationship deltas are mapped PER TARGET person (the summed
+        # scalar in `changes` is journal legacy and ambiguous with
+        # multiple targets).
+        env["last_decision_outcome"] = {
+            "decision_id": pending["id"],
+            "option_id": option["id"],
+            "text": outcome_text,
+            "person_ids": [player.person_id] + person_ids,
+            "changes": dict(changes),
+        }
+        rel_changes = {target.person_id: target.relationship - before
+                       for target, before in rel_before.items()
+                       if target.relationship != before}
+        if rel_changes:
+            env["last_decision_outcome"]["relationship_changes"] = \
+                rel_changes
+        # M4: the legacy "new friend" template mints a REAL friend in
+        # the Friends group (a canonical Person with kind/closeness/
+        # memory) instead of a nameless journal line
+        if pending.get("template_id") == "new_friend" \
+                and option["id"].endswith("_o1"):
+            from src.game.features.social import circles as \
+                _social_circles
+            _social_circles.mint_friend(env, player)
         env["pending"] = None
         # M1 template decisions can also interrupt a year (sampled in
         # decision_offer): resume the persisted continuation until the
         # next decision or real year_close
+        if (env["status"] == "alive"
+                and env.get("turn", {}).get("interrupted")):
+            from src.game import coordinator
+            completed = coordinator.run_turn(env, self, random)
+            if completed:
+                env["turn"] = {"cursor": {"phase_id": "year_start",
+                                          "item_cursor": 0}}
+
+    def _resolve_education_funding(self, env, pending, option_id,
+                                   request_id):
+        """§Education (M3 contracts): B-owned funding resolve. Applies
+        enrollment + funding (loan principal through B's adapter,
+        apprenticeship through A's careers bridge) atomically with this
+        resolve; a refused funding option re-offers minus the spent
+        choices, keeping the same pending id. The interrupted year (if
+        any) resumes only once the pending is fully resolved."""
+        from src.game.features.education import core as education_core
+        from src.game import rule_adapter
+        player = env["player"]
+        try:
+            result = education_core.resolve_funding(
+                env, player, pending, option_id, random)
+        except PermissionError as e:
+            raise _conflict("not_allowed", str(e)) from e
+        except ValueError as e:
+            raise _invalid(str(e)) from e
+        turn_id = env["turn"].get("turn_id", f"t_{env['revision'] + 1}")
+        rule_adapter.post_money_entries(
+            env, self, turn_id, player.age, result.get("money_entries"))
+        rule_adapter.journal_events(env, result.get("events"))
+        outcome_ev = next(
+            (e for e in (result.get("events") or []) if e.get("text")),
+            None)
+        if outcome_ev is not None and knowledge_journal_visible(env, {
+                "audience": outcome_ev.get("audience", "public"),
+                "fact_id": outcome_ev.get("fact_id")}):
+            env["last_decision_outcome"] = {
+                "decision_id": pending["id"],
+                "option_id": option_id,
+                "text": outcome_ev["text"],
+                "person_ids": list(outcome_ev.get("person_ids", ())),
+                "changes": dict(outcome_ev.get("changes", {})),
+                "audience": outcome_ev.get("audience", "public"),
+                "fact_id": outcome_ev.get("fact_id"),
+            }
+        reoffer = result.get("pending_decision")
+        if reoffer is not None:
+            reoffer["id"] = pending["id"]
+            env["pending"] = reoffer
+            return
+        env["pending"] = None
+        from src.game.features.social import circles as _social_circles
+        _social_circles.reconcile(env, self, random)
+        if (env["status"] == "alive"
+                and env.get("turn", {}).get("interrupted")):
+            from src.game import coordinator
+            completed = coordinator.run_turn(env, self, random)
+            if completed:
+                env["turn"] = {"cursor": {"phase_id": "year_start",
+                                          "item_cursor": 0}}
+
+    def _resolve_social_invite(self, env, pending, option_id, request_id):
+        """§Social (M4 contracts): A-owned invite resolve. Accept/decline
+        applies atomically with this resolve (envelope update, optional
+        money through the one poster, stats bundle); the adults_only
+        venue gate refuses under-18 accept with the typed reason. The
+        interrupted year (if any) resumes only after resolution."""
+        from src.game.features.social import invites as social_invites
+        from src.game import rule_adapter
+        player = env["player"]
+        if pending.get("schema_dialect") == "v3":
+            # Amendment 2: a C-authored soc_inv_* offer rides the SHARED
+            # v3 resolver (no second interpreter) — A enforces the
+            # adults_only 18+ gate first, marks the invite after, and
+            # the generic boundary journals/posts C's effects
+            option = next((o for o in pending["options"]
+                           if o["id"] == option_id), None)
+            if option is None:
+                raise _invalid("unknown option")
+            declined = option_id.endswith("_decline")
+            if pending.get("adults_only") and player.age < 18 \
+                    and not declined:
+                raise _conflict(
+                    "not_allowed",
+                    "you must be 18 or older to attend")
+            result_state = self._resolve_rule_pending(
+                env, pending, option_id, None, request_id)
+            social_invites.mark_resolved(env, pending.get("invite_id"),
+                                         accepted=not declined)
+            return result_state
+        try:
+            result = social_invites.resolve(env, self, player, pending,
+                                            option_id, random)
+        except PermissionError as e:
+            raise _conflict("not_allowed", str(e)) from e
+        except ValueError as e:
+            raise _invalid(str(e)) from e
+        turn_id = env["turn"].get("turn_id", f"t_{env['revision'] + 1}")
+        rule_adapter.post_money_entries(
+            env, self, turn_id, player.age, result.get("money_entries"))
+        if result.get("bundle"):
+            rule_adapter.apply_effects_bundle(
+                env, self, player, result["bundle"],
+                occurrence=f"{pending.get('event_id', 'soc')}:effects",
+                person_ids=[], journal_kind="event",
+                outcome_text=None)
+        rule_adapter.journal_events(env, result.get("events"))
+        env["pending"] = None
+        if (env["status"] == "alive"
+                and env.get("turn", {}).get("interrupted")):
+            from src.game import coordinator
+            completed = coordinator.run_turn(env, self, random)
+            if completed:
+                env["turn"] = {"cursor": {"phase_id": "year_start",
+                                          "item_cursor": 0}}
+
+    def _resolve_career_offer(self, env, pending, option_id, request_id):
+        """§Careers (M3 contracts): accept/decline a sampled job/promotion
+        offer. The assignment and the legacy payroll adapter move
+        atomically with this resolve; the interrupted year (if any)
+        resumes from its persisted continuation."""
+        from src.game.features.careers import core as careers_core
+        from src.game import rule_adapter
+        player = env["player"]
+        try:
+            result = careers_core.resolve_offer(env, player, pending,
+                                                option_id)
+        except PermissionError as e:
+            raise _conflict("not_allowed", str(e)) from e
+        rule_adapter.journal_events(env, result.get("events"))
+        # §Decision outcome: the offer outcome feeds C's popup through the
+        # same gated field (public work events)
+        outcome_ev = next(
+            (e for e in (result.get("events") or []) if e.get("text")),
+            None)
+        if outcome_ev is not None and knowledge_journal_visible(env, {
+                "audience": outcome_ev.get("audience", "public"),
+                "fact_id": outcome_ev.get("fact_id")}):
+            env["last_decision_outcome"] = {
+                "decision_id": pending["id"],
+                "option_id": option_id,
+                "text": outcome_ev["text"],
+                "person_ids": list(outcome_ev.get("person_ids", ())),
+                "changes": dict(outcome_ev.get("changes", {})),
+                "audience": outcome_ev.get("audience", "public"),
+                "fact_id": outcome_ev.get("fact_id"),
+            }
+        env["pending"] = None
+        from src.game.features.social import circles as _social_circles
+        _social_circles.reconcile(env, self, random)
         if (env["status"] == "alive"
                 and env.get("turn", {}).get("interrupted")):
             from src.game import coordinator
@@ -2129,6 +2636,10 @@ class GameService:
         from src.game.finance import Ledger
         from src.people.classes.parent import Parent
         from src.people.classes.sibling import Sibling
+        # §Undo: no cross-generation undo — the pre-death snapshot refers
+        # to the previous life
+        env.pop("_undo_snapshot", None)
+        env.pop("_undo_consumed", None)
         from src.people.classes.person import Person
         from random import randint
         from src.lifesim_lib.lifesim_lib import (
@@ -2269,6 +2780,8 @@ class GameService:
         env["dead_ids"] = [pid for pid in env.get("dead_ids", [])
                            if pid != successor.person_id]
         env["generation"] = instructions["generation"]
+        # Amendment 4 cadence is once per life, not once per save.
+        env.pop("wrk_stu_seen", None)
         # M2.5: the primary-relationship projection follows the successor
         primary = None
         for rel in env["graph"]["relationships"]:
@@ -2350,11 +2863,83 @@ class GameService:
             self._per_command_entries(result.get("money_entries"),
                                       request_id))
         rule_adapter.journal_events(env, result.get("events"))
+        # M3b: M2 commands like quit_job/retire end employment without
+        # knowing about named assignments — reconcile the careers
+        # envelope immediately (idempotent no-op when consistent) so the
+        # Work projection never shows a stale active assignment
+        from src.game.features.careers import core as _careers_core
+        _reconciled = _careers_core.reconcile_legacy_transition(
+            env, env["player"])
+        if _reconciled is not None:
+            rule_adapter.journal_events(env, [_reconciled])
         if "pending_decision" in result:
             env["pending"] = result["pending_decision"]
             if env["pending"] is not None:
                 env["pending"]["id"] = f"d_{env['next_decision_num']}"
                 env["next_decision_num"] += 1
+
+    def _cmd_careers_action(self, env, action, payload, rng=None):
+        """§Careers (M3 contracts): feature commands ride the existing
+        command/replay/ledger boundary. PermissionError is the typed
+        refusal (409 not_allowed) with the precise server reason."""
+        from src.game.features.careers import core as careers_core
+        from src.game import rule_adapter
+        player = env["player"]
+        try:
+            result = careers_core.apply_action(env, player, action, payload,
+                                               random, self)
+        except PermissionError as e:
+            raise _conflict("not_allowed", str(e)) from e
+        except ValueError as e:
+            raise _invalid(str(e)) from e
+        turn_id = env["turn"].get("turn_id", f"t_{env['revision'] + 1}")
+        rule_adapter.post_money_entries(
+            env, self, turn_id, player.age, result.get("money_entries"))
+        rule_adapter.journal_events(env, result.get("events"))
+        # M4: reconcile social circles after the transition (NPC
+        # generation rides the mounted stream inside commands)
+        from src.game.features.social import circles as _social_circles
+        _social_circles.reconcile(env, self, random)
+        if "pending_decision" in result:
+            env["pending"] = result["pending_decision"]
+            if env["pending"] is not None:
+                env["pending"]["id"] = f"d_{env['next_decision_num']}"
+                env["next_decision_num"] += 1
+
+    def _cmd_education_action(self, env, action, payload, rng=None):
+        """§Education (M3 contracts): B-owned feature commands ride the
+        existing command/replay/ledger boundary — a clone of the careers
+        seam. PermissionError is the typed refusal (409 not_allowed)."""
+        from src.game.features.education import core as education_core
+        from src.game import rule_adapter
+        player = env["player"]
+        try:
+            result = education_core.apply_action(env, player, action,
+                                                 payload, random, self)
+        except PermissionError as e:
+            raise _conflict("not_allowed", str(e)) from e
+        except ValueError as e:
+            raise _invalid(str(e)) from e
+        turn_id = env["turn"].get("turn_id", f"t_{env['revision'] + 1}")
+        rule_adapter.post_money_entries(
+            env, self, turn_id, player.age, result.get("money_entries"))
+        rule_adapter.journal_events(env, result.get("events"))
+        # M4: reconcile social circles after education transitions
+        from src.game.features.social import circles as _social_circles
+        _social_circles.reconcile(env, self, random)
+        if "pending_decision" in result:
+            env["pending"] = result["pending_decision"]
+            if env["pending"] is not None:
+                env["pending"]["id"] = f"d_{env['next_decision_num']}"
+                env["next_decision_num"] += 1
+
+    def _cmd_train_skill(self, env, payload):
+        """§Skills (M3 contracts): C-owned train command. C raises typed
+        GameError (400 invalid_input / 409 not_allowed) directly; the
+        single gain applier + the one ledger poster run inside C's code."""
+        from src.game.features.skills import training as skills_training
+        skills_training.cmd_train(env, payload, random, self)
+
 
     def _resolve_rule_pending(self, env, pending, option_id, inputs,
                               request_id):
@@ -2393,6 +2978,44 @@ class GameService:
             self._per_command_entries(result.get("money_entries"),
                                       request_id))
         rule_adapter.journal_events(env, result.get("events"))
+        # A stored retirement offer ends employment through resolution,
+        # rather than the direct retire command. Reconcile before any
+        # projection or interrupted-year continuation exposes the result.
+        from src.game.features.careers import core as careers_core
+        reconciled = careers_core.reconcile_legacy_transition(
+            env, env["player"])
+        if reconciled is not None:
+            rule_adapter.journal_events(env, [reconciled])
+        # §Decision outcome (contracts.md): the resolver's leading outcome
+        # event carries the actual applied deltas for C's popup — captured
+        # ONLY when that event passes the same server-side player_known
+        # gate as journal serialization, so the raw-projected field can
+        # never bypass privacy
+        outcome_ev = next(
+            (e for e in (result.get("events") or []) if e.get("text")),
+            None)
+        if outcome_ev is not None and knowledge_journal_visible(env, {
+                "audience": outcome_ev.get("audience", "public"),
+                "fact_id": outcome_ev.get("fact_id")}):
+            env["last_decision_outcome"] = {
+                "decision_id": pending["id"],
+                "option_id": option_id,
+                "text": outcome_ev["text"],
+                "person_ids": list(outcome_ev.get("person_ids", ())),
+                "changes": dict(outcome_ev.get("changes", {})),
+                # visibility metadata preserved so the projection can
+                # re-apply the player_known gate at serialization
+                "audience": outcome_ev.get("audience", "public"),
+                "fact_id": outcome_ev.get("fact_id"),
+            }
+            rel_changes = outcome_ev.get("relationship_changes") or {}
+            if rel_changes:
+                env["last_decision_outcome"]["relationship_changes"] = \
+                    dict(rel_changes)
+        else:
+            # private / not-player-known outcome: nothing player-visible
+            # was resolved, so the popup field is honestly null
+            env["last_decision_outcome"] = None
         for death in result.get("deaths") or []:
             self._apply_event_death(env, death)
         if result.get("finished_turn"):

@@ -7,6 +7,15 @@ import unittest
 from tools.cdp_client import launch_chrome
 from web import server
 
+# M4: with state.social live the Relationships roster is the social
+# module's .v2so-chip; the legacy #familyList roster stays empty/hidden.
+_PERSON_CHIP_WAIT = (
+    "(document.querySelectorAll('#familyList .chip').length > 0 || "
+    "!!document.querySelector('.v2so-chip[data-person-id]'))")
+_PERSON_CHIP_CLICK = (
+    "(document.querySelector('#familyList .chip') || "
+    "document.querySelector('.v2so-chip[data-person-id]')).click()")
+
 
 class BackNavigationBrowserTests(unittest.TestCase):
     @classmethod
@@ -31,7 +40,7 @@ class BackNavigationBrowserTests(unittest.TestCase):
             if proc.stderr: proc.stderr.close()
         self.addCleanup(close)
         page = conn.new_session(self.base + '/game?game=' + st['game_id'])
-        page.wait_js("!!document.querySelector('.v2h-age')")
+        page.wait_js("!!document.querySelector('.v2-agebtn')")
         return page, st
 
     def screen(self, page, name):
@@ -59,7 +68,7 @@ class BackNavigationBrowserTests(unittest.TestCase):
         page, _ = self.open_game()
         self.tab(page, 'job'); self.tab(page, 'assets')
         page.call('Page.reload', {})
-        page.wait_js("!!document.querySelector('.v2h-age')")
+        page.wait_js("!!document.querySelector('.v2-agebtn')")
         self.screen(page, 'assets')
         self.back(page); self.screen(page, 'job')
 
@@ -68,7 +77,7 @@ class BackNavigationBrowserTests(unittest.TestCase):
         # Existing tabs can retain B's earlier unindexed history payload.
         page.js("history.replaceState({v2:1,screen:'home',scroll:0},'')")
         page.call('Page.reload', {})
-        page.wait_js("!!document.querySelector('.v2h-age')")
+        page.wait_js("!!document.querySelector('.v2-agebtn')")
         page.js("document.getElementById('backToLives').click()")
         page.wait_js("document.getElementById('resumeView').checkVisibility()")
         page.call('Page.reload', {})
@@ -112,7 +121,8 @@ class BackNavigationBrowserTests(unittest.TestCase):
     def test_person_back_uses_same_history_and_person_survives_reload(self):
         page, _ = self.open_game()
         self.tab(page, 'people')
-        page.js("document.querySelector('#familyList .chip').click()")
+        page.wait_js(_PERSON_CHIP_WAIT, desc='person chips render')
+        page.js(_PERSON_CHIP_CLICK)
         page.wait_js("!!document.querySelector('.v2p-name')")
         name = page.js("document.querySelector('.v2p-name').textContent")
         page.call('Page.reload', {})
@@ -150,7 +160,7 @@ class BackNavigationBrowserTests(unittest.TestCase):
         page.js("Array.from(document.querySelectorAll('#actionList button'))"
                 ".find(e=>e.textContent.includes('Surrender')).click()")
         page.wait_js("!document.getElementById('modal').hidden && "
-                     "!!document.querySelector('.v2c-options')")
+                     "!!document.querySelector('.v2c-options, .v2e-options')")
         before = self.httpd.service.get_state(state['game_id'])
         self.assertIsNotNone(before['pending_decision'])
         page.js('history.back()'); self.screen(page, 'job')
@@ -158,4 +168,4 @@ class BackNavigationBrowserTests(unittest.TestCase):
         self.assertEqual(after['pending_decision']['id'], before['pending_decision']['id'])
         self.assertEqual(after['revision'], before['revision'])
         self.assertFalse(page.js("document.getElementById('modal').hidden"))
-        self.assertTrue(page.js("document.querySelector('.v2h-age').disabled"))
+        self.assertTrue(page.js("document.querySelector('.v2-agebtn').disabled"))

@@ -1,0 +1,13 @@
+{
+ "schema_version": 1,
+ "_comment": "M4 bullying arc table (Kimi C). Arc STATE is A's env['social_state']['people'][pid]['arc']; this table is the frozen outcome vocabulary applied by C's apply_bullying_response (rule_actions.py) — A's social_invite/resolve path and C's rule actions share it. tell_someone always works (no rng gate); the target is never blamed by authored text.",
+ "stages": ["targeted", "escalated", "resolving", "ended"],
+ "responses": {
+  "tell_someone": {"to_stage": "resolving", "karma": 1,
+                   "fact": "sought_help"},
+  "stand_up":     {"to_stage": "resolving", "health_min": 40,
+                   "fail_to_stage": "escalated"},
+  "avoid":        {"to_stage": null, "stress": -2},
+  "befriend":     {"to_stage": "ended", "edge_to": "acquaintance"}
+ }
+}

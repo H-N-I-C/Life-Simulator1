@@ -1,0 +1,1808 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 51,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Ailey",
+    "last_name": "Schultz",
+    "gender": "female",
+    "country": "Japan",
+    "seed": 73362275,
+    "request_id": "robot-7-51-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 83441603,
+     "base": "man",
+     "skin_tone": "dark",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "earrings"
+     ],
+     "background": "bg_01",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1371",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1372",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_tantrum"
+   },
+   "request_id": "robot-7-r1373",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1374",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1375",
+   "expected_revision": 4
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1376",
+   "expected_revision": 5
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1377",
+   "expected_revision": 6
+  },
+  {
+   "n": 9,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1378",
+   "expected_revision": 6
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1379",
+   "expected_revision": 7
+  },
+  {
+   "n": 12,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1380",
+   "expected_revision": 7
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1381",
+   "expected_revision": 8
+  },
+  {
+   "n": 15,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "conversation",
+   "payload": {
+    "target_id": "85f9bbed-05ce-44b0-b077-ab98c49d8864"
+   },
+   "request_id": "robot-7-r1382",
+   "expected_revision": 8
+  },
+  {
+   "n": 17,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1383",
+   "expected_revision": 9
+  },
+  {
+   "n": 18,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 19,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "conversation",
+   "payload": {
+    "target_id": "d1c796bf-cc40-4ee2-b344-b771804fc2e8"
+   },
+   "request_id": "robot-7-r1384",
+   "expected_revision": 9
+  },
+  {
+   "n": 20,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1385",
+   "expected_revision": 10
+  },
+  {
+   "n": 21,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1386",
+   "expected_revision": 11
+  },
+  {
+   "n": 22,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 23,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "social_befriend",
+   "payload": {
+    "target_id": "8a0b6c76-2ccc-44d0-909d-fcf2d05862e0"
+   },
+   "request_id": "robot-7-r1387",
+   "expected_revision": 11
+  },
+  {
+   "n": 24,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1388",
+   "expected_revision": 12
+  },
+  {
+   "n": 25,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 26,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1389",
+   "expected_revision": 12
+  },
+  {
+   "n": 27,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_decline"
+   },
+   "request_id": "robot-7-r1390",
+   "expected_revision": 13
+  },
+  {
+   "n": 28,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1391",
+   "expected_revision": 14
+  },
+  {
+   "n": 29,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 30,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-7-r1392",
+   "expected_revision": 14
+  },
+  {
+   "n": 31,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1393",
+   "expected_revision": 15
+  },
+  {
+   "n": 32,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_decline"
+   },
+   "request_id": "robot-7-r1394",
+   "expected_revision": 16
+  },
+  {
+   "n": 33,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1395",
+   "expected_revision": 17
+  },
+  {
+   "n": 34,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "conversation",
+   "payload": {
+    "target_id": "d1c796bf-cc40-4ee2-b344-b771804fc2e8"
+   },
+   "request_id": "robot-7-r1396",
+   "expected_revision": 18
+  },
+  {
+   "n": 35,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1397",
+   "expected_revision": 19
+  },
+  {
+   "n": 36,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 37,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1398",
+   "expected_revision": 19
+  },
+  {
+   "n": 38,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "d_3_o1"
+   },
+   "request_id": "robot-7-r1399",
+   "expected_revision": 20
+  },
+  {
+   "n": 39,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "drop_out",
+   "payload": {},
+   "request_id": "robot-7-r1400",
+   "expected_revision": 21
+  },
+  {
+   "n": 40,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "arts_and_crafts",
+   "payload": {},
+   "request_id": "robot-7-r1401",
+   "expected_revision": 22
+  },
+  {
+   "n": 41,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "conversation",
+   "payload": {
+    "target_id": "85f9bbed-05ce-44b0-b077-ab98c49d8864"
+   },
+   "request_id": "robot-7-r1402",
+   "expected_revision": 23
+  },
+  {
+   "n": 42,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1403",
+   "expected_revision": 23
+  },
+  {
+   "n": 43,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 23 does not match current revision 24\"}}"
+  },
+  {
+   "n": 44,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1404",
+   "expected_revision": 24
+  },
+  {
+   "n": 45,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 46,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1405",
+   "expected_revision": 24
+  },
+  {
+   "n": 47,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_4",
+    "option_id": "d_4_truce",
+    "inputs": null
+   },
+   "request_id": "robot-7-r1406",
+   "expected_revision": 25
+  },
+  {
+   "n": 48,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1407",
+   "expected_revision": 26
+  },
+  {
+   "n": 49,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 50,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "play_toys",
+   "payload": {},
+   "request_id": "robot-7-r1408",
+   "expected_revision": 26
+  },
+  {
+   "n": 51,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "train_skill",
+   "payload": {
+    "target_id": "train_practical"
+   },
+   "request_id": "robot-7-r1409",
+   "expected_revision": 27
+  },
+  {
+   "n": 52,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1410",
+   "expected_revision": 28
+  },
+  {
+   "n": 53,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 54,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1411",
+   "expected_revision": 28
+  },
+  {
+   "n": 55,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1412",
+   "expected_revision": 29
+  },
+  {
+   "n": 56,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 57,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "listen_to_music",
+   "payload": {},
+   "request_id": "robot-7-r1413",
+   "expected_revision": 29
+  },
+  {
+   "n": 58,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1414",
+   "expected_revision": 30
+  },
+  {
+   "n": 59,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 60,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "meditate",
+   "payload": {},
+   "request_id": "robot-7-r1415",
+   "expected_revision": 30
+  },
+  {
+   "n": 61,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1416",
+   "expected_revision": 31
+  },
+  {
+   "n": 62,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 63,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "compliment",
+   "payload": {
+    "target_id": "d1c796bf-cc40-4ee2-b344-b771804fc2e8"
+   },
+   "request_id": "robot-7-r1417",
+   "expected_revision": 31
+  },
+  {
+   "n": 64,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1418",
+   "expected_revision": 32
+  },
+  {
+   "n": 65,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 66,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1419",
+   "expected_revision": 32
+  },
+  {
+   "n": 67,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_5",
+    "option_id": "d_5_o1"
+   },
+   "request_id": "robot-7-r1420",
+   "expected_revision": 33
+  },
+  {
+   "n": 68,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1421",
+   "expected_revision": 34
+  },
+  {
+   "n": 69,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 70,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1422",
+   "expected_revision": 34
+  },
+  {
+   "n": 71,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_6",
+    "option_id": "d_6_investigate"
+   },
+   "request_id": "robot-7-r1423",
+   "expected_revision": 35
+  },
+  {
+   "n": 72,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "ask_for_money",
+   "payload": {
+    "target_id": "d1c796bf-cc40-4ee2-b344-b771804fc2e8"
+   },
+   "request_id": "robot-7-r1424",
+   "expected_revision": 36
+  },
+  {
+   "n": 73,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1425",
+   "expected_revision": 37
+  },
+  {
+   "n": 74,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_7",
+    "option_id": "d_7_carry"
+   },
+   "request_id": "robot-7-r1426",
+   "expected_revision": 38
+  },
+  {
+   "n": 75,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1427",
+   "expected_revision": 39
+  },
+  {
+   "n": 76,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1428",
+   "expected_revision": 40
+  },
+  {
+   "n": 77,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 78,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1429",
+   "expected_revision": 40
+  },
+  {
+   "n": 79,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_8",
+    "option_id": "apply"
+   },
+   "request_id": "robot-7-r1430",
+   "expected_revision": 41
+  },
+  {
+   "n": 80,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_8",
+    "option_id": "apply"
+   },
+   "request_id": "robot-7-r1430",
+   "expected_revision": 41
+  },
+  {
+   "n": 81,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_9",
+    "option_id": "scholarship"
+   },
+   "request_id": "robot-7-r1432",
+   "expected_revision": 42
+  },
+  {
+   "n": 82,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_9",
+    "option_id": "parents"
+   },
+   "request_id": "robot-7-r1433",
+   "expected_revision": 43
+  },
+  {
+   "n": 83,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_9",
+    "option_id": "student_loan"
+   },
+   "request_id": "robot-7-r1434",
+   "expected_revision": 44
+  },
+  {
+   "n": 84,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "definitely_not_an_action",
+   "payload": {},
+   "request_id": "robot-7-r1435",
+   "expected_revision": 45
+  },
+  {
+   "n": 85,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown action\"}}"
+  },
+  {
+   "n": 86,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "social_spend_time",
+   "payload": {
+    "target_id": "2745ce88-ccc4-4df8-9430-c51f25a2dcd7"
+   },
+   "request_id": "robot-7-r1436",
+   "expected_revision": 45
+  },
+  {
+   "n": 87,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1437",
+   "expected_revision": 46
+  },
+  {
+   "n": 88,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 89,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "social_befriend",
+   "payload": {
+    "target_id": "27149f20-1ccc-4305-9cd6-a5442b56bba3"
+   },
+   "request_id": "robot-7-r1438",
+   "expected_revision": 46
+  },
+  {
+   "n": 90,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1439",
+   "expected_revision": 47
+  },
+  {
+   "n": 91,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 92,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "meditate",
+   "payload": {},
+   "request_id": "robot-7-r1440",
+   "expected_revision": 47
+  },
+  {
+   "n": 93,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "meditate",
+   "payload": {},
+   "request_id": "robot-7-r1440",
+   "expected_revision": 47
+  },
+  {
+   "n": 94,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1442",
+   "expected_revision": 48
+  },
+  {
+   "n": 95,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 96,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "85f9bbed-05ce-44b0-b077-ab98c49d8864"
+   },
+   "request_id": "robot-7-r1443",
+   "expected_revision": 48
+  },
+  {
+   "n": 97,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1444",
+   "expected_revision": 49
+  },
+  {
+   "n": 98,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"not_allowed\", \"message\": \"not while enrolled in school\"}}"
+  },
+  {
+   "n": 99,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1445",
+   "expected_revision": 49
+  },
+  {
+   "n": 100,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_10",
+    "option_id": "d_10_wait_first"
+   },
+   "request_id": "robot-7-r1446",
+   "expected_revision": 50
+  },
+  {
+   "n": 101,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_11",
+    "option_id": "d_11_own_it"
+   },
+   "request_id": "robot-7-r1447",
+   "expected_revision": 51
+  },
+  {
+   "n": 102,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_12",
+    "option_id": "d_12_give_chance"
+   },
+   "request_id": "robot-7-r1448",
+   "expected_revision": 52
+  },
+  {
+   "n": 103,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1449",
+   "expected_revision": 53
+  },
+  {
+   "n": 104,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_13",
+    "option_id": "d_13_busy"
+   },
+   "request_id": "robot-7-r1450",
+   "expected_revision": 54
+  },
+  {
+   "n": 105,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_14",
+    "option_id": "d_14_ignore"
+   },
+   "request_id": "robot-7-r1451",
+   "expected_revision": 55
+  },
+  {
+   "n": 106,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_15",
+    "option_id": "d_15_sulk"
+   },
+   "request_id": "robot-7-r1452",
+   "expected_revision": 56
+  },
+  {
+   "n": 107,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1453",
+   "expected_revision": 57
+  },
+  {
+   "n": 108,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_16",
+    "option_id": "d_16_space"
+   },
+   "request_id": "robot-7-r1454",
+   "expected_revision": 58
+  },
+  {
+   "n": 109,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_17",
+    "option_id": "d_17_say_something"
+   },
+   "request_id": "robot-7-r1455",
+   "expected_revision": 59
+  },
+  {
+   "n": 110,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_18",
+    "option_id": "d_18_reject"
+   },
+   "request_id": "robot-7-r1456",
+   "expected_revision": 60
+  },
+  {
+   "n": 111,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_18",
+    "option_id": "d_18_reject"
+   },
+   "request_id": "robot-7-r1456",
+   "expected_revision": 60
+  },
+  {
+   "n": 112,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "social_befriend",
+   "payload": {
+    "target_id": "b36f3ddf-a65a-44c6-a688-9ea90f892647"
+   },
+   "request_id": "robot-7-r1458",
+   "expected_revision": 61
+  },
+  {
+   "n": 113,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1459",
+   "expected_revision": 61
+  },
+  {
+   "n": 114,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 61 does not match current revision 62\"}}"
+  },
+  {
+   "n": 115,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "85f9bbed-05ce-44b0-b077-ab98c49d8864"
+   },
+   "request_id": "robot-7-r1460",
+   "expected_revision": 62
+  },
+  {
+   "n": 116,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "compliment",
+   "payload": {
+    "target_id": "d1c796bf-cc40-4ee2-b344-b771804fc2e8"
+   },
+   "request_id": "robot-7-r1461",
+   "expected_revision": 63
+  },
+  {
+   "n": 117,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "insult",
+   "payload": {
+    "target_id": "85f9bbed-05ce-44b0-b077-ab98c49d8864"
+   },
+   "request_id": "robot-7-r1462",
+   "expected_revision": 64
+  },
+  {
+   "n": 118,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1463",
+   "expected_revision": 65
+  },
+  {
+   "n": 119,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_19",
+    "option_id": "d_19_text"
+   },
+   "request_id": "robot-7-r1464",
+   "expected_revision": 66
+  },
+  {
+   "n": 120,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_20",
+    "option_id": "d_20_reschedule"
+   },
+   "request_id": "robot-7-r1465",
+   "expected_revision": 67
+  },
+  {
+   "n": 121,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1466",
+   "expected_revision": 68
+  },
+  {
+   "n": 122,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_21",
+    "option_id": "d_21_decline"
+   },
+   "request_id": "robot-7-r1467",
+   "expected_revision": 69
+  },
+  {
+   "n": 123,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_22",
+    "option_id": "d_22_walk"
+   },
+   "request_id": "robot-7-r1468",
+   "expected_revision": 70
+  },
+  {
+   "n": 124,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1469",
+   "expected_revision": 71
+  },
+  {
+   "n": 125,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_23",
+    "option_id": "d_23_concede"
+   },
+   "request_id": "robot-7-r1470",
+   "expected_revision": 72
+  },
+  {
+   "n": 126,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_23",
+    "option_id": "d_23_concede"
+   },
+   "request_id": "robot-7-r1470",
+   "expected_revision": 72
+  },
+  {
+   "n": 127,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_24",
+    "option_id": "d_24_o2"
+   },
+   "request_id": "robot-7-r1472",
+   "expected_revision": 73
+  },
+  {
+   "n": 128,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1473",
+   "expected_revision": 74
+  },
+  {
+   "n": 129,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_25",
+    "option_id": "d_25_stand_ground"
+   },
+   "request_id": "robot-7-r1474",
+   "expected_revision": 75
+  },
+  {
+   "n": 130,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "library",
+   "payload": {},
+   "request_id": "robot-7-r1475",
+   "expected_revision": 76
+  },
+  {
+   "n": 131,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1476",
+   "expected_revision": 76
+  },
+  {
+   "n": 132,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 76 does not match current revision 77\"}}"
+  },
+  {
+   "n": 133,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "insult",
+   "payload": {
+    "target_id": "85f9bbed-05ce-44b0-b077-ab98c49d8864"
+   },
+   "request_id": "robot-7-r1477",
+   "expected_revision": 77
+  },
+  {
+   "n": 134,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1478",
+   "expected_revision": 78
+  },
+  {
+   "n": 135,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "insult",
+   "payload": {
+    "target_id": "d1c796bf-cc40-4ee2-b344-b771804fc2e8"
+   },
+   "request_id": "robot-7-r1479",
+   "expected_revision": 79
+  },
+  {
+   "n": 136,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "definitely_not_an_action",
+   "payload": {},
+   "request_id": "robot-7-r1480",
+   "expected_revision": 80
+  },
+  {
+   "n": 137,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown action\"}}"
+  },
+  {
+   "n": 138,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "conversation",
+   "payload": {
+    "target_id": "d1c796bf-cc40-4ee2-b344-b771804fc2e8"
+   },
+   "request_id": "robot-7-r1481",
+   "expected_revision": 80
+  },
+  {
+   "n": 139,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "meditate",
+   "payload": {},
+   "request_id": "robot-7-r1482",
+   "expected_revision": 81
+  },
+  {
+   "n": 140,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "lottery",
+   "payload": {},
+   "request_id": "robot-7-r1483",
+   "expected_revision": 82
+  },
+  {
+   "n": 141,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_26",
+    "option_id": "back"
+   },
+   "request_id": "robot-7-r1484",
+   "expected_revision": 83
+  },
+  {
+   "n": 142,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "find_job",
+   "payload": {},
+   "request_id": "robot-7-r1485",
+   "expected_revision": 84
+  },
+  {
+   "n": 143,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_27",
+    "option_id": "apply"
+   },
+   "request_id": "robot-7-r1486",
+   "expected_revision": 85
+  },
+  {
+   "n": 144,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1487",
+   "expected_revision": 86
+  },
+  {
+   "n": 145,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "d1c796bf-cc40-4ee2-b344-b771804fc2e8"
+   },
+   "request_id": "robot-7-r1488",
+   "expected_revision": 87
+  },
+  {
+   "n": 146,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "spend_time",
+   "payload": {
+    "target_id": "d1c796bf-cc40-4ee2-b344-b771804fc2e8"
+   },
+   "request_id": "robot-7-r1488",
+   "expected_revision": 87
+  },
+  {
+   "n": 147,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-7-r1490",
+   "expected_revision": 88
+  },
+  {
+   "n": 148,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_28",
+    "option_id": "continue"
+   },
+   "request_id": "robot-7-r1491",
+   "expected_revision": 89
+  },
+  {
+   "n": 149,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "conversation",
+   "payload": {
+    "target_id": "85f9bbed-05ce-44b0-b077-ab98c49d8864"
+   },
+   "request_id": "robot-7-r1492",
+   "expected_revision": 90
+  },
+  {
+   "n": 150,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "courtship_offer",
+   "payload": {
+    "target_id": "85f9bbed-05ce-44b0-b077-ab98c49d8864"
+   },
+   "request_id": "robot-7-r1493",
+   "expected_revision": 91
+  },
+  {
+   "n": 151,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_29",
+    "option_id": "d_0_back_out"
+   },
+   "request_id": "robot-7-r1494",
+   "expected_revision": 92
+  },
+  {
+   "n": 152,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "social_befriend",
+   "payload": {
+    "target_id": "2745ce88-ccc4-4df8-9430-c51f25a2dcd7"
+   },
+   "request_id": "robot-7-r1495",
+   "expected_revision": 93
+  },
+  {
+   "n": 153,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "definitely_not_an_action",
+   "payload": {},
+   "request_id": "robot-7-r1496",
+   "expected_revision": 94
+  },
+  {
+   "n": 154,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown action\"}}"
+  },
+  {
+   "n": 155,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1497",
+   "expected_revision": 94
+  },
+  {
+   "n": 156,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "social_spend_time",
+   "payload": {
+    "target_id": "2745ce88-ccc4-4df8-9430-c51f25a2dcd7"
+   },
+   "request_id": "robot-7-r1498",
+   "expected_revision": 95
+  },
+  {
+   "n": 157,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1499",
+   "expected_revision": 96
+  },
+  {
+   "n": 158,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1500",
+   "expected_revision": 97
+  },
+  {
+   "n": 159,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "request_raise",
+   "payload": {},
+   "request_id": "robot-7-r1501",
+   "expected_revision": 98
+  },
+  {
+   "n": 160,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "social_befriend",
+   "payload": {
+    "target_id": "08f56367-eaf0-4c2d-b28f-17066d047d55"
+   },
+   "request_id": "robot-7-r1502",
+   "expected_revision": 99
+  },
+  {
+   "n": 161,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1503",
+   "expected_revision": 100
+  },
+  {
+   "n": 162,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "work_harder",
+   "payload": {},
+   "request_id": "robot-7-r1504",
+   "expected_revision": 101
+  },
+  {
+   "n": 163,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1505",
+   "expected_revision": 102
+  },
+  {
+   "n": 164,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_30",
+    "option_id": "d_30_play_dirty"
+   },
+   "request_id": "robot-7-r1506",
+   "expected_revision": 103
+  },
+  {
+   "n": 165,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "conversation",
+   "payload": {
+    "target_id": "d1c796bf-cc40-4ee2-b344-b771804fc2e8"
+   },
+   "request_id": "robot-7-r1507",
+   "expected_revision": 104
+  },
+  {
+   "n": 166,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "conversation",
+   "payload": {
+    "target_id": "d1c796bf-cc40-4ee2-b344-b771804fc2e8"
+   },
+   "request_id": "robot-7-r1508",
+   "expected_revision": 105
+  },
+  {
+   "n": 167,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "conversation",
+   "payload": {
+    "target_id": "85f9bbed-05ce-44b0-b077-ab98c49d8864"
+   },
+   "request_id": "robot-7-r1509",
+   "expected_revision": 106
+  },
+  {
+   "n": 168,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "compliment",
+   "payload": {
+    "target_id": "85f9bbed-05ce-44b0-b077-ab98c49d8864"
+   },
+   "request_id": "robot-7-r1510",
+   "expected_revision": 107
+  },
+  {
+   "n": 169,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1511",
+   "expected_revision": 108
+  },
+  {
+   "n": 170,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_31",
+    "option_id": "d_31_short"
+   },
+   "request_id": "robot-7-r1512",
+   "expected_revision": 109
+  },
+  {
+   "n": 171,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "social_befriend",
+   "payload": {
+    "target_id": "806feeb6-0a12-48ce-af46-8d7ad78e2ad2"
+   },
+   "request_id": "robot-7-r1513",
+   "expected_revision": 110
+  },
+  {
+   "n": 172,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "adjust_hours",
+   "payload": {
+    "hours": 57
+   },
+   "request_id": "robot-7-r1514",
+   "expected_revision": 111
+  },
+  {
+   "n": 173,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "train_skill",
+   "payload": {
+    "target_id": "train_organization"
+   },
+   "request_id": "robot-7-r1515",
+   "expected_revision": 112
+  },
+  {
+   "n": 174,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "courtship_offer",
+   "payload": {
+    "target_id": "d1c796bf-cc40-4ee2-b344-b771804fc2e8"
+   },
+   "request_id": "robot-7-r1516",
+   "expected_revision": 113
+  },
+  {
+   "n": 175,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_32",
+    "option_id": "d_0_back_out"
+   },
+   "request_id": "robot-7-r1517",
+   "expected_revision": 114
+  },
+  {
+   "n": 176,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1518",
+   "expected_revision": 115
+  },
+  {
+   "n": 177,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "train_skill",
+   "payload": {
+    "target_id": "train_organization"
+   },
+   "request_id": "robot-7-r1519",
+   "expected_revision": 116
+  },
+  {
+   "n": 178,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "request_raise",
+   "payload": {},
+   "request_id": "robot-7-r1520",
+   "expected_revision": 117
+  },
+  {
+   "n": 179,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1521",
+   "expected_revision": 118
+  },
+  {
+   "n": 180,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_33",
+    "option_id": "attend"
+   },
+   "request_id": "robot-7-r1522",
+   "expected_revision": 119
+  },
+  {
+   "n": 181,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "witch_doctor",
+   "payload": {},
+   "request_id": "robot-7-r1523",
+   "expected_revision": 120
+  },
+  {
+   "n": 182,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "witch_doctor",
+   "payload": {},
+   "request_id": "robot-7-r1523",
+   "expected_revision": 120
+  },
+  {
+   "n": 183,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_34",
+    "option_id": "take"
+   },
+   "request_id": "robot-7-r1525",
+   "expected_revision": 121
+  },
+  {
+   "n": 184,
+   "kind": "command",
+   "game_id": "g_a6dd4a0d2e",
+   "action": "careers_apply",
+   "payload": {
+    "opening": null
+   },
+   "request_id": "robot-7-r1526",
+   "expected_revision": 122
+  },
+  {
+   "n": 185,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 52 --seed 7 --from-life 51 --fail-fast"
+}

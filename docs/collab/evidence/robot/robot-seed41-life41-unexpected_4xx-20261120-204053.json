@@ -1,0 +1,168 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 41,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Arvind at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Augustine",
+    "last_name": "Hester",
+    "gender": "male",
+    "country": "Indonesia",
+    "seed": 709893379,
+    "request_id": "robot-41-41-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 833435201,
+     "base": "person",
+     "skin_tone": "light",
+     "hair": "white",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses"
+     ],
+     "background": "bg_06",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_9bc2205f06",
+   "action": "definitely_not_an_action",
+   "payload": {},
+   "request_id": "robot-41-r2352",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown action\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_9bc2205f06",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2353",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_9bc2205f06",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r2354",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_9bc2205f06",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2355",
+   "expected_revision": 2
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_9bc2205f06",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2356",
+   "expected_revision": 3
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_9bc2205f06",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r2357",
+   "expected_revision": 4
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_9bc2205f06",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2358",
+   "expected_revision": 5
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_9bc2205f06",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_ask"
+   },
+   "request_id": "robot-41-r2359",
+   "expected_revision": 6
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_9bc2205f06",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2360",
+   "expected_revision": 7
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_9bc2205f06",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r2361",
+   "expected_revision": 8
+  },
+  {
+   "n": 13,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_9bc2205f06",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Arvind",
+    "employer_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+   },
+   "request_id": "robot-41-r2362",
+   "expected_revision": 8
+  },
+  {
+   "n": 15,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Arvind at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 42 --seed 41 --from-life 41 --fail-fast"
+}

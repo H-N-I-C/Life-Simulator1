@@ -1,5 +1,6 @@
 """Forced real-service/browser regressions for Home's command settlement."""
 import random
+import os
 import shutil
 import tempfile
 import threading
@@ -31,16 +32,21 @@ class HomeLifecycleBrowserTests(unittest.TestCase):
         return self.svc.new_game(profile, self.id())
 
     def open_game(self, gid):
-        proc, conn = launch_chrome()
+        # QA rule: isolated Chromium profile under ~/.lifesim-tmp (never
+        # /tmp), deleted after the run.
+        profile_dir = tempfile.mkdtemp(prefix='h1-profile-',
+                                       dir=os.path.expanduser('~/.lifesim-tmp'))
+        proc, conn = launch_chrome(user_data_dir=profile_dir)
         def close():
             proc.terminate()
             proc.wait(timeout=5)
             if proc.stderr:
                 proc.stderr.close()
+            shutil.rmtree(profile_dir, ignore_errors=True)
         self.addCleanup(close)
         page = conn.new_session(self.base + '/game?game=' + gid)
-        page.wait_js("!!document.querySelector('.v2h-age') && "
-                     "!document.querySelector('.v2h-age').disabled")
+        page.wait_js("!!document.querySelector('.v2-agebtn') && "
+                     "!document.querySelector('.v2-agebtn').disabled")
         # Observe the real I/O boundary without replacing any server logic.
         page.js("window.h1Requests=[];window.h1Statuses=[];"
                 "const realFetch=window.fetch;window.fetch=async(...args)=>{"
@@ -55,16 +61,16 @@ class HomeLifecycleBrowserTests(unittest.TestCase):
         return next(p['age'] for p in state['people'] if p['id'] == state['player_id'])
 
     def settled(self, page):
-        page.wait_js("document.querySelector('.v2h-age-note').textContent !== 'Ageing…'",
+        page.wait_js("document.querySelector('.v2-agenote').textContent !== 'Ageing…'",
                      desc='Home busy state settles')
 
     def assert_age_enabled(self, page, gid):
         state = self.svc.get_state(gid)
         allowed = next((a for a in state['available_actions'] if a['id'] == 'age_up'), None)
         self.assertTrue(allowed and allowed['enabled'], state['pending_decision'])
-        page.wait_js("!document.querySelector('.v2h-age').disabled",
+        page.wait_js("!document.querySelector('.v2-agebtn').disabled",
                      desc='central Age reflects the current allowed action')
-        self.assertEqual(page.js("document.querySelector('.v2h-age').getAttribute('aria-disabled')"), 'false')
+        self.assertEqual(page.js("document.querySelector('.v2-agebtn').getAttribute('aria-disabled')"), 'false')
         self.assertEqual(page.console_errors, [])
 
     def test_two_successive_real_age_clicks(self):
@@ -72,7 +78,7 @@ class HomeLifecycleBrowserTests(unittest.TestCase):
         gid = state['game_id']
         page = self.open_game(gid)
         for age in (1, 2):
-            page.js("document.querySelector('.v2h-age').click()")
+            page.js("document.querySelector('.v2-agebtn').click()")
             page.wait_js('window.h1Statuses.length === %d' % age)
             self.settled(page)
             current = self.svc.get_state(gid)
@@ -95,14 +101,14 @@ class HomeLifecycleBrowserTests(unittest.TestCase):
                       'cursor': {'phase_id': 'education', 'item_cursor': 0}, 'done': {}}
         self.svc._save(env)
         page = self.open_game(gid)
-        page.js("document.querySelector('.v2h-age').click()")
+        page.js("document.querySelector('.v2-agebtn').click()")
         page.wait_js('window.h1Statuses.length === 1')
         self.settled(page)
         current = self.svc.get_state(gid)
         self.assertEqual(current['pending_decision']['kind'], 'university_application')
         self.assertNotIn('age_up', [a['id'] for a in current['available_actions']])
         page.wait_js("!document.getElementById('modal').hidden")
-        self.assertTrue(page.js("document.querySelector('.v2h-age').disabled"))
+        self.assertTrue(page.js("document.querySelector('.v2-agebtn').disabled"))
         self.assertEqual(page.console_errors, [])
 
     def test_real_stale_revision_rejection_reconciles_age(self):
@@ -114,7 +120,7 @@ class HomeLifecycleBrowserTests(unittest.TestCase):
         # Another real client advances revision without ageing or a pending.
         self.svc.command(gid, state['revision'], 'h1-other-client',
                          'spend_time', {'target_id': action['target_id']})
-        page.js("document.querySelector('.v2h-age').click()")
+        page.js("document.querySelector('.v2-agebtn').click()")
         page.wait_js('window.h1Statuses.length === 1')
         self.assertEqual(page.js('window.h1Statuses'), [409])
         page.wait_js("!!document.getElementById('pendingPill') && "
@@ -133,7 +139,7 @@ class HomeLifecycleBrowserTests(unittest.TestCase):
                 "window.fetch=async(...args)=>{const r=await observedFetch(...args);"
                 "if(drop && String(args[0]).endsWith('/actions')){drop=false;"
                 "await r.clone().json();throw new TypeError('H1 dropped response');}return r;};"
-                "document.querySelector('.v2h-age').click()")
+                "document.querySelector('.v2-agebtn').click()")
         page.wait_js("!!document.getElementById('pendingPill') && "
                      "!document.getElementById('pendingPill').hidden")
         self.settled(page)
@@ -152,3 +158,103 @@ class HomeLifecycleBrowserTests(unittest.TestCase):
         self.assertEqual(len(requests), 2)
         self.assertEqual(requests[0], requests[1])
         self.assert_age_enabled(page, gid)
+
+    def test_undo_year_flow(self):
+        """§Undo: age → undo (confirm step) → age replays the identical year."""
+        state = self.new_game()
+        gid = state['game_id']
+        page = self.open_game(gid)
+        # Fresh game: undo disabled with the server's reason.
+        page.wait_js("document.querySelector('.v2-undo').disabled")
+        self.assertIn("no year to undo", page.js(
+            "document.querySelector('.v2-undo-reason').textContent"))
+
+        # Age once: undo becomes enabled.
+        page.js("document.querySelector('.v2-agebtn').click()")
+        page.wait_js('window.h1Statuses.length === 1')
+        self.settled(page)
+        current = self.svc.get_state(gid)
+        self.assertEqual(self.age(current), 1)
+        page.wait_js("!document.querySelector('.v2-undo').disabled")
+        year_one = [b for b in current['journal_feed'] if b['age'] == 1]
+        self.assertTrue(year_one, "the aged year produced a feed block")
+        year_one_lines = [e['text'] for b in year_one for e in b['entries']]
+
+        # Confirm step: the first tap sends nothing.
+        page.js("document.querySelector('.v2-undo').click()")
+        self.assertEqual(len(page.js('window.h1Statuses')), 1)
+        self.assertIn("confirm", page.js(
+            "document.querySelector('.v2-undo').textContent"))
+        # Second tap sends undo_year exactly once.
+        page.js("document.querySelector('.v2-undo').click()")
+        page.wait_js('window.h1Statuses.length === 2')
+        self.assertEqual(page.js('window.h1Requests[1].action'), 'undo_year')
+        page.wait_js("document.querySelector('.v2-undo').disabled")
+
+        # The year is gone: age 0, feed back to the birth block, snapshot
+        # consumed so undo is disabled again with the second reason.
+        current = self.svc.get_state(gid)
+        self.assertEqual(self.age(current), 0)
+        self.assertEqual([b['age'] for b in current['journal_feed']], [0])
+        page.wait_js("document.querySelector('.v2-undo').disabled")
+        self.assertIn("only one year can be undone", page.js(
+            "document.querySelector('.v2-undo-reason').textContent"))
+
+        # Re-age: the redone year replays EXACTLY (no re-roll lever).
+        page.js("document.querySelector('.v2-agebtn').click()")
+        page.wait_js('window.h1Statuses.length === 3')
+        self.settled(page)
+        current = self.svc.get_state(gid)
+        self.assertEqual(self.age(current), 1)
+        redone = [b for b in current['journal_feed'] if b['age'] == 1]
+        self.assertEqual([e['text'] for b in redone for e in b['entries']],
+                         year_one_lines)
+        self.assert_age_enabled(page, gid)
+        self.assertEqual(page.console_errors, [])
+
+
+    def test_undo_confirmation_expires_when_year_changes(self):
+        state = self.new_game()
+        gid = state['game_id']
+        page = self.open_game(gid)
+        page.js("document.querySelector('.v2-agebtn').click()")
+        page.wait_js('window.h1Statuses.length === 1')
+        self.settled(page)
+        page.js("document.querySelector('.v2-undo').click()")
+        self.assertIn('confirm', page.js("document.querySelector('.v2-undo').textContent"))
+        page.js("document.querySelector('.v2-agebtn').click()")
+        page.wait_js('window.h1Statuses.length === 2')
+        self.settled(page)
+        page.wait_js("!document.querySelector('.v2-undo').textContent.includes('confirm')")
+        revision = self.svc.get_state(gid)['revision']
+        page.js("document.querySelector('.v2-undo').click()")
+        self.assertEqual(self.svc.get_state(gid)['revision'], revision)
+        self.assertEqual(len(page.js('window.h1Requests')), 2)
+        page.js("document.querySelector('.v2-undo').click()")
+        page.wait_js('window.h1Statuses.length === 3')
+        self.assertEqual(self.age(self.svc.get_state(gid)), 1)
+        self.assertEqual(page.console_errors, [])
+
+    def test_collapsed_choice_keeps_feed_above_expanded_undo_dock(self):
+        state = self.new_game()
+        gid = state['game_id']
+        env = self.svc._load(gid)
+        env['player'].age = 17
+        env['player'].smarts = env['player'].grades = 100
+        env['rng_state'] = random.Random(1).getstate()
+        env['turn'] = {'turn_id':'t_layout_education',
+                      'cursor':{'phase_id':'education','item_cursor':0},'done':{}}
+        self.svc._save(env)
+        page = self.open_game(gid)
+        page.call('Emulation.setDeviceMetricsOverride',
+                  {'width':320,'height':568,'deviceScaleFactor':1,'mobile':True})
+        page.js("document.querySelector('.v2-agebtn').click()")
+        page.wait_js("!!document.querySelector('.v2e-later')")
+        page.js("document.querySelector('.v2e-later').click()")
+        page.wait_js("document.getElementById('modal').hidden")
+        page.js("document.querySelector('.v2-scroll').scrollTop=1e9")
+        page.wait_js("document.documentElement.scrollHeight <= innerHeight + 1 && "
+                     "document.querySelector('#journalList li:last-child').getBoundingClientRect().bottom <= "
+                     "document.querySelector('.v2-dock').getBoundingClientRect().top + 1",
+                     desc='collapsed-choice notice and expanded dock do not cover feed')
+        self.assertEqual(page.console_errors, [])

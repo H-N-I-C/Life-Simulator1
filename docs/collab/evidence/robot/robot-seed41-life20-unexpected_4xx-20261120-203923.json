@@ -1,0 +1,73 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 20,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Abdul at Abdullah\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Anatoly",
+    "last_name": "Christensen",
+    "gender": "male",
+    "country": "Spain",
+    "seed": 666560162,
+    "request_id": "robot-41-20-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1775674425,
+     "base": "man",
+     "skin_tone": "dark",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "flower",
+      "earrings"
+     ],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_17070177c6",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r1305",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_17070177c6",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Abdul",
+    "employer_id": "Abdullah"
+   },
+   "request_id": "robot-41-r1306",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Abdul at Abdullah\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 21 --seed 41 --from-life 20 --fail-fast"
+}

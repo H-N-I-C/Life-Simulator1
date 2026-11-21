@@ -1,0 +1,43 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 120,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Adams at Archibald\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alejandra",
+    "last_name": "Henry",
+    "gender": "female",
+    "country": "Spain",
+    "seed": 1652848872,
+    "request_id": "robot-41-120-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_ab18d174c0",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Adams",
+    "employer_id": "Archibald"
+   },
+   "request_id": "robot-41-r5792",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Adams at Archibald\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 121 --seed 41 --from-life 120 --fail-fast"
+}

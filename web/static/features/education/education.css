@@ -1,0 +1,109 @@
+/* v2 Education module styles (Kimi B, M3). Namespace: v2ed-*. Consumes
+ * the frozen §Tokens (theme.css loads after module stylesheets); fallback
+ * defaults keep a bare test host working. No !important on tokens. */
+
+.v2ed-scope {
+  --v2ed-fallback-accent: #2a63e6;
+  --v2ed-fallback-ink: #16203a;
+  --v2ed-fallback-muted: #6b7690;
+  --v2ed-fallback-card: #ffffff;
+  --v2ed-fallback-track: #e7ebf3;
+  --v2ed-fallback-good: #15803d;
+  --v2ed-fallback-bad: #b3261e;
+  display: flex;
+  flex-direction: column;
+  gap: var(--v2-gap, 10px);
+  color: var(--v2-ink, var(--v2ed-fallback-ink));
+}
+
+.v2ed-card,
+.v2ed-programs,
+.v2ed-quals,
+.v2ed-history {
+  background: var(--v2-card, var(--v2ed-fallback-card));
+  border-radius: var(--v2-radius, 16px);
+  box-shadow: var(--v2-shadow, 0 4px 16px rgba(22, 32, 58, .10));
+  padding: 14px;
+}
+
+.v2ed-title {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+}
+
+.v2ed-enroll-head, .v2ed-program-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: baseline;
+}
+
+.v2ed-program { font-weight: 600; }
+.v2ed-credential, .v2ed-funding {
+  color: var(--v2-muted, var(--v2ed-fallback-muted));
+}
+
+.v2ed-progress {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--v2-track, var(--v2ed-fallback-track));
+  overflow: hidden;
+  margin: 10px 0 4px;
+}
+.v2ed-progress-fill {
+  height: 100%;
+  background: var(--v2-accent, var(--v2ed-fallback-accent));
+  transition: width 160ms ease;
+}
+
+.v2ed-yearline, .v2ed-costs, .v2ed-studied,
+.v2ed-program-meta, .v2ed-fundingopts, .v2ed-apprentice {
+  margin: 4px 0;
+  font-size: .9rem;
+  color: var(--v2-ink-soft, var(--v2ed-fallback-ink));
+}
+.v2ed-studied {
+  color: var(--v2-bar-good, var(--v2ed-fallback-good));
+}
+
+.v2ed-reqs {
+  margin: 6px 0;
+  padding-left: 18px;
+  font-size: .9rem;
+}
+.v2ed-reason {
+  margin: 6px 0;
+  color: var(--v2-bad, var(--v2ed-fallback-bad));
+  font-size: .9rem;
+}
+
+.v2ed-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+.v2ed-btn {
+  padding: 6px 12px;
+  border-radius: var(--v2-radius-sm, 8px);
+  border: 1px solid rgba(127, 127, 127, .4);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.v2ed-btn:disabled { opacity: .55; cursor: not-allowed; }
+.v2ed-busy { opacity: .7; }
+
+.v2ed-program-row {
+  border: 1px solid rgba(127, 127, 127, .25);
+  border-radius: var(--v2-radius-sm, 8px);
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+.v2ed-program-row.v2ed-ineligible { opacity: .85; }
+
+.v2ed-qual-list, .v2ed-history-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: .9rem;
+}
+
+.v2ed-empty {
+  color: var(--v2-muted, var(--v2ed-fallback-muted));
+}

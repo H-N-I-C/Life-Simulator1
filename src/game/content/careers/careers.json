@@ -1,0 +1,397 @@
+{
+  "schema_version": 1,
+  "employers": [
+    {
+      "id": "voltworks",
+      "name": "Voltworks Electrical",
+      "sector": "electrical",
+      "role_ids": [
+        "app_electrician",
+        "electrician",
+        "senior_electrician"
+      ]
+    },
+    {
+      "id": "brightspark",
+      "name": "Brightspark Trades",
+      "sector": "electrical",
+      "role_ids": [
+        "electrician",
+        "senior_electrician",
+        "site_supervisor"
+      ]
+    },
+    {
+      "id": "meridian",
+      "name": "Meridian Office Group",
+      "sector": "office",
+      "role_ids": [
+        "office_assistant",
+        "coordinator",
+        "operations_specialist"
+      ]
+    },
+    {
+      "id": "cascade",
+      "name": "Cascade Logistics",
+      "sector": "office",
+      "role_ids": [
+        "coordinator",
+        "operations_specialist",
+        "operations_manager"
+      ]
+    },
+    {
+      "id": "bluegum",
+      "name": "Bluegum Care Homes",
+      "sector": "healthcare",
+      "role_ids": [
+        "care_assistant",
+        "qualified_care_worker",
+        "nurse"
+      ]
+    },
+    {
+      "id": "staria",
+      "name": "St Aria Hospital",
+      "sector": "healthcare",
+      "role_ids": [
+        "qualified_care_worker",
+        "nurse",
+        "senior_nurse"
+      ]
+    }
+  ],
+  "roles": [
+    {
+      "id": "app_electrician",
+      "label": "Electrical apprentice",
+      "path": "electrical",
+      "level": 1,
+      "base_hours": 38,
+      "pay_min": 26000,
+      "pay_max": 32000,
+      "prerequisites": {
+        "min_age": 16,
+        "skills": {
+          "practical": 10
+        }
+      },
+      "promotions_to": [
+        "electrician"
+      ],
+      "promote_after_years": 2,
+      "promote_performance_min": 55,
+      "look_override": "mechanic",
+      "events": [],
+      "practices_skill": "practical"
+    },
+    {
+      "id": "electrician",
+      "label": "Electrician",
+      "path": "electrical",
+      "level": 2,
+      "base_hours": 38,
+      "pay_min": 52000,
+      "pay_max": 64000,
+      "prerequisites": {
+        "min_age": 18,
+        "qualifications": [
+          "electrical_trade_cert"
+        ],
+        "skills": {
+          "practical": 40
+        },
+        "roles": [
+          "app_electrician"
+        ],
+        "alternatives": [
+          {
+            "qualifications": [
+              "business_degree"
+            ],
+            "label": "a Bachelor of Business"
+          }
+        ]
+      },
+      "promotions_to": [
+        "senior_electrician"
+      ],
+      "promote_after_years": 2,
+      "promote_performance_min": 60,
+      "look_override": "mechanic",
+      "events": [],
+      "practices_skill": "practical"
+    },
+    {
+      "id": "senior_electrician",
+      "label": "Senior electrician",
+      "path": "electrical",
+      "level": 3,
+      "base_hours": 38,
+      "pay_min": 68000,
+      "pay_max": 82000,
+      "prerequisites": {
+        "min_age": 18,
+        "skills": {
+          "practical": 55,
+          "organization": 30
+        },
+        "roles": [
+          "electrician"
+        ]
+      },
+      "promotions_to": [
+        "site_supervisor"
+      ],
+      "promote_after_years": 3,
+      "promote_performance_min": 65,
+      "look_override": "mechanic",
+      "events": [],
+      "practices_skill": "practical"
+    },
+    {
+      "id": "site_supervisor",
+      "label": "Site supervisor",
+      "path": "electrical",
+      "level": 4,
+      "base_hours": 40,
+      "pay_min": 85000,
+      "pay_max": 100000,
+      "prerequisites": {
+        "min_age": 18,
+        "skills": {
+          "practical": 60,
+          "organization": 50
+        },
+        "roles": [
+          "senior_electrician"
+        ]
+      },
+      "promotions_to": [],
+      "promote_performance_min": 0,
+      "events": [],
+      "practices_skill": "practical"
+    },
+    {
+      "id": "office_assistant",
+      "label": "Office assistant",
+      "path": "office",
+      "level": 1,
+      "base_hours": 38,
+      "pay_min": 30000,
+      "pay_max": 36000,
+      "prerequisites": {
+        "min_age": 18,
+        "skills": {
+          "communication": 10
+        }
+      },
+      "promotions_to": [
+        "coordinator"
+      ],
+      "promote_after_years": 2,
+      "promote_performance_min": 55,
+      "events": [],
+      "practices_skill": "organization"
+    },
+    {
+      "id": "coordinator",
+      "label": "Coordinator",
+      "path": "office",
+      "level": 2,
+      "base_hours": 38,
+      "pay_min": 44000,
+      "pay_max": 54000,
+      "prerequisites": {
+        "min_age": 18,
+        "skills": {
+          "communication": 35,
+          "organization": 25
+        },
+        "roles": [
+          "office_assistant"
+        ]
+      },
+      "promotions_to": [
+        "operations_specialist"
+      ],
+      "promote_after_years": 2,
+      "promote_performance_min": 58,
+      "events": [],
+      "practices_skill": "organization"
+    },
+    {
+      "id": "operations_specialist",
+      "label": "Operations specialist",
+      "path": "office",
+      "level": 3,
+      "base_hours": 38,
+      "pay_min": 62000,
+      "pay_max": 78000,
+      "prerequisites": {
+        "min_age": 18,
+        "skills": {
+          "organization": 45
+        },
+        "alternatives": [
+          {
+            "qualifications": [
+              "business_degree"
+            ]
+          },
+          {
+            "roles": [
+              "coordinator"
+            ],
+            "min_role_tenure": 3
+          }
+        ]
+      },
+      "promotions_to": [
+        "operations_manager"
+      ],
+      "promote_performance_min": 60,
+      "events": [],
+      "practices_skill": "organization"
+    },
+    {
+      "id": "operations_manager",
+      "label": "Operations manager",
+      "path": "office",
+      "level": 4,
+      "base_hours": 40,
+      "pay_min": 85000,
+      "pay_max": 105000,
+      "prerequisites": {
+        "min_age": 18,
+        "skills": {
+          "organization": 55,
+          "communication": 40
+        },
+        "roles": [
+          "operations_specialist"
+        ]
+      },
+      "promotions_to": [],
+      "promote_performance_min": 0,
+      "events": [],
+      "practices_skill": "organization"
+    },
+    {
+      "id": "care_assistant",
+      "label": "Care assistant",
+      "path": "healthcare",
+      "level": 1,
+      "base_hours": 38,
+      "pay_min": 28000,
+      "pay_max": 34000,
+      "prerequisites": {
+        "min_age": 18,
+        "skills": {
+          "care": 10
+        }
+      },
+      "promotions_to": [
+        "qualified_care_worker"
+      ],
+      "promote_after_min": 0,
+      "promote_after_years": 1,
+      "promote_performance_min": 50,
+      "events": [],
+      "practices_skill": "care"
+    },
+    {
+      "id": "qualified_care_worker",
+      "label": "Qualified care worker",
+      "path": "healthcare",
+      "level": 2,
+      "base_hours": 38,
+      "pay_min": 40000,
+      "pay_max": 50000,
+      "prerequisites": {
+        "min_age": 18,
+        "qualifications": [
+          "care_diploma_cert"
+        ],
+        "skills": {
+          "care": 30
+        },
+        "roles": [
+          "care_assistant"
+        ]
+      },
+      "promotions_to": [
+        "nurse"
+      ],
+      "promote_after_years": 2,
+      "promote_performance_min": 55,
+      "look_override": "health_worker",
+      "events": [],
+      "practices_skill": "care"
+    },
+    {
+      "id": "nurse",
+      "label": "Nurse",
+      "path": "healthcare",
+      "level": 3,
+      "base_hours": 38,
+      "pay_min": 58000,
+      "pay_max": 72000,
+      "prerequisites": {
+        "min_age": 21,
+        "qualifications": [
+          "nursing_degree"
+        ],
+        "skills": {
+          "care": 45,
+          "communication": 30
+        },
+        "roles": [
+          "qualified_care_worker"
+        ],
+        "alternatives": [
+          {
+            "roles": [
+              "qualified_care_worker"
+            ],
+            "min_role_tenure": 8,
+            "label": "8 years as a Qualified care worker"
+          }
+        ]
+      },
+      "promotions_to": [
+        "senior_nurse"
+      ],
+      "promote_after_years": 3,
+      "promote_performance_min": 60,
+      "look_override": "health_worker",
+      "events": [],
+      "practices_skill": "care"
+    },
+    {
+      "id": "senior_nurse",
+      "label": "Senior nurse",
+      "path": "healthcare",
+      "level": 4,
+      "base_hours": 38,
+      "pay_min": 75000,
+      "pay_max": 90000,
+      "prerequisites": {
+        "min_age": 21,
+        "skills": {
+          "care": 60,
+          "organization": 30
+        },
+        "roles": [
+          "nurse"
+        ]
+      },
+      "promotions_to": [],
+      "promote_performance_min": 0,
+      "look_override": "health_worker",
+      "events": [],
+      "practices_skill": "care"
+    }
+  ]
+}

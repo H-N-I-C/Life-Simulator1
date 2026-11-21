@@ -1,0 +1,70 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 9,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Andri",
+    "last_name": "Proctor",
+    "gender": "male",
+    "country": "UK",
+    "seed": 777,
+    "request_id": "robot-7-9-create",
+    "scenario": "university_pending_17"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_a73f60282e",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_10",
+    "option_id": "decline"
+   },
+   "request_id": "robot-7-r310",
+   "expected_revision": 27
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_a73f60282e",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r311",
+   "expected_revision": 28
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_a73f60282e",
+   "action": "careers_apply",
+   "payload": {
+    "opening": null
+   },
+   "request_id": "robot-7-r312",
+   "expected_revision": 28
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 10 --seed 7 --from-life 9 --fail-fast"
+}

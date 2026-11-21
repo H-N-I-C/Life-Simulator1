@@ -1,0 +1,259 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 167,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Allin at Alexis\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Abbott",
+    "last_name": "Pearson",
+    "gender": "male",
+    "country": "France",
+    "seed": 1502850895,
+    "request_id": "robot-41-167-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 582874631,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "default",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "cap",
+      "earrings"
+     ],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r7230",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r7231",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-41-r7232",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "ask_final"
+   },
+   "request_id": "robot-41-r7233",
+   "expected_revision": 3
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "cancel"
+   },
+   "request_id": "robot-41-r7234",
+   "expected_revision": 4
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r7235",
+   "expected_revision": 5
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r7236",
+   "expected_revision": 6
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r7237",
+   "expected_revision": 7
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-41-r7238",
+   "expected_revision": 8
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_3",
+    "option_id": "continue"
+   },
+   "request_id": "robot-41-r7239",
+   "expected_revision": 9
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r7240",
+   "expected_revision": 10
+  },
+  {
+   "n": 13,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-41-r7241",
+   "expected_revision": 10
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_4",
+    "option_id": "continue"
+   },
+   "request_id": "robot-41-r7242",
+   "expected_revision": 11
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r7243",
+   "expected_revision": 12
+  },
+  {
+   "n": 17,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 18,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r7244",
+   "expected_revision": 12
+  },
+  {
+   "n": 19,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r7245",
+   "expected_revision": 13
+  },
+  {
+   "n": 20,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r7246",
+   "expected_revision": 14
+  },
+  {
+   "n": 21,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r7247",
+   "expected_revision": 15
+  },
+  {
+   "n": 22,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r7248",
+   "expected_revision": 16
+  },
+  {
+   "n": 23,
+   "kind": "command",
+   "game_id": "g_2cca9aab77",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Allin",
+    "employer_id": "Alexis"
+   },
+   "request_id": "robot-41-r7249",
+   "expected_revision": 17
+  },
+  {
+   "n": 24,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Allin at Alexis\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 168 --seed 41 --from-life 167 --fail-fast"
+}

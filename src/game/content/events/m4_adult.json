@@ -1,0 +1,140 @@
+{
+ "schema_version": 3,
+ "_comment": "M4 adult friendship events (Kimi C). Gate: a real friend/best_friend edge (A's envelope). 18+. All options free.",
+ "events": [
+  {
+   "id": "soc_adt_call_friend",
+   "title": "The Missed Call",
+   "text": "My phone shows a missed call from {person:friend}, which almost never happens, and I feel the small alarm of it.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 18,
+                  "all": [{"kind": "social_kind", "role_b": "friend",
+                           "kinds": ["friend", "best_friend"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "friend": {"kind": "person", "select": "predicate",
+                        "predicate": "social_friend_of_actor"}},
+   "choices": [
+    {"id": "call_back", "label": "Call back immediately",
+     "effects": {"relationship": {"role": "friend", "delta": 4},
+                 "stats": {"happiness": 2}},
+     "outcome_text": "I called my friend back immediately and we talked for an hour about nothing urgent, which is what friends are for."},
+    {"id": "text", "label": "Text them later",
+     "effects": {"relationship": {"role": "friend", "delta": -1}},
+     "outcome_text": "I sent my friend a text hours after the missed call; they said it was nothing, and I half-believed them."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_adt_favour_move",
+   "title": "The Moving Favour",
+   "text": "{person:friend} is moving flats this weekend and has asked if I own, or could borrow, a strong back.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 18,
+                  "all": [{"kind": "social_kind", "role_b": "friend",
+                           "kinds": ["friend", "best_friend"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "friend": {"kind": "person", "select": "predicate",
+                        "predicate": "social_friend_of_actor"}},
+   "choices": [
+    {"id": "help_move", "label": "Spend the day hauling boxes",
+     "effects": {"relationship": {"role": "friend", "delta": 5},
+                 "karma": 1, "stats": {"health": -2, "happiness": 1}},
+     "outcome_text": "I spent Saturday hauling my friend's boxes up three flights and was repaid in pizza and lifelong credit."},
+    {"id": "busy", "label": "Beg off with a real excuse",
+     "effects": {"relationship": {"role": "friend", "delta": -2}},
+     "outcome_text": "I got out of moving day with a genuine excuse, and accepted that I now owe my friend one full Saturday."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_adt_old_argument",
+   "title": "The Unfinished Argument",
+   "text": "An old half-resolved argument with {person:friend} has surfaced again, smaller than I remembered but sharper than I expected.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 18,
+                  "all": [{"kind": "social_kind", "role_b": "friend",
+                           "kinds": ["friend", "best_friend"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "friend": {"kind": "person", "select": "predicate",
+                        "predicate": "social_friend_of_actor"}},
+   "choices": [
+    {"id": "apologise", "label": "Apologise first",
+     "effects": {"relationship": {"role": "friend", "delta": 5},
+                 "stats": {"stress": -2, "happiness": 1}},
+     "outcome_text": "I apologised to my friend first, for my half of the old argument, and felt the knot of it loosen."},
+    {"id": "stand_ground", "label": "Hold my ground",
+     "effects": {"relationship": {"role": "friend", "delta": -3},
+                 "stats": {"stress": 2}},
+     "outcome_text": "I held my ground with my friend on the old argument; I may have won the point and lost the afternoon."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "soc_adt_friend_low",
+   "title": "The Bad Patch",
+   "text": "{person:friend} has gone quiet and cancelled plans twice, and mutual friends say they are going through something.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 18,
+                  "all": [{"kind": "social_kind", "role_b": "friend",
+                           "kinds": ["friend", "best_friend"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "friend": {"kind": "person", "select": "predicate",
+                        "predicate": "social_friend_of_actor"}},
+   "choices": [
+    {"id": "show_up", "label": "Just show up with food",
+     "effects": {"relationship": {"role": "friend", "delta": 5},
+                 "karma": 1},
+     "outcome_text": "I turned up at my friend's door with food and no questions, and we sat on the floor of the kitchen until it got easier."},
+    {"id": "space", "label": "Give them space",
+     "effects": {"relationship": {"role": "friend", "delta": -1}},
+     "outcome_text": "I gave my friend their space and sent one short message saying I was here; space, it turns out, needs saying out loud."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_adt_reconnect",
+   "title": "The Almost-Lost Friend",
+   "text": "I realised this week that {person:friend} and I have not really spoken in months, and the silence has started to feel like a shape.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 18,
+                  "all": [{"kind": "social_kind", "role_b": "friend",
+                           "kinds": ["friend", "best_friend"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "friend": {"kind": "person", "select": "predicate",
+                        "predicate": "social_friend_of_actor"}},
+   "choices": [
+    {"id": "reach_out", "label": "Reach out first",
+     "effects": {"relationship": {"role": "friend", "delta": 4},
+                 "stats": {"happiness": 1}},
+     "outcome_text": "I reached out first to the friend I had drifted from, and we picked up mid-sentence like the months were a commercial break."},
+    {"id": "wait_first", "label": "Wait for them",
+     "effects": {"relationship": {"role": "friend", "delta": -2}},
+     "outcome_text": "I waited for my old friend to reach out first, and the silence between us quietly got another month older."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_adt_rival_chess",
+   "title": "The Friendly Enemy",
+   "text": "{person:friend} has beaten me at our standing game four times running and keeps a tally on the fridge like a war memorial.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 18,
+                  "all": [{"kind": "social_kind", "role_b": "friend",
+                           "kinds": ["friend", "best_friend"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "friend": {"kind": "person", "select": "predicate",
+                        "predicate": "social_friend_of_actor"}},
+   "choices": [
+    {"id": "rematch", "label": "Demand a rematch",
+     "effects": {"relationship": {"role": "friend", "delta": 3},
+                 "stats": {"happiness": 2}},
+     "outcome_text": "I demanded a rematch against my friend and lost a fifth time, gloriously, to their unbearable fridge tally."},
+    {"id": "concede", "label": "Concede the title",
+     "effects": {"relationship": {"role": "friend", "delta": 1},
+                 "stats": {"happiness": -1}},
+     "outcome_text": "I conceded the standing game title to my friend with a speech of exactly zero grace; the tally stays."}
+   ],
+   "weight": 1
+  }
+ ]
+}

@@ -1,0 +1,187 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 25,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Andre",
+    "last_name": "Bender",
+    "gender": "male",
+    "country": "Brazil",
+    "seed": 1180694005,
+    "request_id": "robot-7-25-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_40d882354f",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-7-r655",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_40d882354f",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "continue"
+   },
+   "request_id": "robot-7-r656",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_40d882354f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r657",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_40d882354f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r658",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_40d882354f",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_2",
+    "option_id": "d_2_tantrum"
+   },
+   "request_id": "robot-7-r659",
+   "expected_revision": 5
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_40d882354f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r660",
+   "expected_revision": 6
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_40d882354f",
+   "action": "conversation",
+   "payload": {
+    "target_id": "b14bddbe-c48d-4132-bc32-f3e27fa079d0"
+   },
+   "request_id": "robot-7-r661",
+   "expected_revision": 7
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_40d882354f",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r662",
+   "expected_revision": 8
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_40d882354f",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r663",
+   "expected_revision": 9
+  },
+  {
+   "n": 10,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_40d882354f",
+   "action": "conversation",
+   "payload": {
+    "target_id": "b14bddbe-c48d-4132-bc32-f3e27fa079d0"
+   },
+   "request_id": "robot-7-r664",
+   "expected_revision": 9
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_40d882354f",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r665",
+   "expected_revision": 10
+  },
+  {
+   "n": 13,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_40d882354f",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-7-r666",
+   "expected_revision": 10
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_40d882354f",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r667",
+   "expected_revision": 11
+  },
+  {
+   "n": 16,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 17,
+   "kind": "command",
+   "game_id": "g_40d882354f",
+   "action": "careers_apply",
+   "payload": {
+    "opening": null
+   },
+   "request_id": "robot-7-r668",
+   "expected_revision": 11
+  },
+  {
+   "n": 18,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 26 --seed 7 --from-life 25 --fail-fast"
+}

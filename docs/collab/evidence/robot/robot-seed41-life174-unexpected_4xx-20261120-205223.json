@@ -1,0 +1,72 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 174,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Adrian",
+    "last_name": "Mangum",
+    "gender": "male",
+    "country": "Australia",
+    "seed": 1658923282,
+    "request_id": "robot-41-174-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1529574418,
+     "base": "woman",
+     "skin_tone": "light",
+     "hair": "red",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses"
+     ],
+     "background": "bg_07",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_beaba1a9b5",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r7452",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_beaba1a9b5",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+    "employer_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+   },
+   "request_id": "robot-41-r7453",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 175 --seed 41 --from-life 174 --fail-fast"
+}

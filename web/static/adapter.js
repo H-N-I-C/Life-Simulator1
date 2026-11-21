@@ -18,7 +18,24 @@ export const ACTION_CATEGORIES = [
 export const GENERAL_CATEGORIES = ["life", "other"];
 
 export function normalizeState(raw) {
-  const people = Array.isArray(raw.people) ? raw.people : [];
+  const rawPeople = Array.isArray(raw.people) ? raw.people : [];
+  // M4: the social edge (kind/closeness/circles/memory) travels on the
+  // social group refs; attach it to the canonical people entries (copies,
+  // people-array objects never mutated) so the Person page can render it.
+  const socialEdges = {};
+  if (raw.social && Array.isArray(raw.social.groups)) {
+    for (const g of raw.social.groups) {
+      for (const ref of g.people || []) {
+        if (ref && typeof ref.id === "string" &&
+            ref.social && !socialEdges[ref.id]) {
+          socialEdges[ref.id] = ref.social;
+        }
+      }
+    }
+  }
+  const people = rawPeople.map((p) =>
+    p && !p.social && socialEdges[p.id]
+      ? { ...p, social: socialEdges[p.id] } : p);
   const peopleById = {};
   for (const p of people) peopleById[p.id] = p;
 
@@ -57,6 +74,21 @@ export function normalizeState(raw) {
     pending: raw.pending_decision ? normalizeDecision(raw.pending_decision)
                                   : null,
     turn: raw.turn || null,
+    // §Decision outcome (feel-pass F5): actual deltas of the most recent
+    // resolve_decision, for C's outcome popup; null until the first resolve.
+    lastDecisionOutcome: raw.last_decision_outcome || null,
+    // M3 feature projections (additive): careers (A), skills (C) and the
+    // education program view (B). The legacy M2 education section stays
+    // under sections.education — the M3 programs view travels under
+    // `education_programs` to avoid the key collision.
+    careers: raw.careers || null,
+    skills: raw.skills || null,
+    educationFeature: raw.education_programs || null,
+    // M4: group/invite refs are deliberately minimal on the wire; the
+    // adapter fills appearance/relationship/role from the people entries
+    // (same source person.js/event cards use) so feature modules render
+    // real avatars and the family relationship bar.
+    social: raw.social ? normalizeSocial(raw.social, peopleById) : null,
     generation: raw.generation ?? 1,
     completedLives: Array.isArray(raw.completed_lives) ? raw.completed_lives
                                                        : [],
@@ -123,6 +155,7 @@ export function normalizeOption(o) {
     enabled: o.enabled !== false,
     reason: o.reason || "",
     knownEffects: o.known_effects || o.knownEffects || [],
+    knownCosts: o.known_costs || o.knownCosts || [],
     inputs: (o.inputs || []).map(normalizeInput),
   };
 }
@@ -135,6 +168,42 @@ export function journalPeople(entry, peopleById) {
     if (peopleById[id]) out.push(peopleById[id]);
   }
   return out;
+}
+
+/* ---- M4 social --------------------------------------------------------- */
+
+/* Group/invite person refs arrive minimal (id/name/age[/alive][/social]).
+ * Fill appearance/relationship/role from the canonical people entries —
+ * the same source person.js and the event cards use — so the social
+ * module renders real portraits and the family relationship bar. Ref
+ * fields always win; enrichment only fills what the wire omitted. */
+export function normalizeSocial(rawSocial, peopleById) {
+  const fill = (ref) => {
+    if (!ref || typeof ref.id !== "string") return ref;
+    const full = peopleById[ref.id];
+    if (!full) return ref;
+    return {
+      ...full,
+      ...ref,
+      appearance: ref.appearance !== undefined ? ref.appearance
+                                               : full.appearance,
+      relationship: ref.relationship !== undefined ? ref.relationship
+                                                   : full.relationship,
+      role: ref.role !== undefined ? ref.role : full.role,
+    };
+  };
+  const social = { ...rawSocial };
+  if (Array.isArray(social.groups)) {
+    social.groups = social.groups.map((g) => ({
+      ...g,
+      people: Array.isArray(g.people) ? g.people.map(fill) : g.people,
+    }));
+  }
+  if (Array.isArray(social.invites)) {
+    social.invites = social.invites.map((inv) =>
+      inv && inv.host ? { ...inv, host: fill(inv.host) } : inv);
+  }
+  return social;
 }
 
 /* ---- finances projection ---------------------------------------------- */

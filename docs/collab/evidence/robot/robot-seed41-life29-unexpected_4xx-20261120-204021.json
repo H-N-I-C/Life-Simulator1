@@ -1,0 +1,142 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 29,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at Alain\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Ahmad",
+    "last_name": "Hester",
+    "gender": "male",
+    "country": "Canada",
+    "seed": 244902132,
+    "request_id": "robot-41-29-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1783083529,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "red",
+     "facial_hair": "beard",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_02",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_bb4d6ac19d",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r1928",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_bb4d6ac19d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r1929",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_bb4d6ac19d",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r1930",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_bb4d6ac19d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r1931",
+   "expected_revision": 2
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_bb4d6ac19d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r1932",
+   "expected_revision": 3
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_bb4d6ac19d",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r1933",
+   "expected_revision": 4
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_bb4d6ac19d",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r1934",
+   "expected_revision": 5
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_bb4d6ac19d",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_eat"
+   },
+   "request_id": "robot-41-r1935",
+   "expected_revision": 6
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_bb4d6ac19d",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+    "employer_id": "Alain"
+   },
+   "request_id": "robot-41-r1936",
+   "expected_revision": 7
+  },
+  {
+   "n": 12,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at Alain\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 30 --seed 41 --from-life 29 --fail-fast"
+}

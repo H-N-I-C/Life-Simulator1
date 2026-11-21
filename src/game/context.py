@@ -36,6 +36,12 @@ class RuleContext:
         for person in self._env.get("archive", []):
             if person.person_id not in by_id:
                 by_id[person.person_id] = person
+        # M4 social NPCs are canonical people too (resolve/bindings/
+        # person actions must see them exactly like family members)
+        for person in self._env.get("social_people", []):
+            if getattr(person, "person_id", None) \
+                    and person.person_id not in by_id:
+                by_id[person.person_id] = person
         return by_id
 
     # -- annual flags -----------------------------------------------------

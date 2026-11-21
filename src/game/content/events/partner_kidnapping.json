@@ -83,16 +83,17 @@
                   }
                 }
               },
-              "outcome_text": "I paid the ransom for their release."
+              "outcome_text": "I paid the kidnapper's ransom in full, and my partner came home."
             },
             {
               "weight": 1,
               "effects": {
                 "partner_death": "presumed dead"
               },
-              "outcome_text": "I paid, but they never returned."
+              "outcome_text": "I paid the ransom, but my partner never came back."
             }
-          ]
+          ],
+          "outcome_text": "I paid the ransom for my partner in full. They never came back."
         },
         {
           "id": "police",
@@ -125,7 +126,7 @@
                   }
                 }
               },
-              "outcome_text": "The police secured their release."
+              "outcome_text": "The police rescued my partner and secured their release."
             },
             {
               "weight": 1,
@@ -158,10 +159,10 @@
             },
             "partner_death": "presumed dead"
           },
-          "outcome_text": "I did absolutely nothing."
+          "outcome_text": "My partner was still out there, held for ransom, and I did absolutely nothing. The silence in the house was enormous."
         }
       ],
-      "_comment": "Legacy gate (player.py random_events): requires partner + money>=1M AND NOT x_in_y(karma,130) \u2014 i.e. karma must be BELOW 130 and the draw must pass. Scenarios exercising this event must set karma < 130 (e.g. 50); karma >= 130 blocks it entirely. chance_n 250 on top."
+      "_comment": "Legacy gate (player.py random_events): requires partner + money>=1M AND NOT x_in_y(karma,130) — i.e. karma must be BELOW 130 and the draw must pass. Scenarios exercising this event must set karma < 130 (e.g. 50); karma >= 130 blocks it entirely. chance_n 250 on top."
     }
   ]
 }

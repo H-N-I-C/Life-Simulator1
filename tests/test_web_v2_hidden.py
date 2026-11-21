@@ -34,10 +34,12 @@ class V2HiddenBrowserTests(unittest.TestCase):
         proc, conn = launch_chrome()
         try:
             page = conn.new_session(self.base + '/game?game=' + self.game['game_id'])
-            page.wait_js("!!document.querySelector('.v2-tabbar')")
+            page.wait_js("!!document.querySelector('.v2-tabbar') && "
+                         "document.getElementById('gameView').checkVisibility()")
             self.assertTrue(page.js("document.getElementById('gameView').checkVisibility()"))
-            page.js("document.querySelector('.v2-header-btn').click();"
-                    "Array.from(document.querySelectorAll('.v2-more button'))"
+            page.js("document.querySelector('[aria-label=\"More routes\"]').click()")
+            page.wait_js("!document.querySelector('.v2-more').hidden")
+            page.js("Array.from(document.querySelectorAll('.v2-more button'))"
                     ".find(b=>b.textContent==='All lives').click()")
             page.wait_js("!document.getElementById('resumeView').hidden && "
                          "!!document.querySelector('#lifeList button')")

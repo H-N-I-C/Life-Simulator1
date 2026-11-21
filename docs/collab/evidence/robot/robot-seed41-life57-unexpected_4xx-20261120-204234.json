@@ -1,0 +1,142 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 57,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at Alton\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Agustin",
+    "last_name": "Farrell",
+    "gender": "male",
+    "country": "Spain",
+    "seed": 2130410213,
+    "request_id": "robot-41-57-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 400992481,
+     "base": "woman",
+     "skin_tone": "light",
+     "hair": "curly",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "crown",
+      "flower"
+     ],
+     "background": "bg_04",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_4c951796ef",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r3235",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_4c951796ef",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3236",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_4c951796ef",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r3237",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_4c951796ef",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r3238",
+   "expected_revision": 2
+  },
+  {
+   "n": 7,
+   "kind": "command",
+   "game_id": "g_4c951796ef",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_stay_calm"
+   },
+   "request_id": "robot-41-r3239",
+   "expected_revision": 3
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_4c951796ef",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r3240",
+   "expected_revision": 4
+  },
+  {
+   "n": 9,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_4c951796ef",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r3241",
+   "expected_revision": 4
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_4c951796ef",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+    "employer_id": "Alton"
+   },
+   "request_id": "robot-41-r3242",
+   "expected_revision": 5
+  },
+  {
+   "n": 12,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN at Alton\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 58 --seed 41 --from-life 57 --fail-fast"
+}

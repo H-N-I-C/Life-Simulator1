@@ -1,0 +1,179 @@
+{
+ "schema_version": 3,
+ "_comment": "M4 school social events (Kimi C). Gates ride the shared v3 path: in_circle school needs A's classmate circle; without classmates the family is silently skipped. All options free; outcomes M3c-audited.",
+ "events": [
+  {
+   "id": "soc_sch_lunchtable",
+   "title": "The Lunch Table Question",
+   "text": "The classroom has rearranged itself and {person:classmate} has waved me over to their lunch table.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 6, "max_age": 17,
+                  "all": [{"kind": "in_circle", "circle": "school"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "classmate": {"kind": "person", "select": "predicate",
+                           "predicate": "social_classmate_of_actor"}},
+   "choices": [
+    {"id": "sit", "label": "Sit with them",
+     "effects": {"relationship": {"role": "classmate", "delta": 5},
+                 "stats": {"happiness": 3}},
+     "outcome_text": "I sat with my classmate at lunch and we traded snacks and terrible jokes until the bell."},
+    {"id": "alone", "label": "Sit on my own today",
+     "effects": {"stats": {"happiness": -1}},
+     "outcome_text": "I sat on my own at lunch with a book, peaceful enough, though the book was partly a shield."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_sch_groupwork",
+   "title": "Assigned Partners",
+   "text": "The teacher has paired me with {person:classmate} for the group project, and we have wildly different ideas.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 8, "max_age": 17,
+                  "all": [{"kind": "in_circle", "circle": "school"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "classmate": {"kind": "person", "select": "predicate",
+                           "predicate": "social_classmate_of_actor"}},
+   "choices": [
+    {"id": "blend", "label": "Merge both ideas",
+     "effects": {"relationship": {"role": "classmate", "delta": 4},
+                 "stats": {"smarts": 2}},
+     "outcome_text": "My classmate and I merged our two project ideas and the result was better than either of ours alone."},
+    {"id": "mine", "label": "Insist on my plan",
+     "effects": {"relationship": {"role": "classmate", "delta": -3},
+                 "stats": {"smarts": 1}},
+     "outcome_text": "I talked my classmate into my project plan and we got a fine grade and a frosty silence."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "soc_sch_rumor",
+   "title": "The Rumour Mill",
+   "text": "A ridiculous rumour about me is doing the rounds of the schoolyard, and {person:classmate} is repeating it.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 9, "max_age": 17,
+                  "all": [{"kind": "in_circle", "circle": "school"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "classmate": {"kind": "person", "select": "predicate",
+                           "predicate": "social_classmate_of_actor"}},
+   "choices": [
+    {"id": "laugh", "label": "Laugh it off publicly",
+     "effects": {"stats": {"happiness": 2, "stress": -2}},
+     "outcome_text": "I laughed at the silly rumour about me in front of everyone, and it died of starvation by Friday."},
+    {"id": "confront", "label": "Ask where they heard it",
+     "effects": {"relationship": {"role": "classmate", "delta": -2},
+                 "stats": {"stress": 2}},
+     "outcome_text": "I asked my classmate straight where the rumour came from; the trail went cold but so did they."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "soc_sch_team_pick",
+   "title": "Picked (or Not)",
+   "text": "Teams are being chosen in PE and the captains are weighing me and {person:classmate} for the last spot.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 6, "max_age": 14,
+                  "all": [{"kind": "in_circle", "circle": "school"},
+                          {"kind": "min_stat", "stat": "health",
+                           "value": 40}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "classmate": {"kind": "person", "select": "predicate",
+                           "predicate": "social_classmate_of_actor"}},
+   "choices": [
+    {"id": "hustle", "label": "Show some hustle",
+     "effects": {"relationship": {"role": "classmate", "delta": 3},
+                 "stats": {"health": 2, "happiness": 2}},
+     "outcome_text": "I hustled hard in PE and got picked ahead of my classmate, then high-fived them on the way past."},
+    {"id": "shrug", "label": "Let it happen",
+     "effects": {"stats": {"happiness": -1}},
+     "outcome_text": "I got picked last in PE and pretended not to care with the ancient dignity of the unchosen."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "soc_sch_homework_copy",
+   "title": "Can I Copy?",
+   "text": "{person:classmate} wants to copy my homework ten minutes before it is due, and is doing the big pleading eyes.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 8, "max_age": 17,
+                  "all": [{"kind": "in_circle", "circle": "school"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "classmate": {"kind": "person", "select": "predicate",
+                           "predicate": "social_classmate_of_actor"}},
+   "choices": [
+    {"id": "refuse", "label": "Refuse kindly",
+     "effects": {"relationship": {"role": "classmate", "delta": -1},
+                 "karma": 1},
+     "outcome_text": "I refused to let my classmate copy my homework, kindly, and offered to explain it after class instead."},
+    {"id": "lend", "label": "Slip them the pages",
+     "effects": {"relationship": {"role": "classmate", "delta": 4},
+                 "karma": -1},
+     "outcome_text": "I let my classmate copy my homework and we both got away with it, which is not the same as it being fine."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "soc_sch_bus_seat",
+   "title": "The Back Seat",
+   "text": "There is exactly one good seat left on the school bus, and {person:classmate} and I have both spotted it.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 6, "max_age": 14,
+                  "all": [{"kind": "in_circle", "circle": "school"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "classmate": {"kind": "person", "select": "predicate",
+                           "predicate": "social_classmate_of_actor"}},
+   "choices": [
+    {"id": "share", "label": "Share the seat",
+     "effects": {"relationship": {"role": "classmate", "delta": 3},
+                 "stats": {"happiness": 1}},
+     "outcome_text": "My classmate and I squeezed into the good bus seat together and argued about window rights all the way home."},
+    {"id": "dash", "label": "Dive for it",
+     "effects": {"relationship": {"role": "classmate", "delta": -2},
+                 "stats": {"happiness": 2}},
+     "outcome_text": "I dived into the last good bus seat ahead of my classmate and enjoyed it with a small side of guilt."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "soc_sch_show_tell",
+   "title": "Show and Tell Panic",
+   "text": "Show and tell is tomorrow and I have nothing, but {person:classmate} has offered to lend me their weird rock collection.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 6, "max_age": 10,
+                  "all": [{"kind": "in_circle", "circle": "school"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "classmate": {"kind": "person", "select": "predicate",
+                           "predicate": "social_classmate_of_actor"}},
+   "choices": [
+    {"id": "borrow", "label": "Borrow the rocks",
+     "effects": {"relationship": {"role": "classmate", "delta": 4},
+                 "stats": {"happiness": 2}},
+     "outcome_text": "I borrowed my classmate's weird rock collection for show and tell and it went disturbingly well."},
+    {"id": "own", "label": "Present something of mine",
+     "effects": {"stats": {"happiness": 1}},
+     "outcome_text": "I did show and tell with a toy of my own and it was fine; the rocks remained a legend."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "soc_sch_study_invite",
+   "title": "Study Group",
+   "text": "{person:classmate} has invited me to their study group, which meets at the library and is apparently mostly snacks.",
+   "interaction": {"kind": "social", "romantic": false},
+   "conditions": {"min_age": 11, "max_age": 17,
+                  "all": [{"kind": "in_circle", "circle": "school"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"},
+             "classmate": {"kind": "person", "select": "predicate",
+                           "predicate": "social_classmate_of_actor"}},
+   "choices": [
+    {"id": "join", "label": "Join the study group",
+     "effects": {"relationship": {"role": "classmate", "delta": 4},
+                 "stats": {"smarts": 2, "happiness": 1}},
+     "outcome_text": "I joined my classmate's library study group and learned almost as much as I ate, which was a great deal."},
+    {"id": "solo", "label": "Study on my own",
+     "effects": {"stats": {"smarts": 1}},
+     "outcome_text": "I skipped the study group and studied solo in my room, efficient and slightly lonelier for it."}
+   ],
+   "weight": 1
+  }
+ ]
+}

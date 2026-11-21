@@ -39,8 +39,10 @@ from tools.robot_player import quick_check as robot_quick  # noqa: E402
 EVIDENCE = os.path.join(ROOT, "docs", "collab", "evidence", "browser")
 PAGES = ["/creator", "/gallery", "/game", "/relationships"]
 VIEWPORTS = [(390, 844), (1280, 800)]
-ROBOT_LIVES = 200
-ROBOT_SEED = 7
+# M3/M4 add yearly pendings, so 200 lives no longer fits the QA
+# window; ROBOT_LIVES env overrides for full sweeps.
+ROBOT_LIVES = int(os.environ.get("ROBOT_LIVES", "60"))
+ROBOT_SEED = int(os.environ.get("ROBOT_SEED", "7"))
 
 
 def _dig(obj, dotted):
@@ -597,13 +599,17 @@ class Runner:
                       " >= %d" % max(1, n_persons),
                       timeout=10, desc="participant portraits render")
             svgs = s.js("document.querySelectorAll("
-                        "'#modalPeople svg, #modalPeople img').length")
+                        "'#modalPeople svg, #modalPeople img, "
+                        "#modal .v2e-avatar, "
+                        "#modal .v2c-people img, "
+                        "#modal .v2c-people svg').length")
             self.record(flow, "decision participants show portraits",
                         isinstance(svgs, int) and svgs >= n_persons >= 1,
                         "person_ids=%d svgs=%r" % (n_persons, svgs))
         except TimeoutError:
             svgs = s.js("document.querySelectorAll("
-                        "'#modalPeople svg, #modalPeople img').length")
+                        "'#modalPeople svg, #modalPeople img, "
+                        "#modal .v2e-avatar').length")
             self.record(flow, "decision participants show portraits",
                         False, "person_ids=%d svgs=%r (never rendered)"
                         % (n_persons, svgs))
@@ -619,6 +625,17 @@ class Runner:
                    m.contains(document.activeElement); })()""",
             desc="pill reopens decision with focus")
         s.js("document.activeElement.click(); true")
+        # v2 sheet: the option click opens the outcome popup first —
+        # Continue must be clicked before the modal closes.
+        try:
+            s.wait_js("!!document.querySelector("
+                      "'.v2e-continue, .v2c-continue, .v2e-later')",
+                      timeout=6, desc="v2 outcome popup")
+            s.js("(() => { const c = document.querySelector("
+                 "'.v2e-continue, .v2c-continue, .v2e-later');"
+                 " if (c) c.click(); return true; })()")
+        except Exception:
+            pass
         s.wait_js("""(() => { const m = document.getElementById('modal');
             return !!m && m.hidden; })()""",
             desc="decision resolves and modal closes")
@@ -1771,7 +1788,26 @@ class Runner:
         self.record(flow, "life created via API", bool(body["game_id"]),
                     "game_id=%s" % body["game_id"][:8])
 
+    def _hook_assert_age_at_least(self, flow, minimum=2, desc=None):
+        self._hook_refresh_state(flow)
+        age = self._player_age_from_state(flow)
+        self.record(flow, desc or "age persisted (>= %s)" % minimum,
+                    age is not None and age >= minimum,
+                    "age=%s (server state)" % age)
+
+    def _player_age_from_state(self, flow):
+        try:
+            st = self.ctx.get("state") or {}
+            return next(p["age"] for p in st.get("people") or []
+                        if p.get("id") == st.get("player_id"))
+        except Exception:
+            return None
+
     def _hook_age_until_two(self, flow):
+        """Age the selected life to >= 2. The legacy view's Age control is
+        retired on the v2-first build (B), so age through the engine API:
+        server state is authoritative for the age; the DOM modal path
+        stays for decisions the page does surface."""
         s = self.s
         SETTLED = """(() => {
             const m = document.getElementById('modal');
@@ -1780,26 +1816,19 @@ class Runner:
             return btns.length === 0 ||
                    [...btns].some(b => !b.disabled);
         })()"""
-        for _ in range(12):
-            age = s.js("""(() => { const el = document.querySelector(
-                '#playerCard .role');
-                if (!el) return null;
-                const m = el.textContent.match(/Age (\\d+)/);
-                return m ? +m[1] : -1; })()""")
-            if age is None:
-                # page mid-render; wait for the summary card to come back
-                s.wait_js("!!document.querySelector('#playerCard .role')",
-                          desc="player summary card present")
-                continue
-            if age >= 2:
-                self.record(flow, "reached age >= 2", True, "age=%s" % age)
+        for _ in range(14):
+            api_age = self._player_age_from_state(flow)
+            if api_age is not None and api_age >= 2:
+                self.record(flow, "reached age >= 2", True,
+                            "age=%s (server state)" % api_age)
                 return
             modal_open = s.js(
                 "(() => { const m = document.getElementById('modal'); "
                 "return m && !m.hidden; })()")
             if modal_open:
                 clicked = s.js("""(() => { const b = document.querySelector(
-                    '#modalOptions button:not([disabled])');
+                    '#modalOptions button:not([disabled]), '
+                    + '#modal .v2e-options button');
                     if (b) { b.click(); return true; } return false; })()""")
                 if not clicked:
                     self.record(flow, "decision has enabled options", False)
@@ -1807,17 +1836,22 @@ class Runner:
                 s.wait_js(SETTLED, timeout=20, desc="decision settles")
                 self.record(flow, "decision resolved", True)
                 continue
-            clicked = s.js("""(() => { const b = [...document
-                .querySelectorAll('#actionList button')]
-                .find(b => b.textContent.toLowerCase()
-                    .includes('age')); if (b) { b.click(); return true; }
-                return false; })()""")
-            if not clicked:
-                self.record(flow, "age-up action available", False)
+            self._hook_refresh_state(flow)
+            if (self.ctx.get("state") or {}).get("pending_decision"):
+                self._hook_clear_pending(flow)
+                continue
+            before = self._player_age_from_state(flow)
+            self._hook_cmd(flow, action="age_up", payload={})
+            self._hook_refresh_state(flow)
+            after = self._player_age_from_state(flow)
+            if after is not None and before is not None and after == before:
+                self.record(flow, "reached age >= 2", False,
+                            "age_up did not advance the life (stuck at %s)"
+                            % after)
                 return
-            s.wait_js(SETTLED, timeout=20, desc="year resolves")
-        self.record(flow, "reached age >= 2", False, "gave up waiting")
-
+        self.record(flow, "reached age >= 2", False,
+                    "gave up waiting (server age=%s)"
+                    % self._player_age_from_state(flow))
 
 def write_report(out, results, deferred):
     counts = {}

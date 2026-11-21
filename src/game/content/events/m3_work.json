@@ -1,0 +1,438 @@
+{
+ "schema_version": 3,
+ "_comment": "M3 workplace events (Kimi C, 2026-11-21). Gated by the shared v3 condition path: every event requires an ACTIVE named-career assignment (active_assignment); several narrow to a ladder via role_ids. Actor-only, all options free, outcome lines carry their context.",
+ "events": [
+  {
+   "id": "wrk_overtime_weekend",
+   "title": "The Weekend Ask",
+   "text": "My manager has asked if I will come in this Saturday to help catch up on the backlog.",
+   "conditions": {"min_age": 16, "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "go_in", "label": "Go in and help",
+     "effects": {"stats": {"stress": 3, "happiness": -1}, "money": 120},
+     "outcome_text": "I gave up my Saturday for the team and the backlog shrank; the extra cash in my pocket softened the sting."},
+    {"id": "decline", "label": "Protect the weekend",
+     "effects": {"stats": {"stress": -3, "happiness": 2}},
+     "outcome_text": "I told my manager I had plans and kept my weekend; the backlog was still waiting on Monday, but so was my sanity."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "wrk_new_trainee",
+   "title": "Show Them the Ropes",
+   "text": "A nervous new starter has been assigned to shadow me for the week, and they are watching everything I do.",
+   "conditions": {"min_age": 18, "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "patient", "label": "Teach them properly",
+     "effects": {"stats": {"happiness": 3, "stress": 1}},
+     "outcome_text": "I slowed down and taught my shadow every trick I know; by Friday they were grinning instead of flinching."},
+    {"id": "rush", "label": "Let them figure it out",
+     "effects": {"stats": {"stress": -1, "happiness": -1}},
+     "outcome_text": "I let the new starter sink or swim on their own; they survived, but I do not think they will thank me for it."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "wrk_promotion_whisper",
+   "title": "Something's Opening Up",
+   "text": "Word around the workplace is that a senior position is about to be advertised, and a colleague thinks I should go for it.",
+   "conditions": {"min_age": 18, "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "prepare", "label": "Start preparing now",
+     "effects": {"stats": {"smarts": 2, "stress": 2}},
+     "outcome_text": "I began quietly preparing for the rumored promotion, polishing my record so I would be ready when it posted."},
+    {"id": "wait", "label": "Wait and see",
+     "effects": {"stats": {"stress": -2, "happiness": 1}},
+     "outcome_text": "I decided not to chase the rumor of a promotion and just kept doing my job well; whatever opens, opens."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_shift_swap",
+   "title": "The Favour",
+   "text": "A colleague has begged me to swap shifts next week because of a family thing they cannot miss.",
+   "conditions": {"min_age": 16, "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "swap", "label": "Swap shifts",
+     "effects": {"stats": {"happiness": 2}, "karma": 2},
+     "outcome_text": "I swapped shifts so my colleague could make their family thing; my week got awkward but my conscience got lighter."},
+    {"id": "refuse", "label": "Sorry, I can't",
+     "effects": {"stats": {"stress": 1, "happiness": -1}},
+     "outcome_text": "I told my colleague I could not swap shifts this time, and I carried a small guilty feeling to my next break."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "wrk_lunch_theft",
+   "title": "The Missing Sandwich",
+   "text": "Someone keeps taking food from the staff fridge, and today it was my carefully packed lunch.",
+   "conditions": {"min_age": 16, "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "note", "label": "Leave a passive-aggressive note",
+     "effects": {"stats": {"happiness": 2, "stress": 1}},
+     "outcome_text": "I taped a stern note to the staff fridge about my stolen lunch; whether it worked, my dignity felt restored."},
+    {"id": "let_go", "label": "Let it go",
+     "effects": {"stats": {"stress": -2, "happiness": -1}},
+     "outcome_text": "I let the lunch thief keep their secrets and bought something hot instead; some battles are not worth the appetite."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_fire_drill",
+   "title": "Not Now, Alarm",
+   "text": "A fire drill has emptied the whole building in the middle of my most productive hour.",
+   "conditions": {"min_age": 16, "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "chat", "label": "Enjoy the break outside",
+     "effects": {"stats": {"happiness": 3, "stress": -2}},
+     "outcome_text": "I treated the fire drill as an unscheduled holiday and chatted in the carpark until the all-clear sounded."},
+    {"id": "fret", "label": "Stress about the deadline",
+     "effects": {"stats": {"stress": 3, "happiness": -2}},
+     "outcome_text": "I spent the whole fire drill fretting about my deadline, and the work was no shorter when we filed back in."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_grumpy_client",
+   "title": "The Unhappy Customer",
+   "text": "A furious customer is demanding to speak to someone in charge, and that someone is currently me.",
+   "conditions": {"min_age": 18, "all": [{"kind": "active_assignment", "role_ids": ["office_assistant", "coordinator", "operations_specialist", "operations_manager"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "listen", "label": "Listen and fix it",
+     "effects": {"stats": {"stress": 2, "happiness": 2}, "karma": 1},
+     "outcome_text": "I listened to the furious customer without interrupting, fixed their problem, and watched their anger deflate."},
+    {"id": "script", "label": "Hide behind policy",
+     "effects": {"stats": {"stress": -1, "happiness": -1}},
+     "outcome_text": "I hid behind company policy with the angry customer; they left unsatisfied, and so did I, to be honest."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "wrk_paperwork_avalanche",
+   "title": "The Filing Mountain",
+   "text": "A mix-up means three weeks of unfiled paperwork has landed on my desk at once.",
+   "conditions": {"min_age": 18, "all": [{"kind": "active_assignment", "role_ids": ["office_assistant", "coordinator", "operations_specialist", "operations_manager"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "tackle", "label": "Tackle it head-on",
+     "effects": {"stats": {"stress": 3, "smarts": 1}},
+     "outcome_text": "I rolled up my sleeves and worked through the whole filing mountain in one long afternoon; my desk has never looked so smug."},
+    {"id": "sneak", "label": "Spread it over the week",
+     "effects": {"stats": {"stress": 1, "happiness": 1}},
+     "outcome_text": "I quietly spread the paperwork avalanche across the whole week; slower, but my evenings stayed my own."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "wrk_office_party",
+   "title": "Mandatory Fun",
+   "text": "The office party is tonight and someone has already mentioned karaoke twice.",
+   "conditions": {"min_age": 18, "all": [{"kind": "active_assignment", "role_ids": ["office_assistant", "coordinator", "operations_specialist", "operations_manager"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "go", "label": "Go and own the karaoke",
+     "effects": {"stats": {"happiness": 3, "stress": -1}},
+     "outcome_text": "I went to the office party and gave the karaoke my full, tuneless commitment; my colleagues will not forget it."},
+    {"id": "skip", "label": "Make an excuse",
+     "effects": {"stats": {"happiness": 1, "stress": -2}},
+     "outcome_text": "I invented a vague excuse and skipped the office party, trading karaoke regret for a quiet evening at home."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_coffee_rota",
+   "title": "The Coffee Rota Wars",
+   "text": "Someone has 'forgotten' the tea-round rota three days running, and the kitchen tension is boiling.",
+   "conditions": {"min_age": 18, "all": [{"kind": "active_assignment", "role_ids": ["office_assistant", "coordinator", "operations_specialist", "operations_manager"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "make_round", "label": "Just make the round",
+     "effects": {"stats": {"happiness": 2}, "karma": 1},
+     "outcome_text": "I gave up on the rota and made the tea round myself; peace returned to the kitchen, sweetened with sugar."},
+    {"id": "confront", "label": "Call out the shirker",
+     "effects": {"stats": {"happiness": -1, "stress": 2}},
+     "outcome_text": "I confronted the colleague dodging the tea rota; the kitchen is fair again, if a little frosty toward me now."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_safety_inspection",
+   "title": "Inspector on Site",
+   "text": "A safety inspector has just walked onto the site and is heading straight for the area I was working in yesterday.",
+   "conditions": {"min_age": 16, "all": [{"kind": "active_assignment", "role_ids": ["app_electrician", "electrician", "senior_electrician", "site_supervisor"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "confident", "label": "Walk them through it proudly",
+     "effects": {"stats": {"happiness": 2, "stress": 1}},
+     "outcome_text": "I walked the safety inspector through my work area with nothing to hide, and the pass mark felt like a medal."},
+    {"id": "tidy", "label": "Quietly fix last week's corner-cutting",
+     "effects": {"stats": {"stress": 3}},
+     "outcome_text": "I quietly tidied up the shortcuts I had taken before the inspector reached them; lesson learned, heart hammering."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "wrk_wrong_cable",
+   "title": "The Rerun",
+   "text": "I have just realised I ran the wrong cable through half of today's job and nobody has noticed yet.",
+   "conditions": {"min_age": 16, "all": [{"kind": "active_assignment", "role_ids": ["app_electrician", "electrician", "senior_electrician", "site_supervisor"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "redo", "label": "Admit it and redo it",
+     "effects": {"stats": {"stress": 2, "happiness": 1}, "karma": 2},
+     "outcome_text": "I owned up to the wrong cable and redid the whole run; it cost me the afternoon but bought me a clear conscience."},
+    {"id": "hide", "label": "Hope nobody checks",
+     "effects": {"stats": {"stress": 4, "happiness": -2}},
+     "outcome_text": "I said nothing about the wrong cable and hoped it would never matter; the worry followed me home anyway."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "wrk_old_machine",
+   "title": "Old Faithful Gives Up",
+   "text": "The ancient machine I rely on has made a noise like a dying whale and stopped dead mid-job.",
+   "conditions": {"min_age": 16, "all": [{"kind": "active_assignment", "role_ids": ["app_electrician", "electrician", "senior_electrician", "site_supervisor"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "repair", "label": "Try to coax it back to life",
+     "effects": {"stats": {"stress": 2, "smarts": 2}},
+     "outcome_text": "I opened up the dying machine and coaxed it back to life with patience and one well-placed thump; the job survived."},
+    {"id": "report", "label": "Report it and wait",
+     "effects": {"stats": {"stress": -1, "happiness": -1}},
+     "outcome_text": "I reported the dead machine and waited out the delay; sometimes the bravest move is admitting the whale won."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_first_solo",
+   "title": "Flying Solo",
+   "text": "For the first time, the boss has sent me to a job entirely on my own.",
+   "conditions": {"min_age": 16, "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "shine", "label": "Show them what I can do",
+     "effects": {"stats": {"happiness": 3, "stress": 2, "smarts": 1}},
+     "outcome_text": "I flew solo on my first lone job and finished clean; the quiet pride of it stayed with me all week."},
+    {"id": "cautious", "label": "Call for advice twice",
+     "effects": {"stats": {"stress": 1, "smarts": 1}},
+     "outcome_text": "I handled my first solo job with two cautious calls to the boss; slow and correct beats fast and wrong."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "wrk_team_building",
+   "title": "Trust Falls and Other Horrors",
+   "text": "Head office has organised a compulsory team-building day involving exercises I can only describe as crimes against dignity.",
+   "conditions": {"min_age": 18, "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "embrace", "label": "Throw yourself in",
+     "effects": {"stats": {"happiness": 2, "stress": 1}},
+     "outcome_text": "I threw myself into the team-building day with alarming enthusiasm; my colleagues found it either inspiring or unsettling."},
+    {"id": "endure", "label": "Endure it with minimum effort",
+     "effects": {"stats": {"stress": 2, "happiness": -2}},
+     "outcome_text": "I endured the team-building exercises with the bare minimum of movement and eye contact; dignity mostly intact."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_budget_cut",
+   "title": "The Lean Season",
+   "text": "Management has announced budget cuts, and everyone is quietly wondering what gets trimmed first.",
+   "conditions": {"min_age": 18, "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "volunteer", "label": "Volunteer improvement ideas",
+     "effects": {"stats": {"smarts": 2, "stress": 2}},
+     "outcome_text": "I met the budget cuts with a list of practical savings; management actually adopted two of my ideas."},
+    {"id": "keep_head_down", "label": "Keep your head down",
+     "effects": {"stats": {"stress": -1, "happiness": -1}},
+     "outcome_text": "I kept my head well below the parapet during the budget cuts and quietly made myself harder to trim."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_rain_leak",
+   "title": "Indoor Weather",
+   "text": "A storm has opened a leak directly above my desk and my paperwork is in the splash zone.",
+   "conditions": {"min_age": 18, "all": [{"kind": "active_assignment", "role_ids": ["office_assistant", "coordinator", "operations_specialist", "operations_manager"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "bucket_brigade", "label": "Mount a bucket defence",
+     "effects": {"stats": {"happiness": 2, "stress": 1}},
+     "outcome_text": "I organised a bucket brigade over my desk and saved the paperwork; the indoor rain became an office legend."},
+    {"id": "relocate", "label": "Move everything immediately",
+     "effects": {"stats": {"stress": 2, "happiness": -1}},
+     "outcome_text": "I evacuated my desk from the leak in one frantic trip and worked from a windowsill for the rest of the day."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_double_booked",
+   "title": "Two Places at Once",
+   "text": "A scheduling error has double-booked me for two different appointments at the same time.",
+   "conditions": {"min_age": 18, "all": [{"kind": "active_assignment", "role_ids": ["care_assistant", "qualified_care_worker", "nurse", "senior_nurse"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "reprioritise", "label": "Reprioritise and rebook",
+     "effects": {"stats": {"stress": 2, "smarts": 1}},
+     "outcome_text": "I untangled the double-booking by priority, rebooked the less urgent visit, and nobody was left waiting on me."},
+    {"id": "rush", "label": "Sprint between both",
+     "effects": {"stats": {"stress": 3, "health": -1}},
+     "outcome_text": "I tried to honour both double-booked appointments by sprinting between them; I made it, barely, and ached after."}
+   ],
+   "weight": 2
+  },
+  {
+   "id": "wrk_thankyou_note",
+   "title": "The Note That Made the Week",
+   "text": "Someone I helped at work has sent a handwritten thank-you note to my supervisor, and it has been pinned to the noticeboard.",
+   "conditions": {"min_age": 18, "all": [{"kind": "active_assignment", "role_ids": ["care_assistant", "qualified_care_worker", "nurse", "senior_nurse"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "savour", "label": "Savour it quietly",
+     "effects": {"stats": {"happiness": 4, "stress": -2}},
+     "outcome_text": "I read the thank-you note on the noticeboard twice and floated through the rest of my shift; this is why I do the work."},
+    {"id": "share", "label": "Frame it at home",
+     "effects": {"stats": {"happiness": 3}},
+     "outcome_text": "I photocopied the kind note before pinning it back, and framed my copy at home for the days the work feels heavy."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_badge_wonky",
+   "title": "Access Denied",
+   "text": "My access badge has demagnetised and the security desk is enjoying this far too much.",
+   "conditions": {"min_age": 16, "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "charm", "label": "Charm the security desk",
+     "effects": {"stats": {"happiness": 2, "stress": -1}},
+     "outcome_text": "I charmed the security desk until they waved me through the dead badge and issued a temporary pass with a smile."},
+    {"id": "queue", "label": "Do the paperwork properly",
+     "effects": {"stats": {"stress": 1}},
+     "outcome_text": "I queued for the proper replacement badge and filled in the form; dull, correct, and permanently fixed."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_boss_retires",
+   "title": "The Old Guard Bows Out",
+   "text": "The boss everyone respected has announced their retirement, and the whole workplace is quietly measuring what changes next.",
+   "conditions": {"min_age": 18, "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "toast", "label": "Give a heartfelt speech",
+     "effects": {"stats": {"happiness": 2, "stress": 2}, "karma": 1},
+     "outcome_text": "I gave the retiring boss a heartfelt send-off speech; several people cried and the boss shook my hand twice."},
+    {"id": "watch", "label": "Watch from the back",
+     "effects": {"stats": {"happiness": -1, "stress": -1}},
+     "outcome_text": "I watched the retirement send-off from the back row, waving once when the old boss scanned the room for familiar faces."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_stationery_hoard",
+   "title": "The Good Pens",
+   "text": "I have discovered who has been hoarding all the good pens in the stationery cupboard, and it is exactly who everyone suspected.",
+   "conditions": {"min_age": 18, "all": [{"kind": "active_assignment", "role_ids": ["office_assistant", "coordinator", "operations_specialist", "operations_manager"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "negotiate", "label": "Negotiate a fair share",
+     "effects": {"stats": {"happiness": 2, "smarts": 1}},
+     "outcome_text": "I negotiated a pen treaty with the stationery hoarder; the good pens now circulate like a small, smooth economy."},
+    {"id": "tattletale", "label": "Report the hoard",
+     "effects": {"stats": {"happiness": -1}, "karma": -1},
+     "outcome_text": "I reported the stationery hoard to management; the pens returned, but the kitchen has been very quiet near me since."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_lift_broken",
+   "title": "Eight Flights of Honesty",
+   "text": "The lift is out of order again and my next appointment is on the top floor.",
+   "conditions": {"min_age": 18, "all": [{"kind": "active_assignment", "role_ids": ["office_assistant", "coordinator", "operations_specialist", "operations_manager"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "climb", "label": "Take the stairs",
+     "effects": {"stats": {"health": 2, "stress": 1, "happiness": 1}},
+     "outcome_text": "I climbed the eight flights to the top-floor appointment and arrived pink, punctual, and weirdly proud of my legs."},
+    {"id": "delay", "label": "Wait for the repair",
+     "effects": {"stats": {"stress": -1, "happiness": -1}},
+     "outcome_text": "I waited out the broken lift and rescheduled the top-floor visit; the stairs will still be there tomorrow, unfortunately."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_health_inspection",
+   "title": "Surprise Audit",
+   "text": "A surprise audit team has arrived to inspect our records and facilities, unannounced.",
+   "conditions": {"min_age": 18, "all": [{"kind": "active_assignment", "role_ids": ["care_assistant", "qualified_care_worker", "nurse", "senior_nurse"]}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "assist", "label": "Assist the auditors fully",
+     "effects": {"stats": {"stress": 2, "smarts": 1, "happiness": 1}},
+     "outcome_text": "I dropped everything to assist the surprise audit team, and our facility passed with only minor notes."},
+    {"id": "shadow", "label": "Stay out of their way",
+     "effects": {"stats": {"stress": 1, "happiness": -1}},
+     "outcome_text": "I kept a respectful distance from the surprise auditors and let my records speak for themselves; they did, mostly."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_uniform_policy",
+   "title": "The New Uniform",
+   "text": "Head office has issued a new uniform policy that everyone agrees makes us look like lost referees.",
+   "conditions": {"min_age": 16, "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "wear_it", "label": "Wear it with pride",
+     "effects": {"stats": {"happiness": 1, "looks": -1}, "karma": 1},
+     "outcome_text": "I wore the ridiculous new uniform with full commitment; if I looked like a lost referee, I was the proudest one on the field."},
+    {"id": "protest", "label": "Join the muttered protest",
+     "effects": {"stats": {"happiness": -1, "stress": 1}},
+     "outcome_text": "I joined the quiet mutiny against the new uniform policy; the shirt stays in the drawer until someone enforces it."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_storm_shutdown",
+   "title": "Sent Home Early",
+   "text": "A wild storm has knocked the power out and management is deciding whether to send everyone home.",
+   "conditions": {"min_age": 16, "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "hope", "label": "Pack up and hope",
+     "effects": {"stats": {"happiness": 3, "stress": -2}},
+     "outcome_text": "The storm sent us all home early; I celebrated the unexpected holiday with soup and the smug comfort of my own couch."},
+    {"id": "stay", "label": "Offer to stay and secure things",
+     "effects": {"stats": {"stress": 2, "happiness": 1}, "karma": 2},
+     "outcome_text": "I stayed late through the storm to secure the worksite; soaked shoes, but the boss noticed who stayed."}
+   ],
+   "weight": 1
+  },
+  {
+   "id": "wrk_skill_refresh",
+   "title": "Back to Class",
+   "text": "My employer is offering a short refresher workshop that would sharpen exactly the skills I use daily.",
+   "conditions": {"min_age": 16, "all": [{"kind": "active_assignment"}]},
+   "roles": {"actor": {"kind": "person", "select": "player"}},
+   "choices": [
+    {"id": "attend", "label": "Attend the workshop",
+     "effects": {"stats": {"smarts": 3, "happiness": 2, "stress": 1}},
+     "outcome_text": "I attended the employer's refresher workshop and came back with new tricks that made my daily work noticeably smoother."},
+    {"id": "skip_workshop", "label": "Skip it, I'm busy",
+     "effects": {"stats": {"stress": -1, "smarts": -1}},
+     "outcome_text": "I skipped the refresher workshop to keep up with the day job; efficient now, maybe costlier later."}
+   ],
+   "weight": 2
+  }
+ ]
+}

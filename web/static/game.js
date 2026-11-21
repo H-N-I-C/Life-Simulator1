@@ -1,5 +1,5 @@
 import { renderAvatar, miniPersonChip, setErrorRetryHandler,
-         hideCrashCard } from "./common.js";
+         hideCrashCard, formatMoney } from "./common.js";
 import { normalizeState, financeRows, journalPeople,
          ACTION_CATEGORIES, GENERAL_CATEGORIES } from "./adapter.js";
 import { buildInputRow, collectInputs } from "./v2/inputs.js";
@@ -85,7 +85,11 @@ async function v2Apply(s) {
     if (v2Shell) v2Shell.closeAux();
     closeV2Panels();
     selectScreen(s.screen);
-    v2SetScroll(s.scroll);
+    // Restore the saved position only for REAL entries: the freshly seeded
+    // base entry carries no scroll (undefined), and forcing 0 here would
+    // clobber the feed's first-paint follow-the-bottom (F4/F12). Mirrors
+    // the panel branch below.
+    if (Number.isFinite(s.scroll)) v2SetScroll(s.scroll);
   } else if (s.person) {
     if (state) { resumeView.hidden = true; gameView.hidden = false; }
     if (v2Shell) v2Shell.closeAux();
@@ -98,6 +102,7 @@ async function v2Apply(s) {
     closeV2Panels();
     selectScreen("activities");
     await openV2PanelDispatch(s.panel, s.personId);
+    if (Number.isFinite(s.scroll)) v2SetScroll(s.scroll);
   } else if (s.lives) {
     setCurrentGameId(null);
     await showResume();
@@ -190,6 +195,7 @@ function esc(s) {
 async function showResume() {
   state = null;
   setPageLoading(true);
+  document.querySelector(".topbar").hidden = false;   // site nav (F1)
   resumeView.hidden = false;
   gameView.hidden = true;
   legacyView.hidden = true;
@@ -269,38 +275,150 @@ function selectScreen(name) {
   if (v2Shell) v2Shell.sync();
 }
 
+/* ================= M3 feature module mounts (§Shell mount API) ============
+ * Careers and education mount under the Occupation (job) screen, skills
+ * under Activities (M3 contracts: B applies the shell registration; A's
+ * careers module and C's skills module export the same frozen mount
+ * shape). The shell only owns the empty hosts; each module lazy-imports,
+ * renders itself from the server's projection slice and receives
+ * update(data) after every successful refresh. A missing projection key
+ * (feature not wired yet) keeps the host hidden — never fabricated
+ * content; an import failure is honest absence, not a fake empty card. */
+const FEATURE_MODULES = [
+  { key: "careers", hostId: "v2CareersMount",
+    path: "/static/features/careers/careers.js",
+    exportName: "mountCareers" },
+  { key: "educationFeature", hostId: "v2EducationMount",
+    path: "/static/features/education/education.js",
+    exportName: "mountEducation" },
+  { key: "skills", hostId: "v2SkillsMount",
+    path: "/static/features/skills/skills.js",
+    exportName: "mountSkills" },
+  { key: "social", hostId: "v2SocialMount",
+    path: "/static/features/social/social.js",
+    exportName: "mountSocial" },
+  { key: "social", hostId: "v2ClubsMount",
+    path: "/static/features/social/clubs.js",
+    exportName: "mountClubs" },
+];
+const featureHandles = new Map();
+
+function syncFeatureModules(s) {
+  for (const def of FEATURE_MODULES) {
+    const host = $(def.hostId);
+    if (!host) continue;
+    // handles are keyed by hostId: two mounts may share one projection
+    // key (M4 social + clubs both read state.social)
+    const handle = featureHandles.get(def.hostId);
+    const data = s[def.key];
+    if (data == null) {
+      if (handle) {
+        handle.unmount();
+        featureHandles.delete(def.hostId);
+      }
+      host.hidden = true;
+      continue;
+    }
+    host.hidden = false;
+    if (handle) {
+      handle.update(data);
+      continue;
+    }
+    if (def._loading || def._failed) continue;
+    def._loading = true;
+    import(def.path).then((mod) => {
+      if (typeof mod[def.exportName] !== "function") {
+        throw new TypeError(def.exportName + " missing");
+      }
+      // The feature may have unwound while the import was in flight.
+      if (featureHandles.has(def.hostId) || host.hidden) return;
+      featureHandles.set(def.hostId,
+                         mod[def.exportName](host, shellHooks, s[def.key]));
+    }).catch(() => {
+      def._failed = true;
+      host.hidden = true;
+    }).finally(() => { def._loading = false; });
+  }
+  applyPendingPause();
+}
+
+/* D finding (M4): while a server decision is pending, feature-module
+ * buttons (careers/skills/social/clubs) stayed clickable for seconds —
+ * the projections keep advertising enabled actions and only the generic
+ * controls gate on state.pending. The shell withholds EVERY action
+ * control the moment a pending exists: visible feature hosts get
+ * .v2-paused and their buttons are disabled immediately (the previous
+ * disabled state is remembered and restored when the pending clears).
+ * shellHooks.sendAction re-checks as defense-in-depth. */
+function applyPendingPause() {
+  const paused = Boolean(state && state.pending);
+  document.querySelectorAll(
+    "#v2CareersMount, #v2EducationMount, #v2SkillsMount, " +
+    "#v2SocialMount, #v2ClubsMount").forEach((host) => {
+    if (host.hidden) return;
+    host.classList.toggle("v2-paused", paused);
+    for (const b of host.querySelectorAll("button")) {
+      if (paused) {
+        if (!b.dataset.v2Paused) {
+          b.dataset.v2Paused = b.disabled ? "1" : "0";
+          b.disabled = true;
+        }
+      } else if (b.dataset.v2Paused) {
+        b.disabled = b.dataset.v2Paused === "1";
+        delete b.dataset.v2Paused;
+      }
+    }
+  });
+}
+
 /* ================= rendering ================= */
 
 function render() {
+  // Capture reading intent before the turn notice changes feed height.
+  // Measuring after inserting that notice mistakes a bottom-following
+  // reader for someone who deliberately scrolled into older history.
+  const journalScroller = document.querySelector(".v2-scroll");
+  const journalScroll = journalScroller ? {
+    top: journalScroller.scrollTop,
+    nearBottom: journalScroller.scrollHeight - journalScroller.scrollTop -
+      journalScroller.clientHeight < 48,
+  } : null;
   setPageLoading(false);
   const s = state;
   resumeView.hidden = true;
   legacyView.hidden = true;
   gameView.hidden = false;
+  // Full-screen in-game (feel-pass F1): the website nav belongs to the
+  // lives list / creator only, never inside a running life.
+  document.querySelector(".topbar").hidden = true;
 
-  // --- Home module (v2): central Age control + real stats sheet ---
+  // --- Home module (v2): ended-life note; Age + stats live in the shell ---
   if (v2Home) v2Home.update(s);
 
-  // --- turn progress (frozen cursor shape) ---
+  // --- M3 feature modules (careers/education on Occupation, skills on
+  // Activities): update with the fresh projection slice per §Shell.
+  syncFeatureModules(s);
+
+  // --- turn progress: player-facing text only (feel-pass F2) — internal
+  // turn ids and phase names never reach the player view ---
   const tc = $("turnCard");
   if (s.turn && (s.turn.pending || s.pending)) {
     tc.hidden = false;
-    const cursor = s.turn.cursor || {};
-    tc.innerHTML = `<h2>This year <span class="muted">(${esc(
-        s.turn.turn_id || "")})</span></h2>
-      <p>${s.pending
-        ? "A choice is needed before the year can continue."
-        : "Resolving the year…"} Current phase:
-        <b>${esc(cursor.phase_id || "year_start")}</b></p>`;
+    tc.innerHTML = `<p>${s.pending
+      ? "A choice is needed before the year can continue."
+      : "Resolving the year…"}</p>`;
   } else {
     tc.hidden = true;
   }
 
-  renderTimeline();
+  renderTimeline(journalScroll);
   renderSectionCards();
   renderFamily();
   renderActions();
-  if (s.pending) {
+  if (v2EventOutcomeOpen) {
+    // Preserve the resolved choice outcome until Continue, even when the
+    // server has already supplied the next decision in this year.
+  } else if (s.pending) {
     // Pending decisions block everything; if the dialog is not open (e.g.
     // right after reload) reopen it so the choice is never stranded. If it
     // IS open but shows a DIFFERENT decision id (a resolve just advanced
@@ -315,9 +433,11 @@ function render() {
       openDecisionModal();
     }
   } else {
-    closeModal();
-    const pill = $("decisionPill");
-    if (pill) pill.hidden = true;
+    if (!v2EventOutcomeOpen) {
+      closeModal();
+      const pill = $("decisionPill");
+      if (pill) pill.hidden = true;
+    }
   }
   const op = loadPendingOp();
   if (op) showPendingPill(op);
@@ -348,8 +468,6 @@ function firstPerson(text) {
   if (text.startsWith("You ")) return "I " + text.slice(4);
   return text;
 }
-
-const TURNED_RE = /^I turned \d+\.?$/;
 
 // never expose schema tokens to the player (engine resolves person
 // roles; this is a last-line strip in case one leaks)
@@ -406,82 +524,170 @@ function linkedPersonChip(person, size = 22) {
   return chip;
 }
 
-function renderTimeline() {
-  // group entries per age into cards; drop "I turned N" filler (the card
-  // header already gives the age); collapse runs of quiet years; first
-  // person; chips only for OTHER people involved
-  const j = $("journalList");
-  j.innerHTML = "";
-  const groups = [];
-  for (const e of state.journal) {
-    const text = sentenceCaseConditions(firstPerson(e.text));
-    if (TURNED_RE.test(text)) continue;  // age header covers this
-    const last = groups[groups.length - 1];
-    if (last && last.age === e.age) last.entries.push({ e, text });
-    else groups.push({ age: e.age, entries: [{ e, text }] });
+/* F4/F12 (feel pass, supersedes the old newest-first §Home rendering):
+ * the journal is a viewport-filling chronological FEED. Blocks come from
+ * A's journal_feed projection (§Journal v2: one block per year, oldest →
+ * newest, server-authored header + every line of the age); the flat
+ * journal groups the same way as a fallback for older saves. The feed
+ * follows the bottom (auto-scrolls to the newest year) only while the
+ * reader is already near the bottom — an older reading position is
+ * preserved, so Back/scroll restoration keeps working. Quiet-year
+ * collapsing is gone: every lived year renders its own header. */
+/* F4/F12: set true after the first journal render of the session, so the
+ * initial paint can open the feed at its newest year (see renderTimeline). */
+let timelinePainted = false;
+let timelineGameId = null;
+
+/* Home-feed line icons (M4 feel pass): derived from the journal entry's
+ * existing kind — no server change. EVERY line gets a marker: known
+ * kinds map to a category icon, everything else renders a neutral dot.
+ * (Money lines journal with kind "finances"; the map is ready for them.) */
+const JOURNAL_KIND_ICONS = {
+  education: "🎓",    // school / stu_
+  work: "💼",         // wrk_
+  relationship: "👪", // family
+  romance: "💕",      // rom_
+  social: "🤝",       // friends / soc_ / dra_
+  health: "❤️",
+  finances: "💰",     // money legs
+  year: "✨",         // flavour lines
+};
+
+function journalLineIcon(e) {
+  return JOURNAL_KIND_ICONS[e && e.kind] || "•";
+}
+
+function renderTimeline(previousScroll) {
+  if (timelineGameId !== state.gameId) {
+    timelinePainted = false;
+    timelineGameId = state.gameId;
   }
-  // Frozen §Home: the card list renders NEWEST FIRST; the underlying
-  // chronological journal is never mutated.
+  const j = $("journalList");
+  const scroller = document.querySelector(".v2-scroll");
+  /* First paint of a session opens the feed at its newest year (a fresh
+   * scroller starts at scrollTop 0, which is NOT "near the bottom"). */
+  const nearBottom = !scroller || scroller.scrollHeight <=
+    (scroller.clientHeight || 0) ||
+    scroller.scrollHeight - scroller.scrollTop -
+      scroller.clientHeight < 48;
+  const wasNearBottom = !timelinePainted ||
+    (previousScroll ? previousScroll.nearBottom : nearBottom);
+  const prevScroll = previousScroll ? previousScroll.top :
+    scroller ? scroller.scrollTop : 0;
+
+  j.innerHTML = "";
   const frag = document.createDocumentFragment();
-  const items = [];
-  let quietFrom = null, quietTo = null;
-  const flushQuiet = () => {
-    if (quietFrom === null) return;
-    const li = document.createElement("li");
-    li.className = "jquiet";
-    li.textContent = quietFrom === quietTo
-      ? "Age " + quietFrom + ": a quiet year"
-      : "Ages " + quietFrom + "-" + quietTo + ": quiet years";
-    items.push(li);
-    quietFrom = quietTo = null;
-  };
-  let prevAge = null;
-  for (const g of groups) {
-    if (prevAge !== null && g.age > prevAge + 1) {
-      quietFrom = prevAge + 1;
-      quietTo = g.age - 1;
-    }
-    flushQuiet();
+
+  const pushBlock = (age, headerText, entries) => {
     const card = document.createElement("li");
     card.className = "jcard";
     const head = document.createElement("div");
     head.className = "jcard-head";
-    head.textContent = "Age " + g.age;
+    head.appendChild(document.createElement("span"));
+    head.firstChild.className = "jcard-head-ic";
+    head.firstChild.textContent = "📅";
+    const headText = document.createElement("span");
+    headText.textContent = headerText || ("Age " + age);
+    head.appendChild(headText);
     card.appendChild(head);
-    for (const { e, text } of g.entries) {
+    for (const e of entries) {
       const line = document.createElement("div");
       line.className = "jline";
-      line.textContent = stripTokens(text);
+      const ic = document.createElement("span");
+      ic.className = "jline-ic";
+      ic.textContent = journalLineIcon(e);
+      line.appendChild(ic);
+      const text = document.createElement("span");
+      text.className = "jline-text";
+      text.textContent = stripTokens(
+        sentenceCaseConditions(firstPerson(e.text)));
+      line.appendChild(text);
       const others = journalPeople(e, state.peopleById)
         .filter((p) => p.id !== state.playerId);
       if (others.length) {
+        // chips live on their OWN row under the line (full width) so
+        // they never squeeze the text into a narrow column
         const chips = document.createElement("span");
-        chips.className = "jchips";
+        chips.className = "jchips jchips-row";
         for (const person of others) {
-          chips.appendChild(linkedPersonChip(person));
+          chips.appendChild(linkedPersonChip(person, 24));
         }
         line.appendChild(chips);
       }
       card.appendChild(line);
     }
-    items.push(card);
-    prevAge = g.age;
+    frag.appendChild(card);
+    return card;
+  };
+
+  const feed = state.raw && Array.isArray(state.raw.journal_feed)
+    ? state.raw.journal_feed : null;
+
+  let newestCard = null;
+  if (feed && feed.length) {
+    for (const block of feed) {
+      const entries = (block.entries || []).filter(
+        (e) => e && typeof e.text === "string" && e.text.trim());
+      if (!entries.length) continue;
+      newestCard = pushBlock(block.age, block.header, entries);
+    }
+  } else {
+    // Fallback for projections without journal_feed: group the flat
+    // chronological journal per age (no quiet-year collapsing beyond an
+    // explicit gap marker).
+    const groups = [];
+    for (const e of state.journal) {
+      const last = groups[groups.length - 1];
+      if (last && last.age === e.age) last.entries.push(e);
+      else groups.push({ age: e.age, entries: [e] });
+    }
+    let prevAge = null;
+    for (const g of groups) {
+      if (prevAge !== null && g.age > prevAge + 1) {
+        const gap = document.createElement("li");
+        gap.className = "jquiet";
+        gap.textContent = g.age - prevAge > 2
+          ? "Ages " + (prevAge + 1) + "-" + (g.age - 1) + ": quiet years"
+          : "Age " + (g.age - 1) + ": a quiet year";
+        frag.appendChild(gap);
+      }
+      newestCard = pushBlock(g.age, null, g.entries);
+      prevAge = g.age;
+    }
   }
-  flushQuiet();
-  if (!groups.length && !state.journal.length) {
+
+  // Newest year gets a one-time subtle highlight that fades to normal
+  // (re-applied per render; CSS animation ends at transparent).
+  if (newestCard) newestCard.classList.add("jcard-newest");
+
+  if (!j.children.length && !frag.children.length) {
     const li = document.createElement("li");
     li.className = "jquiet";
     li.textContent = "Nothing has happened yet — age up to live your " +
       "first year.";
-    items.push(li);
-  } else if (!groups.length) {
-    const li = document.createElement("li");
-    li.className = "jquiet";
-    li.textContent = "A quiet life so far.";
-    items.push(li);
+    frag.appendChild(li);
   }
-  for (let i = items.length - 1; i >= 0; i--) frag.appendChild(items[i]);
   j.appendChild(frag);
+  /* Only a render WITH a live scroller counts as the feed's first paint:
+   * an early render can run before the shell mounts .v2-scroll, and it
+   * must not consume the one-time follow-the-bottom. */
+  if (scroller) timelinePainted = true;
+
+  /* Follow the bottom only when appropriate: the Home feed auto-scrolls
+   * to the newest year when the reader was already near the bottom (or on
+   * first paint). On OTHER screens (People, Activities…) the shared
+   * scroller's position is always preserved — renderTimeline runs on
+   * every render, and jumping the shared scroller while the journal is
+   * not visible would yank the reader's unrelated scroll position.
+   * Back/scroll restoration flows through the same scroller. */
+  if (scroller) {
+    if (activeScreen === "home" && wasNearBottom) {
+      scroller.scrollTop = scroller.scrollHeight;
+
+    } else {
+      scroller.scrollTop = Math.min(prevScroll, scroller.scrollHeight);
+    }
+  }
 }
 
 function kv(rows) {
@@ -496,9 +702,19 @@ function renderSectionCards() {
 
   // Education
   const ed = $("educationCard");
-  if (sec.education) {
-    const e = sec.education;
-    ed.innerHTML = `<h2>Education</h2><div class="kvlist">${kv([
+  // M3a polish: the M3 programs view (mounted above) supersedes the
+  // legacy card once it carries no extra information — an out-of-school
+  // adult's "Stage none / Enrolled No / Grades 0" block is noise next to
+  // the programs catalog. The legacy card stays while it knows something
+  // the M3 view doesn't: school stage/grades, an active university
+  // course, or a live student loan.
+  const e = sec.education;
+  const m3Covers = state.educationFeature && e &&
+      e.stage === "none" && !e.enrolled && !(e.loan && e.loan.has_loan);
+  ed.hidden = !!m3Covers;
+  if (!ed.hidden) {
+    if (e) {
+      ed.innerHTML = `<h2>Education</h2><div class="kvlist">${kv([
       ["Stage", e.stage],
       ["Enrolled", e.enrolled ? "Yes" : "No"],
       ["Grades", e.grades != null ? e.grades : null],
@@ -506,11 +722,12 @@ function renderSectionCards() {
       ["High school done", e.graduated_high_school ? "Yes" : null],
       ["University years left", e.university_years_remaining],
       ...(e.loan && e.loan.has_loan
-          ? [["Loan remaining", "$" + e.loan.remaining.toLocaleString()]]
+          ? [["Loan remaining", formatMoney(e.loan.remaining)]]
           : []),
     ])}</div>`;
   } else {
     ed.innerHTML = `<h2>Education</h2><p class="muted">No education data yet.</p>`;
+  }
   }
 
   // Work
@@ -523,11 +740,11 @@ function renderSectionCards() {
       ["Job", w.employed ? w.job_label : null],
       ["Hours", w.employed ? w.hours : null],
       ["Salary", w.employed && w.salary != null
-        ? "$" + w.salary.toLocaleString() + "/yr" : null],
+        ? formatMoney(w.salary) + "/yr" : null],
       ["Annual gross", w.effective_annual_gross != null
-        ? "$" + w.effective_annual_gross.toLocaleString() : null],
+        ? formatMoney(w.effective_annual_gross) : null],
       ["Pension", w.pension != null && w.pension > 0
-        ? "$" + w.pension.toLocaleString() : null],
+        ? formatMoney(w.pension) : null],
       ["Performance", w.employed ? w.performance : null],
       ["Stress", w.employed ? w.stress : null],
       ["Years worked", w.years_worked != null ? w.years_worked : null],
@@ -561,31 +778,30 @@ function renderSectionCards() {
   const ledgerRows = fin.ledger.slice(-12).reverse().map((r) =>
     `<tr><td>${esc(r.age ?? "")}</td><td>${esc(r.category || "")}</td>
      <td>${esc(r.description || "")}</td>
-     <td class="${r.amount < 0 ? "neg" : "pos"}">` +
-     `${r.amount < 0 ? "−" : "+"}$${Math.abs(r.amount).toLocaleString()}</td>
-     <td>$${(r.balance_after ?? "").toLocaleString ?
-          (r.balance_after ?? "").toLocaleString() : ""}</td></tr>`).join("");
+     <td class="${r.amount < 0 ? "neg" : "pos"}">${formatMoney(r.amount)}</td>
+     <td>${r.balance_after != null ? formatMoney(r.balance_after) : ""}` +
+     `</td></tr>`).join("");
   fc.innerHTML = `<h2>Finances</h2>
     <div class="kvlist">${kv([
-      ["Balance", "$" + (fin.balance ?? state.money).toLocaleString()],
+      ["Balance", formatMoney(fin.balance ?? state.money)],
       ...(fin.debts || []).map((d) =>
         [esc(d.label || d.kind || d.category || "Debt") + " owed",
-         "$" + (d.remaining ?? d.amount ?? d.balance ?? 0).toLocaleString()]),
+         formatMoney(d.remaining ?? d.amount ?? d.balance ?? 0)]),
     ])}</div>
     ${fin.estimate ? `<h2>Annual estimate <span class="muted">(forecast, not
       posted)</span></h2><div class="kvlist">${kv([
         ["Gross", fin.estimate.gross != null
-          ? "$" + fin.estimate.gross.toLocaleString() : null],
+          ? formatMoney(fin.estimate.gross) : null],
         ["Tax", fin.estimate.tax != null
-          ? "$" + fin.estimate.tax.toLocaleString() : null],
+          ? formatMoney(fin.estimate.tax) : null],
         ["Living costs", fin.estimate.expenses != null
-          ? "$" + fin.estimate.expenses.toLocaleString() : null],
+          ? formatMoney(fin.estimate.expenses) : null],
         ["Debt service", fin.estimate.debt_service != null
-          ? "$" + fin.estimate.debt_service.toLocaleString() : null],
+          ? formatMoney(fin.estimate.debt_service) : null],
         ["Pension", fin.estimate.pension != null
-          ? "$" + fin.estimate.pension.toLocaleString() : null],
+          ? formatMoney(fin.estimate.pension) : null],
         ["Net", fin.estimate.net != null
-          ? "$" + fin.estimate.net.toLocaleString() : null],
+          ? formatMoney(fin.estimate.net) : null],
       ])}</div>` : ""}
     ${ledgerRows ? `<h2>Ledger</h2><table class="ledger"><thead>
       <tr><th>Age</th><th>Category</th><th>Description</th><th>Amount</th>
@@ -595,6 +811,11 @@ function renderSectionCards() {
 function renderFamilySection() {
   const box = $("familySectionCard");
   if (!box) return;
+  // M4: when the social module is live it owns the single family view
+  // (its Family group covers parents/partner/children/siblings); the
+  // legacy parents/partner summary hides to avoid the duplicate, while
+  // the family/relationship ACTION cards stay reachable below.
+  if (state.social) { box.innerHTML = ""; box.hidden = true; return; }
   const f = state.sections.family;
   if (!f) { box.innerHTML = ""; box.hidden = true; return; }
   box.hidden = false;
@@ -626,7 +847,14 @@ function renderFamilySection() {
 
 function renderFamily() {
   renderFamilySection();
+  const roster = $("familyRosterCard");
   const fam = $("familyList");
+  // M4: the social module's Family group is the single family roster.
+  if (state.social) {
+    if (roster) roster.hidden = true;
+    return;
+  }
+  if (roster) roster.hidden = false;
   fam.innerHTML = "";
   const others = state.people.filter((p) => p.id !== state.playerId);
   if (!others.length) {
@@ -672,8 +900,7 @@ function costLabel(a) {
   const bits = [];
   for (const c of a.knownCosts || []) {
     if (c.amount != null) {
-      bits.push((c.amount < 0 ? "Cost: $" + (-c.amount).toLocaleString()
-                              : "+$" + c.amount.toLocaleString()));
+      bits.push("Cost: " + formatMoney(Math.abs(c.amount)));
     } else if (c.label) {
       bits.push(esc(c.label));
     }
@@ -737,8 +964,33 @@ function onAction(a) {
 
 const modal = $("modal");
 
+/* C's event module keeps its outcome popup in the modal AFTER the decision
+ * resolved; the authoritative re-render that follows the resolve must not
+ * close it (no pending decision ≠ dismiss the popup). Set while a resolve
+ * through the event module is in flight / its popup is showing. */
+let v2EventOutcomeOpen = false;
+let decisionMountVersion = 0;
+
+function syncModalBackground() {
+  for (const node of document.querySelectorAll(
+    ".v2-header, .v2-tabbar, .v2-dock, .v2-scroll")) {
+    node.inert = !modal.hidden;
+  }
+}
+
+function restoreModalFocus() {
+  if (lastFocusedBeforeModal && lastFocusedBeforeModal.isConnected &&
+      lastFocusedBeforeModal.checkVisibility() &&
+      !lastFocusedBeforeModal.disabled) lastFocusedBeforeModal.focus();
+  else document.querySelector(".v2-header-namerow")?.focus();
+}
+
 function closeModal() {
+  const wasOpen = !modal.hidden;
+  decisionMountVersion++;
+  v2EventOutcomeOpen = false;
   modal.hidden = true;
+  syncModalBackground();
   const box = document.querySelector(".modal-box");
   if (box && box._v2Sheet) {
     box._v2Sheet.unmount();
@@ -751,6 +1003,7 @@ function closeModal() {
   }
   const cancel = $("modalCancel");
   if (cancel) cancel.hidden = false;
+  if (wasOpen) restoreModalFocus();
 }
 
 $("modalCancel").addEventListener("click", closeModal);
@@ -786,7 +1039,9 @@ function openActionModal(a) {
   });
   form.appendChild(submit);
   box.appendChild(form);
+  lastFocusedBeforeModal = document.activeElement;
   modal.hidden = false;
+  syncModalBackground();
   const first = form.querySelector("input, select");
   if (first) first.focus();
 }
@@ -794,13 +1049,18 @@ function openActionModal(a) {
 let lastFocusedBeforeModal = null;
 
 function trapModalFocus(e) {
-  if (modal.hidden || e.key !== "Tab") return;
-  const focusables = modal.querySelectorAll(
-    "button:not([disabled]), input, select, [tabindex]:not([tabindex='-1'])");
+  if (modal.hidden || e.key !== "Tab" ||
+      document.querySelector(".v2-person-host:not([hidden])")) return;
+  const focusables = [...modal.querySelectorAll(
+    "button:not([disabled]), input:not([disabled]), select:not([disabled]), " +
+    "[tabindex]:not([tabindex='-1'])")].filter((el) => el.checkVisibility());
   if (!focusables.length) return;
   const first = focusables[0];
   const last = focusables[focusables.length - 1];
-  if (e.shiftKey && document.activeElement === first) {
+  if (!modal.contains(document.activeElement)) {
+    e.preventDefault();
+    first.focus();
+  } else if (e.shiftKey && document.activeElement === first) {
     e.preventDefault();
     last.focus();
   } else if (!e.shiftKey && document.activeElement === last) {
@@ -811,54 +1071,153 @@ function trapModalFocus(e) {
 
 document.addEventListener("keydown", trapModalFocus);
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && !modal.hidden && state && state.pending) {
+  if (e.key === "Escape" && !modal.hidden && !v2EventOutcomeOpen &&
+      !document.querySelector(".v2-person-host:not([hidden])") &&
+      state && state.pending) {
     collapseDecisionModal();
   }
 });
 /* Escape on v2 surfaces where it is SAFE: it never discards a pending
  * server decision (the sheet branch above wins while a decision is open). */
 document.addEventListener("keydown", (e) => {
-  if (e.key !== "Escape" || !modal.hidden) return;
+  if (e.key !== "Escape") return;
+  if (!modal.hidden && !document.querySelector(".v2-person-host:not([hidden])")) return;
   if (v2Shell) v2Shell.escape();
 });
 
-function openDecisionModal() {
-  const d = state.pending;
+let eventModulePromise = null;
+function loadEventModule() {
+  // C's event module (centered modal + outcome popup, F5/F6) mounts when
+  // present; if it fails to load the sheet falls back to the Stage-2 choice
+  // presentation. Never blocks opening the decision.
+  if (!eventModulePromise) {
+    eventModulePromise = import("./v2/event.js").catch(() => null);
+  }
+  return eventModulePromise;
+}
+
+async function openDecisionModal() {
+  const d = state && state.pending;
+  if (!d || v2EventOutcomeOpen) return;
+  const mountVersion = ++decisionMountVersion;
+  v2EventOutcomeOpen = false;
   const pill = $("decisionPill");
   if (pill) pill.hidden = true;
-  lastFocusedBeforeModal = document.activeElement;
+  if (modal.hidden) lastFocusedBeforeModal = document.activeElement;
   const box = document.querySelector(".modal-box");
   const people = [];
   for (const pid of d.personIds) {
     const p = state.peopleById[pid];
     if (p) people.push(p);
   }
-  // v2 Choice sheet (contracts.md §Choice): presentation only — resolution
-  // stays on the retry-stable op machinery below. The sheet never invents
-  // options, reasons, or effects; collapse never discards the decision.
-  const sheet = mountChoiceSheet(box, {
+  const sheetOpts = {
     decision: { ...d, title: stripTokens(d.title || ""),
                 text: stripTokens(d.text || "") },
     people,
     playerAge: state.player ? state.player.age : null,
-    onResolve: (optId, inputs) => {
-      closeModal();
-      resolveDecision(d.id, optId, inputs).catch(() => {});
-    },
+    playerId: state.playerId,
     onCollapse: collapseDecisionModal,
     onError: (m) => showToast(m, true),
     onPersonClick: (pid) =>
       shellHooks.navigate("person", { personId: pid }),
-  });
+  };
+  // v2 Choice sheet / C's event modal: presentation only — resolution
+  // stays on the retry-stable op machinery. The sheet never invents
+  // options, reasons, or effects; collapse never discards the decision.
+  const mod = await loadEventModule();
+  if (mountVersion !== decisionMountVersion || state.pending?.id !== d.id) return;
+  if (box._v2Sheet) box._v2Sheet.unmount();
+  let sheet;
+  if (mod && typeof mod.mountEventModal === "function") {
+    // C's contract (§Event): onResolve returns a promise of the §Outcome
+    // ({text, changes, person_ids}) or null; the module shows the outcome
+    // popup itself and calls onClose() when the player continues. The flag
+    // keeps render() from closing the modal when the post-resolve state
+    // (no pending decision) arrives mid-popup.
+    sheetOpts.onResolve = (optId, inputs) => {
+      v2EventOutcomeOpen = true;
+      if (v2Shell) v2Shell.sync();
+      return resolveDecision(d.id, optId, inputs)
+        .then((fresh) => {
+          const outcome = fresh && fresh.lastDecisionOutcome;
+          return outcome && outcome.decision_id === d.id &&
+            outcome.option_id === optId ? outcome : null;
+        });
+    };
+    sheetOpts.onClose = () => {
+      if (box._v2Sheet !== sheet) return;
+      closeModal();
+      if (loadPendingOp() && state.pending) collapseDecisionModal();
+      else if (state.status === "dead" && (state.succession || state.continuation)) {
+        renderLegacy();
+      } else render();
+    };
+    sheet = mod.mountEventModal(box, sheetOpts);
+  } else {
+    sheetOpts.onResolve = (optId, inputs) => {
+      closeModal();
+      resolveDecision(d.id, optId, inputs).catch(() => {});
+    };
+    sheet = mountChoiceSheet(box, sheetOpts);
+  }
+  // The event card owns its dialog semantics (and changes its title for
+  // the outcome). Keep the outer transport overlay out of the AX tree.
+  const isEvent = mod && typeof mod.mountEventModal === "function";
+  modal.setAttribute("role", isEvent ? "presentation" : "dialog");
+  if (isEvent) {
+    modal.removeAttribute("aria-modal");
+    modal.removeAttribute("aria-labelledby");
+  } else {
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-labelledby", "v2SheetTitle");
+  }
   box._v2Sheet = sheet;
   box._v2SheetDecisionId = d.id;
   modal.hidden = false;
   $("modalCancel").hidden = true;
+  syncModalBackground();
   if (sheet.firstEnabled) sheet.firstEnabled.focus();
 }
 
+async function openResolvedOutcome(outcome) {
+  const mod = await loadEventModule();
+  if (!mod || typeof mod.mountEventModal !== "function") {
+    v2EventOutcomeOpen = false;
+    render();
+    return;
+  }
+  const box = document.querySelector(".modal-box");
+  if (box._v2Sheet) box._v2Sheet.unmount();
+  if (modal.hidden) lastFocusedBeforeModal = document.activeElement;
+  v2EventOutcomeOpen = true;
+  const people = (outcome.person_ids || []).map((id) => state.peopleById[id])
+    .filter(Boolean);
+  box._v2Sheet = mod.mountEventModal(box, {
+    decision: { id: outcome.decision_id, options: [] }, outcome, people,
+    playerId: state.playerId,
+    onClose: () => {
+      closeModal();
+      if (state.status === "dead" && (state.succession || state.continuation)) {
+        renderLegacy();
+      } else render();
+    },
+  });
+  box._v2SheetDecisionId = outcome.decision_id;
+  $("modalCancel").hidden = true;
+  modal.setAttribute("role", "presentation");
+  modal.removeAttribute("aria-modal");
+  modal.removeAttribute("aria-labelledby");
+  modal.hidden = false;
+  syncModalBackground();
+  if (v2Shell) v2Shell.sync();
+  box._v2Sheet.firstEnabled?.focus();
+}
+
 function collapseDecisionModal() {
+  if (v2EventOutcomeOpen) return;
+  decisionMountVersion++;
   modal.hidden = true;
+  syncModalBackground();
   $("modalCancel").hidden = false;
   if (lastFocusedBeforeModal && lastFocusedBeforeModal.focus) {
     lastFocusedBeforeModal.focus();
@@ -869,8 +1228,10 @@ function collapseDecisionModal() {
     pill = document.createElement("div");
     pill.id = "decisionPill";
     pill.className = "pending-pill decision";
-    document.querySelector("main").prepend(pill);
   }
+  // Keep the notice inside the bounded game shell; prepending it to main
+  // pushes the whole 100dvh game below the viewport and covers the feed.
+  gameView.prepend(pill);
   pill.hidden = false;
   pill.innerHTML = "";
   const label = document.createElement("span");
@@ -915,8 +1276,8 @@ function showPendingPill(op) {
     pill = document.createElement("div");
     pill.id = "pendingPill";
     pill.className = "pending-pill";
-    document.querySelector("main").prepend(pill);
   }
+  (gameView.hidden ? document.querySelector("main") : gameView).prepend(pill);
   pill.hidden = false;
   pill.innerHTML = "";
   const label = document.createElement("span");
@@ -936,6 +1297,11 @@ function showPendingPill(op) {
 }
 
 function startOperation(actionId, payload) {
+  if (v2EventOutcomeOpen && actionId !== "resolve_decision") {
+    return Promise.reject(Object.assign(
+      new Error("Continue the outcome before taking another action"),
+      { code: "outcome_open" }));
+  }
   if (busy) {
     return Promise.reject(Object.assign(
       new Error("Another action is still in flight"), { code: "busy" }));
@@ -952,9 +1318,28 @@ function retryPendingOp() {
   const op = loadPendingOp();
   if (!op || busy) return Promise.resolve(null);
   busy = true;
-  // sendOperation surfaces errors via the pill/toast; swallow the rejection
-  // here so the click handler never trips the global error boundary.
-  return sendOperation(op).catch(() => {});
+  // Keep a retried resolution's actual outcome visible, including after a
+  // reload where the decision itself no longer exists in current state.
+  const resolving = op.action === "resolve_decision";
+  if (resolving) v2EventOutcomeOpen = true;
+  return sendOperation(op).then(async (fresh) => {
+    const outcome = fresh && fresh.lastDecisionOutcome;
+    if (resolving && outcome &&
+        outcome.decision_id === op.payload.decision_id &&
+        outcome.option_id === op.payload.option_id) {
+      await openResolvedOutcome(outcome);
+    } else if (resolving) {
+      v2EventOutcomeOpen = false;
+      if (state.pending && loadPendingOp()) collapseDecisionModal();
+      else render();
+    }
+    return fresh;
+  }).catch(() => {
+    if (resolving) {
+      v2EventOutcomeOpen = false;
+      render();
+    }
+  });
 }
 
 function sendOperation(op) {
@@ -968,7 +1353,9 @@ function sendOperation(op) {
     busy = false;
     clearPendingOp();          // definitive success
     state = normalizeState(raw);
-    render();
+    if (state.status === "dead" && !v2EventOutcomeOpen &&
+        (state.succession || state.continuation)) renderLegacy();
+    else render();
     return state;              // frozen §Shell: resolve with fresh state
   }).catch((err) => {
     busy = false;
@@ -1020,14 +1407,20 @@ async function ensureV2Home() {
 async function renderGame() {
   await ensureV2Shell();
   await ensureV2Home();
-  render();
+  // Make the destination visible before measuring its journal. Measuring
+  // a hidden Home gives a non-overflowing scroller and clamps follow to 0.
   selectScreen(activeScreen);
+  render();
   // Seed the history stack once so Back/Forward (and the header Back) have
   // a base entry and in-app Back can never eject the player from the page.
   if (!history.state || !history.state.v2) {
     try {
+      // No scroll on the seeded base entry: the first v2Apply must not
+      // force the scroller to 0 — it would clobber the feed's first-paint
+      // follow-the-bottom (F4/F12). Real entries capture scroll via v2Push
+      // when the reader navigates away and are restored by v2Apply.
       history.replaceState({ v2: 1, v2Index: 1, game: state.gameId,
-                             screen: activeScreen, scroll: 0 }, "");
+                             screen: activeScreen }, "");
       v2Depth = 1;
     } catch (e) { /* history unavailable (test hosts) */ }
   }
@@ -1071,6 +1464,7 @@ function renderLegacy() {
   gameView.hidden = true;
   resumeView.hidden = true;
   legacyView.hidden = false;
+  document.querySelector(".topbar").hidden = false;   // site nav (F1)
   const eligible = (s.succession && s.succession.eligible) || [];
   const generationNext = s.succession && s.succession.generation_next;
   legacyView.innerHTML = `
@@ -1234,12 +1628,24 @@ async function refreshShell() {
   return state;
 }
 const shellHooks = {
-  getState: () => state,
+  getState: () => !v2EventOutcomeOpen || !state ? state : {
+    ...state,
+    actions: state.actions.map((a) => a.id === "age_up"
+      ? { ...a, enabled: false, reason: "Continue the outcome first." } : a),
+  },
   refresh: refreshShell,
   // Feature screens drive game commands through the shell's retry-stable
   // operation machinery (persisted op + replay ledger), never ad-hoc.
-  sendAction: (actionId, payload, targetId) =>
-    sendAction(actionId, payload || {}, targetId),
+  // Defense-in-depth (D finding): while a server decision is pending,
+  // every action except the resolve itself is refused immediately —
+  // the buttons are already withheld by applyPendingPause.
+  sendAction: (actionId, payload, targetId) => {
+    if (state && state.pending && actionId !== "resolve_decision") {
+      return Promise.reject(
+        new Error("a choice is needed before anything else"));
+    }
+    return sendAction(actionId, payload || {}, targetId);
+  },
   resolveDecision: (decisionId, optionId, inputs) =>
     resolveDecision(decisionId, optionId, inputs || {}),
   // v2 navigation (frozen contracts.md §Shell).
@@ -1285,6 +1691,7 @@ async function openEditorFromShell(personId, fromHistory) {
         editorModule.toggleEditor(state, shellHooks);
       }
     }
+    $("editorPanel")?.scrollIntoView({ block: "start", behavior: "instant" });
     if (v2Shell) v2Shell.sync();
   } catch (err) {
     showToast("Editor failed to load.", true);
@@ -1334,7 +1741,10 @@ let familyTreeCard = null;
 async function openFamilyTreePanel() {
   selectScreen("activities");
   closeV2Panels("familyTree");
-  if (familyTreeCard && !familyTreeCard.hidden) return;
+  if (familyTreeCard && !familyTreeCard.hidden) {
+    familyTreeCard.scrollIntoView({ block: "start", behavior: "instant" });
+    return;
+  }
   if (!familyTreeCard) {
     familyTreeCard = document.createElement("section");
     familyTreeCard.className = "card";
@@ -1348,6 +1758,7 @@ async function openFamilyTreePanel() {
   }
   familyTreeCard.hidden = false;
   await familyTreeModule.mountFamilyTree(familyTreeCard, state.gameId);
+  familyTreeCard.scrollIntoView({ block: "start", behavior: "instant" });
 }
 $("familyTreeToggle").addEventListener("click", async () => {
   try {
@@ -1370,7 +1781,10 @@ let m25Card = null;
 async function openM25Panel() {
   selectScreen("activities");
   closeV2Panels("m25");
-  if (m25Card && !m25Card.hidden) return;
+  if (m25Card && !m25Card.hidden) {
+    m25Card.scrollIntoView({ block: "start", behavior: "instant" });
+    return;
+  }
   if (!m25Card) {
     m25Card = document.createElement("section");
     m25Card.className = "card";
@@ -1384,6 +1798,7 @@ async function openM25Panel() {
   }
   m25Card.hidden = false;
   await m25Module.mountM25(m25Card, shellHooks);
+  m25Card.scrollIntoView({ block: "start", behavior: "instant" });
 }
 $("m25Toggle").addEventListener("click", async () => {
   try {

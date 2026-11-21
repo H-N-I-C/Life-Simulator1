@@ -1,0 +1,73 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 84,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Ashton at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aleece",
+    "last_name": "Floyd",
+    "gender": "female",
+    "country": "Japan",
+    "seed": 572488699,
+    "request_id": "robot-41-84-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1696031702,
+     "base": "person",
+     "skin_tone": "medium-dark",
+     "hair": "curly",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses",
+      "earrings"
+     ],
+     "background": "bg_10",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_2ed94fc2f7",
+   "action": "definitely_not_an_action",
+   "payload": {},
+   "request_id": "robot-41-r4374",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown action\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_2ed94fc2f7",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Ashton",
+    "employer_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+   },
+   "request_id": "robot-41-r4375",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Ashton at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 85 --seed 41 --from-life 84 --fail-fast"
+}

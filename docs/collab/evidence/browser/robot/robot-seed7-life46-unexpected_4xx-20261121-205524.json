@@ -1,0 +1,54 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 46,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'education_enroll' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown program: N\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Alecia",
+    "last_name": "Solomon",
+    "gender": "female",
+    "country": "Australia",
+    "seed": 777,
+    "request_id": "robot-7-46-create",
+    "scenario": "graduating_18"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_70c464d4ed",
+   "action": "insult",
+   "payload": {
+    "target_id": "cf45c065-fb1d-4a7d-892f-734b6443c841"
+   },
+   "request_id": "robot-7-r1189",
+   "expected_revision": 39
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_70c464d4ed",
+   "action": "education_enroll",
+   "payload": {
+    "program_id": "N"
+   },
+   "request_id": "robot-7-r1190",
+   "expected_revision": 40
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown program: N\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 47 --seed 7 --from-life 46 --fail-fast"
+}

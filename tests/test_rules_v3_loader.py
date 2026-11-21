@@ -322,7 +322,10 @@ class V3ResolveTest(unittest.TestCase):
         result = ra.resolve_choice(ctx, pending, option["id"], {},
                                    random.Random(1))
         self.assertEqual(len(result["events"]), 1)
-        self.assertIn("The moment has passed", result["events"][0]["text"])
+        text = result["events"][0]["text"]
+        # Meaning, not the exact wording: the chance lapsed and why.
+        self.assertIn("let the chance slip by", text)
+        self.assertIn("no longer possible", text)
         self.assertEqual(result["money_entries"], [])
         self.assertFalse(result["finished_turn"])
 

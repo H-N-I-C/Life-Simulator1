@@ -47,6 +47,11 @@ class El {
     return {
       add: (...c) => c.forEach((x) => s.add(x)),
       remove: (...c) => c.forEach((x) => s.delete(x)),
+      toggle: (c, force) => {
+        const want = force === undefined ? !s.has(c) : !!force;
+        if (want) s.add(c); else s.delete(c);
+        return want;
+      },
       contains: (c) => s.has(c),
     };
   }
@@ -235,18 +240,35 @@ async function testAsync(name, fn) {
 
 /* ---------- tests ---------- */
 
-test("five frozen destinations + More routes render", () => {
+test("bottom bar: four tabs + one big central Age button (F3)", () => {
   const { host } = setup();
-  assert.deepEqual(V2_SCREENS,
-                   ["home", "job", "assets", "people", "activities"]);
   const tabs = host.findAll((n) => n._classes.has("v2-tab"));
-  assert.equal(tabs.length, 5);
+  assert.equal(tabs.length, 4);
+  const labels = tabs.map((t) => t.textContent);
+  for (const l of ["Occupation", "Assets", "Relationships",
+                   "Activities"]) {
+    assert.ok(labels.some((x) => x.includes(l)), "bar must include " + l);
+  }
+  assert.equal(labels.some((x) => x.includes("AGE")), false,
+               "AGE is the centre button, not a tab");
+  const age = host.findAll((n) => n._classes.has("v2-agebtn"));
+  assert.equal(age.length, 1);
+  assert.ok(age[0].textContent.includes("AGE"));
+  // AGE sits between Assets and Relationships in the bar.
+  const bar = host.findAll((n) => n._classes.has("v2-tabbar"))[0];
+  const order = bar.children.map((c) => c.textContent);
+  const idx = (pred) => order.findIndex((t) => pred(t));
+  assert.ok(idx((t) => t.includes("Assets")) > -1 &&
+            idx((t) => t.includes("Assets")) < idx((t) => t.includes("AGE")) &&
+            idx((t) => t.includes("AGE")) <
+              idx((t) => t.includes("Relationships")),
+            "bar order: Occupation · Assets · AGE · Relationships · Activities");
   const more = host.findAll((n) => n._classes.has("v2-more") &&
                                    n.tagName === "DIV")[0];
-  const labels = more.findText(() => true);
+  const moreLabels = more.findText(() => true);
   for (const l of ["All lives", "Character editor", "Family tree",
                    "Dating & weddings"]) {
-    assert.ok(labels.includes(l), "More must include " + l);
+    assert.ok(moreLabels.includes(l), "More must include " + l);
   }
 });
 
@@ -288,14 +310,37 @@ test("sync renders real name, real job status and money — no mock data", () =>
   assert.ok(host2.findText((t) => t.includes("Retired")).length >= 1);
 });
 
+test("header subtitle shows the named career title when assigned", () => {
+  const { host, shell } = setup();
+  shell.sync();
+  const base = host.findText((t) => t.includes("Junior Architect")).length;
+  assert.ok(base >= 1, "legacy job label shown without an assignment");
+  // with a M3 named assignment the subtitle leads with role · employer
+  const host3 = makeHost();
+  const shell3 = mountShell(host3, {
+    getState: () => state({
+      careers: { assignment: {
+        role_id: "electrician", role_label: "Electrician",
+        employer_id: "voltworks", employer_name: "Voltworks Electrical" } },
+      sections: { work: { employed: true, job_label: "Legacy label" } } }),
+  }, {});
+  shell3.sync();
+  const texts = host3.findText((t) => t.includes("Electrician"));
+  assert.ok(texts.length >= 1, "named role shown");
+  assert.ok(texts.some((t) => t.includes("Voltworks Electrical")),
+            "named employer shown");
+  assert.equal(host3.findText((t) => t.includes("Legacy label")).length, 0,
+               "legacy label replaced by the named title");
+});
+
 test("tab click selects its screen; header home link selects home", () => {
   const { host, shell, calls } = setup();
   shell.sync();
   const people = host.findAll((n) => n._classes.has("v2-tab"))
-                     .find((b) => b.textContent.includes("People"));
+                     .find((b) => b.textContent.includes("Relationships"));
   people.click();
   assert.deepEqual(calls.screens, ["people"]);
-  const home = host.findAll((n) => n._classes.has("v2-home-link"))[0];
+  const home = host.findAll((n) => n._classes.has("v2-header-namerow"))[0];
   home.click();
   assert.deepEqual(calls.screens, ["people", "home"]);
 });
@@ -371,6 +416,7 @@ test("unmount unwraps the scroll region and removes chrome", () => {
   shell.unmount();
   assert.equal(host.findAll((n) => n._classes.has("v2-header")).length, 0);
   assert.equal(host.findAll((n) => n._classes.has("v2-tabbar")).length, 0);
+  assert.equal(host.findAll((n) => n._classes.has("v2-dock")).length, 0);
   for (const s of V2_SCREENS) {
     assert.ok(host.findAll((n) => n.id === "screen-" + s).length === 1,
               "screen-" + s + " still under host");
@@ -442,6 +488,215 @@ test("Escape closes the More menu and reports other surfaces", () => {
   const more = host.findAll((n) => n._classes.has("v2-more"))[0];
   assert.equal(more.hidden, true);
   assert.equal(shell.escape(), false, "nothing to close on plain Home");
+});
+
+test("stats dock: real stats pinned above the bar with % labels (F7)", () => {
+  const { host, shell } = setup({}, {
+    stats: { happiness: 78, health: 64, smarts: 83, looks: 41 },
+  });
+  shell.sync();
+  const dock = host.findAll((n) => n._classes.has("v2-dock"))[0];
+  assert.equal(dock.hidden, false);
+  const texts = host.findText(() => true);
+  for (const v of [78, 64, 83, 41]) {
+    assert.ok(texts.includes(v + "%"), "numeric label " + v + "%");
+  }
+  // F7: short display label — "Happiness" would clip at 320px ("Happin…")
+  assert.ok(texts.includes("Happy"), "happiness displays as Happy");
+  assert.equal(texts.includes("Happiness"), false);
+  const fills = host.findAll((n) => n._classes.has("v2-stat-fill"));
+  assert.equal(fills.length, 4);
+  assert.equal(fills[0].style.background, "var(--v2-bar-good)");  // 78
+  assert.equal(fills[3].style.background, "var(--v2-bar-mid)");   // 41
+  // no stats → dock hides honestly
+  const host2 = makeHost();
+  const shell2 = mountShell(host2, { getState: () => state() }, {});
+  shell2.sync();
+  assert.equal(host2.findAll((n) => n._classes.has("v2-dock"))[0].hidden,
+               true);
+});
+
+test("Age click sends the exact age_up action; spec gates with reason", async () => {
+  const calls = [];
+  const host = makeHost();
+  const shell = mountShell(host, {
+    getState: () => state({ actions: [{ id: "age_up", label: "Age up",
+                                         enabled: true, reason: "" }] }),
+    sendAction: (id, payload, targetId) => {
+      calls.push({ id, payload, targetId });
+      return Promise.resolve({});
+    },
+  }, {});
+  shell.sync();
+  const age = host.findAll((n) => n._classes.has("v2-agebtn"))[0];
+  assert.equal(age.disabled, false);
+  age.click();
+  assert.deepEqual(calls, [{ id: "age_up", payload: {}, targetId: null }]);
+  shell.unmount();
+});
+
+test("disabled spec disables Age with the server reason visible (F3)", () => {
+  const { host, shell } = setup({}, { actions: [{ id: "age_up", label: "Age up",
+      enabled: false, reason: "A decision is waiting for you." }] });
+  shell.sync();
+  const age = host.findAll((n) => n._classes.has("v2-agebtn"))[0];
+  assert.equal(age.disabled, true);
+  assert.equal(age.getAttribute("aria-disabled"), "true");
+  assert.ok(host.findText((t) => t.includes("decision is waiting")).length >= 1);
+});
+
+testAsync("Age busy settles from authoritative state; note clears", async () => {
+  const host2 = makeHost();
+  const current = state({
+    actions: [{ id: "age_up", label: "Age up", enabled: true, reason: "" }],
+  });
+  let resolve;
+  const shell2 = mountShell(host2, {
+    getState: () => current,
+    sendAction: () => new Promise((r) => { resolve = r; }),
+  }, {});
+  shell2.sync();
+  const age2 = host2.findAll((n) => n._classes.has("v2-agebtn"))[0];
+  age2.click();
+  assert.equal(age2.disabled, true);
+  assert.ok(host2.findText((t) => t.includes("Ageing")).length >= 1);
+  resolve(current);
+  await tick(); await tick();
+  assert.equal(age2.disabled, false);
+  assert.equal(host2.findText((t) => t.includes("Ageing")).length, 0);
+  shell2.unmount();
+});
+
+test("F8: stat fills persist across syncs — width updated, flash class, same element", () => {
+  const host = makeHost();
+  let current = state({
+    stats: { happiness: 78, health: 64, smarts: 83, looks: 41 },
+  });
+  const shell = mountShell(host, { getState: () => current }, {});
+  shell.sync();
+  const fill = host.findAll((n) => n._classes.has("v2-stat-fill"))[0];
+  assert.equal(fill.style.width, "78%");
+  assert.equal(fill.classList.contains("animate"), false,
+               "first paint snaps, no animation class");
+  // second sync with a new value: SAME fill element, width updated
+  current = state({
+    stats: { happiness: 90, health: 64, smarts: 83, looks: 41 },
+  });
+  shell.sync();
+  const fill2 = host.findAll((n) => n._classes.has("v2-stat-fill"))[0];
+  assert.equal(fill2, fill, "fill element persisted (F8)");
+  assert.equal(fill2.style.width, "90%");
+  assert.equal(fill2.classList.contains("animate"), true,
+               "persisted fill animates to the new width");
+  const cell = host.findAll((n) => n._classes.has("v2-stat"))[0];
+  assert.equal(cell.classList.contains("up"), true, "green flash on gain");
+  const val = host.findAll((n) => n._classes.has("v2-stat-value"))[0];
+  assert.equal(val.textContent, "90%");
+  shell.unmount();
+});
+
+test("F8: header age chip renders the player's age", () => {
+  const { host, shell } = setup();
+  shell.sync();
+  const texts = host.findText((t) => t.startsWith("Age "));
+  assert.ok(texts.some((t) => t === "Age 27"), "age chip shows Age 27");
+});
+
+testAsync("F8: age chip ticks through intermediate ages", async () => {
+  const host = makeHost();
+  let current = state({ player: { id: "me", name: "Maya Okafor",
+                                   age: 27 } });
+  const shell = mountShell(host, { getState: () => current }, {});
+  shell.sync();
+  // pretend a browser environment so the animated tick path runs
+  globalThis.requestAnimationFrame = () => 1;
+  try {
+    current = state({ player: { id: "me", name: "Maya Okafor", age: 30 } });
+    shell.sync();                  // starts the tick 27 → 30
+    const read = () => {
+      const t = host.findText((x) => /^Age \d+$/.test(x));
+      return t.length ? Number(t[0].replace("Age ", "")) : null;
+    };
+    assert.equal(read(), 27, "tick starts from the previous age");
+    for (let i = 0; i < 12 && read() !== 30; i++) {
+      await new Promise((r) => setTimeout(r, 100));
+    }
+    assert.equal(read(), 30, "tick lands on the new age");
+  } finally {
+    delete globalThis.requestAnimationFrame;
+    shell.unmount();
+  }
+});
+
+testAsync("§Undo: spec-driven enable/disable, reason, two-tap confirm sends undo_year", async () => {
+  const host = makeHost();
+  const calls = [];
+  let current = state({ actions: [
+    { id: "age_up", label: "Age up", enabled: true, reason: null },
+    { id: "undo_year", label: "Undo last year", category: "life",
+      enabled: false, reason: "there is no year to undo" },
+  ] });
+  const shell = mountShell(host, {
+    getState: () => current,
+    sendAction: (id, payload, targetId) => {
+      calls.push({ id, payload, targetId });
+      return Promise.resolve({});
+    },
+  }, {});
+  shell.sync();
+  const undo = () => host.findAll((n) => n._classes.has("v2-undo"))[0];
+  const reason = host.findAll((n) => n._classes.has("v2-undo-reason"))[0];
+  assert.equal(undo().disabled, true, "disabled when can_undo is false");
+  assert.ok(reason.textContent.includes("no year to undo"),
+            "server reason shown");
+  undo().click();
+  assert.equal(calls.length, 0, "disabled button never sends");
+
+  // enabled: first tap arms the confirm, second tap sends
+  current = state({ actions: [
+    { id: "age_up", label: "Age up", enabled: true, reason: null },
+    { id: "undo_year", label: "Undo last year", category: "life",
+      enabled: true, reason: null },
+  ] });
+  shell.sync();
+  assert.equal(undo().disabled, false);
+  assert.equal(reason.textContent, "");
+  undo().click();
+  assert.equal(calls.length, 0, "first tap is the confirm step");
+  assert.ok(undo().textContent.includes("confirm"), "confirm label");
+  undo().click();
+  assert.deepEqual(calls, [{ id: "undo_year", payload: {}, targetId: null }]);
+  await tick(); await tick();           // busy settles
+  assert.equal(undo().disabled, false, "settlement re-renders the spec");
+
+  // action absent from the projection → row hides honestly
+  current = state({ actions: [
+    { id: "age_up", label: "Age up", enabled: true, reason: null }] });
+  shell.sync();
+  assert.equal(host.findAll((n) => n._classes.has("v2-undorow"))[0].hidden,
+               true);
+  shell.unmount();
+});
+
+testAsync("§Undo: a changed revision or life requires a fresh confirmation", async () => {
+  const host = makeHost(), calls = [];
+  const actions = [{id:"undo_year",label:"Undo last year",enabled:true}];
+  let current = state({actions, revision:2});
+  const shell = mountShell(host, {getState:()=>current,
+    sendAction:(id)=>{calls.push(id);return Promise.resolve();}}, {});
+  const undo = host.findAll((n)=>n._classes.has("v2-undo"))[0];
+  undo.click();
+  current = state({actions, revision:3});
+  shell.sync();
+  assert.ok(!undo.textContent.includes("confirm"));
+  undo.click();
+  assert.equal(calls.length,0,"new revision requires the first tap again");
+  current = state({actions,revision:3,gameId:"another-life"});
+  undo.click();
+  assert.equal(calls.length,0,"click handler rechecks identity without sync");
+  undo.click();
+  assert.deepEqual(calls,["undo_year"]);
+  await tick();await tick();shell.unmount();
 });
 
 console.log(passed + " v2-shell DOM tests passed" +

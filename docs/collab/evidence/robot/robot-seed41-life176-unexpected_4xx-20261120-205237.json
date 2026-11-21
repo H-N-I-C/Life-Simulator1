@@ -1,0 +1,58 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 176,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Arnoldo at N\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aloise",
+    "last_name": "Boykin",
+    "gender": "female",
+    "country": "Brazil",
+    "seed": 1121031585,
+    "request_id": "robot-41-176-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_7500cad4e7",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r7610",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_7500cad4e7",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Arnoldo",
+    "employer_id": "N"
+   },
+   "request_id": "robot-41-r7611",
+   "expected_revision": 1
+  },
+  {
+   "n": 4,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Arnoldo at N\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 177 --seed 41 --from-life 176 --fail-fast"
+}

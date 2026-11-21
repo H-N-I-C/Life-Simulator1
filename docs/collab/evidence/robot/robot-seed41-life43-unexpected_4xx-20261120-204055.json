@@ -1,0 +1,67 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 43,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Anders at Armstrong\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Allissa",
+    "last_name": "Justice",
+    "gender": "female",
+    "country": "UK",
+    "seed": 1653924957,
+    "request_id": "robot-41-43-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 483519092,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "bald",
+     "facial_hair": "beard",
+     "headwear": "headscarf",
+     "badges": [
+      "glasses",
+      "flower"
+     ],
+     "background": "bg_03",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_2a80264b2b",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2364",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_2a80264b2b",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Anders",
+    "employer_id": "Armstrong"
+   },
+   "request_id": "robot-41-r2365",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Anders at Armstrong\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 44 --seed 41 --from-life 43 --fail-fast"
+}

@@ -1,0 +1,87 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 7,
+ "life_index": 50,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Ally",
+    "last_name": "Willis",
+    "gender": "female",
+    "country": "Nigeria",
+    "seed": 1171270779,
+    "request_id": "robot-7-50-create"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_385f5cb6ae",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1366",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_385f5cb6ae",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-7-r1367",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_385f5cb6ae",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_1",
+    "option_id": "d_1_bite"
+   },
+   "request_id": "robot-7-r1368",
+   "expected_revision": 3
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_385f5cb6ae",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-7-r1369",
+   "expected_revision": 4
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_385f5cb6ae",
+   "action": "careers_apply",
+   "payload": {
+    "opening": null
+   },
+   "request_id": "robot-7-r1370",
+   "expected_revision": 4
+  },
+  {
+   "n": 7,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"role_id must be a non-empty string\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 51 --seed 7 --from-life 50 --fail-fast"
+}

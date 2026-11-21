@@ -1,0 +1,290 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 37,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Amory at N\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Aeriell",
+    "last_name": "Powers",
+    "gender": "female",
+    "country": "Spain",
+    "seed": 777,
+    "request_id": "robot-41-37-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 821205238,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "bald",
+     "facial_hair": "none",
+     "headwear": "headscarf",
+     "badges": [
+      "cap"
+     ],
+     "background": "bg_07",
+     "look_override": "none"
+    },
+    "scenario": "graduating_18"
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2221",
+   "expected_revision": 32
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_14",
+    "option_id": "d_14_laugh"
+   },
+   "request_id": "robot-41-r2222",
+   "expected_revision": 33
+  },
+  {
+   "n": 3,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_15",
+    "option_id": "d_15_move_on"
+   },
+   "request_id": "robot-41-r2223",
+   "expected_revision": 34
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2224",
+   "expected_revision": 35
+  },
+  {
+   "n": 5,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_16",
+    "option_id": "d_16_reschedule"
+   },
+   "request_id": "robot-41-r2225",
+   "expected_revision": 36
+  },
+  {
+   "n": 6,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2226",
+   "expected_revision": 36
+  },
+  {
+   "n": 7,
+   "kind": "error",
+   "status": 409,
+   "body": "{\"error\": {\"code\": \"stale_revision\", \"message\": \"expected_revision 36 does not match current revision 37\"}}"
+  },
+  {
+   "n": 8,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "conversation",
+   "payload": {
+    "target_id": "2c455007-c688-45e7-8f68-aea9449678bb"
+   },
+   "request_id": "robot-41-r2227",
+   "expected_revision": 37
+  },
+  {
+   "n": 9,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "surrender",
+   "payload": {},
+   "request_id": "robot-41-r2228",
+   "expected_revision": 38
+  },
+  {
+   "n": 10,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_17",
+    "option_id": "continue"
+   },
+   "request_id": "robot-41-r2229",
+   "expected_revision": 39
+  },
+  {
+   "n": 11,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "gym",
+   "payload": {},
+   "request_id": "robot-41-r2230",
+   "expected_revision": 40
+  },
+  {
+   "n": 12,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "courtship_offer",
+   "payload": {
+    "target_id": "362f8d7e-14db-4999-83a6-d098383c2e88"
+   },
+   "request_id": "robot-41-r2231",
+   "expected_revision": 41
+  },
+  {
+   "n": 13,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_18",
+    "option_id": "d_0_ask"
+   },
+   "request_id": "robot-41-r2232",
+   "expected_revision": 42
+  },
+  {
+   "n": 14,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2233",
+   "expected_revision": 43
+  },
+  {
+   "n": 15,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "undo_year",
+   "payload": {},
+   "request_id": "robot-41-r2234",
+   "expected_revision": 44
+  },
+  {
+   "n": 16,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2235",
+   "expected_revision": 45
+  },
+  {
+   "n": 17,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_19",
+    "option_id": "d_19_walk"
+   },
+   "request_id": "robot-41-r2236",
+   "expected_revision": 46
+  },
+  {
+   "n": 18,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "find_partner",
+   "payload": {},
+   "request_id": "robot-41-r2237",
+   "expected_revision": 47
+  },
+  {
+   "n": 19,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_20",
+    "option_id": "decline"
+   },
+   "request_id": "robot-41-r2238",
+   "expected_revision": 48
+  },
+  {
+   "n": 20,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "listen_to_music",
+   "payload": {},
+   "request_id": "robot-41-r2239",
+   "expected_revision": 49
+  },
+  {
+   "n": 21,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2240",
+   "expected_revision": 50
+  },
+  {
+   "n": 22,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "resolve_decision",
+   "payload": {
+    "decision_id": "d_21",
+    "option_id": "d_21_give_chance"
+   },
+   "request_id": "robot-41-r2241",
+   "expected_revision": 51
+  },
+  {
+   "n": 23,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r2242",
+   "expected_revision": 52
+  },
+  {
+   "n": 24,
+   "kind": "command",
+   "game_id": "g_077df18569",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Amory",
+    "employer_id": "N"
+   },
+   "request_id": "robot-41-r2243",
+   "expected_revision": 53
+  },
+  {
+   "n": 25,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Amory at N\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 38 --seed 41 --from-life 37 --fail-fast"
+}

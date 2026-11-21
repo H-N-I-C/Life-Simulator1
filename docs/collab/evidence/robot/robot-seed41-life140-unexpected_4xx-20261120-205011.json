@@ -1,0 +1,79 @@
+{
+ "robot": "tools/robot_player.py",
+ "seed": 41,
+ "life_index": 140,
+ "failure": {
+  "kind": "unexpected_4xx",
+  "detail": "action 'careers_apply' -> HTTP 400: {\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Adger at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+ },
+ "state": null,
+ "command_log": [
+  {
+   "n": 0,
+   "kind": "create",
+   "body": {
+    "first_name": "Agnes",
+    "last_name": "Waters",
+    "gender": "female",
+    "country": "Spain",
+    "seed": 1077215801,
+    "request_id": "robot-41-140-create",
+    "appearance": {
+     "schema_version": 2,
+     "seed": 1141106098,
+     "base": "man",
+     "skin_tone": "medium-light",
+     "hair": "default",
+     "facial_hair": "none",
+     "headwear": "none",
+     "badges": [],
+     "background": "bg_05",
+     "look_override": "none"
+    }
+   }
+  },
+  {
+   "n": 1,
+   "kind": "command",
+   "game_id": "g_6543d68310",
+   "action": "age_up",
+   "payload": {},
+   "request_id": "robot-41-r6476",
+   "expected_revision": 1
+  },
+  {
+   "n": 2,
+   "kind": "command",
+   "game_id": "g_6543d68310",
+   "action": "dating_app",
+   "payload": {},
+   "request_id": "robot-41-r6477",
+   "expected_revision": 2
+  },
+  {
+   "n": 3,
+   "kind": "error",
+   "status": 404,
+   "body": "{\"error\": {\"code\": \"not_found\", \"message\": \"no eligible adults around right now\"}}"
+  },
+  {
+   "n": 4,
+   "kind": "command",
+   "game_id": "g_6543d68310",
+   "action": "careers_apply",
+   "payload": {
+    "role_id": "Adger",
+    "employer_id": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+   },
+   "request_id": "robot-41-r6478",
+   "expected_revision": 2
+  },
+  {
+   "n": 5,
+   "kind": "error",
+   "status": 400,
+   "body": "{\"error\": {\"code\": \"invalid_input\", \"message\": \"unknown opening: Adger at NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\"}}"
+  }
+ ],
+ "reproduce": "python tools/robot_player.py --lives 141 --seed 41 --from-life 140 --fail-fast"
+}

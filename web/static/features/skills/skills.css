@@ -1,0 +1,187 @@
+/* v2 Skills module styles (Kimi C, M3). Scoped .v2sk-*. Consumes the
+ * frozen §Tokens (theme.css loads after module stylesheets); fallback
+ * defaults keep a bare test host working. No !important on tokens.
+ */
+
+.v2sk-scope {
+  --v2-accent: #2a63e6;
+  --v2-ink: #16203a;
+  --v2-ink-soft: #2b3550;
+  --v2-muted: #6b7690;
+  --v2-card: #ffffff;
+  --v2-page: #eef2f9;
+  --v2-track: #e7ebf3;
+  --v2-bar-good: #15803d;
+  --v2-radius: 16px;
+  --v2-shadow: 0 4px 16px rgba(22, 32, 58, .10);
+  --v2-font: "Nunito", "Segoe UI", system-ui, sans-serif;
+}
+
+.v2sk-card {
+  box-sizing: border-box;
+  background: var(--v2-card);
+  color: var(--v2-ink);
+  font-family: var(--v2-font);
+  border-radius: var(--v2-radius);
+  box-shadow: var(--v2-shadow);
+  padding: 14px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.v2sk-title {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--v2-ink);
+}
+
+.v2sk-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 360px) {
+  .v2sk-grid { grid-template-columns: 1fr; }
+}
+
+.v2sk-skill {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border-radius: calc(var(--v2-radius) - 6px);
+  background: var(--v2-page);
+}
+
+.v2sk-skill-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.v2sk-skill-name {
+  font-size: .85rem;
+  font-weight: 800;
+  color: var(--v2-ink-soft);
+}
+
+.v2sk-skill-value {
+  font-size: .82rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: var(--v2-ink);
+}
+
+.v2sk-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--v2-track);
+  overflow: hidden;
+}
+
+.v2sk-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--v2-bar-good);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .v2sk-bar-fill {
+    transition: width .25s ease-out;
+  }
+}
+
+.v2sk-skill-desc {
+  margin: 0;
+  font-size: .72rem;
+  color: var(--v2-muted);
+}
+
+.v2sk-training {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.v2sk-train {
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 2px solid var(--v2-accent);
+  border-radius: calc(var(--v2-radius) - 4px);
+  background: var(--v2-card);
+  color: var(--v2-accent);
+  font-weight: 800;
+  font-size: .92rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.v2sk-train:active { transform: scale(.98); }
+
+.v2sk-train[disabled] {
+  border-color: var(--v2-muted);
+  color: var(--v2-muted);
+  cursor: not-allowed;
+}
+
+.v2sk-cost,
+.v2sk-limits {
+  font-size: .76rem;
+  font-weight: 600;
+  color: var(--v2-muted);
+}
+
+.v2sk-reason {
+  font-size: .76rem;
+  font-weight: 600;
+  color: var(--v2-muted);
+}
+
+.v2sk-busy { opacity: .7; }
+
+.v2sk-empty {
+  margin: 0;
+  font-family: var(--v2-font);
+  color: var(--v2-muted);
+}
+
+.v2sk-scope :focus-visible {
+  outline: 3px solid var(--v2-focus, #2f6fed);
+  outline-offset: 2px;
+}
+
+.v2sk-chooser {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 4px 0 8px;
+}
+
+.v2sk-chooser-prompt {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--v2-muted);
+}
+
+.v2sk-choice {
+  border: 1px solid var(--v2-border, #c8c4dc);
+  border-radius: 999px;
+  background: transparent;
+  padding: 4px 12px;
+  font: inherit;
+  font-size: .82rem;
+  cursor: pointer;
+}
+
+.v2sk-choice:hover {
+  background: var(--v2-hover, rgba(47, 111, 237, .08));
+}
